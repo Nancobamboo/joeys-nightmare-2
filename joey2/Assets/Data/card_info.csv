@@ -1,6 +1,6 @@
 name,id,type,desc,attack,hp,heal,price
-item1,1,item,item1,3,0,0,2
-item2,2,item,item2,2,0,0,1
-item3,3,item,item3,0,0,1,1
-enemy1,4,enemy,enemy1,3,3,0,0
-enemy2,5,enemy,enemy2,2,2,0,0
+item1,item1,item,item1,3,0,0,2
+item2,item2,item,item2,2,0,0,1
+item3,item3,item,item3,0,0,1,1
+enemy1,enemy1,enemy,enemy1,3,3,0,0
+enemy2,enemy2,enemy,enemy2,2,2,0,0

@@ -8,10 +8,6 @@ public class Store : MonoBehaviour
     public List<Card> cardList = new List<Card>();
 
 
-
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +19,6 @@ public class Store : MonoBehaviour
     {
         
     }
-
 
     public void LoadCards()
     {
@@ -51,7 +46,7 @@ public class Store : MonoBehaviour
             else if (values[2] == "enemy"){
                 //create an enemy card
                 string name = values[0];
-                int id = int.Parse(values[1]);
+                string id = values[1];
                 string type = values[2];
                 string desc = values[3];
                 int attack = int.Parse(values[4]);
@@ -63,12 +58,12 @@ public class Store : MonoBehaviour
             else if (values[2] == "item"){
                 //create an item card
                 string name = values[0];
-                int id = int.Parse(values[1]);
+                string id = values[1];
                 string type = values[2];
                 string desc = values[3];
                 int attack = int.Parse(values[4]);
-                int heal = int.Parse(values[5]);
-                int price = int.Parse(values[6]);
+                int heal = int.Parse(values[6]);
+                int price = int.Parse(values[7]);
                 ItemCard itemCard = new ItemCard(id, name, desc, attack, heal, price);
                 cardList.Add(itemCard);
                 Debug.Log("Item card loaded: " + name);

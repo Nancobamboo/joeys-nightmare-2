@@ -316,8 +316,8 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!4 &816935068 stripped
-Transform:
+--- !u!224 &816935068 stripped
+RectTransform:
   m_CorrespondingSourceObject: {fileID: 2791776899690475034, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
   m_PrefabInstance: {fileID: 5590194830407597966}
   m_PrefabAsset: {fileID: 0}
@@ -400,6 +400,14 @@ PrefabInstance:
     - target: {fileID: 2573737337076971280, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
       propertyPath: m_Name
       value: card
+      objectReference: {fileID: 0}
+    - target: {fileID: 2791776899690475034, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 289
+      objectReference: {fileID: 0}
+    - target: {fileID: 2791776899690475034, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 410
       objectReference: {fileID: 0}
     - target: {fileID: 2791776899690475034, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
       propertyPath: m_LocalPosition.x

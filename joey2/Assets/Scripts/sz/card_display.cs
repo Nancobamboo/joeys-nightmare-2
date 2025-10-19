@@ -32,6 +32,7 @@ public class CardDisplay : MonoBehaviour
     public void ShowCard()
     {
         nameText.text = card.name;
+        descriptionText.text = card.desc;
         if (card is EnemyCard)
         {
             var enemy = card as EnemyCard;
