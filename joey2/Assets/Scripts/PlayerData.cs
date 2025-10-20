@@ -9,6 +9,11 @@ public class PlayerData : MonoBehaviour
     // 用户金币卡牌数据的字典。其中key为数据类型（如"coins"或卡牌id），value为对应的数据值
     public Dictionary<string, int> playerDataDict = new Dictionary<string, int>();
     
+
+    void Awake()
+    {
+        LoadPlayerData();
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -24,30 +29,38 @@ public class PlayerData : MonoBehaviour
 
     public void LoadPlayerData()
     {
-        string[] data = playerDataFile.text.Split('\n');
-        foreach (var line in data)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                continue;
-            }
-            string[] values = line.Split(',');
-            if (values.Length < 2)
-            {
-                Debug.LogWarning("跳过不完整的行: " + line);
-                continue;
-            }
-            if (values[0] == "id" || values[0] == "num")
-            {
-                continue;
-            }
-            else 
-            {
-                playerDataDict[values[0]] = int.Parse(values[1]);
-            }
-        }
-        Debug.Log("Player data loaded: " + playerDataDict.Count);
+        playerDataDict.Clear();
 
+        string dataPath = Application.dataPath + "/Data/player_data.csv";
+        string[] lines = null;
+
+        if (File.Exists(dataPath))
+        {
+            lines = File.ReadAllLines(dataPath);
+        }
+        else if (playerDataFile != null)
+        {
+            lines = playerDataFile.text.Split('\n');
+        }
+        else
+        {
+            lines = new string[0];
+        }
+
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+            var values = line.Split(',');
+            if (values.Length < 2) continue;
+            if (values[0] == "id") continue;
+
+            playerDataDict[values[0].Trim()] = int.Parse(values[1].Trim());
+        }
+
+        if (!playerDataDict.ContainsKey("coin"))
+        {
+            playerDataDict["coin"] = 0;
+        }
     }
 
     public void SavePlayerData()

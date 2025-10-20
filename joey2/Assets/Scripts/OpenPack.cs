@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class open_pack : MonoBehaviour
+public class OpenPack : MonoBehaviour
 {
 
 
     public GameObject cardPrefab;
     public GameObject pool;
-    Store store;
+    public Store store;
     List<GameObject> cardList = new List<GameObject>();
     public PlayerData playerData;
 
@@ -16,7 +16,7 @@ public class open_pack : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        store = GetComponent<Store>();
+
     }
 
     // Update is called once per frame
@@ -25,38 +25,37 @@ public class open_pack : MonoBehaviour
         
     }
 
-    public void handleCoin()
-    {
-        if (playerData.playerDataDict.TryGetValue("coin", out var coins))
-        {
-            if (coins >= 10)
-            {
-                playerData.playerDataDict["coin"] -= 10;
-            }
-            else
-            {
-                Debug.Log("金币不足");
-                return;
-            }
-        }
-        else
-        {
-            Debug.Log("没有金币数据");
-            return;
-        }
-    }
 
     public void OnClickOpen()
     {
         ClearPool();
-        handleCoin();
+        playerData.LoadPlayerData();
+        if (playerData.playerDataDict["coin"] >= 10 )
+        {
+            playerData.playerDataDict["coin"] -= 10;
+        }
+        else
+        {
+            Debug.Log("金币不足");
+            return;
+        }
         for (int i = 0; i < 5; i++)
         {
             GameObject newCard = GameObject.Instantiate(cardPrefab, pool.transform);
-            newCard.GetComponent<CardDisplay>().card = store.RandomCard();
-            newCard.GetComponent<CardDisplay>().ShowCard();
+            var cd = newCard.GetComponent<CardDisplay>();
+            var c = store.RandomCard();
+            if (c == null)
+            {
+                Debug.LogWarning("随机到空卡，检查 Store.cardData 是否已绑定并成功加载");
+                Destroy(newCard);
+                continue;
+            }
+            cd.card = c;
+            cd.ShowCard();
             cardList.Add(newCard);
         }
+        Debug.Log("当前 cardList 数量: " + cardList.Count);
+        Debug.Log("当前玩家金币数: " + (playerData.playerDataDict.ContainsKey("coin") ? playerData.playerDataDict["coin"] : 0));
         SavePlayerData();
         playerData.SavePlayerData();
     }

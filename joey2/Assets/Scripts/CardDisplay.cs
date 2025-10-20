@@ -19,7 +19,10 @@ public class CardDisplay : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ShowCard();
+        if (card != null)
+        {
+            ShowCard();
+        }
     }
 
     // Update is called once per frame
@@ -31,6 +34,11 @@ public class CardDisplay : MonoBehaviour
 
     public void ShowCard()
     {
+        if (card == null)
+        {
+            Debug.LogWarning("CardDisplay.ShowCard 被调用时 card 为空");
+            return;
+        }
         nameText.text = card.name;
         descriptionText.text = card.desc;
         if (card is EnemyCard)
