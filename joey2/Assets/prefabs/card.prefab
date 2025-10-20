@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7140621741436954528}
   - component: {fileID: 4255088001812288762}
   m_Layer: 0
-  m_Name: card
+  m_Name: Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51,7 +51,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2573737337076971280}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 208b260ecf9cf2f4bac0cbd0585a8787, type: 3}
+  m_Script: {fileID: 11500000, guid: 99136bbc2e1903a4693836b9c0074f33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   nameText: {fileID: 4823575757497387706}

@@ -3,7 +3,6 @@
 /android/
 *.tmp
 /.history/
-*.json
 /addons/godot-git-plugin/win64/*
 /addons/godot-git-plugin/macos/*
 /addons/godot-git-plugin/linux/*
@@ -64,5 +63,3 @@ Temp/
 *.mdb
 *.opendb
 *.VC.db
-*.meta
-*.asset
