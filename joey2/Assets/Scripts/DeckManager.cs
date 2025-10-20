@@ -32,6 +32,7 @@ public class DeckManager : MonoBehaviour
             if (item.Value > 0 && item.Key != "coin")
             {
                 GameObject newCard = GameObject.Instantiate(cardPrefab, libraryPanel);
+                
             }
         }
         
