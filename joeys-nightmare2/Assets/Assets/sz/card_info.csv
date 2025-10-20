@@ -1,5 +1,0 @@
-﻿card_name,card_id,card_type,base_desc,base_attack,base_heal,base_def,base_price
-iron,1,item,iron,2,0,0,2
-ice,2,item,ice,1,0,0,1
-stone,3,item,stone,1,0,0,1
-shoe,4,equip,shoe,0,0,1,0
