@@ -6,6 +6,7 @@ public class Store : MonoBehaviour
 {
     public TextAsset cardData;
     public Dictionary<string, Card> cardDict = new Dictionary<string, Card>();
+    public Dictionary<string, Card> cardNum = new Dictionary<string, int>();
 
     void Awake()
     {
@@ -94,6 +95,29 @@ public class Store : MonoBehaviour
         }
     }
 
+    public Card CreateInstance(string id)
+    {
+        EnsureLoaded();
+        if (!cardDict.ContainsKey(id)) return null;
+        var t = cardDict[id];
+
+        Card inst = null;
+        if (t is EnemyCard e)
+        {
+            inst = new EnemyCard(e.id, e.name, e.desc, e.attack, e.hp);
+        }
+        else if (t is ItemCard i)
+        {
+            inst = new ItemCard(i.id, i.name, i.desc, i.attack, i.heal, i.price);
+        }
+
+        if (inst != null)
+        {
+            inst.instanceId = Guid.NewGuid().ToString("N"); // 首次创建时固定
+        }
+        return inst;
+    }
+
     public Card RandomCard()
     {
         if (cardDict.Count == 0)
@@ -110,5 +134,9 @@ public class Store : MonoBehaviour
         Card randomCard = values[randomIndex];
         return randomCard;
     }
+
+
+
+
 
 }
