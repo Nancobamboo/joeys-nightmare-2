@@ -41,7 +41,7 @@ public class ItemData : MonoBehaviour
         {
             lines = libraryItemFile.text.Split('\n');
         }
-        libraryItemDict = ProcessData(lines);
+        libraryItemDict = ProcessDataLoad(lines);
     }
 
     public void LoadDeckData()
@@ -58,10 +58,10 @@ public class ItemData : MonoBehaviour
         {
             lines = deckItemFile.text.Split('\n');
         }
-        deckItemDict = ProcessData(lines);
+        deckItemDict = ProcessDataLoad(lines);
     }
 
-    public Dictionary<string, int> ProcessData(string[] lines)
+    public Dictionary<string, int> ProcessDataLoad(string[] lines)
     {
         Dictionary<string, int> dataDict = new Dictionary<string, int>();
         foreach (var line in lines)
@@ -98,23 +98,38 @@ public class ItemData : MonoBehaviour
         }
     }
 
-    public void SaveData(string filePath, Dictionary<string, int> dataDict)
+
+    public List<string> ProcessDataSave(Dictionary<string, int> dataDict)
     {
-        string dataPath = Application.dataPath + filePath;
         List<string> data = new List<string>();
         data.Add("id,num");
         foreach (var item in dataDict)
         {
             data.Add(item.Key + "," + item.Value.ToString());
         }
+        return data;
+    }
+
+    public void SaveLibraryData()
+    {
+        string dataPath = Application.dataPath + "/Data/library_data.csv";
+        List<string> data = ProcessDataSave(libraryItemDict);
+        File.WriteAllLines(dataPath, data);
+    }
+
+
+    public void SaveDeckData()
+    {
+        string dataPath = Application.dataPath + "/Data/deck_data.csv";
+        List<string> data = ProcessDataSave(deckItemDict);
         File.WriteAllLines(dataPath, data);
     }
 
 
     public void SaveData()
     {
-        SaveData("Data/library_data.csv", libraryItemDict);
-        SaveData("Data/deck_data.csv", deckItemDict);
+        SaveLibraryData();
+        SaveDeckData();
     }
 
 

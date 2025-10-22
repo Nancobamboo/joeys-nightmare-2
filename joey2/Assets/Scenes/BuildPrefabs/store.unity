@@ -155,7 +155,7 @@ MonoBehaviour:
   cardPrefab: {fileID: 2573737337076971280, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
   pool: {fileID: 393474425}
   store: {fileID: 3743165210441784184, guid: 83ae6b43f1b384642a5c74c596c0db6f, type: 3}
-  itemData: {fileID: 0}
+  itemData: {fileID: 2145290093}
 --- !u!4 &33167313
 Transform:
   m_ObjectHideFlags: 0
@@ -708,6 +708,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2145290093 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3818001544708155587, guid: 5cbe60e591e866d439e94387de913086, type: 3}
+  m_PrefabInstance: {fileID: 2113325409661256929}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d921b9e92e02b074aaa5333fb099b5ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2113325409661256929
 PrefabInstance:
   m_ObjectHideFlags: 0
