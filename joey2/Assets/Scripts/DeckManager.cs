@@ -9,13 +9,13 @@ public class DeckManager : MonoBehaviour
     public Transform libraryPanel;
     public GameObject cardPrefab;
     public GameObject deckPrefab;
-    private PlayerData playerData;
+    private ItemData itemData;
     private Store store;
 
     // Start is called before the first frame update
     void Start()
     {
-        playerData = GetComponent<PlayerData>();
+        itemData = GetComponent<ItemData>();
         store = GetComponent<Store>();
         UpdateLibrary();
         UpdateDeck();
@@ -44,35 +44,31 @@ public class DeckManager : MonoBehaviour
 				return;
 			}
         }
-        if (playerData == null)
+        if (itemData == null)
         {
-			playerData = GetComponent<PlayerData>();
-			if (playerData == null)
+			itemData = GetComponent<ItemData>();
+			if (itemData == null)
 			{
-				playerData = FindObjectOfType<PlayerData>();
+				itemData = FindObjectOfType<ItemData>();
 			}
-			if (playerData == null)
+			if (itemData == null)
 			{
-				Debug.LogError("DeckManager: 找不到 PlayerData 组件，请在场景中添加一个 PlayerData。");
+				Debug.LogError("DeckManager: 找不到 ItemData 组件，请在场景中添加一个 ItemData。");
 				return;
 			}
         }
-        if (store.cardDict == null || store.cardDict.Count == 0)
-        {
-            store.LoadCards();
-        }
-        if (playerData.playerDataDict == null || playerData.playerDataDict.Count == 0)
-        {
-            playerData.LoadPlayerData();
-        }
+
+        store.EnsureLoaded();
+        itemData.EnsureLoaded();
+
     }
 
     public void UpdateLibrary()
     {
         EnsureLoaded();
-        foreach (var item in playerData.playerDataDict)
+        foreach (var item in itemData.libraryItemDict)
         {
-            if (item.Value > 0 && item.Key != "coin")
+            if (item.Value > 0)
             {
                 GameObject newCard = GameObject.Instantiate(cardPrefab, libraryPanel);
                 newCard.GetComponent<CardDisplay>().card = store.cardDict[item.Key];
@@ -85,9 +81,9 @@ public class DeckManager : MonoBehaviour
     public void UpdateDeck()
     {
         EnsureLoaded();
-        foreach (var item in playerData.playerDataDict)
+        foreach (var item in itemData.deckItemDict)
         {
-            if (item.Value > 0 && item.Key != "coin")
+            if (item.Value > 0)
             {
                 GameObject newCard = GameObject.Instantiate(deckPrefab, deckPanel);
                 newCard.GetComponent<CardDisplay>().card = store.cardDict[item.Key];

@@ -10,7 +10,7 @@ public class OpenPack : MonoBehaviour
     public GameObject pool;
     public Store store;
     List<GameObject> cardList = new List<GameObject>();
-    public PlayerData playerData;
+    public ItemData itemData;
 
 
     // Start is called before the first frame update
@@ -29,16 +29,16 @@ public class OpenPack : MonoBehaviour
     public void OnClickOpen()
     {
         ClearPool();
-        playerData.LoadPlayerData();
-        if (playerData.playerDataDict["coin"] >= 10 )
-        {
-            playerData.playerDataDict["coin"] -= 10;
-        }
-        else
-        {
-            Debug.Log("金币不足");
-            return;
-        }
+        itemData.EnsureLoaded();
+        // if (playerData.playerDataDict["coin"] >= 10 )
+        // {
+        //     playerData.playerDataDict["coin"] -= 10;
+        // }
+        // else
+        // {
+        //     Debug.Log("金币不足");
+        //     return;
+        // }
         for (int i = 0; i < 5; i++)
         {
             GameObject newCard = GameObject.Instantiate(cardPrefab, pool.transform);
@@ -55,9 +55,9 @@ public class OpenPack : MonoBehaviour
             cardList.Add(newCard);
         }
         Debug.Log("当前 cardList 数量: " + cardList.Count);
-        Debug.Log("当前玩家金币数: " + (playerData.playerDataDict.ContainsKey("coin") ? playerData.playerDataDict["coin"] : 0));
-        SavePlayerData();
-        playerData.SavePlayerData();
+        // Debug.Log("当前玩家金币数: " + (playerData.playerDataDict.ContainsKey("coin") ? playerData.playerDataDict["coin"] : 0));
+        SaveLibraryData();
+        itemData.SaveData();
     }
 
     public void ClearPool()
@@ -69,18 +69,18 @@ public class OpenPack : MonoBehaviour
         cardList.Clear();
     }
 
-    public void SavePlayerData()
+    public void SaveLibraryData()
     {
         foreach (var card in cardList)
         {
             string id = card.GetComponent<CardDisplay>().card.id;
-            if (playerData.playerDataDict.TryGetValue(id, out var count))
+            if (itemData.libraryItemDict.TryGetValue(id, out var count))
             {
-                playerData.playerDataDict[id] = count + 1;
+                itemData.libraryItemDict[id] = count + 1;
             }
             else
             {
-                playerData.playerDataDict[id] = 1;
+                itemData.libraryItemDict[id] = 1;
             }        
         }
     }

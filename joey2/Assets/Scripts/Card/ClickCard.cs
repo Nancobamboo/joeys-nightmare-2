@@ -11,11 +11,12 @@ public enum CardState
 
 public class ClickCard : MonoBehaviour, IPointerDownHandler
 {
-    private PlayerData playerData;
+    private ItemData itemData;
+    public CardState state = CardState.Library;
     // Start is called before the first frame update
     void Start()
     {
-        playerData = GameObject.Find("PlayerData").GetComponent<PlayerData>();
+        itemData = GameObject.Find("ItemData").GetComponent<ItemData>();
     }
 
     // Update is called once per frame
