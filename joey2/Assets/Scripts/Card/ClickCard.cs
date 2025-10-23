@@ -11,8 +11,10 @@ public enum CardState
 
 public class ClickCard : MonoBehaviour, IPointerDownHandler
 {
-    private ItemData itemData;
+    
     public CardState state = CardState.Library;
+    private ItemData itemData;
+    private DeckManager deckManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,7 +37,7 @@ public class ClickCard : MonoBehaviour, IPointerDownHandler
         string id = this.GetComponent<CardDisplay>().card.id;
         if (state == CardState.Library || state == CardState.Deck)
         {
-            DeckManager.UpdateCard(state, id,this.gameObject);
+            deckManager.UpdateCard(state, id,this.gameObject);
         }
         else if (state == CardState.Enemy)
         {

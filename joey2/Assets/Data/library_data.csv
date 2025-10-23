@@ -4,7 +4,7 @@ enemy2,atk
 item2,def
 enemy1,def
 item1,item
-as1,atk_skill
-as2,atk_skill
-ds1,def_skill
-ds1,def_skill
+as1,skill
+as2,skill
+ds1,skill
+ds1,skill

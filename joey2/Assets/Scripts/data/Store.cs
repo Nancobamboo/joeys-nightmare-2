@@ -74,7 +74,7 @@ public class Store : MonoBehaviour
                 string desc = values[3].Trim();
                 int attack = int.Parse(values[4].Trim());
                 int hp = int.Parse(values[5].Trim());
-                EnemyCard enemyCard = new EnemyCard(id, name, desc, attack, hp);
+                EnemyCard enemyCard = new EnemyCard(id, name, desc, type, attack, hp);
                 cardDict[id] = enemyCard;
             }
             else {
@@ -86,7 +86,7 @@ public class Store : MonoBehaviour
                 int attack = int.Parse(values[4].Trim());
                 int heal = int.Parse(values[6].Trim());
                 int price = int.Parse(values[7].Trim());
-                ItemCard itemCard = new ItemCard(id, name, desc, attack, heal, price);
+                ItemCard itemCard = new ItemCard(id, name, desc, type, attack, heal, price);
                 cardDict[id] = itemCard;
 
             }
