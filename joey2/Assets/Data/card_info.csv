@@ -1,7 +1,11 @@
 id,name,type,desc,attack,hp,heal,price
 item1,item1,atk,item1,3,0,0,2
 item2,item2,def,item2,2,0,0,1
-item3,item3,atk_skill,item3,0,0,1,1
-enemy1,enemy1,def_skill,enemy1,3,3,0,0
+item3,item3,atk,item3,0,0,1,1
+enemy1,enemy1,atk,enemy1,3,3,0,0
 enemy2,enemy2,item,enemy2,2,2,0,0
 enemy3,enemy2,enemy,enemy2,2,2,0,0
+as1,as1,skill,as1,2,2,0,0
+as2,as2,skill,as2,2,2,0,0
+ds1,ds1,skill,ds1,2,2,0,0
+ds1,ds1,skill,ds1,2,2,0,0

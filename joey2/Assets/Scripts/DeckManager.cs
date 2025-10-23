@@ -77,9 +77,7 @@ public class DeckManager : MonoBehaviour
                 if (string.IsNullOrEmpty(id)) continue;
                 if (!store.cardDict.ContainsKey(id)) continue;
 
-                GameObject newCard = GameObject.Instantiate(cardPrefab, libraryPanel);
-                newCard.GetComponent<CardDisplay>().card = store.cardDict[id];
-                newCard.GetComponent<CardDisplay>().ShowCard();
+                CreateCard(id, CardState.Library);
             }
         }
         
@@ -99,9 +97,7 @@ public class DeckManager : MonoBehaviour
                 if (string.IsNullOrEmpty(id)) continue;
                 if (!store.cardDict.ContainsKey(id)) continue;
 
-                GameObject newCard = GameObject.Instantiate(deckPrefab, deckPanel);
-                newCard.GetComponent<CardDisplay>().card = store.cardDict[id];
-                newCard.GetComponent<CardDisplay>().ShowCard();
+                CreateCard(id, CardState.Deck);
             }
         }
     }
@@ -120,48 +116,47 @@ public class DeckManager : MonoBehaviour
 
         if (_state == CardState.Library){
             // 从 library 移除一张
-            if (itemData.libraryItemDict.TryGetValue(type, out var libraryList))
-            {
-                libraryList.Remove(_id); // 只移除一个匹配项
-            }
-            
-            // 添加到 deck
-            if (!itemData.deckItemDict.TryGetValue(type, out var deckList))
-            {
-                deckList = new List<string>();
-                itemData.deckItemDict[type] = deckList;
-            }
-            deckList.Add(_id);
-            // 同步 UI 与状态
-            if (cardGO != null)
-            {
-                cardGO.transform.SetParent(deckPanel, false);
-                var cc = cardGO.GetComponent<ClickCard>();
-                if (cc != null) cc.state = CardState.Deck;
-            }
+
+            itemData.libraryItemDict[type].Remove(_id);
+            // itemData.deckItemDict[type].Insert(0, _id);
+            itemData.deckItemDict[type].Add(_id);
+            CreateCard(_id, CardState.Deck);
+            if (cardGO != null) Destroy(cardGO);
         }
         else if (_state == CardState.Deck){
             // 从 deck 移除一张
-            if (itemData.deckItemDict.TryGetValue(type, out var deckList))
-            {
-                deckList.Remove(_id); // 只移除一个匹配项
-            }
+            itemData.deckItemDict[type].Remove(_id);
+            itemData.libraryItemDict[type].Add(_id);
+            CreateCard(_id, CardState.Library);
+            if (cardGO != null) Destroy(cardGO);
 
-            // 添加回 library
-            if (!itemData.libraryItemDict.TryGetValue(type, out var libraryList))
-            {
-                libraryList = new List<string>();
-                itemData.libraryItemDict[type] = libraryList;
-            }
-            libraryList.Add(_id);
-
-            // 同步 UI 与状态
-            if (cardGO != null)
-            {
-                cardGO.transform.SetParent(libraryPanel, false);
-                var cc = cardGO.GetComponent<ClickCard>();
-                if (cc != null) cc.state = CardState.Library;
-            }
         }
+        itemData.SaveData();
+    }
+
+
+    public void CreateCard(string _id, CardState _state)
+    {
+        Transform targetPanel =null;
+        GameObject targetPrefab=null;
+
+        if (_state == CardState.Library)
+        {
+            targetPanel = libraryPanel;
+            targetPrefab = cardPrefab;
+        }
+        else if (_state == CardState.Deck)
+        {
+            targetPanel = deckPanel;
+            targetPrefab = deckPrefab;
+        }
+
+        GameObject newCard = GameObject.Instantiate(targetPrefab, targetPanel);
+        newCard.transform.SetAsFirstSibling();
+        newCard.GetComponent<CardDisplay>().card = store.cardDict[_id];
+        newCard.GetComponent<CardDisplay>().ShowCard();
+        var click = newCard.GetComponent<ClickCard>();
+        if (click != null) click.state = _state;
+
     }
 }
