@@ -10,8 +10,9 @@ public class ItemData : MonoBehaviour
     public TextAsset libraryItemFile;
     public TextAsset deckItemFile;
 
-    public Dictionary<string, int> libraryItemDict = new Dictionary<string, int>();
-    public Dictionary<string, int> deckItemDict = new Dictionary<string, int>();
+	public Dictionary<string, List<string>> libraryItemDict = new Dictionary<string, List<string>>();
+	public Dictionary<string, List<string>> deckItemDict = new Dictionary<string, List<string>>();
+
 
 
 
@@ -61,19 +62,26 @@ public class ItemData : MonoBehaviour
         deckItemDict = ProcessDataLoad(lines);
     }
 
-    public Dictionary<string, int> ProcessDataLoad(string[] lines)
+    public Dictionary<string, List<string>> ProcessDataLoad(string[] lines)
     {
-        Dictionary<string, int> dataDict = new Dictionary<string, int>();
-        foreach (var line in lines)
-        {
-            if (string.IsNullOrWhiteSpace(line)) continue;
-            var values = line.Split(',');
-            if (values.Length < 2) continue;
-            if (values[0] == "id") continue;
-            dataDict[values[0].Trim()] = int.Parse(values[1].Trim());
-        }
+		Dictionary<string, List<string>> dataDict = new Dictionary<string, List<string>>();
+		foreach (var line in lines)
+		{
+			if (string.IsNullOrWhiteSpace(line)) continue;
+			var values = line.Split(',');
+			if (values.Length < 2) continue;
+			var id = values[0].Trim();
+			var type = values[1].Trim();
+			if (id == "id") continue; // 跳过表头
+			if (!dataDict.TryGetValue(type, out var list))
+			{
+				list = new List<string>();
+				dataDict[type] = list;
+			}
+			list.Add(id);
+		}
 
-        return dataDict;
+		return dataDict;
     }
 
 
@@ -99,15 +107,23 @@ public class ItemData : MonoBehaviour
     }
 
 
-    public List<string> ProcessDataSave(Dictionary<string, int> dataDict)
+    public List<string> ProcessDataSave(Dictionary<string, List<string>> dataDict)
     {
-        List<string> data = new List<string>();
-        data.Add("id,num");
-        foreach (var item in dataDict)
-        {
-            data.Add(item.Key + "," + item.Value.ToString());
-        }
-        return data;
+		List<string> data = new List<string>();
+		data.Add("id,type");
+		foreach (var kv in dataDict)
+		{
+			var type = kv.Key;
+			var ids = kv.Value;
+			if (ids == null) continue;
+			for (int i = 0; i < ids.Count; i++)
+			{
+				var id = ids[i];
+				if (string.IsNullOrEmpty(id)) continue;
+				data.Add(id + "," + type);
+			}
+		}
+		return data;
     }
 
     public void SaveLibraryData()

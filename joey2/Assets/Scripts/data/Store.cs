@@ -77,7 +77,7 @@ public class Store : MonoBehaviour
                 EnemyCard enemyCard = new EnemyCard(id, name, desc, attack, hp);
                 cardDict[id] = enemyCard;
             }
-            else if (values[2] == "item"){
+            else {
                 //create an item card
                 string id = values[0].Trim();
                 string name = values[1].Trim();

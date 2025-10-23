@@ -66,12 +66,19 @@ public class DeckManager : MonoBehaviour
     public void UpdateLibrary()
     {
         EnsureLoaded();
-        foreach (var item in itemData.libraryItemDict)
+        foreach (var kv in itemData.libraryItemDict)
         {
-            if (item.Value > 0)
+            var ids = kv.Value;
+            if (ids == null || ids.Count == 0) continue;
+
+            for (int i = 0; i < ids.Count; i++)
             {
+                var id = ids[i];
+                if (string.IsNullOrEmpty(id)) continue;
+                if (!store.cardDict.ContainsKey(id)) continue;
+
                 GameObject newCard = GameObject.Instantiate(cardPrefab, libraryPanel);
-                newCard.GetComponent<CardDisplay>().card = store.cardDict[item.Key];
+                newCard.GetComponent<CardDisplay>().card = store.cardDict[id];
                 newCard.GetComponent<CardDisplay>().ShowCard();
             }
         }
@@ -81,16 +88,80 @@ public class DeckManager : MonoBehaviour
     public void UpdateDeck()
     {
         EnsureLoaded();
-        foreach (var item in itemData.deckItemDict)
+        foreach (var kv in itemData.deckItemDict)
         {
-            if (item.Value > 0)
+            var ids = kv.Value;
+            if (ids == null || ids.Count == 0) continue;
+
+            for (int i = 0; i < ids.Count; i++)
             {
+                var id = ids[i];
+                if (string.IsNullOrEmpty(id)) continue;
+                if (!store.cardDict.ContainsKey(id)) continue;
+
                 GameObject newCard = GameObject.Instantiate(deckPrefab, deckPanel);
-                newCard.GetComponent<CardDisplay>().card = store.cardDict[item.Key];
+                newCard.GetComponent<CardDisplay>().card = store.cardDict[id];
                 newCard.GetComponent<CardDisplay>().ShowCard();
             }
         }
     }
 
 
+    public void UpdateCard(CardState _state, string _id, GameObject cardGO)
+    {
+        EnsureLoaded();
+
+        if (!store.cardDict.ContainsKey(_id))
+        {
+            Debug.LogWarning("未知卡牌 id: " + _id);
+            return;
+        }
+        string type = store.cardDict[_id].type;
+
+        if (_state == CardState.Library){
+            // 从 library 移除一张
+            if (itemData.libraryItemDict.TryGetValue(type, out var libraryList))
+            {
+                libraryList.Remove(_id); // 只移除一个匹配项
+            }
+            
+            // 添加到 deck
+            if (!itemData.deckItemDict.TryGetValue(type, out var deckList))
+            {
+                deckList = new List<string>();
+                itemData.deckItemDict[type] = deckList;
+            }
+            deckList.Add(_id);
+            // 同步 UI 与状态
+            if (cardGO != null)
+            {
+                cardGO.transform.SetParent(deckPanel, false);
+                var cc = cardGO.GetComponent<ClickCard>();
+                if (cc != null) cc.state = CardState.Deck;
+            }
+        }
+        else if (_state == CardState.Deck){
+            // 从 deck 移除一张
+            if (itemData.deckItemDict.TryGetValue(type, out var deckList))
+            {
+                deckList.Remove(_id); // 只移除一个匹配项
+            }
+
+            // 添加回 library
+            if (!itemData.libraryItemDict.TryGetValue(type, out var libraryList))
+            {
+                libraryList = new List<string>();
+                itemData.libraryItemDict[type] = libraryList;
+            }
+            libraryList.Add(_id);
+
+            // 同步 UI 与状态
+            if (cardGO != null)
+            {
+                cardGO.transform.SetParent(libraryPanel, false);
+                var cc = cardGO.GetComponent<ClickCard>();
+                if (cc != null) cc.state = CardState.Library;
+            }
+        }
+    }
 }

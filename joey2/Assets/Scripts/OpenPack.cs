@@ -73,15 +73,20 @@ public class OpenPack : MonoBehaviour
     {
         foreach (var card in cardList)
         {
-            string id = card.GetComponent<CardDisplay>().card.id;
-            if (itemData.libraryItemDict.TryGetValue(id, out var count))
+            var display = card.GetComponent<CardDisplay>();
+            if (display == null || display.card == null) continue;
+
+            string id = display.card.id;
+            string type = (display.card is EnemyCard) ? "enemy"
+                : (display.card is ItemCard) ? "item"
+                : "unknown";
+
+            if (!itemData.libraryItemDict.TryGetValue(type, out var list))
             {
-                itemData.libraryItemDict[id] = count + 1;
+                list = new List<string>();
+                itemData.libraryItemDict[type] = list;
             }
-            else
-            {
-                itemData.libraryItemDict[id] = 1;
-            }        
+            list.Add(id);
         }
     }
 

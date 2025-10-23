@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public enum CardState
 {
-    Library,Deck,Hand,Battle,Discard,Trash
+    Library,Deck,Enemy,BagSkill,BagItem
 }
 
 
@@ -16,7 +16,9 @@ public class ClickCard : MonoBehaviour, IPointerDownHandler
     // Start is called before the first frame update
     void Start()
     {
-        itemData = GameObject.Find("ItemData").GetComponent<ItemData>();
+        // itemData = GameObject.Find("ItemData").GetComponent<ItemData>();
+        deckManager = GameObject.Find("DeckManager").GetComponent<DeckManager>();
+
     }
 
     // Update is called once per frame
@@ -30,29 +32,22 @@ public class ClickCard : MonoBehaviour, IPointerDownHandler
     public void OnPointerDown(PointerEventData eventData)
     {
 
-        if (state == CardState.Library)
+        string id = this.GetComponent<CardDisplay>().card.id;
+        if (state == CardState.Library || state == CardState.Deck)
         {
-            // 从库中选择一张卡
+            DeckManager.UpdateCard(state, id,this.gameObject);
         }
-        else if (state == CardState.Deck)
+        else if (state == CardState.Enemy)
         {
-            // 从牌组中选择一张卡
+            // 从敌人中选择一张卡
         }
-        else if (state == CardState.Hand)
+        else if (state == CardState.BagSkill)
         {
-            // 从手牌中选择一张卡
+            // 从技能背包中选择一张卡
         }
-        else if (state == CardState.Battle)
+        else if (state == CardState.BagItem)
         {
-            // 从战斗区中选择一张卡
-        }
-        else if (state == CardState.Discard)
-        {
-            // 从弃牌堆中选择一张卡
-        }
-        else if (state == CardState.Trash)
-        {
-            // 从垃圾堆中选择一张卡
+            // 从物品背包中选择一张卡
         }
         else
         {
