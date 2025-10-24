@@ -9,14 +9,11 @@ public class DeckManager : MonoBehaviour
     public Transform libraryPanel;
     public GameObject cardPrefab;
     public GameObject deckPrefab;
-    private ItemData itemData;
-    private Store store;
 
     // Start is called before the first frame update
     void Start()
     {
-        itemData = GetComponent<ItemData>();
-        store = GetComponent<Store>();
+        GData.Instance.LoadAll();
         UpdateLibrary();
         UpdateDeck();
     }
@@ -29,44 +26,10 @@ public class DeckManager : MonoBehaviour
     }
 
 
-    public void EnsureLoaded()
-    {
-        if (store == null)
-        {
-			store = GetComponent<Store>();
-			if (store == null)
-			{
-				store = FindObjectOfType<Store>();
-			}
-			if (store == null)
-			{
-				Debug.LogError("DeckManager: 找不到 Store 组件，请在场景中添加一个 Store。");
-				return;
-			}
-        }
-        if (itemData == null)
-        {
-			itemData = GetComponent<ItemData>();
-			if (itemData == null)
-			{
-				itemData = FindObjectOfType<ItemData>();
-			}
-			if (itemData == null)
-			{
-				Debug.LogError("DeckManager: 找不到 ItemData 组件，请在场景中添加一个 ItemData。");
-				return;
-			}
-        }
-
-        store.EnsureLoaded();
-        itemData.EnsureLoaded();
-
-    }
-
     public void UpdateLibrary()
     {
-        EnsureLoaded();
-        foreach (var kv in itemData.libraryItemDict)
+        GData.Instance.LoadAll();
+        foreach (var kv in GData.Instance.LibraryItemDict)
         {
             var ids = kv.Value;
             if (ids == null || ids.Count == 0) continue;
@@ -75,7 +38,7 @@ public class DeckManager : MonoBehaviour
             {
                 var id = ids[i];
                 if (string.IsNullOrEmpty(id)) continue;
-                if (!store.cardDict.ContainsKey(id)) continue;
+                if (!GData.Instance.CardDict.ContainsKey(id)) continue;
 
                 CreateCard(id, CardState.Library);
             }
@@ -85,8 +48,8 @@ public class DeckManager : MonoBehaviour
 
     public void UpdateDeck()
     {
-        EnsureLoaded();
-        foreach (var kv in itemData.deckItemDict)
+        GData.Instance.LoadAll();
+        foreach (var kv in GData.Instance.DeckItemDict)
         {
             var ids = kv.Value;
             if (ids == null || ids.Count == 0) continue;
@@ -95,7 +58,7 @@ public class DeckManager : MonoBehaviour
             {
                 var id = ids[i];
                 if (string.IsNullOrEmpty(id)) continue;
-                if (!store.cardDict.ContainsKey(id)) continue;
+                if (!GData.Instance.CardDict.ContainsKey(id)) continue;
 
                 CreateCard(id, CardState.Deck);
             }
@@ -105,33 +68,33 @@ public class DeckManager : MonoBehaviour
 
     public void UpdateCard(CardState _state, string _id, GameObject cardGO)
     {
-        EnsureLoaded();
+        GData.Instance.LoadAll();
 
-        if (!store.cardDict.ContainsKey(_id))
+        if (!GData.Instance.CardDict.ContainsKey(_id))
         {
             Debug.LogWarning("未知卡牌 id: " + _id);
             return;
         }
-        string type = store.cardDict[_id].type;
+        string type = GData.Instance.CardDict[_id].type;
 
         if (_state == CardState.Library){
             // 从 library 移除一张
 
-            itemData.libraryItemDict[type].Remove(_id);
+            GData.Instance.LibraryItemDict[type].Remove(_id);
             // itemData.deckItemDict[type].Insert(0, _id);
-            itemData.deckItemDict[type].Add(_id);
+            GData.Instance.DeckItemDict[type].Add(_id);
             CreateCard(_id, CardState.Deck);
             if (cardGO != null) Destroy(cardGO);
         }
         else if (_state == CardState.Deck){
             // 从 deck 移除一张
-            itemData.deckItemDict[type].Remove(_id);
-            itemData.libraryItemDict[type].Add(_id);
+            GData.Instance.DeckItemDict[type].Remove(_id);
+            GData.Instance.LibraryItemDict[type].Add(_id);
             CreateCard(_id, CardState.Library);
             if (cardGO != null) Destroy(cardGO);
 
         }
-        itemData.SaveData();
+        GData.Instance.SaveAll();
     }
 
 
@@ -153,7 +116,7 @@ public class DeckManager : MonoBehaviour
 
         GameObject newCard = GameObject.Instantiate(targetPrefab, targetPanel);
         newCard.transform.SetAsFirstSibling();
-        newCard.GetComponent<CardDisplay>().card = store.cardDict[_id];
+        newCard.GetComponent<CardDisplay>().card = GData.Instance.CardDict[_id];
         newCard.GetComponent<CardDisplay>().ShowCard();
         var click = newCard.GetComponent<ClickCard>();
         if (click != null) click.state = _state;

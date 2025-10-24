@@ -8,10 +8,7 @@ public class OpenPack : MonoBehaviour
 
     public GameObject cardPrefab;
     public GameObject pool;
-    public Store store;
     List<GameObject> cardList = new List<GameObject>();
-    public ItemData itemData;
-
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +26,7 @@ public class OpenPack : MonoBehaviour
     public void OnClickOpen()
     {
         ClearPool();
-        itemData.EnsureLoaded();
+        GData.Instance.LoadAll();
         // if (playerData.playerDataDict["coin"] >= 10 )
         // {
         //     playerData.playerDataDict["coin"] -= 10;
@@ -43,7 +40,7 @@ public class OpenPack : MonoBehaviour
         {
             GameObject newCard = GameObject.Instantiate(cardPrefab, pool.transform);
             var cd = newCard.GetComponent<CardDisplay>();
-            var c = store.RandomCard();
+            var c = GData.Instance.RandomCard();
             if (c == null)
             {
                 Debug.LogWarning("随机到空卡，检查 Store.cardData 是否已绑定并成功加载");
@@ -57,7 +54,7 @@ public class OpenPack : MonoBehaviour
         Debug.Log("当前 cardList 数量: " + cardList.Count);
         // Debug.Log("当前玩家金币数: " + (playerData.playerDataDict.ContainsKey("coin") ? playerData.playerDataDict["coin"] : 0));
         SaveLibraryData();
-        itemData.SaveData();
+        GData.Instance.SaveAll();
     }
 
     public void ClearPool()
@@ -81,10 +78,10 @@ public class OpenPack : MonoBehaviour
                 : (display.card is ItemCard) ? "item"
                 : "unknown";
 
-            if (!itemData.libraryItemDict.TryGetValue(type, out var list))
+            if (!GData.Instance.LibraryItemDict.TryGetValue(type, out var list))
             {
                 list = new List<string>();
-                itemData.libraryItemDict[type] = list;
+                GData.Instance.LibraryItemDict[type] = list;
             }
             list.Add(id);
         }

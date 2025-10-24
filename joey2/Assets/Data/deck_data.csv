@@ -1,5 +1,7 @@
 id,type
 enemy2,atk
+item1,atk
+enemy1,atk
 enemy1,atk
 item1,atk
 enemy1,def
@@ -7,9 +9,3 @@ item2,def
 item2,def
 item1,item
 enemy2,item
-as1,skill
-as1,skill
-ds1,skill
-ds1,skill
-ds1,skill
-as2,skill

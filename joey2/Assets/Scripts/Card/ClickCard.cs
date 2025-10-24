@@ -13,7 +13,6 @@ public class ClickCard : MonoBehaviour, IPointerDownHandler
 {
     
     public CardState state = CardState.Library;
-    private ItemData itemData;
     private DeckManager deckManager;
     // Start is called before the first frame update
     void Start()
