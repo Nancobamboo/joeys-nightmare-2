@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9169654193038236551}
   - component: {fileID: 1354758869415068546}
   - component: {fileID: 6387957759427254083}
+  - component: {fileID: 9044928951754559712}
   m_Layer: 5
   m_Name: CardDeck
   m_TagString: Untagged
@@ -104,6 +105,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
+--- !u!114 &9044928951754559712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 367487902312413355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6bf6737a09c1994099febc53ed98efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  previewPrefab: {fileID: 2573737337076971280, guid: 82937f477fbad4b4cb73684bd639b151, type: 3}
+  targetCanvas: {fileID: 0}
+  hoverDelay: 1
+  padding: {x: 16, y: 16}
+  previewAlpha: 0.7
 --- !u!1 &4817499776229322470
 GameObject:
   m_ObjectHideFlags: 0
