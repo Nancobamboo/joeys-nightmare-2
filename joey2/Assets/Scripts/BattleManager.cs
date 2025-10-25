@@ -51,6 +51,7 @@ public class BattleManager : MonoBehaviour
                 GameObject cardGO = Instantiate(cardPrefab, envPanels[i].transform);
                 oneEnvCardList.Add(cardGO);
                 CardDisplay cd = cardGO.GetComponent<CardDisplay>();
+                Debug.Log($"cardId: {cardId}, cd: {cd}");
                 cd.card = GData.Instance.CardDict[cardId];
                 cd.ShowCard();
             }

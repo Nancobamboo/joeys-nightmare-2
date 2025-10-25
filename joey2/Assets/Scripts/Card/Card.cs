@@ -25,27 +25,26 @@ public class Card
         this.cardName = _cardName;
         if (_type == "defence")
         {
-            this.iconType = "Assets/Art/UI/icon_defense.png";
+            this.iconType = "Art/UI/icon_defense";
         }
         else if (_type == "attack")
         {
-            this.iconType = "Assets/Art/UI/icon_attack.png";
+            this.iconType = "Art/UI/icon_attack";
         }
         else if (_type == "skill")
         {
-            this.iconType = "Assets/Art/UI/icon_skill.png";
+            this.iconType = "Art/UI/icon_skill";
         }
         else if (_type == "item")
         {
-            this.iconType = "Assets/Art/UI/icon_items.png";
+            this.iconType = "Art/UI/icon_items";
         }
         else if (_type == "monster")
         {
-            this.iconType = "Assets/Art/UI/icon_monster.png";
+            this.iconType = "Art/UI/icon_monster";
         }
         else
         {
-            Debug.LogError("Card type is not valid: " + _type);
             this.iconType = null;
         }
         this.description = _description;
@@ -56,21 +55,21 @@ public class Card
         this.stars = _stars;
         if (_type == "other")
         {
-            this.cardFrame = "Assets/Art/UI/bg_card_golden.png";
+            this.cardFrame = "Art/UI/bg_card_golden";
         }
         else
         {
             if (_stars == 1)
             {
-                this.cardFrame = "Assets/Art/UI/bg_card_write.png";
+                this.cardFrame = "Art/UI/bg_card_write";
             }
             else if (_stars == 2)
             {
-                this.cardFrame = "Assets/Art/UI/bg_card_silver.png";
+                this.cardFrame = "Art/UI/bg_card_silver";
             }
             else if (_stars == 3)
             {
-                this.cardFrame = "Assets/Art/UI/bg_card_golden.png";
+                this.cardFrame = "Art/UI/bg_card_golden";
             }
             else 
             {

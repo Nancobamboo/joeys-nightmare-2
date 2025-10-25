@@ -9,10 +9,10 @@ public sealed class GData : PureSingleton<GData>
 	public Dictionary<string, List<string>> DeckItemDict { get; private set; } = new Dictionary<string, List<string>>();
 
 	// 路径策略（简单直观）
-	private string DataDir => Application.dataPath + "/Data";
-	private string CardCsvPath => Path.Combine(DataDir, "card_info.csv");   // 按你项目实际命名调整
-	private string LibraryCsvPath => Path.Combine(DataDir, "library_data.csv");
-	private string DeckCsvPath => Path.Combine(DataDir, "deck_data.csv");
+
+	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
+	private string LibraryCsvPath = "Data/library_data";
+	private string DeckCsvPath = "Data/deck_data";
     private bool _cardsLoaded = false;
     private bool _libraryLoaded = false;
     private bool _deckLoaded = false;
@@ -37,13 +37,12 @@ public sealed class GData : PureSingleton<GData>
 	{
         if (!force && _cardsLoaded && !FileChanged(CardCsvPath, ref _cardsMTime)) return;
 		CardDict.Clear();
-		if (!File.Exists(CardCsvPath))
-		{
-			Debug.LogWarning("找不到卡牌 CSV: " + CardCsvPath);
-			return;
-		}
-		var lines = File.ReadAllLines(CardCsvPath);
+		var ta = Resources.Load<TextAsset>(CardCsvPath);
+        Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
+        var lines = ta.text.Split('\n');
+        Debug.Log($"Lines: {lines.Length}");
         if (lines.Length == 0) { _cardsLoaded = true; return; }
+        Debug.Log($"Lines: {lines[0]}");
         // 解析表头索引
 		var header = lines[0].Split(',');
 		var idx = new Dictionary<string, int>();
@@ -63,34 +62,49 @@ public sealed class GData : PureSingleton<GData>
 		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
 		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
 
-		for (int i = 0; i < lines.Length; i++)
+        Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
+
+		for (int i = 1; i < lines.Length; i++)
 		{
 			var line = lines[i];
-			if (string.IsNullOrWhiteSpace(line)) continue;
+			if (string.IsNullOrWhiteSpace(line) ) continue;
+
 
 			var values = line.Split(',');
+            if (string.IsNullOrEmpty(values[0])) continue;
 			// 取值函数
 			string Get(int index)
 			{
 				if (index < 0 || index >= values.Length) return string.Empty;
 				return values[index].Trim();
 			}
+			// 安全解析整数的函数（处理空值）
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				Debug.LogWarning($"[GData] 第 {i} 行无法解析整数值: '{value}', 使用默认值 {defaultValue}");
+				return defaultValue;
+			}
             string id = Get(IdIdx);
             string cardImage = Get(CardImageIdx);
             string type = Get(TypeIdx);
             string cardName = Get(CardNameIdx);
             string description = Get(DescriptionIdx);
-            int attack = int.Parse(Get(AttackIdx));
-            int defence = int.Parse(Get(DefenceIdx));
-            int health = int.Parse(Get(HealthIdx));
-            int price = int.Parse(Get(PriceIdx));
-            int stars = int.Parse(Get(StarsIdx));
+            int attack = GetInt(AttackIdx, 0);
+            int defence = GetInt(DefenceIdx, 0);
+            int health = GetInt(HealthIdx, 0);
+            int price = GetInt(PriceIdx, 0);
+            int stars = GetInt(StarsIdx, 0);
 
             var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
             CardDict[id] = card;
-
+            Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
+            Debug.Log($"CardDict: {CardDict.Count}");
 		}
 		_cardsLoaded = true;
+        Debug.Log("Cards loaded: " + CardDict.Count);
 	}
 
 	public Card RandomCard()
@@ -137,7 +151,7 @@ public sealed class GData : PureSingleton<GData>
 			Debug.LogWarning("CSV 不存在: " + path);
 			return dict;
 		}
-		var lines = File.ReadAllLines(path);
+        var lines = Resources.Load<TextAsset>(path).text.Split('\n');
 		for (int i = 0; i < lines.Length; i++)
 		{
 			var line = lines[i];
