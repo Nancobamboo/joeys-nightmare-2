@@ -13,10 +13,10 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         return new List<List<string>>
         {
             new List<string> { "1001", "1002" },
-            new List<string> { "1004", "1005" },
-            new List<string> { "1007", "1008" },
-            new List<string> { "1010", "1011" },
-            new List<string> { "1013", "1014" }
+            new List<string> { "2001", "2002" },
+            new List<string> { "3001", "3002" },
+            new List<string> { "4001", "4002" },
+            new List<string> { "1003", "1004" }
         };
     }
 

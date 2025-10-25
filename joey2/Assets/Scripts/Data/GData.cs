@@ -54,10 +54,8 @@ public sealed class GData : PureSingleton<GData>
 		}
 		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
-		int CardFrameIdx = idx.ContainsKey("cardFrame") ? idx["cardFrame"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
 		int CardNameIdx = idx.ContainsKey("cardName") ? idx["cardName"] : -1;
-		int IconTypeIdx = idx.ContainsKey("iconType") ? idx["iconType"] : -1;
 		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
 		int AttackIdx = idx.ContainsKey("attack") ? idx["attack"] : -1;
 		int DefenceIdx = idx.ContainsKey("defence") ? idx["defence"] : -1;
@@ -79,10 +77,8 @@ public sealed class GData : PureSingleton<GData>
 			}
             string id = Get(IdIdx);
             string cardImage = Get(CardImageIdx);
-            string cardFrame = Get(CardFrameIdx);
             string type = Get(TypeIdx);
             string cardName = Get(CardNameIdx);
-            string iconType = Get(IconTypeIdx);
             string description = Get(DescriptionIdx);
             int attack = int.Parse(Get(AttackIdx));
             int defence = int.Parse(Get(DefenceIdx));
@@ -90,7 +86,7 @@ public sealed class GData : PureSingleton<GData>
             int price = int.Parse(Get(PriceIdx));
             int stars = int.Parse(Get(StarsIdx));
 
-            var card = new Card(id, type, cardImage, cardFrame, cardName, iconType, description, attack, defence, health, price, stars);
+            var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
             CardDict[id] = card;
 
 		}
