@@ -33,18 +33,12 @@ public class BattleManager : MonoBehaviour
 	void Start()
 	{
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
-		SetupBattle();
-		StartCoroutine(BattleLoop());
+		GameStart();
 	}
 
     public void GameStart()
     {
         List<List<string>> cardListEnv = CardDraw.Instance.DrawCardEnv(level);
         
-        foreach (string cardId in cardList)
-        {
-            Card card = GData.Instance.GetCard(cardId);
-            card.state = CardState.inDeck;
-        }
     }
 }
