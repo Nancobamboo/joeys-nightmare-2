@@ -54,6 +54,10 @@ public class CardDisplay : MonoBehaviour
         {
             cardName.text = card.cardName;
         }
+        if (!string.IsNullOrEmpty(card.cardImage))
+        {
+            cardImage.sprite = Resources.Load<Sprite>(card.cardImage);
+        }
         if (!string.IsNullOrEmpty(card.description))
         {
             description.text = card.description;
@@ -104,24 +108,28 @@ public class CardDisplay : MonoBehaviour
             star1.gameObject.SetActive(false);
             star2.gameObject.SetActive(false);
             star3.gameObject.SetActive(false);
+            cardFrame.sprite = Resources.Load<Sprite>(card.cardFrame);
         }
         if (card.stars == 1)
         {
             star1.gameObject.SetActive(true);
             star2.gameObject.SetActive(false);
             star3.gameObject.SetActive(false);
+            cardFrame.sprite = Resources.Load<Sprite>(card.cardFrame);
         }
         else if (card.stars == 2)
         {
             star1.gameObject.SetActive(true);
             star2.gameObject.SetActive(true);
             star3.gameObject.SetActive(false);
+            cardFrame.sprite = Resources.Load<Sprite>(card.cardFrame);
         }
         else if (card.stars >= 3)
         {
             star1.gameObject.SetActive(true);
             star2.gameObject.SetActive(true);
             star3.gameObject.SetActive(true);
+            cardFrame.sprite = Resources.Load<Sprite>(card.cardFrame);
         }
     }
 
