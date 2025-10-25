@@ -1,11 +1,5 @@
 id,type
-enemy2,atk
-item1,atk
-enemy1,atk
-enemy1,atk
-item1,atk
-enemy1,def
-item2,def
-item2,def
-item1,item
-enemy2,item
+enemy2,attack
+item1,attack
+enemy1,attack
+enemy1,defence
