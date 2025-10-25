@@ -7,12 +7,23 @@ using UnityEngine.UI;
 public class CardDisplay : MonoBehaviour
 {
 
-    public Text nameText;
-    public Text descriptionText;
-    public Text leftText;
-    public Text rightText;
-
-    public Image backgroundImage;
+    public Image cardImage;
+    public Image cardFrame;
+    public Text cardName;
+    public Image star1;
+    public Image star2;
+    public Image star3;
+    public Image iconType;
+    public Text description;
+    public Image attack;
+    public Text attackText;
+    public Image monster;
+    public Text monsterText;
+    public Image attaction;
+    public Image defence;
+    public Text defenceText;
+    public Image other;
+    public Text otherText;
 
     public Card card;
 
@@ -39,50 +50,78 @@ public class CardDisplay : MonoBehaviour
             Debug.LogWarning("CardDisplay.ShowCard 被调用时 card 为空");
             return;
         }
-        nameText.text = card.name;
-        if (descriptionText != null)
+        if (card.cardName != null)
         {
-            descriptionText.text = card.desc;
+            cardName.text = card.cardName;
         }
-        
+        if (!string.IsNullOrEmpty(card.description))
+        {
+            description.text = card.description;
+        }
+        if (!string.IsNullOrEmpty(card.type))
+        {
+            iconType.sprite = Resources.Load<Sprite>(card.iconType);
+        }
+        if (card.type == "attack")
+        {
+            attack.gameObject.SetActive(true);
+            defence.gameObject.SetActive(false);
+            monster.gameObject.SetActive(false);
+            other.gameObject.SetActive(false);
+            attackText.text = card.attack.ToString();
+            attackText.gameObject.SetActive(true);
+        }
+        else if (card.type == "defence")
+        {
+            defence.gameObject.SetActive(true);
+            attack.gameObject.SetActive(false);
+            monster.gameObject.SetActive(false);
+            other.gameObject.SetActive(false);
+            defenceText.text = card.defence.ToString();
+            defenceText.gameObject.SetActive(true);
+        }
+        else if (card.type == "monster")
+        {
+            monster.gameObject.SetActive(true);
+            attack.gameObject.SetActive(false);
+            defence.gameObject.SetActive(false);
+            other.gameObject.SetActive(false);
+            monsterText.text = card.health.ToString();
+            monsterText.gameObject.SetActive(true);
+            attaction.gameObject.SetActive(true);
+        }
+        else
+        {
+            other.gameObject.SetActive(true);
+            attack.gameObject.SetActive(false);
+            defence.gameObject.SetActive(false);
+            monster.gameObject.SetActive(false);
+            otherText.text = card.description.ToString();
+            otherText.gameObject.SetActive(true);
+        }
 
-        if (card is EnemyCard)
-        {
-            var enemy = card as EnemyCard;
-            if (leftText != null)
-            {
-                leftText.text = enemy.current_attack.ToString();
-            }
-            if (rightText != null)
-            {
-                rightText.text = enemy.current_hp.ToString();
-            }
+        if (card.stars <= 0){
+            star1.gameObject.SetActive(false);
+            star2.gameObject.SetActive(false);
+            star3.gameObject.SetActive(false);
         }
-        else if (card is ItemCard)
+        if (card.stars == 1)
         {
-            var item = card as ItemCard;
-            if (leftText != null)
-            {
-                if (item.attack <=0)
-                {
-                    leftText.gameObject.SetActive(false);
-                }
-                else
-                {
-                    leftText.text = item.current_attack.ToString();
-                }
-            }
-            if (rightText != null)
-            {
-                if (item.heal <=0)
-                {
-                    rightText.gameObject.SetActive(false);
-                }
-                else
-                {
-                    rightText.text = item.current_heal.ToString();
-                }
-            }
+            star1.gameObject.SetActive(true);
+            star2.gameObject.SetActive(false);
+            star3.gameObject.SetActive(false);
+        }
+        else if (card.stars == 2)
+        {
+            star1.gameObject.SetActive(true);
+            star2.gameObject.SetActive(true);
+            star3.gameObject.SetActive(false);
+        }
+        else if (card.stars >= 3)
+        {
+            star1.gameObject.SetActive(true);
+            star2.gameObject.SetActive(true);
+            star3.gameObject.SetActive(true);
         }
     }
 

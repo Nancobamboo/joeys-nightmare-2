@@ -43,39 +43,56 @@ public sealed class GData : PureSingleton<GData>
 			return;
 		}
 		var lines = File.ReadAllLines(CardCsvPath);
+        if (lines.Length == 0) { _cardsLoaded = true; return; }
+        // 解析表头索引
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
+		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int CardFrameIdx = idx.ContainsKey("cardFrame") ? idx["cardFrame"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int CardNameIdx = idx.ContainsKey("cardName") ? idx["cardName"] : -1;
+		int IconTypeIdx = idx.ContainsKey("iconType") ? idx["iconType"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+		int AttackIdx = idx.ContainsKey("attack") ? idx["attack"] : -1;
+		int DefenceIdx = idx.ContainsKey("defence") ? idx["defence"] : -1;
+		int HealthIdx = idx.ContainsKey("health") ? idx["health"] : -1;
+		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
+		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
+
 		for (int i = 0; i < lines.Length; i++)
 		{
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line)) continue;
 
 			var values = line.Split(',');
-			if (values.Length < 5) continue;
-			if (values[0] == "id") continue;
+			// 取值函数
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+            string id = Get(IdIdx);
+            string cardImage = Get(CardImageIdx);
+            string cardFrame = Get(CardFrameIdx);
+            string type = Get(TypeIdx);
+            string cardName = Get(CardNameIdx);
+            string iconType = Get(IconTypeIdx);
+            string description = Get(DescriptionIdx);
+            int attack = int.Parse(Get(AttackIdx));
+            int defence = int.Parse(Get(DefenceIdx));
+            int health = int.Parse(Get(HealthIdx));
+            int price = int.Parse(Get(PriceIdx));
+            int stars = int.Parse(Get(StarsIdx));
 
-			// 与你现有 Store.LoadCards 保持一致
-			if (values[2].Trim() == "enemy")
-			{
-				string id = values[0].Trim();
-				string name = values[1].Trim();
-				string type = values[2].Trim();
-				string desc = values[3].Trim();
-				int attack = int.Parse(values[4].Trim());
-				int hp = int.Parse(values[5].Trim());
-				var enemyCard = new EnemyCard(id, name, desc, type, attack, hp);
-				CardDict[id] = enemyCard;
-			}
-			else
-			{
-				string id = values[0].Trim();
-				string name = values[1].Trim();
-				string type = values[2].Trim();
-				string desc = values[3].Trim();
-				int attack = int.Parse(values[4].Trim());
-				int heal = int.Parse(values[6].Trim());
-				int price = int.Parse(values[7].Trim());
-				var itemCard = new ItemCard(id, name, desc, type, attack, heal, price);
-				CardDict[id] = itemCard;
-			}
+            var card = new Card(id, type, cardImage, cardFrame, cardName, iconType, description, attack, defence, health, price, stars);
+            CardDict[id] = card;
+
 		}
 		_cardsLoaded = true;
 	}
