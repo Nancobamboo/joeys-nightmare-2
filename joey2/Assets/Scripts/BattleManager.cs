@@ -101,6 +101,7 @@ public class BattleManager : MonoBehaviour
                 }
             }
         }
+        Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
 
 
 

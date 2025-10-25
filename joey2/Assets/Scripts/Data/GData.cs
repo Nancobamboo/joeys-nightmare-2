@@ -5,30 +5,30 @@ using UnityEngine;
 public sealed class GData : PureSingleton<GData>
 {
 	public Dictionary<string, Card> CardDict { get; private set; } = new Dictionary<string, Card>();
-	public Dictionary<string, List<string>> LibraryItemDict { get; private set; } = new Dictionary<string, List<string>>();
+	// public Dictionary<string, List<string>> LibraryItemDict { get; private set; } = new Dictionary<string, List<string>>();
 	public Dictionary<string, List<string>> DeckItemDict { get; private set; } = new Dictionary<string, List<string>>();
 
 	// 路径策略（简单直观）
 
 	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
-	private string LibraryCsvPath = "Data/library_data";
+	// private string LibraryCsvPath = "Data/library_data";
 	private string DeckCsvPath = "Data/deck_data";
     private bool _cardsLoaded = false;
-    private bool _libraryLoaded = false;
+    // private bool _libraryLoaded = false;
     private bool _deckLoaded = false;
     private System.DateTime _cardsMTime = System.DateTime.MinValue;
-    private System.DateTime _libraryMTime = System.DateTime.MinValue;
+    // private System.DateTime _libraryMTime = System.DateTime.MinValue;
     private System.DateTime _deckMTime = System.DateTime.MinValue;
 	// 一键加载/保存
 	public void LoadAll(bool force = false)
 	{
 		LoadCards();
-		LoadLibrary();
+		// LoadLibrary();
 		LoadDeck();
 	}
 	public void SaveAll()
 	{
-		SaveLibrary();
+		// SaveLibrary();
 		SaveDeck();
 	}
 
@@ -38,11 +38,11 @@ public sealed class GData : PureSingleton<GData>
         if (!force && _cardsLoaded && !FileChanged(CardCsvPath, ref _cardsMTime)) return;
 		CardDict.Clear();
 		var ta = Resources.Load<TextAsset>(CardCsvPath);
-        Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
+        // Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
         var lines = ta.text.Split('\n');
-        Debug.Log($"Lines: {lines.Length}");
+        // Debug.Log($"Lines: {lines.Length}");
         if (lines.Length == 0) { _cardsLoaded = true; return; }
-        Debug.Log($"Lines: {lines[0]}");
+        // Debug.Log($"Lines: {lines[0]}");
         // 解析表头索引
 		var header = lines[0].Split(',');
 		var idx = new Dictionary<string, int>();
@@ -62,13 +62,12 @@ public sealed class GData : PureSingleton<GData>
 		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
 		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
 
-        Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
+        // Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
 
 		for (int i = 1; i < lines.Length; i++)
 		{
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line) ) continue;
-
 
 			var values = line.Split(',');
             if (string.IsNullOrEmpty(values[0])) continue;
@@ -117,25 +116,27 @@ public sealed class GData : PureSingleton<GData>
 	}
 
 	// ---------------- 牌库/卡组（原 ItemData 的纯 C# 版本） ----------------
-	public void LoadLibrary(bool force = false)
-	{
-		if (!force && _libraryLoaded && !FileChanged(LibraryCsvPath, ref _libraryMTime)) return;
-		LibraryItemDict = LoadTypeListCsv(LibraryCsvPath);
-		_libraryLoaded = true;
-	}
+	// public void LoadLibrary(bool force = false)
+	// {
+	// 	if (!force && _libraryLoaded && !FileChanged(LibraryCsvPath, ref _libraryMTime)) return;
+	// 	LibraryItemDict = LoadTypeListCsv(LibraryCsvPath);
+	// 	Debug.Log($"LibraryItemDict: {LibraryItemDict.Count}");
+	// 	_libraryLoaded = true;
+	// }
 
 	public void LoadDeck(bool force = false)
 	{
 		if (!force && _deckLoaded && !FileChanged(DeckCsvPath, ref _deckMTime)) return;
 		DeckItemDict = LoadTypeListCsv(DeckCsvPath);
+		Debug.Log($"DeckItemDict: {DeckItemDict.Count}");
 		_deckLoaded = true;
 	}
 
 
-	public void SaveLibrary()
-	{
-		SaveTypeListCsv(LibraryCsvPath, LibraryItemDict);
-	}
+	// public void SaveLibrary()
+	// {
+	// 	SaveTypeListCsv(LibraryCsvPath, LibraryItemDict);
+	// }
 
 	public void SaveDeck()
 	{
@@ -146,28 +147,24 @@ public sealed class GData : PureSingleton<GData>
 	private Dictionary<string, List<string>> LoadTypeListCsv(string path)
 	{
 		var dict = new Dictionary<string, List<string>>();
-		if (!File.Exists(path))
-		{
-			Debug.LogWarning("CSV 不存在: " + path);
-			return dict;
-		}
         var lines = Resources.Load<TextAsset>(path).text.Split('\n');
-		for (int i = 0; i < lines.Length; i++)
+		for (int i = 1; i < lines.Length; i++)
 		{
+			
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line)) continue;
 			var values = line.Split(',');
+            if (string.IsNullOrEmpty(values[0])) continue;
 			if (values.Length < 2) continue;
 			var id = values[0].Trim();
 			var type = values[1].Trim();
-			if (id == "id") continue;
 
-			if (!dict.TryGetValue(type, out var list))
+			if (!dict.ContainsKey(type))
 			{
-				list = new List<string>();
-				dict[type] = list;
+				dict[type] = new List<string>();
 			}
-			list.Add(id);
+			dict[type].Add(id);
+
 		}
 		return dict;
 	}
