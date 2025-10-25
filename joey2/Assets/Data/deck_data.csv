@@ -1,5 +1,6 @@
 id,type
-enemy2,attack
-item1,attack
-enemy1,attack
-enemy1,defence
+1002,attack
+1002,attack
+1001,attack
+2001,def
+2001,def
