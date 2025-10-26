@@ -2,14 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+
 public sealed class GData : PureSingleton<GData>
 {
 	public Dictionary<string, Card> CardDict { get; private set; } = new Dictionary<string, Card>();
 	// public Dictionary<string, List<string>> LibraryItemDict { get; private set; } = new Dictionary<string, List<string>>();
 	public Dictionary<string, List<string>> DeckItemDict { get; private set; } = new Dictionary<string, List<string>>();
 
-	// 路径策略（简单直观）
+	// 临时加入卡包的卡的id列表
+	public List<string> TempCardIdList { get; set; } = new List<string>();
 
+	// 路径策略（简单直观）
 	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
 	// private string LibraryCsvPath = "Data/library_data";
 	private string DeckCsvPath = "Data/deck_data";

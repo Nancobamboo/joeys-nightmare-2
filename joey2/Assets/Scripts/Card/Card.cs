@@ -4,7 +4,12 @@ using UnityEngine;
 
 public enum CardState
 {
-    Default,Deck,Sell,Buy,EnvActive,EnvInactive,BagActive,BagInactive
+    Default,Active,Inactive,Used
+}
+
+public enum CardPosition
+{
+    Default,Deck,Sell,Buy,Env,Bag,Used
 }
 
 
@@ -23,6 +28,7 @@ public class Card
     public int price;
     public int stars;
     public CardState state;
+    public CardPosition position;
 
     public  Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars)
     {
@@ -85,7 +91,7 @@ public class Card
             }
         }
         this.state = CardState.Default;
-
+        this.position = CardPosition.Default;
     }
     public Card Clone()
     {

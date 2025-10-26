@@ -24,7 +24,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
 
         var cd = GetCardDisplay();
         // Debug.Log($"CardClick: {id}");
-        if (cd.card.state != CardState.Default)
+        if (cd.card.state == CardState.Active)
         {
             Debug.Log($"CardClick: {cd.card.id}");
             GameEvents.RaiseCardClicked(cd.gameObject); // 广播全局事件
@@ -39,7 +39,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         var cd = GetCardDisplay();
-        if (cd.card.state == CardState.Deck || cd.card.state == CardState.Sell || cd.card.state == CardState.Buy)
+        if (cd.card.position == CardPosition.Deck)
         {
             transform.localScale = new Vector3(zoomSize, zoomSize, 1.0f);
         }
@@ -48,7 +48,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
     public void OnPointerExit(PointerEventData eventData)
     {
         var cd = GetCardDisplay();
-        if (cd.card.state == CardState.Deck || cd.card.state == CardState.Sell || cd.card.state == CardState.Buy)
+        if (cd.card.position == CardPosition.Deck)
         {
             transform.localScale = Vector3.one;
         }

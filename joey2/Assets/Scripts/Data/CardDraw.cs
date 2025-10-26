@@ -16,7 +16,7 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             new List<string> { "2001", "2002" },
             new List<string> { "3001", "3002" },
             new List<string> { "4001", "4002" },
-            new List<string> { "1003", "1004" }
+            new List<string> { "5001", "5002" }
         };
     }
 

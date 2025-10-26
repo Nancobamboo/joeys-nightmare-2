@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum GamePhase
-{
-	battleStart, playerStart, playerAction, playerEnd, enemyStart, enemyAction, enemyEnd, battleEnd
-}
+
 
 public class BattleManager : MonoSingleton<BattleManager>
 {
     public int level =1 ;// 关卡等级
-    public GamePhase gamePhase = GamePhase.battleStart;
-
     public List<Transform> envPanels = new List<Transform>();
     public List<List<GameObject>> envCardListList = new List<List<GameObject>>();
     public Transform attackPanel;
@@ -26,12 +21,12 @@ public class BattleManager : MonoSingleton<BattleManager>
     public GameObject cardPrefab;
 
     // 弃牌列表
-    public List<string> usedCardIdList = new List<string>();
+    public List<GameObject> usedCardList = new List<GameObject>();
 
 	void Start()
 	{
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
-		GameStart();
+        PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
 	}
 
     void OnEnable()
@@ -43,7 +38,10 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnCardClicked -= OnCardClicked;
     }
 
-    private void OnCardClicked(GameObject cardGameObject)
+
+
+
+    public void OnCardClicked(GameObject cardGameObject)
     {
         var cd = cardGameObject.GetComponent<CardDisplay>();
         if (cd == null || cd.card == null)
@@ -51,32 +49,229 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("OnCardClicked: CardDisplay 或 card 为空");
             return;
         }
-        Debug.Log($"OnCardClicked: {cd.card.id}, {cd.card.state}");
+        if(cd.card.state != CardState.Active)
+        {
+            Debug.LogError("OnCardClicked: 卡牌状态不是Active");
+            return;
+        }
+        if (cd.card.position == CardPosition.Env)
+        {
+            OnEnvClicked(cardGameObject);
+        }
+        else if (cd.card.position == CardPosition.Bag)
+        {
+            OnBagClicked(cardGameObject);
+        }
+        else 
+        {
+            Debug.LogError("OnCardClicked: 未知的位置");
+            return;
+        }
     }
 
-    private GameObject CreateCard(Transform parent, string cardId,CardState state, List<GameObject> attachList = null)
+
+    public void OnEnvClicked(GameObject cardGameObject)
     {
-        if (parent == null || string.IsNullOrEmpty(cardId)) {
-            Debug.LogError($"CreateCard: parent is null or cardId is empty, cardId: {cardId}");
-            return null;
+        if (cardGameObject.GetComponent<CardDisplay>().card.type == "monster")
+        {
+            OnEnvMonsterClicked(cardGameObject);
         }
-        if (!GData.Instance.CardDict.ContainsKey(cardId)) {
-            Debug.LogError($"CreateCard: cardId not found in CardDict, cardId: {cardId}");
-            return null;
+        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "other")
+        {
+            Debug.Log($"OnEnvClicked: {cardGameObject.name}");
         }
-
-        var go = Instantiate(cardPrefab, parent);
-        // 视觉倒序：新卡插到最前
-        go.transform.SetSiblingIndex(0);
-        if (attachList != null) attachList.Add(go);
-
-        var cd = go.GetComponent<CardDisplay>();
-        var baseCard = GData.Instance.CardDict[cardId];
-        cd.card = baseCard.Clone();
-        cd.card.state = state;
-        cd.ShowCard();
-        return go;
+        else
+        {
+            OnEnvCardClicked(cardGameObject);
+        }
     }
+
+    public void OnBagClicked(GameObject cardGameObject)
+    {
+        if (cardGameObject.GetComponent<CardDisplay>().card.type == "attack")
+        {
+            OnBagAttackClicked(cardGameObject);
+        }
+        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "defence")
+        {
+            OnBagDefenceClicked(cardGameObject);
+        }
+        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "skill")
+        {
+            OnBagSkillClicked(cardGameObject);
+        }
+        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "item")
+        {
+            OnBagItemClicked(cardGameObject);
+        }
+        else
+        {
+            Debug.LogError("OnBagClicked: 未知的位置");
+            return;
+        }
+    }
+
+    public void OnBagAttackClicked(GameObject cardGameObject)
+    {
+        Debug.Log($"OnBagAttackClicked: {cardGameObject.name}");
+    }
+
+    public void OnBagDefenceClicked(GameObject cardGameObject)
+    {
+        Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+    }
+
+    public void OnBagSkillClicked(GameObject cardGameObject)
+    {
+        Debug.Log($"OnBagSkillClicked: {cardGameObject.name}");
+    }
+
+    public void OnBagItemClicked(GameObject cardGameObject)
+    {
+        Debug.Log($"OnBagItemClicked: {cardGameObject.name}");
+    }
+
+    public void OnEnvMonsterClicked(GameObject cardGameObject)
+    {
+        if (attackCardList.Count == 0)
+        {
+            CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
+        }
+        GameObject attackCardGameObject = UIGridHelper.GetCardListOrderIndex0(attackPanel);
+        attackCardList.Insert(0, attackCardGameObject);
+        UseAttack(attackCardGameObject, cardGameObject);
+    }
+
+    public void OnEnvCardClicked(GameObject cardGO)
+    {
+        int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:envCardListList);
+        
+        if (envListIndex < 0 || envListIndex >= envCardListList.Count)
+        {
+            Debug.LogError("OnEnvCardClicked: envListIndex 超出范围");
+            return;
+        }
+
+        // 从 env 的 list 中移除卡
+        
+        switch (cardGO.GetComponent<CardDisplay>().card.type)
+        {
+            case "attack":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:attackCardList, state:CardState.Active, position:CardPosition.Bag);
+                cardGO.transform.SetParent(attackPanel);
+                UIGridHelper.RefreshPanel(attackPanel);
+                break;
+            case "defence":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:defenceCardList, state:CardState.Active, position:CardPosition.Bag);
+                cardGO.transform.SetParent(defencePanel);
+                UIGridHelper.RefreshPanel(defencePanel);
+                break;
+            case "skill":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:skillCardList, state:CardState.Active, position:CardPosition.Bag);
+                cardGO.transform.SetParent(skillPanel);
+                UIGridHelper.RefreshPanel(skillPanel);
+                break;
+            case "item":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:itemCardList, state:CardState.Active, position:CardPosition.Bag);
+                cardGO.transform.SetParent(itemPanel);
+                UIGridHelper.RefreshPanel(itemPanel);
+                break;
+            default:
+                Debug.LogError("OnEnvCardClicked: 未知的位置");
+                return;
+        }
+        UIGridHelper.RefreshPanel(envPanels[envListIndex]);
+        PhaseManager.Instance.SetGamePhase(GamePhase.playerStart);
+    }
+
+    public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
+    {
+        var attakCard = attakCardGameObject.GetComponent<CardDisplay>();
+        var targetCard = targetCardGameObject.GetComponent<CardDisplay>();
+        if (attakCard == null || targetCard == null)
+        {
+            Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
+        }
+        int attackValue = attakCard.card.attack;
+        targetCard.card.health -= attackValue;
+        if (targetCard.card.health <= 0)
+        {
+            targetCard.card.health = 0;
+        }
+        targetCard.ShowCard();
+        CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        UIGridHelper.RefreshPanel(attackPanel);
+
+        if (targetCard.card.health <= 0)
+        {
+            int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:targetCardGameObject, envCardListList:envCardListList);
+            if (envListIndex == null)
+            {
+                Debug.LogError("MonsterAttack: envListIndex 为空");
+                return;
+            }
+            CardHelper.MoveCard(cardGO:targetCardGameObject, fromCardList:envCardListList[envListIndex], toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+            UIGridHelper.RefreshPanel(envPanels[envListIndex]);
+        }
+        else
+        {
+            MonsterAttack(monsterCardGO:targetCardGameObject);
+        }
+    }
+
+    public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
+    {
+        int defenceValue = 0;
+        if (defenceGO != null)
+        {
+            defenceValue = defenceGO.GetComponent<CardDisplay>().card.defence;
+        }
+
+        int attackValue = attackGO.GetComponent<CardDisplay>().card.attack;
+        int attackRealValue = 0;
+        if (defenceValue < attackValue)
+        {
+            attackRealValue = attackValue - defenceValue;
+        }
+        PData.Instance.playerHealth -= attackRealValue;
+        Debug.Log($"UseDefence: playerHealth: {PData.Instance.playerHealth}");
+        CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        UIGridHelper.RefreshPanel(defencePanel);
+
+        if (PData.Instance.playerHealth <= 0)
+        {
+            Debug.Log("PlayerLost");
+            PhaseManager.Instance.SetGamePhase(GamePhase.battleEnd);
+        }
+        else
+        {
+            PhaseManager.Instance.SetGamePhase(GamePhase.playerStart);
+        }
+
+    }
+
+    public void MonsterAttack(GameObject monsterCardGO)
+    {
+        var monsterCard = monsterCardGO.GetComponent<CardDisplay>();
+        if (monsterCard == null || monsterCard.card == null)
+        {
+            Debug.LogError("MonsterAttack: monsterCard 或 monsterCard.card 为空");
+            return;
+        }
+        if (defenceCardList.Count == 0)
+        {
+            UseDefence(attackGO:monsterCardGO,defenceGO:null);
+        }
+        else
+        {
+            UseDefence(attackGO:monsterCardGO,defenceGO:defenceCardList[0]);
+        }
+    }
+
+
+
+
+
 
     private bool TryGetPanelAndList(string cardType, out Transform panel, out List<GameObject> list)
     {
@@ -103,9 +298,9 @@ public class BattleManager : MonoSingleton<BattleManager>
             for (int j = 0; j < cardIdList.Count; j++)
             {
                 string cardId = cardIdList[j];
-                CardState state = CardState.EnvInactive;
-                if (j == 0) state = CardState.EnvActive;
-                CreateCard(envPanels[i].transform, cardId, state, oneEnvCardList);
+                CardState state = CardState.Inactive;
+                if (j == 0) state = CardState.Active;
+                CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:envPanels[i].transform, cardId:cardId, state:state, position:CardPosition.Env, attachList:oneEnvCardList);
             }
             envCardListList.Add(oneEnvCardList);
         }
@@ -122,13 +317,12 @@ public class BattleManager : MonoSingleton<BattleManager>
             for (int j = 0; j < cardIds.Count; j++)
             {
                 string cardId = cardIds[j];
-                CardState state = CardState.Default;
-                if (j == 0) state = CardState.Deck;
-                CreateCard(panel, cardId, state, list);
+                CardState state = CardState.Inactive;
+                if (j == 0) state = CardState.Active;
+                CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:panel, cardId:cardId, state:state, position:CardPosition.Bag, attachList:list);
             }
         }
         Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
-
     }
 
 
