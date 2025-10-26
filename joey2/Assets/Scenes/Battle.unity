@@ -2123,6 +2123,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!224 &1116114881 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5396701686662672251, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+  m_PrefabInstance: {fileID: 966049681}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1759304526
 GameObject:
   m_ObjectHideFlags: 0
@@ -2168,7 +2173,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 1
-  gamePhase: 0
   envPanels:
   - {fileID: 966049691}
   - {fileID: 966049690}
@@ -2179,11 +2183,12 @@ MonoBehaviour:
   attackCardList: []
   defencePanel: {fileID: 966049685}
   defenceCardList: []
-  skillPanel: {fileID: 0}
+  skillPanel: {fileID: 966049684}
   skillCardList: []
-  itemPanel: {fileID: 966049684}
+  itemPanel: {fileID: 1116114881}
   itemCardList: []
   cardPrefab: {fileID: 1396557840748590307, guid: a8a665ea8296230488c9dc4c394ff7b9, type: 3}
+  usedCardList: []
 --- !u!1 &1910341611
 GameObject:
   m_ObjectHideFlags: 0

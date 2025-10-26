@@ -1,9 +1,9 @@
-id   ,cardImage ,cardName            ,type,description ,attack ,defence ,health ,price ,stars
+﻿id   ,cardImage ,cardName            ,type,description ,attack ,defence ,health ,price ,stars
 1001,Art/Img/img_card_attrack_01,匕首        ,attack,每次装备时，对随机敌人造成伤害     ,3,0,0,0,1
 1002,Art/Img/img_card_attrack_01,铁剑        ,attack,没有装备防具时，对敌人额外造成3点伤害 ,5,0,1,0,1
 1003,Art/Img/img_card_attrack_01,重锤        ,attack,缓慢蓄力后，发出致命一击        ,10,0,0,0,1
 1004,Art/Img/img_card_attrack_01,回旋镖       ,attack,攻击后向随机敌人弹射，每次伤害减半          ,4,0,0,0,1
-,,,,,,,,,
+1005,Art/Img/img_card_attrack_01,赤手空拳,attack,赤手空拳,2,0,0,0,1
 ,,,,,,,,,
 ,,,,,,,,,
 ,,,,,,,,,
@@ -41,8 +41,8 @@ id   ,cardImage ,cardName            ,type,description ,attack ,defence ,health 
 ,,,,,,,,,
 ,,,,,,,,,
 ,,,,,,,,,
-5001,Art/Img/img_card_attrack_01,史莱姆    ,monster      ,充满粘液的怪物,0,2,0,0,1
-5002,Art/Img/img_card_attrack_01,大史莱姆,monster      ,血量较低时可能会分裂,,,,,2
+5001,Art/Img/img_card_attrack_01,史莱姆    ,monster      ,充满粘液的怪物,0,2,5,0,1
+5002,Art/Img/img_card_attrack_01,大史莱姆,monster      ,血量较低时可能会分裂,,,10,,2
 5003,Art/Img/img_card_attrack_01,骷髅,monster      ,可怕的不死生物,,,,,1
 5004,Art/Img/img_card_attrack_01,骷髅骑士,monster      ,训练有素的骷髅骑士，会进行格挡,,,,,2
 5005,Art/Img/img_card_attrack_01,吸血蝙蝠,monster      ,攻击时回复血量,,,,,1
