@@ -8,9 +8,8 @@ public enum GamePhase
 	battleStart, playerStart, playerAction, playerEnd, enemyStart, enemyAction, enemyEnd, battleEnd
 }
 
-public class BattleManager : MonoBehaviour
+public class BattleManager : MonoSingleton<BattleManager>
 {
-	public static BattleManager Instance;
     public int level =1 ;// 关卡等级
     public GamePhase gamePhase = GamePhase.battleStart;
 
@@ -26,11 +25,8 @@ public class BattleManager : MonoBehaviour
     public List<GameObject> itemCardList = new List<GameObject>();
     public GameObject cardPrefab;
 
-
-	void Awake()
-	{
-		Instance = this;
-	}
+    // 弃牌列表
+    public List<string> usedCardIdList = new List<string>();
 
 	void Start()
 	{
@@ -38,22 +34,78 @@ public class BattleManager : MonoBehaviour
 		GameStart();
 	}
 
+    void OnEnable()
+    {
+        GameEvents.OnCardClicked += OnCardClicked;
+    }
+    void OnDisable()
+    {
+        GameEvents.OnCardClicked -= OnCardClicked;
+    }
+
+    private void OnCardClicked(GameObject cardGameObject)
+    {
+        var cd = cardGameObject.GetComponent<CardDisplay>();
+        if (cd == null || cd.card == null)
+        {
+            Debug.LogError("OnCardClicked: CardDisplay 或 card 为空");
+            return;
+        }
+        Debug.Log($"OnCardClicked: {cd.card.id}, {cd.card.state}");
+    }
+
+    private GameObject CreateCard(Transform parent, string cardId,CardState state, List<GameObject> attachList = null)
+    {
+        if (parent == null || string.IsNullOrEmpty(cardId)) {
+            Debug.LogError($"CreateCard: parent is null or cardId is empty, cardId: {cardId}");
+            return null;
+        }
+        if (!GData.Instance.CardDict.ContainsKey(cardId)) {
+            Debug.LogError($"CreateCard: cardId not found in CardDict, cardId: {cardId}");
+            return null;
+        }
+
+        var go = Instantiate(cardPrefab, parent);
+        // 视觉倒序：新卡插到最前
+        go.transform.SetSiblingIndex(0);
+        if (attachList != null) attachList.Add(go);
+
+        var cd = go.GetComponent<CardDisplay>();
+        var baseCard = GData.Instance.CardDict[cardId];
+        cd.card = baseCard.Clone();
+        cd.card.state = state;
+        cd.ShowCard();
+        return go;
+    }
+
+    private bool TryGetPanelAndList(string cardType, out Transform panel, out List<GameObject> list)
+    {
+        switch (cardType)
+        {
+            case "attack": panel = attackPanel; list = attackCardList; return true;
+            case "defence": panel = defencePanel; list = defenceCardList; return true;
+            case "skill": panel = skillPanel; list = skillCardList; return true;
+            case "item": panel = itemPanel; list = itemCardList; return true;
+            default: panel = null; list = null; return false;
+        }
+    }
+
     public void GameStart()
     {
+        // 加载所有卡牌数据
         GData.Instance.LoadAll();
+        // 抽取环境卡牌
         List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(level);
         for (int i = 0; i < cardIdListEnv.Count; i++)
         {
             List<string> cardIdList = cardIdListEnv[i];
             List<GameObject> oneEnvCardList = new List<GameObject>();
-            foreach (string cardId in cardIdList)
+            for (int j = 0; j < cardIdList.Count; j++)
             {
-                GameObject cardGO = Instantiate(cardPrefab, envPanels[i].transform);
-                oneEnvCardList.Add(cardGO);
-                CardDisplay cd = cardGO.GetComponent<CardDisplay>();
-                Debug.Log($"cardId: {cardId}, cd: {cd}");
-                cd.card = GData.Instance.CardDict[cardId];
-                cd.ShowCard();
+                string cardId = cardIdList[j];
+                CardState state = CardState.EnvInactive;
+                if (j == 0) state = CardState.EnvActive;
+                CreateCard(envPanels[i].transform, cardId, state, oneEnvCardList);
             }
             envCardListList.Add(oneEnvCardList);
         }
@@ -65,46 +117,21 @@ public class BattleManager : MonoBehaviour
             List<string> cardIds = kv.Value;
             
             if (cardIds == null || cardIds.Count == 0) continue;
-            
-            foreach (string cardId in cardIds)
+            if (!TryGetPanelAndList(cardType, out var panel, out var list)) continue;
+
+            for (int j = 0; j < cardIds.Count; j++)
             {
-                if (string.IsNullOrEmpty(cardId)) continue;
-                if (!GData.Instance.CardDict.ContainsKey(cardId)) continue;
-                
-                GameObject cardGO = null;
-                
-                if (cardType == "attack")
-                {
-                    cardGO = Instantiate(cardPrefab, attackPanel);
-                    attackCardList.Add(cardGO);
-                }
-                else if (cardType == "defence")
-                {
-                    cardGO = Instantiate(cardPrefab, defencePanel);
-                    defenceCardList.Add(cardGO);
-                }
-                else if (cardType == "skill")
-                {
-                    cardGO = Instantiate(cardPrefab, skillPanel);
-                    skillCardList.Add(cardGO);
-                }
-                else if (cardType == "item")
-                {
-                    cardGO = Instantiate(cardPrefab, itemPanel);
-                    itemCardList.Add(cardGO);
-                }
-                
-                if (cardGO != null)
-                {
-                    cardGO.GetComponent<CardDisplay>().card = GData.Instance.CardDict[cardId];
-                    cardGO.GetComponent<CardDisplay>().ShowCard();
-                }
+                string cardId = cardIds[j];
+                CardState state = CardState.Default;
+                if (j == 0) state = CardState.Deck;
+                CreateCard(panel, cardId, state, list);
             }
         }
         Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
 
-
-
-
     }
+
+
+
+
 }

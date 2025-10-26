@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum CardState
+{
+    Default,Deck,Sell,Buy,EnvActive,EnvInactive,BagActive,BagInactive
+}
+
+
 public class Card 
 {
     public string id;
@@ -16,6 +22,7 @@ public class Card
     public int health;
     public int price;
     public int stars;
+    public CardState state;
 
     public  Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars)
     {
@@ -77,8 +84,13 @@ public class Card
                 this.cardFrame = null;
             }
         }
+        this.state = CardState.Default;
 
-
+    }
+    public Card Clone()
+    {
+        var c =  new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
+        return c;
     }
 
 }

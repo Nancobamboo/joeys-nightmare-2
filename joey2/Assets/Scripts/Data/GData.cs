@@ -99,8 +99,8 @@ public sealed class GData : PureSingleton<GData>
 
             var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
             CardDict[id] = card;
-            Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
-            Debug.Log($"CardDict: {CardDict.Count}");
+            // Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
+            // Debug.Log($"CardDict: {CardDict.Count}");
 		}
 		_cardsLoaded = true;
         Debug.Log("Cards loaded: " + CardDict.Count);
