@@ -204,7 +204,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         if (targetCard.card.health <= 0)
         {
             int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:targetCardGameObject, envCardListList:envCardListList);
-            if (envListIndex == null)
+            if (envListIndex == -1)
             {
                 Debug.LogError("MonsterAttack: envListIndex 为空");
                 return;
