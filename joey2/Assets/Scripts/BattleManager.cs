@@ -39,7 +39,49 @@ public class BattleManager : MonoSingleton<BattleManager>
     }
 
 
+    public GameObject GetRandomEnemy()
+    {
+        List<GameObject> monsterCards = new List<GameObject>();
+        foreach (var panel in envPanels)
+        {
+            GameObject cardObj = UIGridHelper.GetCardListOrderIndex0(panel);
+            if (cardObj != null)
+            {
+                var cd = cardObj.GetComponent<CardDisplay>();
+                if (cd != null && cd.card != null && cd.card.type == "monster" && cd.card.health > 0)
+                {
+                    monsterCards.Add(cardObj);
+                }
+            }
+        }
+        if (monsterCards.Count == 0)
+            return null;
+        int randIdx = Random.Range(0, monsterCards.Count);
+        return monsterCards[randIdx];
+    }
 
+    public void ApplyDamageToEnemy(GameObject enemy, int damage)
+    {
+        var targetCard = enemy.GetComponent<CardDisplay>();
+        if (targetCard == null || targetCard.card == null) return;
+
+        targetCard.card.health -= damage;
+        if (targetCard.card.health < 0) targetCard.card.health = 0;
+        targetCard.ShowCard();
+
+        if (targetCard.card.health <= 0)
+        {
+            // 移动到已使用堆
+            int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:enemy, envCardListList:envCardListList);
+            if (envListIndex != -1)
+            {
+                CardHelper.MoveCard(cardGO:enemy, fromCardList:envCardListList[envListIndex], toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(envPanels[envListIndex]);
+            }
+            // 触发击杀
+            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy, value: damage);
+        }
+    }
 
     public void OnCardClicked(GameObject cardGameObject)
     {

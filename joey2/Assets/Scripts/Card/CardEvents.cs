@@ -21,6 +21,14 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // 只允许鼠标左键
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        if (PData.Instance.canOperate == false)
+        {
+            return;
+        }
 
         var cd = GetCardDisplay();
         // Debug.Log($"CardClick: {id}");
