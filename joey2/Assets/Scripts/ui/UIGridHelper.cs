@@ -40,6 +40,7 @@ public static class UIGridHelper
             if (go.activeInHierarchy) 
             {
                 go.GetComponent<CardDisplay>().card.state = CardState.Inactive;
+                go.transform.localScale = Vector3.one;
                 hasActiveChild = true;
             }
 
