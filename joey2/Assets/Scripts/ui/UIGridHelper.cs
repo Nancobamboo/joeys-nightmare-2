@@ -39,7 +39,7 @@ public static class UIGridHelper
             var go = panel.GetChild(i).gameObject;
             if (go.activeInHierarchy) 
             {
-                go.GetComponent<CardDisplay>().card.state = CardState.Inactive;
+                go.GetComponent<CardDisplay>().card.SetState(CardState.Inactive);
                 go.transform.localScale = Vector3.one;
                 hasActiveChild = true;
             }
@@ -47,7 +47,17 @@ public static class UIGridHelper
         }
         if (!hasActiveChild) return;
         GameObject cardGO = GetCardListOrderIndex0(panel);
-        cardGO.GetComponent<CardDisplay>().card.state = CardState.Active;
+        cardGO.GetComponent<CardDisplay>().card.SetState(CardState.Active);
+        if (cardGO.GetComponent<CardDisplay>().card.position == CardPosition.Bag)
+        {
+            if (cardGO.GetComponent<CardDisplay>().card.state == CardState.Active)
+            {
+                if (cardGO.GetComponent<CardDisplay>().card.lastState == CardState.Inactive)
+                {
+                    EffectRunner.Instance.Raise(CardTrigger.OnBecomeTopOfPile, cardGO);
+                }
+            }
+        }
 
     }
 

@@ -63,7 +63,8 @@ public sealed class GData : PureSingleton<GData>
 		int DefenceIdx = idx.ContainsKey("defence") ? idx["defence"] : -1;
 		int HealthIdx = idx.ContainsKey("health") ? idx["health"] : -1;
 		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
-		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
+        int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
+        int EffectIdsIdx = idx.ContainsKey("effectIds") ? idx["effectIds"] : -1;
 
         // Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
 
@@ -99,8 +100,20 @@ public sealed class GData : PureSingleton<GData>
             int health = GetInt(HealthIdx, 0);
             int price = GetInt(PriceIdx, 0);
             int stars = GetInt(StarsIdx, 0);
+            List<string> effectIds = new List<string>();
+            if (EffectIdsIdx >= 0)
+            {
+                string eff = Get(EffectIdsIdx);
+                var parts = eff.Split(new char[]{';','|'}, System.StringSplitOptions.RemoveEmptyEntries);
+                for (int k = 0; k < parts.Length; k++)
+                {
+                    var eid = parts[k].Trim();
+                    if (!string.IsNullOrEmpty(eid)) effectIds.Add(eid);
+                }
+            }
 
-            var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
+            var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
+
             CardDict[id] = card;
             // Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
             // Debug.Log($"CardDict: {CardDict.Count}");
