@@ -23,14 +23,21 @@ public class Card
     public string cardName;
     public string description;
     public int attack;
+    public int currentAttack;
     public int defence;
+    public int currentDefence;
     public int health;
+    public int currentHealth;
     public int price;
+    public int currentPrice;
     public int stars;
     public CardState state;
+    public CardState lastState;
     public CardPosition position;
+    public CardPosition lastPosition;
+    public List<string> effectIds = new List<string>();
 
-    public  Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars)
+    public  Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, List<string> _effectIds)
     {
         this.id = _id;
         this.type = _type;
@@ -62,9 +69,13 @@ public class Card
         }
         this.description = _description;
         this.attack = _attack;
+        this.currentAttack = _attack;
         this.defence = _defence;
+        this.currentDefence = _defence;
         this.health = _health;
+        this.currentHealth = _health;
         this.price = _price;
+        this.currentPrice = _price;
         this.stars = _stars;
         if (_type == "other")
         {
@@ -90,16 +101,31 @@ public class Card
                 this.cardFrame = null;
             }
         }
+        this.effectIds = _effectIds;
         this.state = CardState.Default;
+        this.lastState = CardState.Default;
         this.position = CardPosition.Default;
+        this.lastPosition = CardPosition.Default;
+    }
+    public void SetState(CardState state)
+    {
+        if (state != this.state)
+        {
+            this.lastState = this.state;
+            this.state = state;
+        }
+    }
+    public void SetPosition(CardPosition position)
+    {
+        if (position != this.position)
+        {
+            this.lastPosition = this.position;
+            this.position = position;
+        }
     }
     public Card Clone()
     {
-        var c =  new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
+        var c =  new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
         return c;
     }
-
 }
-
-
-

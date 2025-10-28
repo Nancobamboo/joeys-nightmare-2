@@ -19,7 +19,7 @@ public class CardDisplay : MonoBehaviour
     public Text attackText;
     public Image monster;
     public Text monsterText;
-    public Image attaction;
+    public Image monsterAttackIcon;
     public Image defence;
     public Text defenceText;
     public Image other;
@@ -68,12 +68,12 @@ public class CardDisplay : MonoBehaviour
         monster.gameObject.SetActive(false);
         other.gameObject.SetActive(false);
 
-        attackText.gameObject.SetActive(false);
-        defenceText.gameObject.SetActive(false);
-        monsterText.gameObject.SetActive(false);
-        otherText.gameObject.SetActive(false);
+        // attackText.gameObject.SetActive(false);
+        // defenceText.gameObject.SetActive(false);
+        // monsterText.gameObject.SetActive(false);
+        // otherText.gameObject.SetActive(false);
 
-        attaction.gameObject.SetActive(false);
+        // monsterAttackIcon.gameObject.SetActive(false);
 
         switch (type)
         {
@@ -90,10 +90,12 @@ public class CardDisplay : MonoBehaviour
                 break;
 
             case "monster":
+                attack.gameObject.SetActive(true);
+                attackText.text = card.attack.ToString();
                 monster.gameObject.SetActive(true);
                 monsterText.text = card.health.ToString();
-                monsterText.gameObject.SetActive(true);
-                attaction.gameObject.SetActive(true);
+                // monsterText.gameObject.SetActive(true);
+                // monsterAttackIcon.gameObject.SetActive(true);
                 break;
 
             default:
