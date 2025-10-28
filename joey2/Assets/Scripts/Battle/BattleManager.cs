@@ -27,6 +27,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 	{
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
         PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
+        GameEvents.RaiseHPChanged(PData.Instance.playerHealth);
 	}
 
     void OnEnable()
@@ -41,24 +42,10 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public GameObject GetRandomEnemy()
     {
-        List<GameObject> monsterCards = new List<GameObject>();
-        foreach (var panel in envPanels)
-        {
-            GameObject cardObj = UIGridHelper.GetCardListOrderIndex0(panel);
-            if (cardObj != null)
-            {
-                var cd = cardObj.GetComponent<CardDisplay>();
-                if (cd != null && cd.card != null && cd.card.type == "monster" && cd.card.health > 0)
-                {
-                    monsterCards.Add(cardObj);
-                }
-            }
-        }
-        if (monsterCards.Count == 0)
-            return null;
-        int randIdx = Random.Range(0, monsterCards.Count);
-        return monsterCards[randIdx];
+        return EnemyManager.GetRandomEnemy(envPanels);
     }
+
+    // public void Handle
 
     public void ApplyDamageToEnemy(GameObject enemy, int damage)
     {
@@ -275,6 +262,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             attackRealValue = attackValue - defenceValue;
         }
         PData.Instance.playerHealth -= attackRealValue;
+        GameEvents.RaiseHPChanged(PData.Instance.playerHealth);
         Debug.Log($"UseDefence: playerHealth: {PData.Instance.playerHealth}");
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
