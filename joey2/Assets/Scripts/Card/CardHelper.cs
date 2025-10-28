@@ -34,7 +34,7 @@ public static class CardHelper
             holder.effects.Clear();
             for (int i = 0; i < cd.card.effectIds.Count; i++)
             {
-                var eff = CardEffectRegistry.Create(cd.card.effectIds[i]);
+                var eff = CardEffectRegistry.CreateWithArgs(cd.card.effectIds[i]);
                 if (eff != null) holder.effects.Add(eff);
             }
         }
