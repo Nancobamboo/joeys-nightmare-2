@@ -2,33 +2,36 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+
 public sealed class GData : PureSingleton<GData>
 {
 	public Dictionary<string, Card> CardDict { get; private set; } = new Dictionary<string, Card>();
-	public Dictionary<string, List<string>> LibraryItemDict { get; private set; } = new Dictionary<string, List<string>>();
+	// public Dictionary<string, List<string>> LibraryItemDict { get; private set; } = new Dictionary<string, List<string>>();
 	public Dictionary<string, List<string>> DeckItemDict { get; private set; } = new Dictionary<string, List<string>>();
 
+	// 临时加入卡包的卡的id列表
+	public List<string> TempCardIdList { get; set; } = new List<string>();
+
 	// 路径策略（简单直观）
-	private string DataDir => Application.dataPath + "/Data";
-	private string CardCsvPath => Path.Combine(DataDir, "card_info.csv");   // 按你项目实际命名调整
-	private string LibraryCsvPath => Path.Combine(DataDir, "library_data.csv");
-	private string DeckCsvPath => Path.Combine(DataDir, "deck_data.csv");
+	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
+	// private string LibraryCsvPath = "Data/library_data";
+	private string DeckCsvPath = "Data/deck_data";
     private bool _cardsLoaded = false;
-    private bool _libraryLoaded = false;
+    // private bool _libraryLoaded = false;
     private bool _deckLoaded = false;
     private System.DateTime _cardsMTime = System.DateTime.MinValue;
-    private System.DateTime _libraryMTime = System.DateTime.MinValue;
+    // private System.DateTime _libraryMTime = System.DateTime.MinValue;
     private System.DateTime _deckMTime = System.DateTime.MinValue;
 	// 一键加载/保存
 	public void LoadAll(bool force = false)
 	{
 		LoadCards();
-		LoadLibrary();
+		// LoadLibrary();
 		LoadDeck();
 	}
 	public void SaveAll()
 	{
-		SaveLibrary();
+		// SaveLibrary();
 		SaveDeck();
 	}
 
@@ -37,47 +40,73 @@ public sealed class GData : PureSingleton<GData>
 	{
         if (!force && _cardsLoaded && !FileChanged(CardCsvPath, ref _cardsMTime)) return;
 		CardDict.Clear();
-		if (!File.Exists(CardCsvPath))
+		var ta = Resources.Load<TextAsset>(CardCsvPath);
+        // Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
+        var lines = ta.text.Split('\n');
+        // Debug.Log($"Lines: {lines.Length}");
+        if (lines.Length == 0) { _cardsLoaded = true; return; }
+        // Debug.Log($"Lines: {lines[0]}");
+        // 解析表头索引
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
 		{
-			Debug.LogWarning("找不到卡牌 CSV: " + CardCsvPath);
-			return;
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
 		}
-		var lines = File.ReadAllLines(CardCsvPath);
-		for (int i = 0; i < lines.Length; i++)
+		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
+		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int CardNameIdx = idx.ContainsKey("cardName") ? idx["cardName"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+		int AttackIdx = idx.ContainsKey("attack") ? idx["attack"] : -1;
+		int DefenceIdx = idx.ContainsKey("defence") ? idx["defence"] : -1;
+		int HealthIdx = idx.ContainsKey("health") ? idx["health"] : -1;
+		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
+		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
+
+        // Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
+
+		for (int i = 1; i < lines.Length; i++)
 		{
 			var line = lines[i];
-			if (string.IsNullOrWhiteSpace(line)) continue;
+			if (string.IsNullOrWhiteSpace(line) ) continue;
 
 			var values = line.Split(',');
-			if (values.Length < 5) continue;
-			if (values[0] == "id") continue;
+            if (string.IsNullOrEmpty(values[0])) continue;
+			// 取值函数
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+			// 安全解析整数的函数（处理空值）
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				Debug.LogWarning($"[GData] 第 {i} 行无法解析整数值: '{value}', 使用默认值 {defaultValue}");
+				return defaultValue;
+			}
+            string id = Get(IdIdx);
+            string cardImage = Get(CardImageIdx);
+            string type = Get(TypeIdx);
+            string cardName = Get(CardNameIdx);
+            string description = Get(DescriptionIdx);
+            int attack = GetInt(AttackIdx, 0);
+            int defence = GetInt(DefenceIdx, 0);
+            int health = GetInt(HealthIdx, 0);
+            int price = GetInt(PriceIdx, 0);
+            int stars = GetInt(StarsIdx, 0);
 
-			// 与你现有 Store.LoadCards 保持一致
-			if (values[2].Trim() == "enemy")
-			{
-				string id = values[0].Trim();
-				string name = values[1].Trim();
-				string type = values[2].Trim();
-				string desc = values[3].Trim();
-				int attack = int.Parse(values[4].Trim());
-				int hp = int.Parse(values[5].Trim());
-				var enemyCard = new EnemyCard(id, name, desc, type, attack, hp);
-				CardDict[id] = enemyCard;
-			}
-			else
-			{
-				string id = values[0].Trim();
-				string name = values[1].Trim();
-				string type = values[2].Trim();
-				string desc = values[3].Trim();
-				int attack = int.Parse(values[4].Trim());
-				int heal = int.Parse(values[6].Trim());
-				int price = int.Parse(values[7].Trim());
-				var itemCard = new ItemCard(id, name, desc, type, attack, heal, price);
-				CardDict[id] = itemCard;
-			}
+            var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars);
+            CardDict[id] = card;
+            // Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
+            // Debug.Log($"CardDict: {CardDict.Count}");
 		}
 		_cardsLoaded = true;
+        Debug.Log("Cards loaded: " + CardDict.Count);
 	}
 
 	public Card RandomCard()
@@ -90,25 +119,27 @@ public sealed class GData : PureSingleton<GData>
 	}
 
 	// ---------------- 牌库/卡组（原 ItemData 的纯 C# 版本） ----------------
-	public void LoadLibrary(bool force = false)
-	{
-		if (!force && _libraryLoaded && !FileChanged(LibraryCsvPath, ref _libraryMTime)) return;
-		LibraryItemDict = LoadTypeListCsv(LibraryCsvPath);
-		_libraryLoaded = true;
-	}
+	// public void LoadLibrary(bool force = false)
+	// {
+	// 	if (!force && _libraryLoaded && !FileChanged(LibraryCsvPath, ref _libraryMTime)) return;
+	// 	LibraryItemDict = LoadTypeListCsv(LibraryCsvPath);
+	// 	Debug.Log($"LibraryItemDict: {LibraryItemDict.Count}");
+	// 	_libraryLoaded = true;
+	// }
 
 	public void LoadDeck(bool force = false)
 	{
 		if (!force && _deckLoaded && !FileChanged(DeckCsvPath, ref _deckMTime)) return;
 		DeckItemDict = LoadTypeListCsv(DeckCsvPath);
+		Debug.Log($"DeckItemDict: {DeckItemDict.Count}");
 		_deckLoaded = true;
 	}
 
 
-	public void SaveLibrary()
-	{
-		SaveTypeListCsv(LibraryCsvPath, LibraryItemDict);
-	}
+	// public void SaveLibrary()
+	// {
+	// 	SaveTypeListCsv(LibraryCsvPath, LibraryItemDict);
+	// }
 
 	public void SaveDeck()
 	{
@@ -119,28 +150,24 @@ public sealed class GData : PureSingleton<GData>
 	private Dictionary<string, List<string>> LoadTypeListCsv(string path)
 	{
 		var dict = new Dictionary<string, List<string>>();
-		if (!File.Exists(path))
+        var lines = Resources.Load<TextAsset>(path).text.Split('\n');
+		for (int i = 1; i < lines.Length; i++)
 		{
-			Debug.LogWarning("CSV 不存在: " + path);
-			return dict;
-		}
-		var lines = File.ReadAllLines(path);
-		for (int i = 0; i < lines.Length; i++)
-		{
+			
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line)) continue;
 			var values = line.Split(',');
+            if (string.IsNullOrEmpty(values[0])) continue;
 			if (values.Length < 2) continue;
 			var id = values[0].Trim();
 			var type = values[1].Trim();
-			if (id == "id") continue;
 
-			if (!dict.TryGetValue(type, out var list))
+			if (!dict.ContainsKey(type))
 			{
-				list = new List<string>();
-				dict[type] = list;
+				dict[type] = new List<string>();
 			}
-			list.Add(id);
+			dict[type].Add(id);
+
 		}
 		return dict;
 	}
