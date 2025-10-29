@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FX_VFX_Advanced
+  m_Name: FX_VFX_Advanced 5
   m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -35,7 +35,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _DissolveTex:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 0.88, y: 0.22}
         m_Offset: {x: 0, y: 0}
     - _DissolveTex2:
         m_Texture: {fileID: 0}
@@ -50,9 +50,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 2c313f06a69412c46b60edb71914884b, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
+        m_Texture: {fileID: 2800000, guid: 6667b9abbfd6a8949b15ba2a5466df71, type: 3}
+        m_Scale: {x: 0.68, y: 1}
+        m_Offset: {x: 0.21, y: 0}
     - _Mask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -88,19 +88,19 @@ Material:
     - _NULL_SeamFold: 0
     - _NULL_ShaderID: 1
     - _SoftParticlesEnabled: 0
-    - _Softness: 0.25
+    - _Softness: 0.494
     - _Spread: 1
     - _UseUnscaledTime: 0
-    - _Width: 0.1
+    - _Width: 1.332
     m_Colors:
     - _AnimationSettings: {r: 1, g: 0, b: 0, a: 1}
-    - _Color: {r: 1.7886794, g: 0.92045045, b: 0.3611107, a: 1}
+    - _Color: {r: 1.1486983, g: 1.1486983, b: 1.1486983, a: 1}
     - _ColorAlphaBrightnessContrast: {r: 1, g: 1, b: 1, a: 1}
     - _DissolvePanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortPanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
-    - _EdgeColor: {r: 0, g: 0, b: 0, a: 0}
+    - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
     - _FixValue: {r: 0, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
