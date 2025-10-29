@@ -12,11 +12,11 @@ public class HPManager : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-        PData.Instance.OnHPChanged += OnHPChanged;
+        GameEvents.OnHPChanged += OnHPChanged;
     }
     void OnDisable()
     {
-        PData.Instance.OnHPChanged -= OnHPChanged;
+        GameEvents.OnHPChanged -= OnHPChanged;
     }
 
     void OnHPChanged(int hp)

@@ -22,5 +22,10 @@ public static class GameEvents
         OnCardClicked?.Invoke(cardGameObject);
     }
 
-
+    // 心数改变
+    public static event Action<int> OnHPChanged;
+    public static void RaiseHPChanged(int hp)
+    {
+        OnHPChanged?.Invoke(hp);
+    }
 }
