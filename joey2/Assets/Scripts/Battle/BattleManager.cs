@@ -261,21 +261,11 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             attackRealValue = attackValue - defenceValue;
         }
-        PData.Instance.playerHealth -= attackRealValue;
-        GameEvents.RaiseHPChanged(PData.Instance.playerHealth);
-        Debug.Log($"UseDefence: playerHealth: {PData.Instance.playerHealth}");
+        PData.Instance.SetPlayerHP(PData.Instance.playerHealth - attackRealValue);
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
 
-        if (PData.Instance.playerHealth <= 0)
-        {
-            Debug.Log("PlayerLost");
-            PhaseManager.Instance.SetGamePhase(GamePhase.battleEnd);
-        }
-        else
-        {
-            PhaseManager.Instance.SetGamePhase(GamePhase.playerStart);
-        }
+        
 
     }
 
