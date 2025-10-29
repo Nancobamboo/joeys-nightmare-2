@@ -270,7 +270,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.1
-  pointerIn: 0
 --- !u!1 &2495113706277072694
 GameObject:
   m_ObjectHideFlags: 0
