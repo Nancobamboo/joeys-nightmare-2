@@ -27,6 +27,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 	{
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
         PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
+        PData.Instance.SetPlayerHP(PData.Instance.playerHealth);
 	}
 
     void OnEnable()
@@ -41,24 +42,10 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public GameObject GetRandomEnemy()
     {
-        List<GameObject> monsterCards = new List<GameObject>();
-        foreach (var panel in envPanels)
-        {
-            GameObject cardObj = UIGridHelper.GetCardListOrderIndex0(panel);
-            if (cardObj != null)
-            {
-                var cd = cardObj.GetComponent<CardDisplay>();
-                if (cd != null && cd.card != null && cd.card.type == "monster" && cd.card.health > 0)
-                {
-                    monsterCards.Add(cardObj);
-                }
-            }
-        }
-        if (monsterCards.Count == 0)
-            return null;
-        int randIdx = Random.Range(0, monsterCards.Count);
-        return monsterCards[randIdx];
+        return EnemyManager.GetRandomEnemy(envPanels);
     }
+
+    // public void Handle
 
     public void ApplyDamageToEnemy(GameObject enemy, int damage)
     {
@@ -274,20 +261,11 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             attackRealValue = attackValue - defenceValue;
         }
-        PData.Instance.playerHealth -= attackRealValue;
-        Debug.Log($"UseDefence: playerHealth: {PData.Instance.playerHealth}");
+        PData.Instance.SetPlayerHP(PData.Instance.playerHealth - attackRealValue);
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
 
-        if (PData.Instance.playerHealth <= 0)
-        {
-            Debug.Log("PlayerLost");
-            PhaseManager.Instance.SetGamePhase(GamePhase.battleEnd);
-        }
-        else
-        {
-            PhaseManager.Instance.SetGamePhase(GamePhase.playerStart);
-        }
+        
 
     }
 
