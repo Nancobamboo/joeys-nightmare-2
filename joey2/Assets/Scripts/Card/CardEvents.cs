@@ -6,8 +6,11 @@ using UnityEngine.EventSystems;
 
 public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandler, IPointerExitHandler
 {
-    public float zoomSize = 1.2f;
-
+    public float zoomSize = 1.1f;
+    public bool pointerIn = false;
+    // 添加特效相关变量
+    private GameObject vfxInstance;
+    private string glowPath = "VFX/VFX_glow";
     public CardDisplay GetCardDisplay()
     {
         var cd = this.GetComponent<CardDisplay>();
@@ -47,21 +50,60 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
     public void OnPointerEnter(PointerEventData eventData)
     {
         var cd = GetCardDisplay();
-        if (cd.card.position == CardPosition.Deck)
+        if (cd.card.position == CardPosition.Deck || cd.card.state == CardState.Active)
         {
+            pointerIn = true;
             transform.localScale = new Vector3(zoomSize, zoomSize, 1.0f);
+            PlayGlowVFX();
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         var cd = GetCardDisplay();
-        if (cd.card.position == CardPosition.Deck)
+        if (pointerIn)
         {
+            pointerIn = false;
             transform.localScale = Vector3.one;
+        }
+        DestroyGlowVFX();
+    }
+
+    private void PlayGlowVFX()
+    {
+        Debug.Log("PlayGlowVFX");
+        // 如果已经有特效实例，先销毁
+        DestroyGlowVFX();
+        
+        // 从Resources加载特效预制体
+        GameObject vfxPrefab = Resources.Load<GameObject>(glowPath);
+        if (vfxPrefab != null)
+        {
+            // 在卡牌位置实例化特效
+            vfxInstance = Instantiate(vfxPrefab, transform.position, Quaternion.identity, transform);
+            // 设置为卡牌的子对象，跟随卡牌移动
+            vfxInstance.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            Debug.LogError($"无法加载特效: {glowPath}");
         }
     }
 
+    private void DestroyGlowVFX()
+    {
+        // 销毁特效实例
+        if (vfxInstance != null)
+        {
+            Destroy(vfxInstance);
+            vfxInstance = null;
+        }
+    }
 
+    // 在对象销毁时也清理特效
+    private void OnDestroy()
+    {
+        DestroyGlowVFX();
+    }
 
 }
