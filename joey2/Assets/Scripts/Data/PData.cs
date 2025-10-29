@@ -12,10 +12,6 @@ public sealed class PData : PureSingleton<PData>
 
 	public void SetPlayerHP(int hp)
 	{
-		if (playerHealth == hp)
-		{
-			return;
-		}
 		playerHealth = hp;
 		GameEvents.RaiseHPChanged(playerHealth);
 	}

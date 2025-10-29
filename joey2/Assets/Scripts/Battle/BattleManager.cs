@@ -27,7 +27,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 	{
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
         PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
-        GameEvents.RaiseHPChanged(PData.Instance.playerHealth);
+        PData.Instance.SetPlayerHP(PData.Instance.playerHealth);
 	}
 
     void OnEnable()
