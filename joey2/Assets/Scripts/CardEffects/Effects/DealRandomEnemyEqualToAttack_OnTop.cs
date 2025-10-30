@@ -17,7 +17,9 @@ public class DealRandomEnemyEqualToAttack_OnTop : ICardEffect
         int damage = Mathf.Max(0, srcCd.card.attack);
 
         // 可选：播放VFX/Shake
-        yield return VFX.PlayHit(ctx.source, enemy);
+        VFX.PlayHit(ctx.source, enemy);
+        yield return new WaitForSeconds(0.5f);
+        // VFX.StoHit(ctx.source, enemy);
 
         BattleManager.Instance.ApplyDamageToEnemy(enemy, damage);
         // 补一个触发：造成伤害

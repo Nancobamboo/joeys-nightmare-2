@@ -10,7 +10,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
     public bool pointerIn = false;
     // 添加特效相关变量
     private GameObject vfxInstance;
-    private string glowPath = "VFX/VFX_glow";
+    private string glowPath = "VFX/base/VFX_glow";
     public CardDisplay GetCardDisplay()
     {
         var cd = this.GetComponent<CardDisplay>();
