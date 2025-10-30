@@ -7,16 +7,22 @@ using UnityEngine.UI;
 public class HPManager : MonoBehaviour
 {
     public Text heartText;
+    public Text attackText;
+    public Text defenceText;
 
     
     // Start is called before the first frame update
     void OnEnable()
     {
         GameEvents.OnHPChanged += OnHPChanged;
+        GameEvents.OnAttackChanged += OnAttackChanged;
+        GameEvents.OnDefenceChanged += OnDefenceChanged;
     }
     void OnDisable()
     {
         GameEvents.OnHPChanged -= OnHPChanged;
+        GameEvents.OnAttackChanged -= OnAttackChanged;
+        GameEvents.OnDefenceChanged -= OnDefenceChanged;
     }
 
     void OnHPChanged(int hp)
@@ -26,6 +32,22 @@ public class HPManager : MonoBehaviour
         {
             Debug.Log("PlayerLost");
             PhaseManager.Instance.SetGamePhase(GamePhase.battleEnd);
+        }
+    }
+
+    void OnAttackChanged(int attack)
+    {
+        if (attackText != null)
+        {
+            attackText.text = PData.Instance.playerAttack.ToString();
+        }
+    }
+
+    void OnDefenceChanged(int defence)
+    {
+        if (defenceText != null)
+        {
+            defenceText.text = PData.Instance.playerDefence.ToString();
         }
     }
 }
