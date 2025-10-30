@@ -16,6 +16,12 @@ public sealed class GData : PureSingleton<GData>
 	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
 	// private string LibraryCsvPath = "Data/library_data";
 	private string DeckCsvPath = "Data/deck_data";
+	private string TutorialEquipmentDeckCsvPath = "Data/tutorial_equipment_deck";
+	private string TutorialPlayerDataCsvPath = "Data/tutorial_player_data";
+	private Dictionary<int, Dictionary<string, List<string>>> _tutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
+	private bool _tutorialEquipmentDeckLoaded = false;
+	private Dictionary<int, (int health, int maxHealth)> _tutorialPlayerDataCache = new Dictionary<int, (int, int)>();
+	private bool _tutorialPlayerDataLoaded = false;
     private bool _cardsLoaded = false;
     // private bool _libraryLoaded = false;
     private bool _deckLoaded = false;
@@ -28,6 +34,8 @@ public sealed class GData : PureSingleton<GData>
 		LoadCards();
 		// LoadLibrary();
 		LoadDeck();
+		LoadTutorialEquipmentDeck();
+		LoadTutorialPlayerData();
 	}
 	public void SaveAll()
 	{
@@ -227,5 +235,159 @@ public sealed class GData : PureSingleton<GData>
         return File.Exists(path) ? File.GetLastWriteTimeUtc(path) : System.DateTime.MinValue;
     }
 
+	// ---------------- 教程装备卡组 ---------------- 
+	public void LoadTutorialEquipmentDeck(bool force = false)
+	{
+		if (!force && _tutorialEquipmentDeckLoaded) return;
+		
+		_tutorialEquipmentDeckCache.Clear();
+		var ta = Resources.Load<TextAsset>(TutorialEquipmentDeckCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Tutorial equipment deck CSV not found: {TutorialEquipmentDeckCsvPath}");
+			_tutorialEquipmentDeckLoaded = true;
+			return;
+		}
+
+		var lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			_tutorialEquipmentDeckLoaded = true;
+			return;
+		}
+
+		// Parse header
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int CardIdsIdx = idx.ContainsKey("cardIds") ? idx["cardIds"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			var values = line.Split(',');
+			if (values.Length < 3) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			if (!int.TryParse(Get(LevelIdx), out int level)) continue;
+			string type = Get(TypeIdx);
+			if (string.IsNullOrEmpty(type)) continue;
+			string cardIdsStr = Get(CardIdsIdx);
+
+			List<string> cardIds = new List<string>();
+			if (!string.IsNullOrWhiteSpace(cardIdsStr))
+			{
+				var parts = cardIdsStr.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+				foreach (var part in parts)
+				{
+					var id = part.Trim();
+					if (!string.IsNullOrEmpty(id)) cardIds.Add(id);
+				}
+			}
+
+			if (!_tutorialEquipmentDeckCache.ContainsKey(level))
+			{
+				_tutorialEquipmentDeckCache[level] = new Dictionary<string, List<string>>();
+			}
+			_tutorialEquipmentDeckCache[level][type] = cardIds;
+		}
+
+		_tutorialEquipmentDeckLoaded = true;
+		Debug.Log($"Tutorial equipment deck loaded: {_tutorialEquipmentDeckCache.Count} levels");
+	}
+
+	public Dictionary<string, List<string>> GetTutorialEquipmentDeck(int level)
+	{
+		LoadTutorialEquipmentDeck();
+		if (_tutorialEquipmentDeckCache.ContainsKey(level))
+		{
+			return _tutorialEquipmentDeckCache[level];
+		}
+		Debug.LogWarning($"Tutorial equipment deck for level {level} not found in CSV");
+		return new Dictionary<string, List<string>>();
+	}
+
+	// ---------------- 教程关卡血量配置 ---------------- 
+	public void LoadTutorialPlayerData(bool force = false)
+	{
+		if (!force && _tutorialPlayerDataLoaded) return;
+		
+		_tutorialPlayerDataCache.Clear();
+		var ta = Resources.Load<TextAsset>(TutorialPlayerDataCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Tutorial player data CSV not found: {TutorialPlayerDataCsvPath}");
+			_tutorialPlayerDataLoaded = true;
+			return;
+		}
+
+		var lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			_tutorialPlayerDataLoaded = true;
+			return;
+		}
+
+		// Parse header
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+		int HealthIdx = idx.ContainsKey("health") ? idx["health"] : -1;
+		int MaxHealthIdx = idx.ContainsKey("maxHealth") ? idx["maxHealth"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			var values = line.Split(',');
+			if (values.Length < 3) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			if (!int.TryParse(Get(LevelIdx), out int level)) continue;
+			if (!int.TryParse(Get(HealthIdx), out int health)) health = 30;
+			if (!int.TryParse(Get(MaxHealthIdx), out int maxHealth)) maxHealth = 30;
+
+			_tutorialPlayerDataCache[level] = (health, maxHealth);
+		}
+
+		_tutorialPlayerDataLoaded = true;
+		Debug.Log($"Tutorial player data loaded: {_tutorialPlayerDataCache.Count} levels");
+	}
+
+	public (int health, int maxHealth)? GetTutorialPlayerData(int level)
+	{
+		LoadTutorialPlayerData();
+		if (_tutorialPlayerDataCache.ContainsKey(level))
+		{
+			return _tutorialPlayerDataCache[level];
+		}
+		return null;
+	}
 
 }
