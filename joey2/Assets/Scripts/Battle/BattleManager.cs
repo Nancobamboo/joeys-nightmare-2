@@ -173,10 +173,10 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)
     {
-        if (attackCardList.Count == 0)
-        {
-            CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
-        }
+        // if (attackCardList.Count == 0)
+        // {
+        //     CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
+        // }
         GameObject attackCardGameObject = UIGridHelper.GetCardListOrderIndex0(attackPanel);
         UseAttack(attackCardGameObject, cardGameObject);
     }
@@ -291,6 +291,19 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         // 加载所有卡牌数据
         GData.Instance.LoadAll();
+        
+        // Set player health for tutorial levels (1-3) from CSV config
+        if (level >= 1 && level <= 3)
+        {
+            var playerData = GData.Instance.GetTutorialPlayerData(level);
+            if (playerData.HasValue)
+            {
+                PData.Instance.playerHealth = playerData.Value.health;
+                PData.Instance.playerMaxHealth = playerData.Value.maxHealth;
+                PData.Instance.SetPlayerHP(playerData.Value.health);
+            }
+        }
+        
         // 抽取环境卡牌
         List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(level);
         for (int i = 0; i < cardIdListEnv.Count; i++)
@@ -307,8 +320,32 @@ public class BattleManager : MonoSingleton<BattleManager>
             envCardListList.Add(oneEnvCardList);
         }
 
+        // Tutorial levels (1-3) use CSV config equipment deck
+        Dictionary<string, List<string>> equipmentDeck;
+        if (level >= 1 && level <= 3)
+        {
+            // Load tutorial deck from CSV
+            equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(level);
+            if (equipmentDeck.Count == 0)
+            {
+                Debug.LogWarning($"Tutorial equipment deck for level {level} not found, using default");
+                equipmentDeck = new Dictionary<string, List<string>>
+                {
+                    { "attack", new List<string> { "1002", "1002", "1001" } },
+                    { "defence", new List<string> { "2001", "2001" } },
+                    { "skill", new List<string>() },
+                    { "item", new List<string>() }
+                };
+            }
+        }
+        else
+        {
+            // Normal levels use deck from GData
+            equipmentDeck = GData.Instance.DeckItemDict;
+        }
+
         // 遍历玩家牌组，根据卡牌类型分配到对应面板
-        foreach (var kv in GData.Instance.DeckItemDict)
+        foreach (var kv in equipmentDeck)
         {
             string cardType = kv.Key;
             List<string> cardIds = kv.Value;
