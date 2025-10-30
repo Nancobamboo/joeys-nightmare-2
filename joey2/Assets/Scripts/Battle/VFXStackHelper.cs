@@ -116,7 +116,8 @@ public static class VFXStackHelper
     public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage)
     {
         if (cardGO == null) yield break;
-
+        // 获取Canvas
+        Canvas canvas = cardGO.GetComponentInParent<Canvas>();
         // 1. 播放卡牌受击动画（如果有animator）
         Animator animator = cardGO.GetComponentInChildren<Animator>();
         Debug.Log($"PlayDamageVFX: Animator found = {animator != null}, CardGO = {cardGO.name}");
@@ -140,8 +141,6 @@ public static class VFXStackHelper
         GameObject damageInstance = null;
         if (damageUI != null)
         {
-            // 获取Canvas
-            Canvas canvas = cardGO.GetComponentInParent<Canvas>();
             if (canvas != null)
             {
                 // 实例化伤害数字UI
@@ -160,7 +159,8 @@ public static class VFXStackHelper
 
         // 3. 播放受击特效
         GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Shouji");
-        GameObject vfxInstance = Object.Instantiate(vfxPrefab, cardGO.transform.position, Quaternion.identity);
+        GameObject vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+        vfxInstance.transform.position = cardGO.transform.position; // 使用相同的坐标设置方式
         
         // 4. 播放震动特效
         if (CameraShake.Instance != null)
@@ -174,7 +174,7 @@ public static class VFXStackHelper
         }
         
         
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.5f);
         if (vfxInstance != null)
         {
             Object.Destroy(vfxInstance);

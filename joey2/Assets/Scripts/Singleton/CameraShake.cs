@@ -7,15 +7,25 @@ using UnityEngine;
 /// </summary>
 public class CameraShake : MonoSingleton<CameraShake>
 {
-    private Camera mainCamera;
+    private Camera shakeCamera;
     private Vector3 originalPosition;
 
     private void Start()
     {
-        mainCamera = Camera.main;
-        if (mainCamera == null)
+        // 优先查找MainCamera，如果没有则查找任意激活的相机
+        shakeCamera = Camera.main;
+        if (shakeCamera == null)
         {
-            Debug.LogError("CameraShake: 场景中找不到 Main Camera");
+            // 如果没有MainCamera标签，则使用场景中第一个找到的相机
+            shakeCamera = FindObjectOfType<Camera>();
+            if (shakeCamera == null)
+            {
+                Debug.LogError("CameraShake: 场景中找不到任何相机");
+            }
+            else
+            {
+                Debug.LogWarning($"CameraShake: 场景中找不到 Main Camera，使用 {shakeCamera.name} 代替");
+            }
         }
     }
 
@@ -52,13 +62,13 @@ public class CameraShake : MonoSingleton<CameraShake>
     /// <param name="magnitude">振动幅度</param>
     private IEnumerator Shake(float duration, float magnitude)
     {
-        if (mainCamera == null)
+        if (shakeCamera == null)
         {
-            Debug.LogWarning("CameraShake.Shake: mainCamera is null");
+            Debug.LogWarning("CameraShake.Shake: shakeCamera is null");
             yield break;
         }
 
-        originalPosition = mainCamera.transform.localPosition;
+        originalPosition = shakeCamera.transform.localPosition;
         Debug.Log($"CameraShake.Shake: Starting shake with duration={duration}, magnitude={magnitude}");
         float elapsed = 0f;
 
@@ -67,14 +77,14 @@ public class CameraShake : MonoSingleton<CameraShake>
             float randomX = Random.Range(-1f, 1f) * magnitude;
             float randomY = Random.Range(-1f, 1f) * magnitude;
 
-            mainCamera.transform.localPosition = originalPosition + new Vector3(randomX, randomY, 0f);
+            shakeCamera.transform.localPosition = originalPosition + new Vector3(randomX, randomY, 0f);
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         // 恢复摄像机原始位置
-        mainCamera.transform.localPosition = originalPosition;
+        shakeCamera.transform.localPosition = originalPosition;
         Debug.Log("CameraShake.Shake: Shake completed");
     }
 }
