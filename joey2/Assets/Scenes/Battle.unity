@@ -123,6 +123,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &109006952 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5757915165870456582, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+  m_PrefabInstance: {fileID: 966049681}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &303064581
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,7 +249,7 @@ GameObject:
   - component: {fileID: 416638772}
   - component: {fileID: 416638771}
   m_Layer: 0
-  m_Name: HeartManager
+  m_Name: PlayerStateManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,10 +264,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 416638770}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea5cf23b121b62a47b848859e1b8bb48, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a5730957f599cc4487c86c3dee7a691, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   heartText: {fileID: 966049683}
+  attackText: {fileID: 109006952}
+  defenceText: {fileID: 1462383341}
 --- !u!4 &416638772
 Transform:
   m_ObjectHideFlags: 0
@@ -495,6 +508,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1703720555338805462, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+      propertyPath: m_Name
+      value: AttackNum
+      objectReference: {fileID: 0}
     - target: {fileID: 2769174519241808265, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -606,6 +623,10 @@ PrefabInstance:
     - target: {fileID: 6017697089894755127, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6286538776170320892, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+      propertyPath: m_Name
+      value: DefenceNum
       objectReference: {fileID: 0}
     - target: {fileID: 6918669209917738642, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_Pivot.x
@@ -824,6 +845,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5396701686662672251, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
   m_PrefabInstance: {fileID: 966049681}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1462383341 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6519441647543781599, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+  m_PrefabInstance: {fileID: 966049681}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1759304526
 GameObject:
   m_ObjectHideFlags: 0
