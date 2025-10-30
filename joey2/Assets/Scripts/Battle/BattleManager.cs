@@ -360,8 +360,17 @@ public class BattleManager : MonoSingleton<BattleManager>
                 if (j == 0) state = CardState.Active;
                 CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:panel, cardId:cardId, state:state, position:CardPosition.Bag, attachList:list);
             }
+            
+            // Refresh panel after creating cards to ensure active state is set correctly
+            UIGridHelper.RefreshPanel(panel);
         }
         Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
+        
+        // Update player display after game start
+        if (PlayerDisplay.Instance != null)
+        {
+            PlayerDisplay.Instance.UpdatePlayerStats();
+        }
     }
 
 

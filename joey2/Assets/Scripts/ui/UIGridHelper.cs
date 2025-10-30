@@ -45,7 +45,15 @@ public static class UIGridHelper
             }
 
         }
-        if (!hasActiveChild) return;
+        if (!hasActiveChild) 
+        {
+            // Update player display even if no active card
+            if (PlayerDisplay.Instance != null)
+            {
+                PlayerDisplay.Instance.UpdatePlayerStats();
+            }
+            return;
+        }
         GameObject cardGO = GetCardListOrderIndex0(panel);
         cardGO.GetComponent<CardDisplay>().card.SetState(CardState.Active);
         if (cardGO.GetComponent<CardDisplay>().card.position == CardPosition.Bag)
@@ -57,6 +65,12 @@ public static class UIGridHelper
                     EffectRunner.Instance.Raise(CardTrigger.OnBecomeTopOfPile, cardGO);
                 }
             }
+        }
+
+        // Update player display when panel is refreshed
+        if (PlayerDisplay.Instance != null)
+        {
+            PlayerDisplay.Instance.UpdatePlayerStats();
         }
 
     }
