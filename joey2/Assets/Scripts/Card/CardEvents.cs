@@ -54,7 +54,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
         {
             pointerIn = true;
             transform.localScale = new Vector3(zoomSize, zoomSize, 1.0f);
-            PlayGlowVFX();
+            // PlayGlowVFX();
         }
     }
 
@@ -66,7 +66,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
             pointerIn = false;
             transform.localScale = Vector3.one;
         }
-        DestroyGlowVFX();
+        // DestroyGlowVFX();
     }
 
     private void PlayGlowVFX()
