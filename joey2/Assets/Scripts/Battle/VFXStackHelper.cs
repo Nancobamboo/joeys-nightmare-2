@@ -10,40 +10,39 @@ public static class VFXStackHelper
     public static IEnumerator PlayAppearDisappearVFX(GameObject cardGO, int envListIndex)
     {
         if (cardGO == null) yield break;
-        // 在方法开始时声明变量
-        GameObject appearVfxInstance = null;
-        GameObject disappearVfxInstance = null;
-
-        // 获取cardGO所在的canvas
+        // 记录原始位置
         Canvas canvas = cardGO.GetComponentInParent<Canvas>();
-        Vector3 oldWorldPosition = cardGO.transform.position;
-        
-        
-        GameObject disappearVfxPrefab = Resources.Load<GameObject>(disappearVFXPath);
-        if (disappearVFXPath != null)
-        {
-            PData.Instance.canOperate = false;
-            disappearVfxInstance = Object.Instantiate(disappearVfxPrefab, canvas.transform);
-            disappearVfxInstance.transform.position = oldWorldPosition;
-            // 让布局系统忽略这个特效对象
-            var layoutElement = disappearVfxInstance.GetComponent<UnityEngine.UI.LayoutElement>();
-            if (layoutElement == null)
-            {
-                layoutElement = disappearVfxInstance.AddComponent<UnityEngine.UI.LayoutElement>();
-            }
-            layoutElement.ignoreLayout = true;
+        Vector3 startWorldPosition = cardGO.transform.position;
+        Vector3 startScale = cardGO.transform.localScale;
 
-            yield return new WaitForSeconds(0.3f);
-            // // 将卡片透明度设为0
-            // var canvasGroup = cardGO.GetComponent<CanvasGroup>();
-            // if (canvasGroup == null)
-            // {
-            //     canvasGroup = cardGO.AddComponent<CanvasGroup>();
-            // }
-            // canvasGroup.alpha = 0f;
-            PData.Instance.canOperate = true;
-            // yield return new WaitForSeconds(0.1f); 
+        // 创建一个临时的卡牌视觉副本用于飞行动画
+        GameObject flyingCard = Object.Instantiate(cardGO, canvas.transform);
+        flyingCard.transform.position = startWorldPosition;
+        flyingCard.transform.localScale = startScale;
+        // 让飞行卡牌忽略布局
+        var layoutElement = flyingCard.GetComponent<UnityEngine.UI.LayoutElement>();
+        if (layoutElement == null)
+        {
+            layoutElement = flyingCard.AddComponent<UnityEngine.UI.LayoutElement>();
         }
+        layoutElement.ignoreLayout = true;
+
+        // 禁用飞行卡牌的交互
+        var canvasGroup = flyingCard.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = flyingCard.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.blocksRaycasts = false;
+
+        // 隐藏原始卡牌
+        var originalCanvasGroup = cardGO.GetComponent<CanvasGroup>();
+        if (originalCanvasGroup == null)
+        {
+            originalCanvasGroup = cardGO.AddComponent<CanvasGroup>();
+        }
+        originalCanvasGroup.alpha = 0f;
+
 
         switch (cardGO.GetComponent<CardDisplay>().card.type)
         {
@@ -76,32 +75,39 @@ public static class VFXStackHelper
                 yield break;
         }
 
+        // 等待一帧，让布局系统更新目标位置
+        yield return null;
+        // 获取目标位置和缩放
+        Vector3 targetWorldPosition = cardGO.transform.position;
+        Vector3 targetScale = new Vector3(0.8f, 0.8f, 1.0f);
 
-
-        GameObject appearVfxPrefab = Resources.Load<GameObject>(appearVFXPath);
-        if (appearVfxPrefab != null)
+        // 播放飞行动画
+        PData.Instance.canOperate = false;
+        // 使用协程实现飞行动画（不需要DOTween）
+        float duration = 0.45f; // 飞行时间
+        float elapsed = 0f;
+        while (elapsed < duration)
         {
-            PData.Instance.canOperate = false;
-            appearVfxInstance = Object.Instantiate(appearVfxPrefab, cardGO.transform);
-            appearVfxInstance.transform.localPosition = Vector3.zero;
-            yield return new WaitForSeconds(0.4f);
-            // // 将卡片透明度设为1
-            // var canvasGroup = cardGO.GetComponent<CanvasGroup>();
-            // if (canvasGroup == null)
-            // {
-            //     canvasGroup = cardGO.AddComponent<CanvasGroup>();
-            // }
-            // canvasGroup.alpha = 1f;
-            yield return new WaitForSeconds(0.4f);
-            PData.Instance.canOperate = true;
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            
+            // 使用缓动函数（EaseOutQuad）
+            float easeT = 1f - (1f - t) * (1f - t);
+            
+            // 插值位置
+            flyingCard.transform.position = Vector3.Lerp(startWorldPosition, targetWorldPosition, easeT);
+            
+            // 插值缩放
+            flyingCard.transform.localScale = Vector3.Lerp(startScale, targetScale, easeT);
+            
+            yield return null;
         }
-        if (disappearVfxInstance != null)
-        {
-            Object.Destroy(disappearVfxInstance);
-        }
-        if (appearVfxInstance != null)
-        {
-            Object.Destroy(appearVfxInstance);
-        }
+        // 确保最终位置准确
+        flyingCard.transform.position = targetWorldPosition;
+        flyingCard.transform.localScale = targetScale;
+        // 销毁飞行卡牌，显示原始卡牌
+        Object.Destroy(flyingCard);
+        originalCanvasGroup.alpha = 1f;
+        PData.Instance.canOperate = true;
     }
 }
