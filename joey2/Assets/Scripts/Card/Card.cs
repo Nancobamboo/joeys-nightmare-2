@@ -57,7 +57,7 @@ public class Card
         }
         else if (_type == "item")
         {
-            this.iconType = "Art/UI/icon_items";
+            this.iconType = "Art/UI/icon_item";
         }
         else if (_type == "monster")
         {
@@ -79,7 +79,7 @@ public class Card
         this.stars = _stars;
         if (_type == "other")
         {
-            this.cardFrame = "Art/UI/bg_card_golden";
+            this.cardFrame = "Art/UI/bg_card_character";
         }
         else
         {
