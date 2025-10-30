@@ -55,8 +55,13 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.card.health -= damage;
         if (targetCard.card.health < 0) targetCard.card.health = 0;
         targetCard.ShowCard();
+        Settlement(enemy);
+    }
 
-        if (targetCard.card.health <= 0)
+    public void Settlement(GameObject enemy)
+    {
+        var enemyCard = enemy.GetComponent<CardDisplay>();
+        if (enemyCard.card.health <= 0)
         {
             // 移动到已使用堆
             int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:enemy, envCardListList:envCardListList);
@@ -66,9 +71,15 @@ public class BattleManager : MonoSingleton<BattleManager>
                 UIGridHelper.RefreshPanel(envPanels[envListIndex]);
             }
             // 触发击杀
-            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy, value: damage);
+            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy);
         }
     }
+
+
+
+
+
+
 
     public void OnCardClicked(GameObject cardGameObject)
     {
@@ -179,37 +190,9 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("OnEnvCardClicked: envListIndex 超出范围");
             return;
         }
-
         // 从 env 的 list 中移除卡
-        
-        switch (cardGO.GetComponent<CardDisplay>().card.type)
-        {
-            case "attack":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:attackCardList, state:CardState.Active, position:CardPosition.Bag);
-                cardGO.transform.SetParent(attackPanel);
-                UIGridHelper.RefreshPanel(attackPanel);
-                break;
-            case "defence":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:defenceCardList, state:CardState.Active, position:CardPosition.Bag);
-                cardGO.transform.SetParent(defencePanel);
-                UIGridHelper.RefreshPanel(defencePanel);
-                break;
-            case "skill":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:skillCardList, state:CardState.Active, position:CardPosition.Bag);
-                cardGO.transform.SetParent(skillPanel);
-                UIGridHelper.RefreshPanel(skillPanel);
-                break;
-            case "item":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:envCardListList[envListIndex], toCardList:itemCardList, state:CardState.Active, position:CardPosition.Bag);
-                cardGO.transform.SetParent(itemPanel);
-                UIGridHelper.RefreshPanel(itemPanel);
-                break;
-            default:
-                Debug.LogError("OnEnvCardClicked: 未知的位置");
-                return;
-        }
-        UIGridHelper.RefreshPanel(envPanels[envListIndex]);
-        PhaseManager.Instance.SetGamePhase(GamePhase.playerStart);
+        StartCoroutine(VFXStackHelper.PlayAppearDisappearVFX(cardGO:cardGO, envListIndex:envListIndex));
+        PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
 
     public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
