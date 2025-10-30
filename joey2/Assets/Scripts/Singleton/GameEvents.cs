@@ -28,4 +28,18 @@ public static class GameEvents
     {
         OnHPChanged?.Invoke(hp);
     }
+
+    // 攻击改变
+    public static event Action<int> OnAttackChanged;
+    public static void RaiseAttackChanged(int attack)
+    {
+        OnAttackChanged?.Invoke(attack);
+    }
+
+    // 防御改变
+    public static event Action<int> OnDefenceChanged;
+    public static void RaiseDefenceChanged(int defence)
+    {
+        OnDefenceChanged?.Invoke(defence);
+    }
 }

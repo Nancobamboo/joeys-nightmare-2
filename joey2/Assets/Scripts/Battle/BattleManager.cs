@@ -212,6 +212,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.ShowCard();
         CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(attackPanel);
+        UpdatePlayerAttackAndDefence();
 
         ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue);
         Settlement(targetCardGameObject);
@@ -234,6 +235,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth - attackRealValue);
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
+        UpdatePlayerAttackAndDefence();
 
     }
 
@@ -270,6 +272,45 @@ public class BattleManager : MonoSingleton<BattleManager>
             case "item": panel = itemPanel; list = itemCardList; return true;
             default: panel = null; list = null; return false;
         }
+    }
+
+    // Update player attack and defence based on active cards
+    public void UpdatePlayerAttackAndDefence()
+    {
+        // Get active attack card
+        int attackValue = 0;
+        if (attackPanel != null)
+        {
+            GameObject activeAttackCard = UIGridHelper.GetCardListOrderIndex0(attackPanel);
+            if (activeAttackCard != null)
+            {
+                var cardDisplay = activeAttackCard.GetComponent<CardDisplay>();
+                if (cardDisplay != null && cardDisplay.card != null && cardDisplay.card.state == CardState.Active)
+                {
+                    attackValue = cardDisplay.card.attack;
+                }
+            }
+        }
+
+        // Get active defence card
+        int defenceValue = 0;
+        if (defencePanel != null)
+        {
+            GameObject activeDefenceCard = UIGridHelper.GetCardListOrderIndex0(defencePanel);
+            if (activeDefenceCard != null)
+            {
+                var cardDisplay = activeDefenceCard.GetComponent<CardDisplay>();
+                if (cardDisplay != null && cardDisplay.card != null && cardDisplay.card.state == CardState.Active)
+                {
+                    defenceValue = cardDisplay.card.defence;
+                }
+            }
+        }
+
+        // Update PData
+        Debug.Log($"[BattleManager] UpdatePlayerAttackAndDefence: attack={attackValue}, defence={defenceValue}");
+        PData.Instance.SetPlayerAttack(attackValue);
+        PData.Instance.SetPlayerDefence(defenceValue);
     }
 
     public void GameStart()
@@ -351,11 +392,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
         
-        // Update player display after game start
-        if (PlayerDisplay.Instance != null)
-        {
-            PlayerDisplay.Instance.UpdatePlayerStats();
-        }
+        // Update player attack and defence after game start
+        UpdatePlayerAttackAndDefence();
     }
 
 

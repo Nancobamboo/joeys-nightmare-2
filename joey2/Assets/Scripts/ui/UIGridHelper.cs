@@ -47,10 +47,10 @@ public static class UIGridHelper
         }
         if (!hasActiveChild) 
         {
-            // Update player display even if no active card
-            if (PlayerDisplay.Instance != null)
+            // Update player attack and defence even if no active card
+            if (BattleManager.Instance != null)
             {
-                PlayerDisplay.Instance.UpdatePlayerStats();
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
             }
             return;
         }
@@ -67,10 +67,11 @@ public static class UIGridHelper
             }
         }
 
-        // Update player display when panel is refreshed
-        if (PlayerDisplay.Instance != null)
+        // Update player attack and defence when panel is refreshed
+        // Only update if this is attack or defence panel
+        if (BattleManager.Instance != null && (panel == BattleManager.Instance.attackPanel || panel == BattleManager.Instance.defencePanel))
         {
-            PlayerDisplay.Instance.UpdatePlayerStats();
+            BattleManager.Instance.UpdatePlayerAttackAndDefence();
         }
 
     }
