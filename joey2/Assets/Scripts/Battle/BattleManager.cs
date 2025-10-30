@@ -178,10 +178,11 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)
     {
-        // if (attackCardList.Count == 0)
-        // {
-        //     CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
-        // }
+        if (attackCardList.Count == 0)
+        {
+            // CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
+            return;
+        }
         GameObject attackCardGameObject = UIGridHelper.GetCardListOrderIndex0(attackPanel);
         UseAttack(attackCardGameObject, cardGameObject);
     }
