@@ -147,7 +147,7 @@ public static class VFXStackHelper
                 damageInstance = Object.Instantiate(damageUI, canvas.transform);
                 
                 // 设置位置在卡牌上方
-                damageInstance.transform.position = cardGO.transform.position + new Vector3(0, 30f, 0);
+                damageInstance.transform.position = cardGO.transform.position + new Vector3(0, 3f, 0);
                 // 设置伤害数字
                 UnityEngine.UI.Text damageText = damageInstance.GetComponentInChildren<UnityEngine.UI.Text>();
                 if (damageText != null)
