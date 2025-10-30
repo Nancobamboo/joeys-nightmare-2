@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FX_VFX_Advanced 5
+  m_Name: FX_VFX_Advanced 12
   m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -50,9 +50,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 6667b9abbfd6a8949b15ba2a5466df71, type: 3}
-        m_Scale: {x: 0.68, y: 1}
-        m_Offset: {x: 0.21, y: 0}
+        m_Texture: {fileID: 2800000, guid: c92b5f08b765b9d469894306633d3b97, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Mask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -72,7 +72,7 @@ Material:
     - _BlendDst: 10
     - _BlendMode: 1
     - _BlendSrc: 5
-    - _CustomDataUV: 1
+    - _CustomDataUV: 0
     - _InvFade: 0.44
     - _MyCullMode: 0
     - _MyZTest: 4
@@ -94,14 +94,14 @@ Material:
     - _Width: 1.332
     m_Colors:
     - _AnimationSettings: {r: 1, g: 0, b: 0, a: 1}
-    - _Color: {r: 1.8443025, g: 1.8443025, b: 1.8443025, a: 1}
+    - _Color: {r: 1.1486983, g: 1.1486983, b: 1.1486983, a: 1}
     - _ColorAlphaBrightnessContrast: {r: 1, g: 1, b: 1, a: 1}
     - _DissolvePanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortPanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
-    - _FixValue: {r: 0, g: 0, b: 1, a: 0}
+    - _FixValue: {r: 0, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
