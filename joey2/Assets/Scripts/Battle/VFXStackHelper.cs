@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public static class VFXStackHelper
 {
@@ -110,4 +111,81 @@ public static class VFXStackHelper
         originalCanvasGroup.alpha = 1f;
         PData.Instance.canOperate = true;
     }
+
+
+    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage)
+    {
+        if (cardGO == null) yield break;
+
+        // 1. 播放卡牌受击动画（如果有animator）
+        Animator animator = cardGO.GetComponentInChildren<Animator>();
+        Debug.Log($"PlayDamageVFX: Animator found = {animator != null}, CardGO = {cardGO.name}");
+        if (animator != null)
+        {
+            animator.enabled = true;
+            if (animator.runtimeAnimatorController == null)
+            {
+                Debug.LogError($"PlayDamageVFX: No AnimatorController assigned to {cardGO.name}");
+            }
+            else
+            {
+                animator.SetTrigger("UI_Carditem_shouji");
+                yield return null;
+            }
+            
+        }
+
+        // 2. 展示伤害数字
+        GameObject damageUI = Resources.Load<GameObject>("prefab/UIDamage");
+        GameObject damageInstance = null;
+        if (damageUI != null)
+        {
+            // 获取Canvas
+            Canvas canvas = cardGO.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                // 实例化伤害数字UI
+                damageInstance = Object.Instantiate(damageUI, canvas.transform);
+                
+                // 设置位置在卡牌上方
+                damageInstance.transform.position = cardGO.transform.position + new Vector3(0, 30f, 0);
+                // 设置伤害数字
+                UnityEngine.UI.Text damageText = damageInstance.GetComponentInChildren<UnityEngine.UI.Text>();
+                if (damageText != null)
+                {
+                    damageText.text = damage.ToString();
+                }
+            }
+        }
+
+        // 3. 播放受击特效
+        GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Shouji");
+        GameObject vfxInstance = Object.Instantiate(vfxPrefab, cardGO.transform.position, Quaternion.identity);
+        
+        // 4. 播放震动特效
+        if (CameraShake.Instance != null)
+        {
+            Debug.Log("PlayDamageVFX: Triggering camera shake");
+            yield return CameraShake.Instance.ShakeLight();
+        }
+        else
+        {
+            Debug.LogWarning("PlayDamageVFX: CameraShake.Instance is null");
+        }
+        
+        
+        yield return new WaitForSeconds(0.4f);
+        if (vfxInstance != null)
+        {
+            Object.Destroy(vfxInstance);
+        }
+        if (damageInstance != null)
+        {
+            Object.Destroy(damageInstance);
+        }
+
+
+    }
+
+
 }
