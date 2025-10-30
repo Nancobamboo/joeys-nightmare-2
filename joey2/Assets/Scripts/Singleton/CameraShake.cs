@@ -53,9 +53,13 @@ public class CameraShake : MonoSingleton<CameraShake>
     private IEnumerator Shake(float duration, float magnitude)
     {
         if (mainCamera == null)
+        {
+            Debug.LogWarning("CameraShake.Shake: mainCamera is null");
             yield break;
+        }
 
         originalPosition = mainCamera.transform.localPosition;
+        Debug.Log($"CameraShake.Shake: Starting shake with duration={duration}, magnitude={magnitude}");
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -71,5 +75,6 @@ public class CameraShake : MonoSingleton<CameraShake>
 
         // 恢复摄像机原始位置
         mainCamera.transform.localPosition = originalPosition;
+        Debug.Log("CameraShake.Shake: Shake completed");
     }
 }
