@@ -55,7 +55,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.card.health -= damage;
         if (targetCard.card.health < 0) targetCard.card.health = 0;
         targetCard.ShowCard();
-        Settlement(enemy);
+        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage));
+        
     }
 
     public void Settlement(GameObject enemy)
@@ -72,6 +73,10 @@ public class BattleManager : MonoSingleton<BattleManager>
             }
             // 触发击杀
             EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy);
+        }
+        else 
+        {
+            MonsterAttack(monsterCardGO:enemy);
         }
     }
 
@@ -204,30 +209,12 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
         }
         int attackValue = attakCard.card.attack;
-        targetCard.card.health -= attackValue;
-        if (targetCard.card.health <= 0)
-        {
-            targetCard.card.health = 0;
-        }
         targetCard.ShowCard();
         CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(attackPanel);
 
-        if (targetCard.card.health <= 0)
-        {
-            int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:targetCardGameObject, envCardListList:envCardListList);
-            if (envListIndex == -1)
-            {
-                Debug.LogError("MonsterAttack: envListIndex 为空");
-                return;
-            }
-            CardHelper.MoveCard(cardGO:targetCardGameObject, fromCardList:envCardListList[envListIndex], toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-            UIGridHelper.RefreshPanel(envPanels[envListIndex]);
-        }
-        else
-        {
-            MonsterAttack(monsterCardGO:targetCardGameObject);
-        }
+        ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue);
+        Settlement(targetCardGameObject);
     }
 
     public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
@@ -247,8 +234,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth - attackRealValue);
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
-
-        
 
     }
 
