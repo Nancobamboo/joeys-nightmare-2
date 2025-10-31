@@ -42,4 +42,11 @@ public static class GameEvents
     {
         OnDefenceChanged?.Invoke(defence);
     }
+
+    // damage complete
+    public static event Action<GameObject,bool> OnDamageComplete;
+    public static void RaiseDamageComplete(GameObject enemy,bool monsterAttack=false)
+    {
+        OnDamageComplete?.Invoke(enemy,monsterAttack);
+    }
 }
