@@ -379,14 +379,8 @@ public class BattleManager : MonoSingleton<BattleManager>
             equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(level);
             if (equipmentDeck.Count == 0)
             {
-                Debug.LogWarning($"Tutorial equipment deck for level {level} not found, using default");
-                equipmentDeck = new Dictionary<string, List<string>>
-                {
-                    { "attack", new List<string> { "1002", "1002", "1001" } },
-                    { "defence", new List<string> { "2001", "2001" } },
-                    { "skill", new List<string>() },
-                    { "item", new List<string>() }
-                };
+                Debug.LogError($"Tutorial equipment deck for level {level} not found in CSV!");
+                return;
             }
         }
         else
