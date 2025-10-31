@@ -33,10 +33,12 @@ public class BattleManager : MonoSingleton<BattleManager>
     void OnEnable()
     {
         GameEvents.OnCardClicked += OnCardClicked;
+        GameEvents.OnDamageComplete += OnDamageComplete;
     }
     void OnDisable()
     {
         GameEvents.OnCardClicked -= OnCardClicked;
+        GameEvents.OnDamageComplete -= OnDamageComplete;
     }
 
 
@@ -47,7 +49,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     // public void Handle
 
-    public void ApplyDamageToEnemy(GameObject enemy, int damage)
+    public void ApplyDamageToEnemy(GameObject enemy, int damage,bool monsterAttack=false)
     {
         var targetCard = enemy.GetComponent<CardDisplay>();
         if (targetCard == null || targetCard.card == null) return;
@@ -55,11 +57,15 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.card.health -= damage;
         if (targetCard.card.health < 0) targetCard.card.health = 0;
         targetCard.ShowCard();
-        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage));
-        
+        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage, monsterAttack:monsterAttack));
     }
 
-    public void Settlement(GameObject enemy)
+    public void OnDamageComplete(GameObject enemy,bool monsterAttack=false)
+    {
+        Settlement(enemy,monsterAttack);
+    }
+
+    public void Settlement(GameObject enemy,bool monsterAttack=false)
     {
         var enemyCard = enemy.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
@@ -76,7 +82,10 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         else 
         {
-            MonsterAttack(monsterCardGO:enemy);
+            if (monsterAttack)
+            {
+                MonsterAttack(monsterCardGO:enemy);
+            }
         }
     }
 
@@ -214,9 +223,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(attackPanel);
         UpdatePlayerAttackAndDefence();
-
         ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue);
-        Settlement(targetCardGameObject);
     }
 
     public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
