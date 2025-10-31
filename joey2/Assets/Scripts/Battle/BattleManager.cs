@@ -223,7 +223,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(attackPanel);
         UpdatePlayerAttackAndDefence();
-        ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue);
+        ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue,monsterAttack:true);
     }
 
     public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
