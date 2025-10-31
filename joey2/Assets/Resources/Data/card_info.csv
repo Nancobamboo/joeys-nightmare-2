@@ -1,4 +1,5 @@
 ﻿id   ,cardImage ,cardName            ,type,description ,attack ,defence ,health ,price ,stars,effectIds
+1000,Art/Img/img_card_attrack_01,武器牌,attack,点击装备,5,0,0,0,1,
 1001,Art/Img/img_card_attrack_01,赤手空拳,attack,赤手空拳,1,0,0,0,1,
 1002,Art/Img/img_card_attrack_01,断剑   ,attack,折断的剑，勉强能用     ,5,0,0,0,1,
 1003,Art/Img/img_card_attrack_01,匕首        ,attack,每次装备时，对随机敌人造成伤害     ,3,0,0,0,1,DealRandomEnemyEqualToAttack_OnTop
@@ -12,7 +13,7 @@
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
+2000,Art/Img/img_card_defence_01,防御牌,defence,点击装备,0,3,0,0,1,
 2001,Art/Img/img_card_defence_01,破盾       ,defence,不太坚固的木盾，可以格挡攻击               ,0,3,0,0,1,
 2002,Art/Img/img_card_defence_01,铁盾       ,defence,坚固的铁盾，但是装备时攻击减3,0,8,0,0,1,
 2003,Art/Img/img_card_defence_01,刃甲,defence,格挡怪物攻击后，反弹5点伤害,5,5,,,2,
@@ -41,7 +42,7 @@
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
+5000,Art/Img/img_card_attrack_01,怪物牌,monster      ,点击攻击,3,,10,,1,
 5001,Art/Img/img_card_attrack_01,史莱姆    ,monster      ,充满粘液的怪物,3,,5,,1,
 5002,Art/Img/img_card_attrack_01,大史莱姆,monster      ,血量较低时可能会分裂,6,,10,,2,
 5003,Art/Img/img_card_attrack_01,骷髅,monster      ,可怕的不死生物,5,,10,,1,
