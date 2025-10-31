@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/BuildPrefabs/card_sample.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/Scenes/Battle.unity
+    guid: 9edcc5772cc9ea445932e07f5f2dd972
+  - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 66bac9c45210b4b4589f7ddf6b107335
   m_configObjects: {}
