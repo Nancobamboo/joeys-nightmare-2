@@ -882,7 +882,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: Battle
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
 --- !u!114 &1359025321
 MonoBehaviour:
   m_ObjectHideFlags: 0
