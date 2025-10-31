@@ -21,7 +21,7 @@ public class DealRandomEnemyEqualToAttack_OnTop : ICardEffect
         yield return new WaitForSeconds(0.5f);
         // VFX.StoHit(ctx.source, enemy);
 
-        BattleManager.Instance.ApplyDamageToEnemy(enemy, damage);
+        BattleManager.Instance.ApplyDamageToEnemy(enemy, damage,false);
         // 补一个触发：造成伤害
         EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, ctx.source, enemy, damage);
     }

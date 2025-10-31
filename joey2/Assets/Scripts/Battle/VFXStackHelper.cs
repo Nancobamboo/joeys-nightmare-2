@@ -113,7 +113,7 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage)
+    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage,bool monsterAttack=false)
     {
         if (cardGO == null) yield break;
         // 获取Canvas
@@ -130,39 +130,63 @@ public static class VFXStackHelper
             }
             else
             {
-                animator.SetTrigger("UI_Carditem_shouji");
+                animator.Play("UI_Carditem_shouji");
                 yield return null;
             }
             
         }
 
         // 2. 展示伤害数字
-        GameObject damageUI = Resources.Load<GameObject>("prefab/UIDamage");
+        GameObject damageUIPrefab = Resources.Load<GameObject>("prefab/UIDamage");
         GameObject damageInstance = null;
-        if (damageUI != null)
+        if (damageUIPrefab != null)
         {
-            if (canvas != null)
+            // 实例化伤害UI
+            damageInstance = Object.Instantiate(damageUIPrefab, cardGO.transform);
+            
+            // 设置位置在卡牌上方
+            damageInstance.transform.localPosition = new Vector3(0, 80f, 0);
+            
+            // 设置伤害数字文本
+            Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
+            if (damageTextTransform != null)
             {
-                // 实例化伤害数字UI
-                damageInstance = Object.Instantiate(damageUI, canvas.transform);
-                
-                // 设置位置在卡牌上方
-                damageInstance.transform.position = cardGO.transform.position + new Vector3(0, 3f, 0);
-                // 设置伤害数字
-                UnityEngine.UI.Text damageText = damageInstance.GetComponentInChildren<UnityEngine.UI.Text>();
+                Text damageText = damageTextTransform.GetComponent<Text>();
                 if (damageText != null)
                 {
                     damageText.text = damage.ToString();
+                    damageText.gameObject.SetActive(true);
+                    Debug.Log($"PlayDamageVFX: Set damage text to {damageText.text}");
+                }
+                else
+                {
+                    Debug.LogError("PlayDamageVFX: Damage Text component not found");
                 }
             }
+            else
+            {
+                Debug.LogError("PlayDamageVFX: Damage transform not found");
+            }
+            
+            // 3. 播放伤害数字动画
+            Animator damageAnimator = damageInstance.GetComponent<Animator>();
+            if (damageAnimator != null)
+            {
+                damageAnimator.Play("UIDamage_kouxue");
+                Debug.Log("PlayDamageVFX: Playing damage animation");
+            }
+        }
+        else
+        {
+            Debug.LogError("PlayDamageVFX: Failed to load UIDamage prefab");
         }
 
-        // 3. 播放受击特效
+        // 4. 播放受击特效
         GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Shouji");
         GameObject vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
         vfxInstance.transform.position = cardGO.transform.position; // 使用相同的坐标设置方式
         
-        // 4. 播放震动特效
+        // 5. 播放震动特效
         if (CameraShake.Instance != null)
         {
             Debug.Log("PlayDamageVFX: Triggering camera shake");
@@ -174,7 +198,7 @@ public static class VFXStackHelper
         }
         
         
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(2f);
         if (vfxInstance != null)
         {
             Object.Destroy(vfxInstance);
@@ -183,6 +207,7 @@ public static class VFXStackHelper
         {
             Object.Destroy(damageInstance);
         }
+        GameEvents.RaiseDamageComplete(cardGO,monsterAttack);
 
 
     }

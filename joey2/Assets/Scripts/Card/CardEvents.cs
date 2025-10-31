@@ -37,7 +37,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
         // Debug.Log($"CardClick: {id}");
         if (cd.card.state == CardState.Active)
         {
-            Debug.Log($"CardClick: {cd.card.id}");
+            // Debug.Log($"CardClick: {cd.card.id}");
             GameEvents.RaiseCardClicked(cd.gameObject); // 广播全局事件
         }
         else
@@ -71,7 +71,7 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
 
     private void PlayGlowVFX()
     {
-        Debug.Log("PlayGlowVFX");
+        // Debug.Log("PlayGlowVFX");
         // 如果已经有特效实例，先销毁
         DestroyGlowVFX();
         
