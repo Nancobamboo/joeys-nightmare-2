@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-
+using UnityEngine.UI;
 
 
 public class BattleManager : MonoSingleton<BattleManager>
@@ -20,6 +20,9 @@ public class BattleManager : MonoSingleton<BattleManager>
     public List<GameObject> itemCardList = new List<GameObject>();
     public GameObject cardPrefab;
 
+    public Image joeyImage ;
+
+
     // 弃牌列表
     public List<GameObject> usedCardList = new List<GameObject>();
 
@@ -34,11 +37,13 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         GameEvents.OnCardClicked += OnCardClicked;
         GameEvents.OnDamageComplete += OnDamageComplete;
+        GameEvents.OnDamageToPlayerComplete += OnDamageToPlayerComplete;
     }
     void OnDisable()
     {
         GameEvents.OnCardClicked -= OnCardClicked;
         GameEvents.OnDamageComplete -= OnDamageComplete;
+        GameEvents.OnDamageToPlayerComplete -= OnDamageToPlayerComplete;
     }
 
 
@@ -62,10 +67,10 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnDamageComplete(GameObject enemy,bool monsterAttack=false)
     {
-        Settlement(enemy,monsterAttack);
+        SettlementEnemy(enemy,monsterAttack);
     }
 
-    public void Settlement(GameObject enemy,bool monsterAttack=false)
+    public void SettlementEnemy(GameObject enemy,bool monsterAttack=false)
     {
         var enemyCard = enemy.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
@@ -226,6 +231,17 @@ public class BattleManager : MonoSingleton<BattleManager>
         ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue,monsterAttack:true);
     }
 
+
+    public void OnDamageToPlayerComplete()
+    {
+        SettlementPlayer();
+    }
+
+    public void SettlementPlayer()
+    {
+        
+    }
+
     public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
     {
         int defenceValue = 0;
@@ -235,12 +251,13 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
 
         int attackValue = attackGO.GetComponent<CardDisplay>().card.attack;
-        int attackRealValue = 0;
+        int damage = 0;
         if (defenceValue < attackValue)
         {
-            attackRealValue = attackValue - defenceValue;
+            damage = attackValue - defenceValue;
         }
-        PData.Instance.SetPlayerHP(PData.Instance.playerHealth - attackRealValue);
+        PData.Instance.SetPlayerHP(PData.Instance.playerHealth - damage);
+        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage:joeyImage,damage:damage));
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
         UpdatePlayerAttackAndDefence();

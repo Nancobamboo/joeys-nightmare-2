@@ -8,6 +8,17 @@ public static class VFXStackHelper
     public static string appearVFXPath = "VFX/base/VFX_appear";
     public static string disappearVFXPath = "VFX/base/VFX_disappear";
 
+    public static Sprite playerDamageSprite;
+    public static Sprite playerSleepSprite;
+
+    static VFXStackHelper()
+    {
+        playerDamageSprite = Resources.Load<Sprite>("Art/Img/img_card_merge");
+        playerSleepSprite = Resources.Load<Sprite>("Art/Img/img_sleep");
+    }
+
+
+
     public static IEnumerator PlayAppearDisappearVFX(GameObject cardGO, int envListIndex)
     {
         if (cardGO == null) yield break;
@@ -212,5 +223,76 @@ public static class VFXStackHelper
 
     }
 
+
+    public static IEnumerator PlayDamageToPlayerVFX(Image joeyImage, int damage)
+    {
+        if (damage <= 0) yield break;
+        if (joeyImage == null) yield break;
+
+        // 获取Canvas
+        Canvas canvas = joeyImage.GetComponentInParent<Canvas>();
+
+        // 替换成受伤图片
+        joeyImage.sprite = playerDamageSprite;
+
+        // 展示伤害数字
+        GameObject damageUIPrefab = Resources.Load<GameObject>("prefab/UIDamage");
+        GameObject damageInstance = null;
+        if (damageUIPrefab != null)
+        {
+            // 实例化伤害UI
+            damageInstance = Object.Instantiate(damageUIPrefab, joeyImage.transform);
+            
+            // 设置位置在图片上方
+            damageInstance.transform.localPosition = new Vector3(100f, 190f, 0);
+            
+            // 设置伤害数字文本
+            Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
+            if (damageTextTransform != null)
+            {
+                Text damageText = damageTextTransform.GetComponent<Text>();
+                if (damageText != null)
+                {
+                    damageText.text = "-" + damage.ToString();
+                    damageText.gameObject.SetActive(true);
+                    // Debug.Log($"PlayDamageToPlayerVFX: Set damage text to {damageText.text}");
+                }
+            }
+        }
+
+        // 播放伤害数字动画
+        if (damageInstance != null)
+        {
+            Animator damageAnimator = damageInstance.GetComponent<Animator>();
+            if (damageAnimator != null)
+            {
+                damageAnimator.Play("UIDamage_kouxue");
+                // Debug.Log("PlayDamageToPlayerVFX: Playing damage animation");
+            }
+        }
+
+        // 播放屏幕震动
+        if (CameraShake.Instance != null)
+        {
+            Debug.Log("PlayDamageToPlayerVFX: Triggering camera shake");
+            yield return CameraShake.Instance.ShakeLight();
+        }
+
+        // 等待0.5秒
+        yield return new WaitForSeconds(0.7f);
+
+        // 切回原始图片
+        joeyImage.sprite = playerSleepSprite;
+
+        // 清理伤害UI
+        yield return new WaitForSeconds(0.3f); // 继续等待一段时间让数字动画完成
+        if (damageInstance != null)
+        {
+            Object.Destroy(damageInstance);
+        }
+
+        // 触发伤害完成事件
+        GameEvents.RaiseDamageToPlayerComplete();
+    }
 
 }

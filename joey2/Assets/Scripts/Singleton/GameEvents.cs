@@ -49,4 +49,12 @@ public static class GameEvents
     {
         OnDamageComplete?.Invoke(enemy,monsterAttack);
     }
+
+
+    // damage to player complete
+    public static event Action OnDamageToPlayerComplete;
+    public static void RaiseDamageToPlayerComplete()
+    {
+        OnDamageToPlayerComplete?.Invoke();
+    }
 }

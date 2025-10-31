@@ -134,6 +134,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &166766093 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 489947113919896401, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+  m_PrefabInstance: {fileID: 966049681}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &303064581
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,6 +928,7 @@ MonoBehaviour:
   itemPanel: {fileID: 1116114881}
   itemCardList: []
   cardPrefab: {fileID: 1396557840748590307, guid: a8a665ea8296230488c9dc4c394ff7b9, type: 3}
+  joeyImage: {fileID: 166766093}
   usedCardList: []
 --- !u!1 &1910341611
 GameObject:
