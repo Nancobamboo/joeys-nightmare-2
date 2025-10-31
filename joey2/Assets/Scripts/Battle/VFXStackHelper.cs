@@ -145,7 +145,7 @@ public static class VFXStackHelper
             damageInstance = Object.Instantiate(damageUIPrefab, cardGO.transform);
             
             // 设置位置在卡牌上方
-            damageInstance.transform.localPosition = new Vector3(0, 80f, 0);
+            damageInstance.transform.localPosition = new Vector3(85f, 160f, 0);
             
             // 设置伤害数字文本
             Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
@@ -154,7 +154,7 @@ public static class VFXStackHelper
                 Text damageText = damageTextTransform.GetComponent<Text>();
                 if (damageText != null)
                 {
-                    damageText.text = damage.ToString();
+                    damageText.text = "-" + damage.ToString();
                     damageText.gameObject.SetActive(true);
                     Debug.Log($"PlayDamageVFX: Set damage text to {damageText.text}");
                 }
@@ -198,7 +198,7 @@ public static class VFXStackHelper
         }
         
         
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         if (vfxInstance != null)
         {
             Object.Destroy(vfxInstance);
