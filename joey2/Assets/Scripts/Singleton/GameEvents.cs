@@ -57,4 +57,17 @@ public static class GameEvents
     {
         OnDamageToPlayerComplete?.Invoke();
     }
+
+
+    public static event Action<GameObject,GameObject,int,bool> OnAttackPre;
+    public static void RaiseAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
+    {
+        OnAttackPre?.Invoke(attackerCardGO,targetCardGO,damage,monsterAttack);
+    }
+
+    public static event Action<GameObject> OnAttackPreFinish;
+    public static void RaiseAttackPreFinish(GameObject attackerCardGO)
+    {
+        OnAttackPreFinish?.Invoke(attackerCardGO);
+    }
 }

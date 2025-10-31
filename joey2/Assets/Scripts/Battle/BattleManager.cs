@@ -38,12 +38,16 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnCardClicked += OnCardClicked;
         GameEvents.OnDamageComplete += OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete += OnDamageToPlayerComplete;
+        GameEvents.OnAttackPre += OnAttackPre;
+        GameEvents.OnAttackPreFinish += OnAttackPreFinish;
     }
     void OnDisable()
     {
         GameEvents.OnCardClicked -= OnCardClicked;
         GameEvents.OnDamageComplete -= OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete -= OnDamageToPlayerComplete;
+        GameEvents.OnAttackPre -= OnAttackPre;
+        GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
     }
 
 
@@ -52,8 +56,29 @@ public class BattleManager : MonoSingleton<BattleManager>
         return EnemyManager.GetRandomEnemy(envPanels);
     }
 
-    // public void Handle
 
+    public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
+    {
+        var attakCard = attakCardGameObject.GetComponent<CardDisplay>();
+        var targetCard = targetCardGameObject.GetComponent<CardDisplay>();
+        if (attakCard == null || targetCard == null)
+        {
+            Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
+        }
+        int attackValue = attakCard.card.attack;
+        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,true));
+    }
+    public void OnAttackPreFinish(GameObject attackerCardGO)
+    {
+        CardHelper.MoveCard(cardGO:attackerCardGO, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        UIGridHelper.RefreshPanel(attackPanel);
+        UpdatePlayerAttackAndDefence();
+    }
+    // public void Handle
+    public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
+    {
+        ApplyDamageToEnemy(enemy:targetCardGO, damage:damage,monsterAttack:monsterAttack);
+    }
     public void ApplyDamageToEnemy(GameObject enemy, int damage,bool monsterAttack=false)
     {
         var targetCard = enemy.GetComponent<CardDisplay>();
@@ -215,21 +240,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
 
-    public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
-    {
-        var attakCard = attakCardGameObject.GetComponent<CardDisplay>();
-        var targetCard = targetCardGameObject.GetComponent<CardDisplay>();
-        if (attakCard == null || targetCard == null)
-        {
-            Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
-        }
-        int attackValue = attakCard.card.attack;
-        targetCard.ShowCard();
-        CardHelper.MoveCard(cardGO:attakCardGameObject, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(attackPanel);
-        UpdatePlayerAttackAndDefence();
-        ApplyDamageToEnemy(enemy:targetCardGameObject, damage:attackValue,monsterAttack:true);
-    }
+
 
 
     public void OnDamageToPlayerComplete()
