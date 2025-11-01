@@ -6,7 +6,8 @@ public static class CardEffectRegistry
 {
     public static Dictionary<string, Func<ICardEffect>> factory = new()
     {
-        { "DealRandomEnemyEqualToAttack_OnTop", () => new DealRandomEnemyEqualToAttack_OnTop() }
+        { "DealRandomEnemyEqualToAttack_OnTop", () => new DealRandomEnemyEqualToAttack_OnTop() },
+        { "DoubleAttack_OnPlay", () => new DoubleAttack_OnPlay() }
     };
 
     // 新增：解析带参数的 token，例如 "ExtraDamage_OnDealDamage:3"
@@ -27,6 +28,12 @@ public static class CardEffectRegistry
             int baseExtra = 0;
             if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
             return new LifeSteal_OnDealDamage(baseExtra);
+        }
+        else if (id == "HealPlayer_OnPlay")
+        {
+            int healAmount = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out healAmount);
+            return new HealPlayer_OnPlay(healAmount);
         }
 
         // 走原有无参分发

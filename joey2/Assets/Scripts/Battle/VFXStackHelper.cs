@@ -130,7 +130,6 @@ public static class VFXStackHelper
         Canvas canvas = cardGO.GetComponentInParent<Canvas>();
         // 1. 播放卡牌受击动画（如果有animator）
         Animator animator = cardGO.GetComponentInChildren<Animator>();
-        // Debug.Log($"PlayDamageVFX: Animator found = {animator != null}, CardGO = {cardGO.name}");
         if (animator != null)
         {
             animator.enabled = true;
@@ -140,10 +139,12 @@ public static class VFXStackHelper
             }
             else
             {
-                animator.Play("UI_Carditem_shouji");
+                // Reset animator state to ensure animation can play even if previous animation is still playing
+                animator.Rebind();
+                animator.Update(0f);
+                animator.Play("UI_Carditem_shouji", 0, 0f);
                 yield return null;
             }
-            
         }
 
         // 2. 展示伤害数字
