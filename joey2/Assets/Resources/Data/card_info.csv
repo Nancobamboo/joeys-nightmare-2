@@ -21,7 +21,7 @@
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-3001,Art/Img/img_card_defence_01,道具牌,item   ,点击使用，恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
+3000,Art/Img/img_card_defence_01,道具牌,item   ,点击使用，恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
 3001,Art/Img/img_card_defence_01,小血瓶  ,item   ,恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
 3002,Art/Img/img_card_defence_01,连环闪电    ,item        ,对全场敌人造成3点伤害,0,0,0,0,1,
 3003,Art/Img/img_card_defence_01,钩索,item        ,随机装备一件武器,,,,,1,
