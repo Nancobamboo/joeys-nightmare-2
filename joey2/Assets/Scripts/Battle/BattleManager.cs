@@ -28,6 +28,12 @@ public class BattleManager : MonoSingleton<BattleManager>
 
 	void Start()
 	{
+		// Load level from PData if exists, otherwise use default
+		if (PData.Instance.currentLevel > 0)
+		{
+			level = PData.Instance.currentLevel;
+		}
+		
 		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
         PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth);
@@ -41,6 +47,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre += OnAttackPre;
         GameEvents.OnAttackPreFinish += OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
+        GameEvents.OnNextLevelRequested += OnNextLevelRequested;
     }
     void OnDisable()
     {
@@ -50,6 +57,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre -= OnAttackPre;
         GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
+        GameEvents.OnNextLevelRequested -= OnNextLevelRequested;
     }
 
 
@@ -140,6 +148,14 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("OnCardClicked: 卡牌状态不是Active");
             return;
         }
+        
+        // Check if card id is 6001 (next level card)
+        if (cd.card.id == "6001")
+        {
+            GameEvents.RaiseNextLevelRequested();
+            return;
+        }
+        
         if (cd.card.position == CardPosition.Env)
         {
             OnEnvClicked(cardGameObject);
@@ -372,6 +388,30 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Debug.Log($"[BattleManager] UpdatePlayerAttackAndDefence: attack={attackValue}, defence={defenceValue}");
         PData.Instance.SetPlayerAttack(attackValue);
         PData.Instance.SetPlayerDefence(defenceValue);
+    }
+
+    /// <summary>
+    /// Handle next level requested event
+    /// </summary>
+    private void OnNextLevelRequested()
+    {
+        LoadNextLevel();
+    }
+
+    /// <summary>
+    /// Load next level scene based on current level
+    /// </summary>
+    private void LoadNextLevel()
+    {
+        int nextLevel = level + 1;
+        
+        // Save next level to PData before reloading scene
+        PData.Instance.currentLevel = nextLevel;
+        
+        Debug.Log($"Loading next level: {nextLevel}, reloading Battle scene");
+        
+        // Reload Battle scene with new level
+        SceneLoader.Instance.LoadScene("Battle");
     }
 
     public void GameStart()
