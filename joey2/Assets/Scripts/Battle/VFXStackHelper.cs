@@ -316,7 +316,17 @@ public static class VFXStackHelper
         }
         else
         {
+            // 1. 盾牌受击特效
+            if (defenceCardGO != null)
+            {
+                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+            }
+            
             BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            yield return new WaitForSeconds(0.5f);
+
         }
         
         // 5. 移走盾牌
