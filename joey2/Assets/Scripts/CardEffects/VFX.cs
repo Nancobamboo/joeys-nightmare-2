@@ -51,10 +51,40 @@ public class VFX : MonoSingleton<VFX>
             else
             {
                 animator.Play(animationName);
+                // Debug.Log("PlayMonsterHit: Playing attack animation");
                 yield return null;
             }
         }
     }
+
+    public static IEnumerator PlayAnimatorReverse(GameObject cardGO, string animationName)
+    {
+        Animator animator = cardGO.GetComponentInChildren<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = true;
+            if (animator.runtimeAnimatorController == null)
+            {
+                Debug.LogError($"PlayAnimatorReverse: No AnimatorController assigned to {cardGO.name}");
+            }
+            else
+            {
+                Debug.Log("PlayAnimatorReverse: Playing animation in reverse");
+                // 设置倒放速度
+                animator.speed = -1f;
+                // 从动画的结尾开始播放（normalizedTime = 1 表示 100%）
+                animator.Play(animationName, 0, 1f);
+                
+                // Debug.Log($"PlayAnimatorReverse: Playing {animationName} in reverse");
+                yield return null; // 等一帧让动画开始
+                yield return new WaitForSeconds(0.7f);
+                animator.speed = 1f;
+                Debug.Log("PlayAnimatorReverse: Playing animation in reverse");
+            }
+        }
+    }
+
+
 
     public static IEnumerator PlayMonsterHit(GameObject cardGO)
     {
