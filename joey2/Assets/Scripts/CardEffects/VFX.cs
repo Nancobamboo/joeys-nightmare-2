@@ -65,8 +65,8 @@ public class VFX : MonoSingleton<VFX>
         yield return PlayAnimator(cardGO, "UI_Carditem_guaiwugongji");
         yield return new WaitForSeconds(0.4f);
         GameEvents.RaiseMonsterAttackPre(cardGO);
-        // yield return new WaitForSeconds(0.4f);
-        // GameEvents.RaiseMonsterAttackPreFinish(cardGO);
+        yield return new WaitForSeconds(0.4f);
+        GameEvents.RaiseMonsterAttackPreFinish(cardGO);
 
     }
 

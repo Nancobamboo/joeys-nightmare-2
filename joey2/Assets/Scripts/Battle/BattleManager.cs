@@ -47,7 +47,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre += OnAttackPre;
         GameEvents.OnAttackPreFinish += OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
+        GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested += OnNextLevelRequested;
+        GameEvents.OnCardFinished += OnCardFinished;
     }
     void OnDisable()
     {
@@ -57,9 +59,20 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre -= OnAttackPre;
         GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
+        GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested -= OnNextLevelRequested;
+        GameEvents.OnCardFinished -= OnCardFinished;
     }
 
+
+    public void OnMonsterAttackPreFinish(GameObject monsterCardGO)
+    {
+        monsterCardGO.GetComponent<CardDisplay>().card.state = CardState.Active;
+    }
+    public void OnCardFinished(GameObject cardGO)
+    {
+        StartCoroutine(VFXStackHelper.FinshCardVFX(cardGO:cardGO));
+    }
 
     public GameObject GetRandomEnemy()
     {
@@ -80,9 +93,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     }
     public void OnAttackPreFinish(GameObject attackerCardGO)
     {
-        CardHelper.MoveCard(cardGO:attackerCardGO, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(attackPanel);
-        UpdatePlayerAttackAndDefence();
+        GameEvents.RaiseCardFinished(cardGO:attackerCardGO);
     }
     // public void Handle
     public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
@@ -111,12 +122,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         if (enemyCard.card.health <= 0)
         {
             // 移动到已使用堆
-            int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:enemy, envCardListList:envCardListList);
-            if (envListIndex != -1)
-            {
-                CardHelper.MoveCard(cardGO:enemy, fromCardList:envCardListList[envListIndex], toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-                UIGridHelper.RefreshPanel(envPanels[envListIndex]);
-            }
+            GameEvents.RaiseCardFinished(cardGO:enemy);
             // 触发击杀
             EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy);
         }
@@ -124,14 +130,11 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             if (monsterAttack)
             {
-                MonsterAttack(monsterCardGO:enemy);
+                StartCoroutine(VFX.PlayMonsterHit(cardGO:enemy));
+                // MonsterAttack(monsterCardGO:enemy);
             }
         }
     }
-
-
-
-
 
 
 
@@ -240,6 +243,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             // CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
             return;
         }
+        cardGameObject.GetComponent<CardDisplay>().card.state = CardState.Inactive;
         GameObject attackCardGameObject = UIGridHelper.GetCardListOrderIndex0(attackPanel);
         UseAttack(attackCardGameObject, cardGameObject);
     }
@@ -263,38 +267,13 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnDamageToPlayerComplete()
     {
-        // Check if player is dead before settling
-        if (PData.Instance.playerHealth <= 0)
-        {
-            // Player is dead, skip settlement
-            return;
-        }
-        SettlementPlayer();
+        // GameEvents.RaiseCardFinished(cardGO:defenceGO);
     }
 
     public void SettlementPlayer()
     {
-        GameObject defenceGO = UIGridHelper.GetCardListOrderIndex0(defencePanel);
-        
-        // Check if defence card exists
-        if (defenceGO == null)
-        {
-            // No defence card to move, just refresh panel and update stats
-            UIGridHelper.RefreshPanel(defencePanel);
-            UpdatePlayerAttackAndDefence();
-            return;
-        }
-        
-        CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(defencePanel);
-        UpdatePlayerAttackAndDefence();
-        
-        // Reset canvas group alpha if component exists
-        var originalCanvasGroup = defenceGO.GetComponent<CanvasGroup>();
-        if (originalCanvasGroup != null)
-        {
-            originalCanvasGroup.alpha = 1f;
-        }
+
+        // GameEvents.RaiseCardFinished(cardGO:defenceGO);
     }
 
 
@@ -323,16 +302,10 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     }
 
-    public void MonsterAttack(GameObject monsterCardGO)
-    {
-        var monsterCard = monsterCardGO.GetComponent<CardDisplay>();
-        if (monsterCard == null || monsterCard.card == null)
-        {
-            Debug.LogError("MonsterAttack: monsterCard 或 monsterCard.card 为空");
-            return;
-        }
-        StartCoroutine(VFX.PlayMonsterHit(cardGO:monsterCardGO));
-    }
+    // public void MonsterAttack(GameObject monsterCardGO)
+    // {
+    //     StartCoroutine(VFX.PlayMonsterHit(cardGO:monsterCardGO));
+    // }
 
 
 
