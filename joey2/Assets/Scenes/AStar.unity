@@ -258,6 +258,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioPath: Audio/SFX/Main/AStar
   nextSceneName: Start
+  enableScanLine: 1
+  scanSpeed: 300
+  scanLineColor: {r: 1, g: 1, b: 1, a: 0.5}
 --- !u!4 &429962003
 Transform:
   m_ObjectHideFlags: 0
