@@ -40,7 +40,7 @@ public class VFX : MonoSingleton<VFX>
             }
             else
             {
-                animator.Play("UI_CardItem_gongji");
+                animator.Play("UI_Carditem_gongji");
                 // Debug.Log("PlayHit: Playing attack animation");
                 yield return null;
             }

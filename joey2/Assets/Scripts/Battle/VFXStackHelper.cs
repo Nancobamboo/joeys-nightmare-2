@@ -301,7 +301,25 @@ public static class VFXStackHelper
                 GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
                 vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
                 vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+
+                // 1.5 盾牌受击动画
+                Animator animator = defenceCardGO.GetComponentInChildren<Animator>();
+                if (animator != null)
+                {
+                    animator.enabled = true;
+                    if (animator.runtimeAnimatorController == null)
+                    {
+                        Debug.LogError($"PlayDamageVFX: No AnimatorController");
+                    }
+                    else
+                    {
+                        animator.Play("UI_Carditem_dunpai");
+                    }
+                }
+
             }
+
+
 
             // 2. joey受击图片
             joeyImage.sprite = playerDamageSprite;
@@ -317,15 +335,27 @@ public static class VFXStackHelper
         else
         {
             // 1. 盾牌受击特效
-            if (defenceCardGO != null)
+            GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+            vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+            vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+
+            // 1.5 盾牌受击动画
+            Animator animator = defenceCardGO.GetComponentInChildren<Animator>();
+            if (animator != null)
             {
-                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
-                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
-                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
-            }
+                animator.enabled = true;
+                if (animator.runtimeAnimatorController == null)
+                {
+                    Debug.LogError($"PlayDamageVFX: No AnimatorController");
+                }
+                else
+                {
+                    animator.Play("UI_Carditem_dunpai");
+                }
             
             BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
             yield return new WaitForSeconds(0.5f);
+            }
 
         }
         
