@@ -46,8 +46,9 @@ public static class CardHelper
                 }
             }
         }
-        // BattleManager.Instance.StartCoroutine(VFX.PlayAnimatorReverse(go, "UI_Carditem_feitian"));
         cd.ShowCard();
+        BattleManager.Instance.StartCoroutine(VFX.PlayAnimator(go, "UI_Carditem_pailai"));
+
         return go;
     }
 

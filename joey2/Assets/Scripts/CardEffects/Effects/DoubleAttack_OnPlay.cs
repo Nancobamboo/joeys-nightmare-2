@@ -100,7 +100,7 @@ public class DoubleAttack_OnPlay : ICardEffect
 
     private static IEnumerator PerformSecondAttackSequence(GameObject nextAttackCard, GameObject target, GameObject previousCard)
     {
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(0.15f);
         
         Transform attackPanel = BattleManager.Instance.attackPanel;
         
