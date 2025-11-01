@@ -947,6 +947,7 @@ MonoBehaviour:
   defenceText: {fileID: 4593830919990803275}
   other: {fileID: 3853108336267157275}
   otherText: {fileID: 3478757168654505940}
+  CardAnimator: {fileID: 0}
 --- !u!114 &425751788272153861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -960,6 +961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &221658560595948293
 GameObject:
   m_ObjectHideFlags: 0
@@ -2049,6 +2051,7 @@ MonoBehaviour:
   defenceText: {fileID: 4110965192129244331}
   other: {fileID: 3726016690372659451}
   otherText: {fileID: 3930097493251244084}
+  CardAnimator: {fileID: 0}
 --- !u!114 &226612716673491685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2062,6 +2065,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &421282393804875967
 GameObject:
   m_ObjectHideFlags: 0
@@ -7611,6 +7615,7 @@ MonoBehaviour:
   defenceText: {fileID: 3153875569544133325}
   other: {fileID: 2413010625907711645}
   otherText: {fileID: 2613010040546317906}
+  CardAnimator: {fileID: 0}
 --- !u!114 &1291639197790565507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7624,6 +7629,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &1700205172610656384
 GameObject:
   m_ObjectHideFlags: 0
@@ -8553,6 +8559,7 @@ MonoBehaviour:
   defenceText: {fileID: 2806616452374143304}
   other: {fileID: 3191776379801306392}
   otherText: {fileID: 2987167605757316567}
+  CardAnimator: {fileID: 0}
 --- !u!114 &2079282952020438790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8566,6 +8573,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &1908391934981076495
 GameObject:
   m_ObjectHideFlags: 0
@@ -8748,6 +8756,7 @@ MonoBehaviour:
   defenceText: {fileID: 2739000237122197585}
   other: {fileID: 3223046039337188353}
   otherText: {fileID: 2991927147093701838}
+  CardAnimator: {fileID: 0}
 --- !u!114 &2029681058367280671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8761,6 +8770,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &1932342880100028447
 GameObject:
   m_ObjectHideFlags: 0
@@ -15381,6 +15391,7 @@ MonoBehaviour:
   defenceText: {fileID: 2519343825261576953}
   other: {fileID: 2904518997137909417}
   otherText: {fileID: 3274422641296240230}
+  CardAnimator: {fileID: 0}
 --- !u!114 &1792014577395387575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15394,6 +15405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &2181980993055484047
 GameObject:
   m_ObjectHideFlags: 0
@@ -15948,6 +15960,7 @@ MonoBehaviour:
   defenceText: {fileID: 2559668424515897479}
   other: {fileID: 2971717838659710167}
   otherText: {fileID: 3171188388211647512}
+  CardAnimator: {fileID: 0}
 --- !u!114 &1850353557442578121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15961,6 +15974,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &2283832853344201508
 GameObject:
   m_ObjectHideFlags: 0
@@ -20518,6 +20532,7 @@ MonoBehaviour:
   defenceText: {fileID: 1663883189513612129}
   other: {fileID: 2138965241973624625}
   otherText: {fileID: 1770155612958410750}
+  CardAnimator: {fileID: 0}
 --- !u!114 &3260411443316581679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20531,6 +20546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &3166954341808246763
 GameObject:
   m_ObjectHideFlags: 0
@@ -21327,6 +21343,7 @@ MonoBehaviour:
   defenceText: {fileID: 1288650103252698912}
   other: {fileID: 1970985708091401072}
   otherText: {fileID: 2190336734613138367}
+  CardAnimator: {fileID: 0}
 --- !u!114 &3155394343223085422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21340,6 +21357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &3272059700221363894
 GameObject:
   m_ObjectHideFlags: 0
@@ -21447,6 +21465,7 @@ MonoBehaviour:
   defenceText: {fileID: 1271790709920466575}
   other: {fileID: 1954038417180238559}
   otherText: {fileID: 2171255359242283536}
+  CardAnimator: {fileID: 0}
 --- !u!114 &3138530611971524801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21460,6 +21479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &3280777162943686921
 GameObject:
   m_ObjectHideFlags: 0
@@ -29223,6 +29243,7 @@ MonoBehaviour:
   defenceText: {fileID: 8856521131903433508}
   other: {fileID: 8093182335414247284}
   otherText: {fileID: 8462044746387756987}
+  CardAnimator: {fileID: 0}
 --- !u!114 &4665919518502761834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29236,6 +29257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &5055802307167970271
 GameObject:
   m_ObjectHideFlags: 0
@@ -34699,6 +34721,7 @@ MonoBehaviour:
   defenceText: {fileID: 8445562336660219799}
   other: {fileID: 9190940073837839303}
   otherText: {fileID: 8841478549835860744}
+  CardAnimator: {fileID: 0}
 --- !u!114 &5700616142981163481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34712,6 +34735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &5336870759033069199
 GameObject:
   m_ObjectHideFlags: 0
@@ -35429,6 +35453,7 @@ MonoBehaviour:
   defenceText: {fileID: 8602438497721306568}
   other: {fileID: 9068680936792517016}
   otherText: {fileID: 8711536090528211287}
+  CardAnimator: {fileID: 0}
 --- !u!114 &5569266240639320966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35442,6 +35467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &5470594587227281651
 GameObject:
   m_ObjectHideFlags: 0
@@ -37314,6 +37340,7 @@ MonoBehaviour:
   defenceText: {fileID: 7944777379676838479}
   other: {fileID: 7276103482229095967}
   otherText: {fileID: 7045339805790336720}
+  CardAnimator: {fileID: 0}
 --- !u!114 &6082541145294984193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37327,6 +37354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &5956883222951133103
 GameObject:
   m_ObjectHideFlags: 0
@@ -37434,6 +37462,7 @@ MonoBehaviour:
   defenceText: {fileID: 7955019014799835030}
   other: {fileID: 7268118044945292230}
   otherText: {fileID: 7053323602411655945}
+  CardAnimator: {fileID: 0}
 --- !u!114 &6074764061175460312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37447,6 +37476,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &5977986565502452560
 GameObject:
   m_ObjectHideFlags: 0
@@ -39669,6 +39699,7 @@ MonoBehaviour:
   defenceText: {fileID: 7211903730567420218}
   other: {fileID: 7975234218978721130}
   otherText: {fileID: 7751332593038407077}
+  CardAnimator: {fileID: 0}
 --- !u!114 &6790819265818269556
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39682,6 +39713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &6406797361472903735
 GameObject:
   m_ObjectHideFlags: 0
@@ -41015,6 +41047,7 @@ MonoBehaviour:
   defenceText: {fileID: 7427750289257059741}
   other: {fileID: 7902910211620729293}
   otherText: {fileID: 7535432984506661122}
+  CardAnimator: {fileID: 0}
 --- !u!114 &6718431212975414227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41028,6 +41061,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &6625970153190827042
 GameObject:
   m_ObjectHideFlags: 0
@@ -42826,6 +42860,7 @@ MonoBehaviour:
   defenceText: {fileID: 6810246358437775800}
   other: {fileID: 6069365229217246696}
   otherText: {fileID: 5838157344716612903}
+  CardAnimator: {fileID: 0}
 --- !u!114 &7253848623692630006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42839,6 +42874,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &7117802587724172965
 GameObject:
   m_ObjectHideFlags: 0
@@ -44172,6 +44208,7 @@ MonoBehaviour:
   defenceText: {fileID: 6354835254138088617}
   other: {fileID: 5947150099070748921}
   otherText: {fileID: 6320660419467313206}
+  CardAnimator: {fileID: 0}
 --- !u!114 &7068657869917561575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44185,6 +44222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &7283221095989529448
 GameObject:
   m_ObjectHideFlags: 0
@@ -44837,6 +44875,7 @@ MonoBehaviour:
   defenceText: {fileID: 6585587281678872904}
   other: {fileID: 5898829040567031064}
   otherText: {fileID: 6116771660846833111}
+  CardAnimator: {fileID: 0}
 --- !u!114 &7011179529896967942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44850,6 +44889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &7478263612621115010
 GameObject:
   m_ObjectHideFlags: 0
@@ -46317,6 +46357,7 @@ MonoBehaviour:
   defenceText: {fileID: 6240893849642740857}
   other: {fileID: 6639562163254790185}
   otherText: {fileID: 6420879851898470630}
+  CardAnimator: {fileID: 0}
 --- !u!114 &7832914225966293559
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46330,6 +46371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &7671916203984505075
 GameObject:
   m_ObjectHideFlags: 0
@@ -46512,6 +46554,7 @@ MonoBehaviour:
   defenceText: {fileID: 6213480192562445550}
   other: {fileID: 6666130295480195262}
   otherText: {fileID: 6466360407683698801}
+  CardAnimator: {fileID: 0}
 --- !u!114 &7787486058843681440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46525,6 +46568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &7736668601130945649
 GameObject:
   m_ObjectHideFlags: 0
@@ -48155,6 +48199,7 @@ MonoBehaviour:
   defenceText: {fileID: 5594877422753100113}
   other: {fileID: 5124131144073221377}
   otherText: {fileID: 4765767767237467598}
+  CardAnimator: {fileID: 0}
 --- !u!114 &8614538641110089503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48168,6 +48213,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &8203019522320509021
 GameObject:
   m_ObjectHideFlags: 0
@@ -48958,6 +49004,7 @@ MonoBehaviour:
   defenceText: {fileID: 5201570209870860408}
   other: {fileID: 4798547968189166632}
   otherText: {fileID: 5163420251968535783}
+  CardAnimator: {fileID: 0}
 --- !u!114 &8216732397906452022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48971,6 +49018,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &8436370465370432222
 GameObject:
   m_ObjectHideFlags: 0
@@ -52122,6 +52170,7 @@ MonoBehaviour:
   defenceText: {fileID: 4868443575313848572}
   other: {fileID: 5271536879912647852}
   otherText: {fileID: 5483053881760052323}
+  CardAnimator: {fileID: 0}
 --- !u!114 &8770810560547542706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52135,6 +52184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.2
+  pointerIn: 0
 --- !u!1 &9195192854366940996
 GameObject:
   m_ObjectHideFlags: 0

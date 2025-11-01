@@ -257,6 +257,7 @@ MonoBehaviour:
   defenceText: {fileID: 3436088097710306522}
   other: {fileID: 2672607740709654666}
   otherText: {fileID: 2317374945698994245}
+  CardAnimator: {fileID: 0}
 --- !u!114 &1551329493116484244
 MonoBehaviour:
   m_ObjectHideFlags: 0

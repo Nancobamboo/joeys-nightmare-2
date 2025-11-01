@@ -18,6 +18,68 @@ public static class VFXStackHelper
     }
 
 
+    public static IEnumerator PlayMoveCardVFX(GameObject cardGO, Vector3 targetWorldPosition)
+    {
+        if (cardGO == null) yield break;
+        // 记录原始位置
+        Canvas canvas = cardGO.GetComponentInParent<Canvas>();
+        Vector3 startWorldPosition = cardGO.transform.position;
+        Vector3 startScale = cardGO.transform.localScale;
+
+        // 创建一个临时的卡牌视觉副本用于飞行动画
+        GameObject flyingCard = Object.Instantiate(cardGO, canvas.transform);
+        flyingCard.transform.position = startWorldPosition;
+        flyingCard.transform.localScale = startScale;
+        // 让飞行卡牌忽略布局
+        var layoutElement = flyingCard.GetComponent<UnityEngine.UI.LayoutElement>();
+        if (layoutElement == null)
+        {
+            layoutElement = flyingCard.AddComponent<UnityEngine.UI.LayoutElement>();
+        }
+        layoutElement.ignoreLayout = true;
+
+        // 禁用飞行卡牌的交互
+        var canvasGroup = flyingCard.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = flyingCard.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.blocksRaycasts = false;
+
+        // 隐藏原始卡牌
+        var originalCanvasGroup = cardGO.GetComponent<CanvasGroup>();
+        if (originalCanvasGroup == null)
+        {
+            originalCanvasGroup = cardGO.AddComponent<CanvasGroup>();
+        }
+        originalCanvasGroup.alpha = 0f;
+        // 播放飞行动画
+        PData.Instance.canOperate = false;
+        // 使用协程实现飞行动画（不需要DOTween）
+        float duration = 0.4f; // 飞行时间
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            
+            // 使用缓动函数（EaseOutQuad）
+            float easeT = 1f - (1f - t) * (1f - t);
+            
+            // 插值位置
+            flyingCard.transform.position = Vector3.Lerp(startWorldPosition, targetWorldPosition, easeT);
+            
+            yield return null;
+        }
+        // 确保最终位置准确
+        flyingCard.transform.position = targetWorldPosition;
+        // 销毁飞行卡牌，显示原始卡牌
+        Object.Destroy(flyingCard);
+        PData.Instance.canOperate = true;
+
+    }
+
+
 
     public static IEnumerator PlayAppearDisappearVFX(GameObject cardGO, int envListIndex)
     {
@@ -131,7 +193,7 @@ public static class VFXStackHelper
         Canvas canvas = cardGO.GetComponentInParent<Canvas>();
         // 1. 播放卡牌受击动画（如果有animator）
         Animator animator = cardGO.GetComponentInChildren<Animator>();
-        Debug.Log($"PlayDamageVFX: Animator found = {animator != null}, CardGO = {cardGO.name}");
+        // Debug.Log($"PlayDamageVFX: Animator found = {animator != null}, CardGO = {cardGO.name}");
         if (animator != null)
         {
             animator.enabled = true;
@@ -167,7 +229,7 @@ public static class VFXStackHelper
                 {
                     damageText.text = "-" + damage.ToString();
                     damageText.gameObject.SetActive(true);
-                    Debug.Log($"PlayDamageVFX: Set damage text to {damageText.text}");
+                    // Debug.Log($"PlayDamageVFX: Set damage text to {damageText.text}");
                 }
                 else
                 {
@@ -176,7 +238,7 @@ public static class VFXStackHelper
             }
             else
             {
-                Debug.LogError("PlayDamageVFX: Damage transform not found");
+                // Debug.LogError("PlayDamageVFX: Damage transform not found");
             }
             
             // 3. 播放伤害数字动画
@@ -184,7 +246,7 @@ public static class VFXStackHelper
             if (damageAnimator != null)
             {
                 damageAnimator.Play("UIDamage_kouxue");
-                Debug.Log("PlayDamageVFX: Playing damage animation");
+                // Debug.Log("PlayDamageVFX: Playing damage animation");
             }
         }
         else
@@ -200,7 +262,7 @@ public static class VFXStackHelper
         // 5. 播放震动特效
         if (CameraShake.Instance != null)
         {
-            Debug.Log("PlayDamageVFX: Triggering camera shake");
+            // Debug.Log("PlayDamageVFX: Triggering camera shake");
             yield return CameraShake.Instance.ShakeLight();
         }
         else
@@ -224,18 +286,37 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayDamageToPlayerVFX(Image joeyImage, int damage)
+    public static IEnumerator PlayDamageToPlayerVFX(Image joeyImage,GameObject defenceCardGO, int damage)
     {
-        if (damage <= 0) yield break;
-        if (joeyImage == null) yield break;
-
+        PData.Instance.canOperate = false;
         // 获取Canvas
         Canvas canvas = joeyImage.GetComponentInParent<Canvas>();
+        GameObject vfxInstance=null;
 
-        // 替换成受伤图片
-        joeyImage.sprite = playerDamageSprite;
+        // 1. 盾牌受击特效
+        if (defenceCardGO != null)
+        {
+            if (damage <= 0)
+            {
+                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+            }
+            else
+            {
+                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+            }
+        }
 
-        // 展示伤害数字
+        // 2. joey受击图片
+        if (damage > 0)
+        {
+            joeyImage.sprite = playerDamageSprite;
+        }
+
+        // 3. 展示伤害数字
         GameObject damageUIPrefab = Resources.Load<GameObject>("prefab/UIDamage");
         GameObject damageInstance = null;
         if (damageUIPrefab != null)
@@ -271,21 +352,35 @@ public static class VFXStackHelper
             }
         }
 
-        // 播放屏幕震动
+        
+        // 4. 播放屏幕震动
         if (CameraShake.Instance != null)
         {
-            Debug.Log("PlayDamageToPlayerVFX: Triggering camera shake");
-            yield return CameraShake.Instance.ShakeLight();
+            if (damage > 0)
+            {
+                yield return CameraShake.Instance.ShakeLight();
+                yield return new WaitForSeconds(0.2f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.4f);
+            }
         }
 
-        // 等待0.5秒
-        yield return new WaitForSeconds(0.7f);
 
         // 切回原始图片
         joeyImage.sprite = playerSleepSprite;
 
+        // 5. 移走盾牌
+        if (defenceCardGO != null)
+        {
+            Vector3 targetWorldPosition = defenceCardGO.transform.position + new Vector3(0,-500f,0);
+            yield return PlayMoveCardVFX(cardGO:defenceCardGO, targetWorldPosition:targetWorldPosition);
+        }
+
+        PData.Instance.canOperate = true;
+
         // 清理伤害UI
-        yield return new WaitForSeconds(0.3f); // 继续等待一段时间让数字动画完成
         if (damageInstance != null)
         {
             Object.Destroy(damageInstance);
@@ -294,5 +389,6 @@ public static class VFXStackHelper
         // 触发伤害完成事件
         GameEvents.RaiseDamageToPlayerComplete();
     }
+
 
 }

@@ -162,7 +162,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         else if (cardGameObject.GetComponent<CardDisplay>().card.type == "other")
         {
-            Debug.Log($"OnEnvClicked: {cardGameObject.name}");
+            // Debug.Log($"OnEnvClicked: {cardGameObject.name}");
         }
         else
         {
@@ -197,22 +197,22 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagAttackClicked(GameObject cardGameObject)
     {
-        Debug.Log($"OnBagAttackClicked: {cardGameObject.name}");
+        // Debug.Log($"OnBagAttackClicked: {cardGameObject.name}");
     }
 
     public void OnBagDefenceClicked(GameObject cardGameObject)
     {
-        Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+        // Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
     }
 
     public void OnBagSkillClicked(GameObject cardGameObject)
     {
-        Debug.Log($"OnBagSkillClicked: {cardGameObject.name}");
+        // Debug.Log($"OnBagSkillClicked: {cardGameObject.name}");
     }
 
     public void OnBagItemClicked(GameObject cardGameObject)
     {
-        Debug.Log($"OnBagItemClicked: {cardGameObject.name}");
+        // Debug.Log($"OnBagItemClicked: {cardGameObject.name}");
     }
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)
@@ -250,11 +250,17 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void SettlementPlayer()
     {
-        
+        GameObject defenceGO = UIGridHelper.GetCardListOrderIndex0(defencePanel);
+        CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        UIGridHelper.RefreshPanel(defencePanel);
+        UpdatePlayerAttackAndDefence();
+        var originalCanvasGroup = defenceGO.GetComponent<CanvasGroup>();
+        originalCanvasGroup.alpha = 1f;
     }
 
-    public void UseDefence(GameObject attackGO,GameObject defenceGO=null)
+    public void UseDefence(GameObject attackGO)
     {
+        GameObject defenceGO = UIGridHelper.GetCardListOrderIndex0(defencePanel);
         int defenceValue = 0;
         if (defenceGO != null)
         {
@@ -267,11 +273,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             damage = attackValue - defenceValue;
         }
+
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth - damage);
-        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage:joeyImage,damage:damage));
-        CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(defencePanel);
-        UpdatePlayerAttackAndDefence();
+        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage:joeyImage,defenceCardGO:defenceGO,damage:damage));
 
     }
 
@@ -283,14 +287,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("MonsterAttack: monsterCard 或 monsterCard.card 为空");
             return;
         }
-        if (defenceCardList.Count == 0)
-        {
-            UseDefence(attackGO:monsterCardGO,defenceGO:null);
-        }
-        else
-        {
-            UseDefence(attackGO:monsterCardGO,defenceGO:defenceCardList[0]);
-        }
+        UseDefence(attackGO:monsterCardGO);
     }
 
 
@@ -344,7 +341,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
 
         // Update PData
-        Debug.Log($"[BattleManager] UpdatePlayerAttackAndDefence: attack={attackValue}, defence={defenceValue}");
+        // Debug.Log($"[BattleManager] UpdatePlayerAttackAndDefence: attack={attackValue}, defence={defenceValue}");
         PData.Instance.SetPlayerAttack(attackValue);
         PData.Instance.SetPlayerDefence(defenceValue);
     }
