@@ -116,13 +116,13 @@ public class PhaseManager : MonoSingleton<PhaseManager>
         if (PData.Instance.playerHealth <= 0)
         {
             // Show GameOver UI
-            if (UIGameOver.Instance != null)
+            if (MenuManager.Instance != null)
             {
-                UIGameOver.Instance.ShowGameOver();
+                MenuManager.Instance.ShowGameOver();
             }
             else
             {
-                Debug.LogError("PhaseManager: UIGameOver.Instance is null! Cannot show GameOver UI.");
+                Debug.LogError("PhaseManager: MenuManager.Instance is null! Cannot show GameOver UI.");
             }
         }
         
