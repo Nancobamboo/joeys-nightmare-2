@@ -18,69 +18,6 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayMoveCardVFX(GameObject cardGO, Vector3 targetWorldPosition)
-    {
-        if (cardGO == null) yield break;
-        // 记录原始位置
-        Canvas canvas = cardGO.GetComponentInParent<Canvas>();
-        Vector3 startWorldPosition = cardGO.transform.position;
-        Vector3 startScale = cardGO.transform.localScale;
-
-        // 创建一个临时的卡牌视觉副本用于飞行动画
-        GameObject flyingCard = Object.Instantiate(cardGO, canvas.transform);
-        flyingCard.transform.position = startWorldPosition;
-        flyingCard.transform.localScale = startScale;
-        // 让飞行卡牌忽略布局
-        var layoutElement = flyingCard.GetComponent<UnityEngine.UI.LayoutElement>();
-        if (layoutElement == null)
-        {
-            layoutElement = flyingCard.AddComponent<UnityEngine.UI.LayoutElement>();
-        }
-        layoutElement.ignoreLayout = true;
-
-        // 禁用飞行卡牌的交互
-        var canvasGroup = flyingCard.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-        {
-            canvasGroup = flyingCard.AddComponent<CanvasGroup>();
-        }
-        canvasGroup.blocksRaycasts = false;
-
-        // 隐藏原始卡牌
-        var originalCanvasGroup = cardGO.GetComponent<CanvasGroup>();
-        if (originalCanvasGroup == null)
-        {
-            originalCanvasGroup = cardGO.AddComponent<CanvasGroup>();
-        }
-        originalCanvasGroup.alpha = 0f;
-        // 播放飞行动画
-        PData.Instance.canOperate = false;
-        // 使用协程实现飞行动画（不需要DOTween）
-        float duration = 0.4f; // 飞行时间
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / duration;
-            
-            // 使用缓动函数（EaseOutQuad）
-            float easeT = 1f - (1f - t) * (1f - t);
-            
-            // 插值位置
-            flyingCard.transform.position = Vector3.Lerp(startWorldPosition, targetWorldPosition, easeT);
-            
-            yield return null;
-        }
-        // 确保最终位置准确
-        flyingCard.transform.position = targetWorldPosition;
-        // 销毁飞行卡牌，显示原始卡牌
-        Object.Destroy(flyingCard);
-        PData.Instance.canOperate = true;
-
-    }
-
-
-
     public static IEnumerator PlayAppearDisappearVFX(GameObject cardGO, int envListIndex)
     {
         if (cardGO == null) yield break;
@@ -304,23 +241,8 @@ public static class VFXStackHelper
                 vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
 
                 // 1.5 盾牌受击动画
-                Animator animator = defenceCardGO.GetComponentInChildren<Animator>();
-                if (animator != null)
-                {
-                    animator.enabled = true;
-                    if (animator.runtimeAnimatorController == null)
-                    {
-                        Debug.LogError($"PlayDamageVFX: No AnimatorController");
-                    }
-                    else
-                    {
-                        animator.Play("UI_Carditem_dunpai");
-                    }
-                }
-
+                yield return VFX.PlayAnimator(defenceCardGO, "UI_Carditem_dunpai");
             }
-
-
 
             // 2. joey受击图片
             joeyImage.sprite = playerDamageSprite;
@@ -341,36 +263,18 @@ public static class VFXStackHelper
             vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
 
             // 1.5 盾牌受击动画
-            Animator animator = defenceCardGO.GetComponentInChildren<Animator>();
-            if (animator != null)
-            {
-                animator.enabled = true;
-                if (animator.runtimeAnimatorController == null)
-                {
-                    Debug.LogError($"PlayDamageVFX: No AnimatorController");
-                }
-                else
-                {
-                    animator.Play("UI_Carditem_dunpai");
-                }
-            
+            yield return VFX.PlayAnimator(defenceCardGO, "UI_Carditem_dunpai");
             BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
-            yield return new WaitForSeconds(0.5f);
-            }
+            yield return new WaitForSeconds(0.4f);
+            
 
         }
         
-        // 5. 移走盾牌
-        if (defenceCardGO != null)
-        {
-            Vector3 targetWorldPosition = defenceCardGO.transform.position + new Vector3(0,-500f,0);
-            yield return PlayMoveCardVFX(cardGO:defenceCardGO, targetWorldPosition:targetWorldPosition);
-        }
-
         PData.Instance.canOperate = true;
 
         // 触发伤害完成事件
         GameEvents.RaiseDamageToPlayerComplete();
+        GameEvents.RaiseCardFinished(defenceCardGO);
         
         // Check if player is dead and trigger game over event
         if (PData.Instance.playerHealth <= 0)
@@ -380,4 +284,53 @@ public static class VFXStackHelper
     }
 
 
+    public static IEnumerator FinshCardVFX(GameObject cardGO)
+    {
+        if (cardGO == null) yield break;
+        CardDisplay cd = cardGO.GetComponent<CardDisplay>();
+        cd.card.state = CardState.Used;
+        if (cd.card.position == CardPosition.Env)
+        {
+            yield return VFX.PlayAnimator(cardGO, "UI_Carditem_feitian");
+        }
+        else if (cd.card.position == CardPosition.Bag)
+        {
+            yield return VFX.PlayAnimator(cardGO, "UI_Carditem_diaoluo_anim");
+
+        }
+
+        yield return new WaitForSeconds(0.4f);
+        switch (cd.card.type)
+        {
+            case "attack":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.attackCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(BattleManager.Instance.attackPanel);
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                break;
+            case "defence":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.defenceCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(BattleManager.Instance.defencePanel);
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                break;
+            case "skill":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.skillCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(BattleManager.Instance.skillPanel);
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                break;
+            case "item":
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.itemCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(BattleManager.Instance.itemPanel);
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                break;
+            case "monster":
+                int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:BattleManager.Instance.envCardListList);
+                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
+                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                break;
+            default:
+                Debug.LogError("FinshCardVFX: 未知的位置");
+                break;
+        }
+    }
 }
