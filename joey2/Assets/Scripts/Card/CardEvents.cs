@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+using UnityEngine.UI;
 
 public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandler, IPointerExitHandler
 {
     public float zoomSize = 1.1f;
+    public float enterDelay = 0.2f;         // 悬停延迟时间
+    public float spacingOnEnterEnv = -490;
+    public float spacingOnEnterBag = -460;
     public bool pointerIn = false;
     // 添加特效相关变量
     private GameObject vfxInstance;
     private string glowPath = "VFX/base/VFX_glow";
+    private VerticalLayoutGroup parentVLG;
+    private Coroutine enterCoroutine;
     public CardDisplay GetCardDisplay()
     {
         var cd = this.GetComponent<CardDisplay>();
@@ -20,6 +25,15 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
             return null;
         }
         return cd;
+    }
+
+    public void Start()
+    {
+        parentVLG = GetComponentInParent<VerticalLayoutGroup>();
+        if (parentVLG == null)
+        {
+            Debug.LogError("CardEvents: VerticalLayoutGroup 为空");
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -56,6 +70,23 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
             transform.localScale = new Vector3(zoomSize, zoomSize, 1.0f);
             // PlayGlowVFX();
         }
+        // // 如果之前有延迟协程，先取消
+        // if (enterCoroutine != null)
+        // {
+        //     StopCoroutine(enterCoroutine);
+        //     enterCoroutine = null;
+        // }
+        // if (cd.card.state == CardState.Inactive)
+        // {
+        //     if (cd.card.position == CardPosition.Env)
+        //     {
+        //         enterCoroutine = StartCoroutine(DelayedSetSpacing(enterDelay, -400));
+        //     }
+        //     else
+        //     {
+        //         enterCoroutine = StartCoroutine(DelayedSetSpacing(enterDelay, -400));
+        //     }
+        // }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -66,8 +97,43 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
             pointerIn = false;
             transform.localScale = Vector3.one;
         }
-        // DestroyGlowVFX();
+        // if (enterCoroutine == null)
+        // {
+        //     return ;
+        // }
+        // if (enterCoroutine != null)
+        // {
+        //     StopCoroutine(enterCoroutine);
+        //     enterCoroutine = null;
+        // }
+        // // 离开时立即恢复 spacing（或你也可以延迟恢复）
+        // if (cd.card.position == CardPosition.Env)
+        // {
+        //     SetSpacing(spacingOnEnterEnv);
+        // }
+        // else
+        // {
+        //     SetSpacing(spacingOnEnterBag);
+        // }
     }
+
+    // private IEnumerator DelayedSetSpacing(float delay, float targetSpacing)
+    // {
+    //     yield return new WaitForSeconds(delay);
+    //     SetSpacing(targetSpacing);
+    //     enterCoroutine = null;
+    // }
+
+    // private void SetSpacing(float spacing)
+    // {
+    //     parentVLG.spacing = spacing;
+    //     // //强制刷新布局，否则可能看不出 spacing 修改效果
+    //     // LayoutRebuilder.ForceRebuildLayoutImmediate(
+    //     //     parentVLG.GetComponent<RectTransform>()
+    //     // );
+    // }
+
+
 
     private void PlayGlowVFX()
     {
