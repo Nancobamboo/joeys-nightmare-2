@@ -15,10 +15,12 @@ public class PhaseManager : MonoSingleton<PhaseManager>
     void OnEnable()
     {
         GameEvents.OnGamePhaseChanged += OnGamePhaseChanged;
+        GameEvents.OnGameOver += OnGameOver;
     }
     void OnDisable()
     {
         GameEvents.OnGamePhaseChanged -= OnGamePhaseChanged;
+        GameEvents.OnGameOver -= OnGameOver;
     }
 
 
@@ -112,21 +114,23 @@ public class PhaseManager : MonoSingleton<PhaseManager>
     {
         Debug.Log("BattleEnd");
         
-        // Check if player is dead
-        if (PData.Instance.playerHealth <= 0)
-        {
-            // Show GameOver UI
-            if (MenuManager.Instance != null)
-            {
-                MenuManager.Instance.ShowGameOver();
-            }
-            else
-            {
-                Debug.LogError("PhaseManager: MenuManager.Instance is null! Cannot show GameOver UI.");
-            }
-        }
+        // Game over will be triggered by OnGameOver event after damage to player VFX completes
+        // Don't check player health here anymore
         
         SetGamePhase(GamePhase.Default);
+    }
+    
+    private void OnGameOver()
+    {
+        // Show GameOver UI when damage to player VFX completes
+        if (MenuManager.Instance != null)
+        {
+            MenuManager.Instance.ShowGameOver();
+        }
+        else
+        {
+            Debug.LogError("PhaseManager: MenuManager.Instance is null! Cannot show GameOver UI.");
+        }
     }
 
 
