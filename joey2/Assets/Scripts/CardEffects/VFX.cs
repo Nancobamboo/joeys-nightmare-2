@@ -46,7 +46,7 @@ public class VFX : MonoSingleton<VFX>
             animator.enabled = true;
             if (animator.runtimeAnimatorController == null)
             {
-                Debug.LogError($"PlayDamageVFX: No AnimatorController assigned to {cardGO.name}");
+                Debug.LogError($"PlayAnimator: No AnimatorController assigned to {cardGO.name}");
             }
             else
             {

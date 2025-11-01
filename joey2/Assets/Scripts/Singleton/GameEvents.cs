@@ -71,6 +71,13 @@ public static class GameEvents
         OnAttackPreFinish?.Invoke(attackerCardGO);
     }
 
+    // Attack initiated event - fired when an attack starts
+    public static event Action<GameObject, GameObject> OnAttackInitiated;
+    public static void RaiseAttackInitiated(GameObject attackerCardGO, GameObject targetCardGO)
+    {
+        OnAttackInitiated?.Invoke(attackerCardGO, targetCardGO);
+    }
+
     public static event Action<GameObject> OnMonsterAttackPre;
     public static void RaiseMonsterAttackPre(GameObject attackerCardGO)
     {
