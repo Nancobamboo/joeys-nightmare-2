@@ -52,7 +52,7 @@ public class VFX : MonoSingleton<VFX>
 
     }
 
-    public static IEnumerator PlayMonsterHit(GameObject cardGO ,GameObject targetCardGO=null,int damage=0,bool monsterAttack=false)
+    public static IEnumerator PlayMonsterHit(GameObject cardGO)
     {
         if (cardGO == null) yield break;
         // TODO: 播放击中特效、抖动、音效等
@@ -67,13 +67,13 @@ public class VFX : MonoSingleton<VFX>
             else
             {
                 animator.Play("UI_Carditem_guaiwugongji");
-                // Debug.Log("PlayHit: Playing attack animation");
+                Debug.Log("PlayMonsterHit: Playing attack animation");
                 yield return null;
             }
             yield return new WaitForSeconds(0.4f);
-            GameEvents.RaiseMonsterAttackPre(cardGO,targetCardGO,damage,monsterAttack);
-            yield return new WaitForSeconds(0.4f);
-            GameEvents.RaiseMonsterAttackPreFinish(cardGO);
+            GameEvents.RaiseMonsterAttackPre(cardGO);
+            // yield return new WaitForSeconds(0.4f);
+            // GameEvents.RaiseMonsterAttackPreFinish(cardGO);
         }
 
     }

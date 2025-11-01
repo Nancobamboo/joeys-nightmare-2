@@ -41,7 +41,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre += OnAttackPre;
         GameEvents.OnAttackPreFinish += OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
-        GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
     }
     void OnDisable()
     {
@@ -51,7 +50,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnAttackPre -= OnAttackPre;
         GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
-        GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
     }
 
 
@@ -262,6 +260,11 @@ public class BattleManager : MonoSingleton<BattleManager>
         originalCanvasGroup.alpha = 1f;
     }
 
+
+    public void OnMonsterAttackPre(GameObject monsterCardGO)
+    {
+        UseDefence(attackGO:monsterCardGO);
+    }
     public void UseDefence(GameObject attackGO)
     {
         GameObject defenceGO = UIGridHelper.GetCardListOrderIndex0(defencePanel);
@@ -291,9 +294,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("MonsterAttack: monsterCard 或 monsterCard.card 为空");
             return;
         }
-        Start
-        
-        UseDefence(attackGO:monsterCardGO);
+        StartCoroutine(VFX.PlayMonsterHit(cardGO:monsterCardGO));
     }
 
 
