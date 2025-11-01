@@ -40,6 +40,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageToPlayerComplete += OnDamageToPlayerComplete;
         GameEvents.OnAttackPre += OnAttackPre;
         GameEvents.OnAttackPreFinish += OnAttackPreFinish;
+        GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
+        GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
     }
     void OnDisable()
     {
@@ -48,6 +50,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageToPlayerComplete -= OnDamageToPlayerComplete;
         GameEvents.OnAttackPre -= OnAttackPre;
         GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
+        GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
+        GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
     }
 
 
@@ -287,6 +291,8 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("MonsterAttack: monsterCard 或 monsterCard.card 为空");
             return;
         }
+        Start
+        
         UseDefence(attackGO:monsterCardGO);
     }
 

@@ -298,7 +298,7 @@ public static class VFXStackHelper
             // 1. 盾牌受击特效
             if (defenceCardGO != null)
             {
-                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dunsui");
                 vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
                 vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
 
