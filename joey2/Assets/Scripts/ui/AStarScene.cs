@@ -7,11 +7,23 @@ public class AStarScene : MonoBehaviour
     [SerializeField] private string audioPath = "Audio/SFX/Main/AStar";
     [SerializeField] private string nextSceneName = "Start";
     
+    [Header("Scan Line Effect")]
+    [SerializeField] private bool enableScanLine = true;
+    [SerializeField] private float scanSpeed = 400f;
+    [SerializeField] private Color scanLineColor = new Color(1f, 1f, 1f, 0.8f);
+    
     private AudioSource audioSource;
     private AudioClip audioClip;
+    private ScanLineEffect scanLineEffect;
 
     private void Start()
     {
+        // Initialize scan line effect
+        if (enableScanLine)
+        {
+            InitializeScanLine();
+        }
+        
         // Load audio clip from Resources
         audioClip = Resources.Load<AudioClip>(audioPath);
         
@@ -35,6 +47,23 @@ public class AStarScene : MonoBehaviour
         
         // Wait for audio to finish, then switch scene
         StartCoroutine(SwitchSceneAfterDelay(audioClip.length));
+    }
+
+    private void InitializeScanLine()
+    {
+        GameObject scanLineObj = new GameObject("ScanLineEffect");
+        scanLineObj.transform.SetParent(transform);
+        scanLineEffect = scanLineObj.AddComponent<ScanLineEffect>();
+        
+        // Force white color for scan line
+        scanLineColor = Color.white;
+        
+        // Configure scan line properties before initialization
+        scanLineEffect.ScanSpeed = scanSpeed;
+        scanLineEffect.ScanLineColor = scanLineColor;
+        
+        // Manually initialize to ensure properties are set
+        scanLineEffect.Initialize();
     }
 
     private IEnumerator SwitchSceneAfterDelay(float delay)
