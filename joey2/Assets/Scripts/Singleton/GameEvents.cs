@@ -77,6 +77,13 @@ public static class GameEvents
         OnMonsterAttackPre?.Invoke(attackerCardGO);
     }
 
+    // game over event
+    public static event Action OnGameOver;
+    public static void RaiseGameOver()
+    {
+        OnGameOver?.Invoke();
+    }
+
 
 
 
