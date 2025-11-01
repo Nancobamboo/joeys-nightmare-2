@@ -1115,7 +1115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a48e687090c254a9ff26339809ec12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level: 1
+  level: 3
   envPanels:
   - {fileID: 966049691}
   - {fileID: 966049690}

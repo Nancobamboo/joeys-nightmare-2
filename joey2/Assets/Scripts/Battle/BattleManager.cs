@@ -28,9 +28,21 @@ public class BattleManager : MonoSingleton<BattleManager>
 
 	void Start()
 	{
-		// Load level from PData if exists, otherwise use default
-		if (PData.Instance.currentLevel > 0)
+		// If PData.currentLevel is greater than editor level, use PData (for level progression)
+		// Otherwise, use editor level value and sync to PData
+		if (PData.Instance.currentLevel > level)
 		{
+			// Game progression takes priority
+			level = PData.Instance.currentLevel;
+		}
+		else if (level > 0)
+		{
+			// Editor value takes priority, sync to PData
+			PData.Instance.currentLevel = level;
+		}
+		else if (PData.Instance.currentLevel > 0)
+		{
+			// Use PData value if editor value is 0 or not set
 			level = PData.Instance.currentLevel;
 		}
 		
@@ -230,7 +242,12 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagItemClicked(GameObject cardGameObject)
     {
-        // Debug.Log($"OnBagItemClicked: {cardGameObject.name}");
+        // Trigger OnPlay effect for item cards
+        EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
+        
+        // Move item card to used pile after use
+        CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:itemCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        UIGridHelper.RefreshPanel(itemPanel);
     }
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)

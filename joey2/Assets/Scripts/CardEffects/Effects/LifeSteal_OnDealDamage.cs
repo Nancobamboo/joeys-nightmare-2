@@ -18,7 +18,12 @@ public class LifeSteal_OnDealDamage : ICardEffect
         // 可选：播放吸血特效
         yield return VFX.PlayLifeSteal(ctx.source);
 
-        PData.Instance.playerHealth += heal;
+        // Calculate new health (don't exceed max health)
+        int newHealth = Mathf.Min(
+            PData.Instance.playerHealth + heal,
+            PData.Instance.playerMaxHealth
+        );
+        PData.Instance.SetPlayerHP(newHealth);
         yield break;
     }
 }

@@ -21,14 +21,14 @@
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
-3001,Art/Img/img_card_defence_01,小血瓶  ,item   ,恢复10点生命值,0,0,0,0,1,
+3001,Art/Img/img_card_defence_01,道具牌,item   ,点击使用，恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
+3001,Art/Img/img_card_defence_01,小血瓶  ,item   ,恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
 3002,Art/Img/img_card_defence_01,连环闪电    ,item        ,对全场敌人造成3点伤害,0,0,0,0,1,
 3003,Art/Img/img_card_defence_01,钩索,item        ,随机装备一件武器,,,,,1,
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
+4000,Art/Img/img_card_attrack_01,技能牌,skill     ,"点击使用,攻击时打出两张牌",0,0,0,0,1,
 4001,Art/Img/img_card_attrack_01,连击       ,skill     ,攻击时打出两张牌,0,0,0,0,1,
 4002,Art/Img/img_card_attrack_01,痛击       ,skill     ,下次攻击使怪物处于两层易伤效果,0,0,0,0,1,
 4003,Art/Img/img_card_attrack_01,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
