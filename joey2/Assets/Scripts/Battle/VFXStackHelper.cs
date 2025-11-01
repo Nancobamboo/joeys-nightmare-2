@@ -293,84 +293,32 @@ public static class VFXStackHelper
         Canvas canvas = joeyImage.GetComponentInParent<Canvas>();
         GameObject vfxInstance=null;
 
-        // 1. 盾牌受击特效
-        if (defenceCardGO != null)
-        {
-            if (damage <= 0)
-            {
-                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
-                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
-                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
-            }
-            else
-            {
-                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
-                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
-                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
-            }
-        }
-
-        // 2. joey受击图片
         if (damage > 0)
         {
+            // 1. 盾牌受击特效
+            if (defenceCardGO != null)
+            {
+                GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Dun");
+                vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
+                vfxInstance.transform.position = defenceCardGO.transform.position; // 使用相同的坐标设置方式
+            }
+
+            // 2. joey受击图片
             joeyImage.sprite = playerDamageSprite;
-        }
+            // 3. 展示伤害数字
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            // 4. 播放屏幕震动
+            BattleManager.Instance.StartCoroutine(CameraShake.Instance.ShakeLight());
+            yield return new WaitForSeconds(0.6f);
+            // 切回原始图片
+            joeyImage.sprite = playerSleepSprite;
 
-        // 3. 展示伤害数字
-        GameObject damageUIPrefab = Resources.Load<GameObject>("prefab/UIDamage");
-        GameObject damageInstance = null;
-        if (damageUIPrefab != null)
+        }
+        else
         {
-            // 实例化伤害UI
-            damageInstance = Object.Instantiate(damageUIPrefab, joeyImage.transform);
-            
-            // 设置位置在图片上方
-            damageInstance.transform.localPosition = new Vector3(100f, 190f, 0);
-            
-            // 设置伤害数字文本
-            Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
-            if (damageTextTransform != null)
-            {
-                Text damageText = damageTextTransform.GetComponent<Text>();
-                if (damageText != null)
-                {
-                    damageText.text = "-" + damage.ToString();
-                    damageText.gameObject.SetActive(true);
-                    // Debug.Log($"PlayDamageToPlayerVFX: Set damage text to {damageText.text}");
-                }
-            }
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
         }
-
-        // 播放伤害数字动画
-        if (damageInstance != null)
-        {
-            Animator damageAnimator = damageInstance.GetComponent<Animator>();
-            if (damageAnimator != null)
-            {
-                damageAnimator.Play("UIDamage_kouxue");
-                // Debug.Log("PlayDamageToPlayerVFX: Playing damage animation");
-            }
-        }
-
         
-        // 4. 播放屏幕震动
-        if (CameraShake.Instance != null)
-        {
-            if (damage > 0)
-            {
-                yield return CameraShake.Instance.ShakeLight();
-                yield return new WaitForSeconds(0.2f);
-            }
-            else
-            {
-                yield return new WaitForSeconds(0.4f);
-            }
-        }
-
-
-        // 切回原始图片
-        joeyImage.sprite = playerSleepSprite;
-
         // 5. 移走盾牌
         if (defenceCardGO != null)
         {
@@ -379,12 +327,6 @@ public static class VFXStackHelper
         }
 
         PData.Instance.canOperate = true;
-
-        // 清理伤害UI
-        if (damageInstance != null)
-        {
-            Object.Destroy(damageInstance);
-        }
 
         // 触发伤害完成事件
         GameEvents.RaiseDamageToPlayerComplete();
