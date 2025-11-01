@@ -343,6 +343,12 @@ public static class VFXStackHelper
 
         // 触发伤害完成事件
         GameEvents.RaiseDamageToPlayerComplete();
+        
+        // Check if player is dead and trigger game over event
+        if (PData.Instance.playerHealth <= 0)
+        {
+            GameEvents.RaiseGameOver();
+        }
     }
 
 

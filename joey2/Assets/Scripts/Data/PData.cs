@@ -11,6 +11,7 @@ public sealed class PData : PureSingleton<PData>
 	public int playerAttack { get; set; } = 0;
 	public int playerDefence { get; set; } = 0;
 	public bool canOperate { get; set; } = true;
+	public int currentLevel { get; set; } = 1;
 
 	public void SetPlayerHP(int hp)
 	{
