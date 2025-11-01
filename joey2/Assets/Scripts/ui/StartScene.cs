@@ -8,6 +8,10 @@ public class StartScene : MonoBehaviour
     public void LoadBattleScene()
     {
         Debug.Log("StartScene: LoadBattleScene called!");
+        
+        // Reset level to 1 when starting new game from menu
+        PData.Instance.currentLevel = 1;
+        
         SceneLoader.Instance.LoadScene("Battle");
     }
 }

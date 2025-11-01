@@ -84,6 +84,13 @@ public static class GameEvents
         OnGameOver?.Invoke();
     }
 
+    // next level event
+    public static event Action OnNextLevelRequested;
+    public static void RaiseNextLevelRequested()
+    {
+        OnNextLevelRequested?.Invoke();
+    }
+
 
 
 
