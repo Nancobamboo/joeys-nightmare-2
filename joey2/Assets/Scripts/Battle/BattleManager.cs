@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class BattleManager : MonoSingleton<BattleManager>
 {
-    public int level =1 ;//   关卡等级
+    public int level =1 ;// 关卡等级
     public List<Transform> envPanels = new List<Transform>();
     public List<List<GameObject>> envCardListList = new List<List<GameObject>>();
     public Transform attackPanel;
