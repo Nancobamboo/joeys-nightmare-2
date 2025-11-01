@@ -21,14 +21,14 @@ public class EffectRunner : MonoSingleton<EffectRunner>
     private IEnumerator Run()
     {
         running = true;
-        PData.Instance.canOperate = false;
+        // PData.Instance.canOperate = false;
         OnQueueStart?.Invoke();
         while (queue.Count > 0)
         {
             yield return queue.Dequeue();
         }
         OnQueueEmpty?.Invoke();
-        PData.Instance.canOperate = true;
+        // PData.Instance.canOperate = true;
         running = false;
     }
 
