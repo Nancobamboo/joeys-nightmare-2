@@ -111,6 +111,21 @@ public class PhaseManager : MonoSingleton<PhaseManager>
     public void BattleEnd()
     {
         Debug.Log("BattleEnd");
+        
+        // Check if player is dead
+        if (PData.Instance.playerHealth <= 0)
+        {
+            // Show GameOver UI
+            if (UIGameOver.Instance != null)
+            {
+                UIGameOver.Instance.ShowGameOver();
+            }
+            else
+            {
+                Debug.LogError("PhaseManager: UIGameOver.Instance is null! Cannot show GameOver UI.");
+            }
+        }
+        
         SetGamePhase(GamePhase.Default);
     }
 

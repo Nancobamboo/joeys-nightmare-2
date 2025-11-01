@@ -245,17 +245,38 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnDamageToPlayerComplete()
     {
+        // Check if player is dead before settling
+        if (PData.Instance.playerHealth <= 0)
+        {
+            // Player is dead, skip settlement
+            return;
+        }
         SettlementPlayer();
     }
 
     public void SettlementPlayer()
     {
         GameObject defenceGO = UIGridHelper.GetCardListOrderIndex0(defencePanel);
+        
+        // Check if defence card exists
+        if (defenceGO == null)
+        {
+            // No defence card to move, just refresh panel and update stats
+            UIGridHelper.RefreshPanel(defencePanel);
+            UpdatePlayerAttackAndDefence();
+            return;
+        }
+        
         CardHelper.MoveCard(cardGO:defenceGO, fromCardList:defenceCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         UIGridHelper.RefreshPanel(defencePanel);
         UpdatePlayerAttackAndDefence();
+        
+        // Reset canvas group alpha if component exists
         var originalCanvasGroup = defenceGO.GetComponent<CanvasGroup>();
-        originalCanvasGroup.alpha = 1f;
+        if (originalCanvasGroup != null)
+        {
+            originalCanvasGroup.alpha = 1f;
+        }
     }
 
     public void UseDefence(GameObject attackGO)
