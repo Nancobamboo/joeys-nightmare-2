@@ -26,15 +26,6 @@ public class BattleManager : MonoSingleton<BattleManager>
     // 弃牌列表
     public List<GameObject> usedCardList = new List<GameObject>();
 
-    // Store last attack target for double attack buff
-    private GameObject lastAttackTarget = null;
-    
-    // Track if we're in the middle of a double attack sequence
-    private bool isInDoubleAttackSequence = false;
-    
-    // Track how many attacks are pending in the sequence
-    private int pendingAttacksInSequence = 0;
-
 	void Start()
 	{
 		// If PData.currentLevel is greater than editor level, use PData (for level progression)
@@ -66,7 +57,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageComplete += OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete += OnDamageToPlayerComplete;
         GameEvents.OnAttackPre += OnAttackPre;
-        GameEvents.OnAttackPreFinish += OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
         GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested += OnNextLevelRequested;
@@ -78,7 +68,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageComplete -= OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete -= OnDamageToPlayerComplete;
         GameEvents.OnAttackPre -= OnAttackPre;
-        GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
         GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested -= OnNextLevelRequested;
@@ -110,81 +99,11 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
             return;
         }
-        // Store target if buff is active and not already stored
-        if (PData.Instance.nextAttackPlayTwoCards && lastAttackTarget == null)
-        {
-            lastAttackTarget = targetCardGameObject;
-        }
         
-        // Initialize double attack sequence on first attack
-        if (PData.Instance.nextAttackPlayTwoCards && !isInDoubleAttackSequence)
-        {
-            isInDoubleAttackSequence = true;
-            pendingAttacksInSequence = 2;
-        }
+        GameEvents.RaiseAttackInitiated(attakCardGameObject, targetCardGameObject);
         
         int attackValue = attakCard.card.attack;
-        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,true));
-    }
-    public void OnAttackPreFinish(GameObject attackerCardGO)
-    {
-        CardHelper.MoveCard(cardGO:attackerCardGO, fromCardList:attackCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(attackPanel);
-        UpdatePlayerAttackAndDefence();
-        
-        // Check if double attack buff is active and there are more attack cards
-        if (PData.Instance.nextAttackPlayTwoCards && lastAttackTarget != null && isInDoubleAttackSequence)
-        {
-            StartCoroutine(CheckAndPerformSecondAttack());
-        }
-        else
-        {
-            // Clear buff if not active or no target
-            if (!PData.Instance.nextAttackPlayTwoCards)
-            {
-                lastAttackTarget = null;
-            }
-            // Keep isInDoubleAttackSequence flag until all damage VFX complete (handled in SettlementEnemy)
-        }
-        
-        GameEvents.RaiseCardFinished(cardGO:attackerCardGO);
-    }
-    
-    private System.Collections.IEnumerator CheckAndPerformSecondAttack()
-    {
-        yield return null; // Wait a frame to ensure RefreshPanel has completed
-        
-        GameObject nextAttackCard = UIGridHelper.GetCardListOrderIndex0(attackPanel);
-        
-        if (nextAttackCard != null && lastAttackTarget != null && nextAttackCard.activeInHierarchy)
-        {
-            // Clear buff before second attack to prevent infinite loop
-            PData.Instance.nextAttackPlayTwoCards = false;
-            yield return StartCoroutine(DelayedSecondAttack(nextAttackCard, lastAttackTarget));
-            // Sequence flag will be cleared in SettlementEnemy when all damage VFX complete
-        }
-        else
-        {
-            // No more attack cards available, clear buff and end sequence
-            PData.Instance.nextAttackPlayTwoCards = false;
-            lastAttackTarget = null;
-            isInDoubleAttackSequence = false;
-            pendingAttacksInSequence = 0;
-        }
-    }
-    
-    private System.Collections.IEnumerator DelayedSecondAttack(GameObject attackCard, GameObject target)
-    {
-        yield return new WaitForSeconds(0.3f); // Small delay between attacks for visual feedback
-        
-        if (target != null && target.activeInHierarchy)
-        {
-            UseAttack(attackCard, target);
-        }
-        else
-        {
-            lastAttackTarget = null; // Target destroyed
-        }
+        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,false));
     }
     
     public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
@@ -212,28 +131,14 @@ public class BattleManager : MonoSingleton<BattleManager>
         var enemyCard = enemy.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
         {
-            // 移动到已使用堆
             GameEvents.RaiseCardFinished(cardGO:enemy);
-            // 触发击杀
             EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy);
         }
         else 
         {
-            // Only trigger monster counterattack once after all attacks complete
-            if (monsterAttack)
+            if (!monsterAttack)
             {
-                if (isInDoubleAttackSequence)
-                {
-                    pendingAttacksInSequence--;
-                    // Trigger counterattack only when all attacks in sequence are complete
-                    if (pendingAttacksInSequence <= 0)
-                    {
-                        isInDoubleAttackSequence = false;
-                        pendingAttacksInSequence = 0;
-                        StartCoroutine(VFX.PlayMonsterHit(cardGO:enemy));
-                    }
-                }
-                else
+                if (!DoubleAttack_OnPlay.IsInDoubleAttackSequence())
                 {
                     StartCoroutine(VFX.PlayMonsterHit(cardGO:enemy));
                 }
@@ -336,9 +241,12 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Trigger OnPlay effect for skill cards
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
         
-        // Move skill card to used pile after use
-        CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:skillCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(skillPanel);
+        // Don't move card here - let FinshCardVFX handle the animation and move
+        // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:skillCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        // UIGridHelper.RefreshPanel(skillPanel);
+        
+        // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
+        GameEvents.RaiseCardFinished(cardGO:cardGameObject);
     }
 
     public void OnBagItemClicked(GameObject cardGameObject)
@@ -346,9 +254,12 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Trigger OnPlay effect for item cards
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
         
-        // Move item card to used pile after use
-        CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:itemCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
-        UIGridHelper.RefreshPanel(itemPanel);
+        // Don't move card here - let FinshCardVFX handle the animation and move
+        // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:itemCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
+        // UIGridHelper.RefreshPanel(itemPanel);
+        
+        // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
+        GameEvents.RaiseCardFinished(cardGO:cardGameObject);
     }
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)
@@ -357,12 +268,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             // CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
             return;
-        }
-        
-        // Store target if buff is active (for double attack)
-        if (PData.Instance.nextAttackPlayTwoCards)
-        {
-            lastAttackTarget = cardGameObject;
         }
         
         cardGameObject.GetComponent<CardDisplay>().card.state = CardState.Inactive;
@@ -424,9 +329,9 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     }
 
-    // public void MonsterAttack(GameObject monsterCardGO)
+    // public void monsterattack(gameobject monstercardgo)
     // {
-    //     StartCoroutine(VFX.PlayMonsterHit(cardGO:monsterCardGO));
+    //     startcoroutine(vfx.playmonsterhit(cardgo:monstercardgo));
     // }
 
 
