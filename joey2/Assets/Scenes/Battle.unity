@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIGameOver
       objectReference: {fileID: 0}
+    - target: {fileID: 1409157765972126641, guid: a2416942795ed4140b5bad02e1670dc1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9182260296137675835, guid: a2416942795ed4140b5bad02e1670dc1, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1377,7 +1381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1409157765972126641, guid: fbf7dcb7de26c784c8125e3575ad880f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3196675289489794698, guid: fbf7dcb7de26c784c8125e3575ad880f, type: 3}
       propertyPath: m_IsActive
