@@ -26,7 +26,8 @@ public static class CardHelper
         cd.card = baseCard.Clone();
         cd.card.state = state;
         cd.card.position = position;
-        // 若有配置效果，则挂载并实例化
+        
+        // Attach and instantiate effects if configured
         if (cd.card.effectIds != null && cd.card.effectIds.Count > 0)
         {
             var holder = go.GetComponent<EffectHolder>();
@@ -35,7 +36,14 @@ public static class CardHelper
             for (int i = 0; i < cd.card.effectIds.Count; i++)
             {
                 var eff = CardEffectRegistry.CreateWithArgs(cd.card.effectIds[i]);
-                if (eff != null) holder.effects.Add(eff);
+                if (eff != null)
+                {
+                    holder.effects.Add(eff);
+                }
+                else
+                {
+                    Debug.LogWarning($"CardHelper: Failed to create effect from: '{cd.card.effectIds[i]}'");
+                }
             }
         }
         cd.ShowCard();

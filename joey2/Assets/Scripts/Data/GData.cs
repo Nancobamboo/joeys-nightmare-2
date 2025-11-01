@@ -81,8 +81,9 @@ public sealed class GData : PureSingleton<GData>
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line) ) continue;
 
-			var values = line.Split(',');
-            if (string.IsNullOrEmpty(values[0])) continue;
+			// Parse CSV line handling quoted fields
+			var values = ParseCSVLine(line);
+            if (values == null || values.Length == 0 || string.IsNullOrEmpty(values[0])) continue;
 			// 取值函数
 			string Get(int index)
 			{
@@ -123,11 +124,40 @@ public sealed class GData : PureSingleton<GData>
             var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
 
             CardDict[id] = card;
-            // Debug.Log($"Card: {card.id}, {card.cardName}, {card.type}, {card.cardImage}, {card.description}, {card.attack}, {card.defence}, {card.health}, {card.price}, {card.stars}");
-            // Debug.Log($"CardDict: {CardDict.Count}");
 		}
 		_cardsLoaded = true;
         Debug.Log("Cards loaded: " + CardDict.Count);
+	}
+
+	// Parse CSV line handling quoted fields with commas
+	private string[] ParseCSVLine(string line)
+	{
+		var values = new List<string>();
+		bool inQuotes = false;
+		string currentValue = "";
+		
+		for (int i = 0; i < line.Length; i++)
+		{
+			char c = line[i];
+			
+			if (c == '"')
+			{
+				// Toggle quote state, but don't add quote to value
+				inQuotes = !inQuotes;
+			}
+			else if (c == ',' && !inQuotes)
+			{
+				values.Add(currentValue);
+				currentValue = "";
+			}
+			else
+			{
+				currentValue += c;
+			}
+		}
+		values.Add(currentValue); // Add last value
+		
+		return values.ToArray();
 	}
 
 	public Card RandomCard()

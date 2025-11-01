@@ -6,7 +6,8 @@ public static class CardEffectRegistry
 {
     public static Dictionary<string, Func<ICardEffect>> factory = new()
     {
-        { "DealRandomEnemyEqualToAttack_OnTop", () => new DealRandomEnemyEqualToAttack_OnTop() }
+        { "DealRandomEnemyEqualToAttack_OnTop", () => new DealRandomEnemyEqualToAttack_OnTop() },
+        { "DoubleAttack_OnPlay", () => new DoubleAttack_OnPlay() }
     };
 
     // 新增：解析带参数的 token，例如 "ExtraDamage_OnDealDamage:3"
