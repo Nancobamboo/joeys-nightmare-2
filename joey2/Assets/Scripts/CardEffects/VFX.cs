@@ -26,10 +26,30 @@ public class VFX : MonoSingleton<VFX>
     /// <summary>
     /// 原始的简单击中特效（保持向后兼容）
     /// </summary>
-    public static IEnumerator PlayHit(GameObject src, GameObject dst)
+    public static IEnumerator PlayHit(GameObject cardGO ,GameObject targetCardGO=null,int damage=0,bool monsterAttack=false)
     {
+        if (cardGO == null) yield break;
         // TODO: 播放击中特效、抖动、音效等
-        yield return null;
+        Animator animator = cardGO.GetComponentInChildren<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = true;
+            if (animator.runtimeAnimatorController == null)
+            {
+                Debug.LogError($"PlayDamageVFX: No AnimatorController assigned to {cardGO.name}");
+            }
+            else
+            {
+                animator.Play("UI_Carditem_gongji");
+                Debug.Log("PlayHit: Playing attack animation");
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.4f);
+            GameEvents.RaiseAttackPre(cardGO,targetCardGO,damage,monsterAttack);
+            yield return new WaitForSeconds(0.4f);
+            GameEvents.RaiseAttackPreFinish(cardGO);
+        }
+
     }
 
     public static IEnumerator PlayLifeSteal(GameObject src)
