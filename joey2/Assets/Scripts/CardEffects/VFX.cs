@@ -40,7 +40,7 @@ public class VFX : MonoSingleton<VFX>
             }
             else
             {
-                animator.Play("UI_CardItem_gongji");
+                animator.Play("UI_Carditem_gongji");
                 // Debug.Log("PlayHit: Playing attack animation");
                 yield return null;
             }
@@ -51,6 +51,36 @@ public class VFX : MonoSingleton<VFX>
         }
 
     }
+
+    public static IEnumerator PlayMonsterHit(GameObject cardGO)
+    {
+        if (cardGO == null) yield break;
+        // TODO: 播放击中特效、抖动、音效等
+        Animator animator = cardGO.GetComponentInChildren<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = true;
+            if (animator.runtimeAnimatorController == null)
+            {
+                Debug.LogError($"PlayDamageVFX: No AnimatorController assigned to {cardGO.name}");
+            }
+            else
+            {
+                animator.Play("UI_Carditem_guaiwugongji");
+                Debug.Log("PlayMonsterHit: Playing attack animation");
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.4f);
+            GameEvents.RaiseMonsterAttackPre(cardGO);
+            // yield return new WaitForSeconds(0.4f);
+            // GameEvents.RaiseMonsterAttackPreFinish(cardGO);
+        }
+
+    }
+
+
+
+
 
     public static IEnumerator PlayLifeSteal(GameObject src)
     {

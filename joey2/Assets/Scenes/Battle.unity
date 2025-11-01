@@ -732,10 +732,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1703720555338805462, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_Name
-      value: AttackNum
-      objectReference: {fileID: 0}
     - target: {fileID: 2769174519241808265, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -816,22 +812,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5339248573902592676, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5339248573902592676, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5339248573902592676, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5339248573902592676, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6017697089894755127, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -847,10 +827,6 @@ PrefabInstance:
     - target: {fileID: 6017697089894755127, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6286538776170320892, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
-      propertyPath: m_Name
-      value: DefenceNum
       objectReference: {fileID: 0}
     - target: {fileID: 6918669209917738642, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_Pivot.x
@@ -952,6 +928,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIMainGame
       objectReference: {fileID: 0}
+    - target: {fileID: 8529653691939217863, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9138504185748230265, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -969,8 +949,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 5055802307167970271, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}

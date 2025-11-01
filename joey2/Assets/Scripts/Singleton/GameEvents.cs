@@ -70,4 +70,14 @@ public static class GameEvents
     {
         OnAttackPreFinish?.Invoke(attackerCardGO);
     }
+
+    public static event Action<GameObject> OnMonsterAttackPre;
+    public static void RaiseMonsterAttackPre(GameObject attackerCardGO)
+    {
+        OnMonsterAttackPre?.Invoke(attackerCardGO);
+    }
+
+
+
+
 }
