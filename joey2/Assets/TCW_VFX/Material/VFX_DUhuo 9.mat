@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FX_VFX_Advanced 12
+  m_Name: VFX_DUhuo 9
   m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -50,7 +50,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c040cfc14b23f9744b352006fa7eb3ce, type: 3}
+        m_Texture: {fileID: 2800000, guid: ae6d9c32bbb25b44da73ff2d1aabf36b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
@@ -94,7 +94,7 @@ Material:
     - _Width: 1.332
     m_Colors:
     - _AnimationSettings: {r: 1, g: 0, b: 0, a: 1}
-    - _Color: {r: 1.1486983, g: 1.1486983, b: 1.1486983, a: 1}
+    - _Color: {r: 1, g: 0.85249966, b: 0.7754717, a: 1}
     - _ColorAlphaBrightnessContrast: {r: 1, g: 1, b: 1, a: 1}
     - _DissolvePanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortPanner: {r: 0, g: 0, b: 0, a: 0}
@@ -103,7 +103,7 @@ Material:
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
     - _FixValue: {r: 0, g: 1, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
-    - _Panner1: {r: 0, g: 1, b: 0, a: 0}
+    - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
     - _SoftParticleFadeParams: {r: -0.26, g: 1, b: 1, a: 0}
     - _ToggleAdvanced: {r: 0, g: 0, b: 0, a: 0}

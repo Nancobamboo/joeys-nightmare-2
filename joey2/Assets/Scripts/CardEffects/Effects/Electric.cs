@@ -18,7 +18,7 @@ public class Electric : ICardEffect
     public IEnumerator Execute(CardEffectContext ctx)
     {
         // 获取当前场景所有的怪物
-        List<GameObject> allEnemies = EnemyManager.GetAllEnemies(BattleManager.Instance.envPanels);
+        List<GameObject> allEnemies = BattleManager.Instance.GetAllEnemies();
         if (allEnemies.Count == 0)
         {
             yield break;
@@ -31,9 +31,13 @@ public class Electric : ICardEffect
             vfxInstance.transform.position = enemy.transform.position; // 使用相同的坐标设置方式
             vfxInstances.Add(vfxInstance);
             SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/electric",startTime:0f));
+        }
+        yield return new WaitForSeconds(0.35f);
+        foreach (var enemy in allEnemies)
+        {
             BattleManager.Instance.ApplyDamageToEnemy(enemy:enemy,damage:baseExtra,monsterAttack:false,attackerCardGO:ctx.source);
         }
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.35f);
         foreach (var vfxInstance in vfxInstances)
         {
             Object.Destroy(vfxInstance);
