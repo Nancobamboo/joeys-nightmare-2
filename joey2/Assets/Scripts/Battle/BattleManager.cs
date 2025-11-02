@@ -275,7 +275,8 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagDefenceClicked(GameObject cardGameObject)
     {
-        // Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+        Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+        Debug.Log($"OnBagDefenceClicked: {cardGameObject.GetComponent<CardDisplay>().card.state}");
     }
 
     public void OnBagSkillClicked(GameObject cardGameObject)

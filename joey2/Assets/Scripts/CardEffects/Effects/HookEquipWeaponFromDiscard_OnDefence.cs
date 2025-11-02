@@ -56,6 +56,8 @@ public class HookEquipWeaponFromDiscard_OnDefence : ICardEffect
             state: CardState.Inactive,
             position: CardPosition.Bag
         );
+        // selected.transform.SetParent(BattleManager.Instance.defencePanel);
+        // UIGridHelper.RefreshPanel(BattleManager.Instance.attackPanel);
 
         selected.transform.SetParent(battleManager.attackPanel, false);
         selected.transform.SetAsLastSibling();

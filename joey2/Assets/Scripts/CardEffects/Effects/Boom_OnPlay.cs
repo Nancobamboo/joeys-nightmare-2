@@ -52,7 +52,7 @@ public class Boom_OnPlay : ICardEffect
         if (envListIndex - 1 >= 0)
         {
             enemy_left = UIGridHelper.GetCardListOrderIndex0(BattleManager.Instance.envPanels[envListIndex - 1]);
-            if (enemy_left.GetComponent<CardDisplay>().card.type == "monster" && enemy_left.GetComponent<CardDisplay>().card.health > 0)
+            if (enemy_left != null && enemy_left.GetComponent<CardDisplay>().card.type == "monster" && enemy_left.GetComponent<CardDisplay>().card.health > 0)
             {
                 //
             }
@@ -65,7 +65,7 @@ public class Boom_OnPlay : ICardEffect
         if (envListIndex + 1 < BattleManager.Instance.envCardListList.Count)
         {
             enemy_right = UIGridHelper.GetCardListOrderIndex0(BattleManager.Instance.envPanels[envListIndex + 1]);
-            if (enemy_right.GetComponent<CardDisplay>().card.type == "monster" && enemy_right.GetComponent<CardDisplay>().card.health > 0)
+            if (enemy_right != null && enemy_right.GetComponent<CardDisplay>().card.type == "monster" && enemy_right.GetComponent<CardDisplay>().card.health > 0)
             {
                 //
             }
