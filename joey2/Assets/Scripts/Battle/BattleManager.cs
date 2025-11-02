@@ -213,7 +213,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Check if card id is 6001 (next level card)
         if (cd.card.id == "6001")
         {
-            GameEvents.RaiseNextLevelRequested();
+            SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Other/door",startTime:0.1f));
+            StartCoroutine(LoadNextLevelCoroutine(delay:0.5f));
             return;
         }
 
@@ -328,7 +329,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             return;
         }
         // 从 env 的 list 中移除卡
-        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/deal_cards",startTime:0f));
+        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/deal_cards",volume:2f,startTime:0.5f));
         StartCoroutine(VFXStackHelper.PlayAppearDisappearVFX(cardGO:cardGO, envListIndex:envListIndex));
         PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
@@ -458,6 +459,13 @@ public class BattleManager : MonoSingleton<BattleManager>
 
         // Reload Battle scene with new level
         SceneLoader.Instance.LoadScene("Battle");
+    }
+
+
+    public IEnumerator LoadNextLevelCoroutine(float delay=0.5f)
+    {
+        yield return new WaitForSeconds(delay);
+        LoadNextLevel();
     }
 
     public void GameStart()
