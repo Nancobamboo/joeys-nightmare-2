@@ -1,12 +1,12 @@
 ﻿id   ,cardImage ,cardName            ,type,description,attack ,defence ,health ,price ,stars,effectIds
-1000,Art/Img/Attack/img_card_BrokenSword,武器牌,attack,点击装备,5,0,0,0,1,
-1001,Art/Img/Attack/img_card_attrack_01,赤手空拳,attack,点击装备,1,0,0,0,1,
+1000,Art/Img/Attack/img_card_BrokenSword,武器牌1,attack,点击装备,5,0,0,0,1,
+1001,Art/Img/Attack/img_card_Claymore,武器牌2,attack,点击装备，堆叠到手牌,8,0,0,0,1,
 1002,Art/Img/Attack/img_card_BrokenSword,断剑   ,attack,点击装备,5,0,0,0,1,
-1003,Art/Img/Attack/img_card_Dart,手里剑        ,attack,每次位于手牌顶时：自动攻击1次,3,0,0,0,1,DealRandomEnemyEqualToAttack_OnTop
-1004,Art/Img/Attack/img_card_Claymore,铁剑        ,attack,点击装备,8,0,0,0,1,
-1005,Art/Img/Attack/img_card_DoubleSwords,对剑,attack,没有防具时，额外伤害:5 ,8,0,0,0,1,ExtraDamage_NoDefence:5
-1006,Art/Img/Attack/img_card_Hammer,重锤        ,attack,点击装备,15,0,0,0,1,
-1007,Art/Img/Attack/img_card_Boomerang,回旋镖       ,attack,攻击时，向周围敌人弹射2次,4,0,0,0,1,BounceToRandomEnemy_OnDealDamage:2;LifeSteal_OnDealDamage:3
+1003,Art/Img/Attack/img_card_Dart,手里剑        ,attack,每次位于手牌顶时：自动攻击1次,3,0,0,0,2,DealRandomEnemyEqualToAttack_OnTop
+1004,Art/Img/Attack/img_card_Claymore,铁剑        ,attack,点击装备,8,0,0,0,2,
+1005,Art/Img/Attack/img_card_DoubleSwords,对剑,attack,没有防具时，额外伤害：5 ,8,0,0,0,2,ExtraDamage_NoDefence:5
+1006,Art/Img/Attack/img_card_Hammer,重锤        ,attack,点击装备,15,0,0,0,3,
+1007,Art/Img/Attack/img_card_Boomerang,回旋镖       ,attack,攻击时，向周围敌人弹射2次,4,0,0,0,3,BounceToRandomEnemy_OnDealDamage:2;LifeSteal_OnDealDamage:3
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
@@ -15,21 +15,21 @@
 ,,,,,,,,,,
 2000,Art/Img/Defence/img_card_BreakTheShield,防御牌,defence,点击装备,0,3,0,0,1,
 2001,Art/Img/Defence/img_card_BreakTheShield,破盾       ,defence,点击装备,0,3,0,0,1,
-2002,Art/Img/Defence/img_card_Shield,铁盾       ,defence,装备时，我方攻击减3,0,8,0,0,1,
-2003,Art/Img/Defence/img_card_Koilonychia,刃甲,defence,受击时：反弹5点伤害,5,5,,,2,DealDamage_UseDefence:5
-2004,Art/Img/Defence/img_card_HandGuard,护手,defence,受击时：从弃牌堆随机抽一张武器牌置入手牌,0,5,,,2,HookEquipWeaponFromDiscard_OnDefence
+2002,Art/Img/Defence/img_card_Shield,铁盾       ,defence,点击装备,0,8,0,0,2,
+2003,Art/Img/Defence/img_card_Koilonychia,刃甲,defence,受击时：反弹5点伤害,5,5,,,3,DealDamage_UseDefence:5
+2004,Art/Img/Defence/img_card_HandGuard,护手,defence,受击时：从弃牌堆随机抽一张武器牌置入手牌,0,5,,,3,HookEquipWeaponFromDiscard_OnDefence
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-3000,Art/Img/Item/img_card_Blood_bottle,道具牌,item   ,点击使用：恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
-3001,Art/Img/Item/img_card_Blood_bottle,小血瓶  ,item   ,点击使用：恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
+3000,Art/Img/Item/img_card_Blood_bottle,道具牌,item   ,点击使用：恢复10点生命值,0,0,0,0,2,HealPlayer_OnPlay:10
+3001,Art/Img/Item/img_card_Blood_bottle,小血瓶  ,item   ,点击使用：恢复10点生命值,0,0,0,0,2,HealPlayer_OnPlay:10
 3002,Art/Img/Item/img_card_Boom,炸弹,item   ,点击使用：对随机敌人及两侧目标各造成10点伤害,,,,,3,Boom_OnPlay:10
-3003,Art/Img/Item/img_card_HookLock,钩索,item        ,点击使用：从弃牌堆随机抽一张武器牌置入手牌,,,,,1,HookEquipWeaponFromDiscard_OnPlay
+3003,Art/Img/Item/img_card_HookLock,钩索,item        ,点击使用：从弃牌堆随机抽一张武器牌置入手牌,,,,,2,HookEquipWeaponFromDiscard_OnPlay
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-4000,Art/Img/img_card_attrack_01,技能牌,skill     ,"点击使用：下次使用攻击牌时会攻击两次",0,0,0,0,1,DoubleAttack_OnPlay
-4001,Art/Img/img_card_attrack_01,连击       ,skill     ,点击使用：下次使用攻击牌时会攻击两次,0,0,0,0,1,DoubleAttack_OnPlay
+4000,Art/Img/Skill/img_card_double,技能牌,skill     ,"点击使用：下次使用攻击牌时会攻击两次",0,0,0,0,2,DoubleAttack_OnPlay
+4001,Art/Img/img_card_attrack_01,连击       ,skill     ,点击使用：下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay
 4002,Art/Img/img_card_attrack_01,痛击       ,skill     ,下次攻击使怪物处于两层易伤效果,0,0,0,0,1,
 4003,Art/Img/img_card_attrack_01,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
 4004,Art/Img/img_card_attrack_01,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,
@@ -45,11 +45,11 @@
 5000,Art/Img/Monster/img_card_Slime,怪物牌,monster      ,点击攻击,3,,10,,1,
 5001,Art/Img/Monster/img_card_Slime,史莱姆    ,monster      ,点击攻击,3,,5,,1,
 5002,Art/Img/Monster/img_card_Slime,大史莱姆,monster      ,血量低于一半时，会分裂,6,,10,,2,
-5003,Art/Img/Monster/img_card_MediEvil,骷髅,monster      ,点击攻击,5,,10,,1,
-5004,Art/Img/Monster/img_card_SkeletonKnight,骷髅骑士,monster      ,死亡后可掉落宝物,8,,15,,2,
+5003,Art/Img/Monster/img_card_MediEvil,骷髅,monster      ,点击攻击,5,,15,,2,
+5004,Art/Img/Monster/img_card_SkeletonKnight,骷髅骑士,monster      ,死亡后可掉落宝物,8,,30,,3,
 5005,Art/Img/Monster/img_card_bat,吸血蝙蝠,monster      ,每次攻击时回复3点血量,,,,,1,
-5006,Art/Img/Monster/img_card_Barrel,木桶,monster,可能藏着好东西？,,,,,1,
-5007,Art/Img/Monster/img_card_Bangalore,炸药桶,monster,亡语：对两侧敌人各造成10点伤害,,,1,,1,Boom_OnKill:10
+5006,Art/Img/Monster/img_card_Barrel,木桶,monster,可能藏着好东西？,,,1,,1,
+5007,Art/Img/Monster/img_card_Bangalore,炸药桶,monster,亡语：对两侧敌人各造成10点伤害,,,1,,3,Boom_OnKill:10
+5008,Art/Img/Monster/img_card_bat,蝙蝠,monster      ,点击攻击,5,,8,,1,
 ,,,,,,,,,,
-,,,,,,,,,,
-6001,Art/Img/Other/img_card_attrack_01,传送门,other,点击传送到下一关,,,,,1,
+6001,Art/Img/Other/img_card_door,Key Path,other,点击传送到下一关,,,,,3,
