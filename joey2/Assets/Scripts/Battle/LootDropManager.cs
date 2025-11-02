@@ -208,6 +208,7 @@ public class LootDropManager : MonoSingleton<LootDropManager>
 
     public bool HandleMonsterDrop(string monsterId, int centerIndex)
     {
+        // Drop to environment panels and insert at the visual front
         if (!TryGetDropCards(monsterId, out var cardIds) || cardIds == null || cardIds.Count == 0)
         {
             return false;
@@ -243,13 +244,19 @@ public class LootDropManager : MonoSingleton<LootDropManager>
             var panel = battle.envPanels[panelIndex];
             var attachList = EnsureEnvAttachList(battle, panelIndex);
 
-            CardHelper.CreateCardToTransform(
+            var go = CardHelper.CreateCardToTransform(
                 cardPrefab: battle.cardPrefab,
                 parent: panel,
                 cardId: cardIds[i],
                 state: CardState.Inactive,
                 position: CardPosition.Env,
                 attachList: attachList);
+
+            if (go != null)
+            {
+                // For environment, make sure it appears at the visual front
+                go.transform.SetSiblingIndex(panel.childCount - 1);
+            }
 
             usedIndices.Add(panelIndex);
             touchedPanels.Add(panelIndex);
