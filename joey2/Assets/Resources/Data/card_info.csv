@@ -4,7 +4,7 @@
 1002,Art/Img/img_card_attrack_01,断剑   ,attack,折断的剑，勉强能用     ,5,0,0,0,1,
 1003,Art/Img/img_card_attrack_01,匕首        ,attack,出现在卡堆最上方时:造成伤害  ,3,0,0,0,1,DealRandomEnemyEqualToAttack_OnTop
 1004,Art/Img/img_card_attrack_01,铁剑        ,attack,锋利的铁剑,8,0,0,0,1,
-1005,Art/Img/img_card_attrack_01,双手剑,attack,没有装备防具时，对敌人额外造成5点伤害 ,8,0,0,0,1,
+1005,Art/Img/img_card_attrack_01,双手剑,attack,没有防具时，额外伤害:5 ,8,0,0,0,1,
 1006,Art/Img/img_card_attrack_01,重锤        ,attack,缓慢蓄力后，发出致命一击        ,15,0,0,0,1,
 1007,Art/Img/img_card_attrack_01,回旋镖       ,attack,弹射:2,4,0,0,0,1,BounceToRandomEnemy_OnDealDamage:2;LifeSteal_OnDealDamage:3
 ,,,,,,,,,,
