@@ -69,8 +69,8 @@ Material:
     m_Floats:
     - _AlphaLimit: 0
     - _AnimMode: 0
-    - _BlendDst: 10
-    - _BlendMode: 1
+    - _BlendDst: 1
+    - _BlendMode: 0
     - _BlendSrc: 5
     - _CustomDataUV: 0
     - _InvFade: 0.44
@@ -94,14 +94,14 @@ Material:
     - _Width: 1.332
     m_Colors:
     - _AnimationSettings: {r: 1, g: 0, b: 0, a: 1}
-    - _Color: {r: 1.1486983, g: 1.1486983, b: 1.1486983, a: 1}
+    - _Color: {r: 1.7207952, g: 1.7207952, b: 1.7207952, a: 1}
     - _ColorAlphaBrightnessContrast: {r: 1, g: 1, b: 1, a: 1}
     - _DissolvePanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortPanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
-    - _FixValue: {r: 0, g: 0, b: 0, a: 0}
+    - _FixValue: {r: 0, g: 1, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
