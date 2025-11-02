@@ -8,6 +8,7 @@ public static class CardEffectRegistry
     {
         { "DealRandomEnemyEqualToAttack_OnTop", () => new DealRandomEnemyEqualToAttack_OnTop() },
         { "HookEquipWeaponFromDiscard_OnPlay", () => new HookEquipWeaponFromDiscard_OnPlay() },
+        { "HookEquipWeaponFromDiscard_OnDefence", () => new HookEquipWeaponFromDiscard_OnDefence() },
         { "DoubleAttack_OnPlay", () => new DoubleAttack_OnPlay() }
     };
 
@@ -53,6 +54,18 @@ public static class CardEffectRegistry
             int baseExtra = 0;
             if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
             return new DealDamage_UseDefence(baseExtra);
+        }
+        else if (id == "HookEquipWeaponFromDiscard_OnPlay")
+        {
+            return new HookEquipWeaponFromDiscard_OnPlay();
+        }
+        else if (id == "HookEquipWeaponFromDiscard_OnDefence")
+        {
+            return new HookEquipWeaponFromDiscard_OnDefence();
+        }
+        else if (id == "DoubleAttack_OnPlay")
+        {
+            return new DoubleAttack_OnPlay();
         }
 
         // 走原有无参分发
