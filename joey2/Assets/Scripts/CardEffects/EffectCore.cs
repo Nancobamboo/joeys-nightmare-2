@@ -10,6 +10,7 @@ public enum CardTrigger
     OnDealDamage,           // 造成伤害后
     OnTakeDamage,           // 受到伤害后
     OnKill,                 // 击杀后
+    UseDefence,            // 使用防御
     OnTurnStart_Player,     // 我方回合开始
     OnTurnEnd_Player,       // 我方回合结束
     OnTurnStart_Enemy,      // 敌方回合开始

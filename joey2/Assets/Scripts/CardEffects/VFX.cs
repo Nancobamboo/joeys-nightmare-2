@@ -58,7 +58,7 @@ public class VFX : MonoSingleton<VFX>
                 animator.Rebind();
                 animator.Update(0f);
                 animator.Play(animationName, 0, 0f);
-                Debug.Log($"PlayAnimator: Playing {animationName} animation");
+                // Debug.Log($"PlayAnimator: Playing {animationName} animation");
                 yield return null;
             }
         }

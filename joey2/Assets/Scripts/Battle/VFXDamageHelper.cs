@@ -12,6 +12,9 @@ public static class VFXDamageHelper
     {
         GameObject damageUIPrefab = Resources.Load<GameObject>(damageUIPath);
         GameObject damageInstance = null;
+        
+
+        
         if (damageUIPrefab != null)
         {
             // 实例化伤害UI
@@ -23,6 +26,7 @@ public static class VFXDamageHelper
             // 设置伤害数字文本
             if (damage > 0)
             {
+                SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/MonsterOnAttack",startTime:0.1f));
                 Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
                 if (damageTextTransform != null)
                 {
@@ -37,6 +41,7 @@ public static class VFXDamageHelper
             }
             else
             {
+                
                 Transform treatmentTextTransform = damageInstance.transform.Find("Image/Damage");
                 if (treatmentTextTransform != null)
                 {

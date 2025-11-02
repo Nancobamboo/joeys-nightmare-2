@@ -307,6 +307,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             return;
         }
         // 从 env 的 list 中移除卡
+        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/swing-whoosh-5-198498",startTime:0f));
         StartCoroutine(VFXStackHelper.PlayAppearDisappearVFX(cardGO:cardGO, envListIndex:envListIndex));
         PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
@@ -336,8 +337,10 @@ public class BattleManager : MonoSingleton<BattleManager>
         int defenceValue = 0;
         if (defenceGO != null)
         {
+            SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/Defence",startTime:0f));
             defenceValue = defenceGO.GetComponent<CardDisplay>().card.defence;
         }
+        EffectRunner.Instance.Raise(CardTrigger.UseDefence, source: defenceGO, target: attackGO);
 
         int attackValue = attackGO.GetComponent<CardDisplay>().card.attack;
         int damage = 0;
