@@ -153,9 +153,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         if (attackerCardGO != null)
         {
             var attackerCard = attackerCardGO.GetComponent<CardDisplay>();
-            if (attackerCard.card.effectIds.Any(id => id.StartsWith("BounceToRandomEnemy_OnDealDamage")))
+            if (attackerCard.card.effectIds.Any(id => id.Contains("BounceToRandomEnemy_OnDealDamage")))
             {
-                // Debug.Log("OnAttackPreFinish: 回旋镖，不销毁");
+                Debug.Log("OnAttackPreFinish: 回旋镖，不销毁");
                 return;
             }
             else
