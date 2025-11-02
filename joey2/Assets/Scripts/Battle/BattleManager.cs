@@ -461,8 +461,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         GData.Instance.LoadAll();
         StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/shuffle_cards",startTime:0f));
 
-        // Set player health for tutorial levels (1-3) from CSV config
-        if (level >= 1 && level <= 4)
+        // Set player health for tutorial levels (1-5) from CSV config
+        if (level >= 1 && level <= 5)
         {
             var playerData = GData.Instance.GetTutorialPlayerData(level);
             if (playerData.HasValue)
@@ -489,9 +489,9 @@ public class BattleManager : MonoSingleton<BattleManager>
             envCardListList.Add(oneEnvCardList);
         }
 
-        // Tutorial levels (1-3) use CSV config equipment deck
+        // Tutorial levels (1-5) use CSV config equipment deck
         Dictionary<string, List<string>> equipmentDeck;
-        if (level >= 1 && level <= 4)
+        if (level >= 1 && level <= 5)
         {
             // Load tutorial deck from CSV
             equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(level);
