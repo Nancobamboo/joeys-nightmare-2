@@ -329,7 +329,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             return;
         }
         // 从 env 的 list 中移除卡
-        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/deal_cards",startTime:0f));
+        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/deal_cards",volume:2f,startTime:0.5f));
         StartCoroutine(VFXStackHelper.PlayAppearDisappearVFX(cardGO:cardGO, envListIndex:envListIndex));
         PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
