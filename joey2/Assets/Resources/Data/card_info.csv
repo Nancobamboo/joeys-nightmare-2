@@ -17,7 +17,7 @@
 2001,Art/Img/Defence/img_card_BreakTheShield,破盾       ,defence,不太坚固的木盾，可以格挡攻击               ,0,3,0,0,1,
 2002,Art/Img/Defence/img_card_Shield,铁盾       ,defence,坚固的铁盾，但是装备时攻击减3,0,8,0,0,1,
 2003,Art/Img/Defence/img_card_Koilonychia,刃甲,defence,格挡怪物攻击后，反弹5点伤害,5,5,,,2,DealDamage_UseDefence:5
-2004,Art/Img/Defence/img_card_HandGuard,护手,defence,格挡攻击时，随机装备一件武器,0,5,,,2,
+2004,Art/Img/Defence/img_card_HandGuard,护手,defence,格挡攻击时，随机装备一件武器,0,5,,,2,HookEquipWeaponFromDiscard_OnDefence
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

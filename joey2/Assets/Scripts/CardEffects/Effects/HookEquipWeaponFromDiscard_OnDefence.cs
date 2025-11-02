@@ -1,13 +1,13 @@
-// Scripts/CardEffects/Effects/HookEquipWeaponFromDiscard_OnPlay.cs
+// Scripts/CardEffects/Effects/HookEquipWeaponFromDiscard_OnDefence.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HookEquipWeaponFromDiscard_OnPlay : ICardEffect
+public class HookEquipWeaponFromDiscard_OnDefence : ICardEffect
 {
-    public string Id => "HookEquipWeaponFromDiscard_OnPlay";
+    public string Id => "HookEquipWeaponFromDiscard_OnDefence";
 
-    public bool MatchTrigger(CardTrigger trigger) => trigger == CardTrigger.OnPlay;
+    public bool MatchTrigger(CardTrigger trigger) => trigger == CardTrigger.UseDefence;
 
     public IEnumerator Execute(CardEffectContext ctx)
     {
@@ -17,11 +17,14 @@ public class HookEquipWeaponFromDiscard_OnPlay : ICardEffect
             yield break;
         }
 
-        // Collect all used attack cards that can be re-equipped
-        List<GameObject> usedWeapons = new List<GameObject>();
-        for (int i = 0; i < battleManager.usedCardList.Count; i++)
+        if (battleManager.usedCardList == null || battleManager.usedCardList.Count == 0)
         {
-            var candidate = battleManager.usedCardList[i];
+            yield break;
+        }
+
+        List<GameObject> usedWeapons = new List<GameObject>();
+        foreach (var candidate in battleManager.usedCardList)
+        {
             if (candidate == null)
             {
                 continue;
@@ -44,10 +47,8 @@ public class HookEquipWeaponFromDiscard_OnPlay : ICardEffect
             yield break;
         }
 
-        // Pick one used weapon at random
         var selected = usedWeapons[Random.Range(0, usedWeapons.Count)];
 
-        // Move it back to the attack pile
         CardHelper.MoveCard(
             cardGO: selected,
             fromCardList: battleManager.usedCardList,
@@ -60,7 +61,6 @@ public class HookEquipWeaponFromDiscard_OnPlay : ICardEffect
         selected.transform.SetAsLastSibling();
         selected.SetActive(true);
 
-        // Reset layout related components to ensure the card is visible again
         var layoutElement = selected.GetComponent<UnityEngine.UI.LayoutElement>();
         if (layoutElement != null)
         {
@@ -77,7 +77,6 @@ public class HookEquipWeaponFromDiscard_OnPlay : ICardEffect
 
         selected.transform.localRotation = Quaternion.identity;
 
-        // Try to align scale with existing attack card; fallback to 0.8 when none exists
         Vector3 targetScale = new Vector3(0.8f, 0.8f, 1f);
         Transform panel = battleManager.attackPanel;
         GameObject referenceCard = null;
