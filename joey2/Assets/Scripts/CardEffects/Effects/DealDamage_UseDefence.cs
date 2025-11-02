@@ -16,6 +16,7 @@ public class DealDamage_UseDefence : ICardEffect
 
     public IEnumerator Execute(CardEffectContext ctx)
     {
+        Debug.Log("DealDamage_UseDefence: Execute");
         BattleManager.Instance.ApplyDamageToEnemy(ctx.target, baseExtra,false);
         yield return null;
     }

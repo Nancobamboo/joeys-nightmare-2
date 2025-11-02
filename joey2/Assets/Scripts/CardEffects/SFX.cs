@@ -28,7 +28,7 @@ public class SFX : MonoSingleton<SFX>
                 return;
             }
             audioClipCache[audioPath] = clip;
-            Debug.Log($"SFX: Loaded and cached audio '{audioPath}'");
+            // Debug.Log($"SFX: Loaded and cached audio '{audioPath}'");
         }
 
         AudioClip audioClip = audioClipCache[audioPath];
@@ -61,7 +61,7 @@ public class SFX : MonoSingleton<SFX>
                 yield break;
             }
             audioClipCache[audioPath] = clip;
-            Debug.Log($"SFX: Loaded and cached audio '{audioPath}'");
+            // Debug.Log($"SFX: Loaded and cached audio '{audioPath}'");
         }
 
         AudioClip audioClip = audioClipCache[audioPath];
