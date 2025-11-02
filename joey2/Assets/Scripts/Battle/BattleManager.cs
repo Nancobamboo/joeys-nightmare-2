@@ -29,21 +29,8 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     void Start()
     {
-        // If PData.currentLevel is greater than editor level, use PData (for level progression)
-        // Otherwise, use editor level value and sync to PData
-        if (PData.Instance.currentLevel > level)
+        if (PData.Instance.currentLevel > 0)
         {
-            // Game progression takes priority
-            level = PData.Instance.currentLevel;
-        }
-        else if (level > 0)
-        {
-            // Editor value takes priority, sync to PData
-            PData.Instance.currentLevel = level;
-        }
-        else if (PData.Instance.currentLevel > 0)
-        {
-            // Use PData value if editor value is 0 or not set
             level = PData.Instance.currentLevel;
         }
 
