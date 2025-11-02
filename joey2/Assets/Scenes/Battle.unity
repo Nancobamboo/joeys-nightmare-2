@@ -720,6 +720,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 489947113919896401, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 2e09ee8767f034f47b69f236d5684599, type: 3}
     - target: {fileID: 496041996335203565, guid: d85ea6f44516fda499b6c53824c3de1f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1452,6 +1456,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 4
+  mode: 0
   envPanels:
   - {fileID: 966049691}
   - {fileID: 966049690}

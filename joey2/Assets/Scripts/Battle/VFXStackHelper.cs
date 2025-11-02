@@ -8,13 +8,38 @@ public static class VFXStackHelper
     public static string appearVFXPath = "VFX/base/VFX_appear";
     public static string disappearVFXPath = "VFX/base/VFX_disappear";
 
-    public static Sprite playerDamageSprite;
-    public static Sprite playerSleepSprite;
+    public static Sprite sadSprite;
+    public static Sprite sleepSprite;
+    public static Sprite happySprite;
+    public static Sprite deathSprite;
+
+
 
     static VFXStackHelper()
     {
-        playerDamageSprite = Resources.Load<Sprite>("Art/Img/img_card_merge");
-        playerSleepSprite = Resources.Load<Sprite>("Art/Img/img_sleep");
+        sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
+        sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
+        happySprite = Resources.Load<Sprite>("Art/Img/joey/joey_happy");
+        deathSprite = Resources.Load<Sprite>("Art/Img/joey/joey_weekup");
+    }
+
+
+    public static IEnumerator ChangeJoeyImage(Image joeyImage)
+    {
+        if (PData.Instance.playerHealth < PData.Instance.lastPlayerHealth)
+        {
+            joeyImage.sprite = sadSprite;
+        }
+        else if (PData.Instance.playerHealth > PData.Instance.lastPlayerHealth)
+        {
+            joeyImage.sprite = happySprite;
+        }
+        else if (PData.Instance.playerHealth <= 0)
+        {
+            joeyImage.sprite = deathSprite;
+        }
+        yield return new WaitForSeconds(0.5f);
+        joeyImage.sprite = sleepSprite;
     }
 
 
@@ -178,11 +203,11 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayDamageToPlayerVFX(Image joeyImage,GameObject defenceCardGO, int damage)
+    public static IEnumerator PlayDamageToPlayerVFX(GameObject defenceCardGO, int damage)
     {
         PData.Instance.canOperate = false;
         // 获取Canvas
-        Canvas canvas = joeyImage.GetComponentInParent<Canvas>();
+        Canvas canvas = BattleManager.Instance.joeyImage.GetComponentInParent<Canvas>();
         GameObject vfxInstance=null;
 
         if (damage > 0)
@@ -198,15 +223,11 @@ public static class VFXStackHelper
                 yield return VFX.PlayAnimator(defenceCardGO, "UI_Carditem_dunpai");
             }
 
-            // 2. joey受击图片
-            joeyImage.sprite = playerDamageSprite;
             // 3. 展示伤害数字
-            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:BattleManager.Instance.joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
             // 4. 播放屏幕震动
             BattleManager.Instance.StartCoroutine(CameraShake.Instance.ShakeLight());
             yield return new WaitForSeconds(0.6f);
-            // 切回原始图片
-            joeyImage.sprite = playerSleepSprite;
 
         }
         else
@@ -218,7 +239,7 @@ public static class VFXStackHelper
 
             // 1.5 盾牌受击动画
             yield return VFX.PlayAnimator(defenceCardGO, "UI_Carditem_dunpai");
-            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:BattleManager.Instance.joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
             yield return new WaitForSeconds(0.4f);
             
 
@@ -238,9 +259,10 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator FinshCardVFX(GameObject cardGO)
+    public static IEnumerator FinshCardVFX(GameObject cardGO,float delay=0f)
     {
         if (cardGO == null) yield break;
+        yield return new WaitForSeconds(delay);
         CardDisplay cd = cardGO.GetComponent<CardDisplay>();
         cd.card.state = CardState.Used;
         if (cd.card.position == CardPosition.Env)

@@ -34,7 +34,7 @@
 4003,Art/Img/img_card_attrack_01,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
 4004,Art/Img/img_card_attrack_01,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,
 4005,Art/Img/img_card_attrack_01,肉盾冲击,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,,2,
-,,,,,,,,,,
+4006,Art/Img/img_card_attrack_01,连环闪电    ,skill     ,对全场敌人造成3点伤害,0,0,0,0,2,Electric:3
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

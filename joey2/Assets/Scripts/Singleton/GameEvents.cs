@@ -104,10 +104,10 @@ public static class GameEvents
         OnNextLevelRequested?.Invoke();
     }
 
-    public static event Action<GameObject> OnCardFinished;
-    public static void RaiseCardFinished(GameObject cardGO)
+    public static event Action<GameObject,float> OnCardFinished;
+    public static void RaiseCardFinished(GameObject cardGO,float delay=0f)
     {
-        OnCardFinished?.Invoke(cardGO);
+        OnCardFinished?.Invoke(cardGO,delay);
     }
 
 
