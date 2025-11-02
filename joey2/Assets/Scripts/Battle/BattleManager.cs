@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-
+using System.Linq;  // 添加这一行
 
 public class BattleManager : MonoSingleton<BattleManager>
 {
@@ -58,10 +58,12 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageComplete += OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete += OnDamageToPlayerComplete;
         GameEvents.OnAttackPre += OnAttackPre;
+        GameEvents.OnAttackPreFinish += OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre += OnMonsterAttackPre;
         GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested += OnNextLevelRequested;
         GameEvents.OnCardFinished += OnCardFinished;
+
     }
     void OnDisable()
     {
@@ -69,10 +71,12 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnDamageComplete -= OnDamageComplete;
         GameEvents.OnDamageToPlayerComplete -= OnDamageToPlayerComplete;
         GameEvents.OnAttackPre -= OnAttackPre;
+        GameEvents.OnAttackPreFinish -= OnAttackPreFinish;
         GameEvents.OnMonsterAttackPre -= OnMonsterAttackPre;
         GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested -= OnNextLevelRequested;
         GameEvents.OnCardFinished -= OnCardFinished;
+
     }
 
 
@@ -135,12 +139,31 @@ public class BattleManager : MonoSingleton<BattleManager>
             EffectRunner.Instance.Raise(CardTrigger.OnKill, source: attackerCardGO, target: enemyCardGO);
         }
         EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, source: attackerCardGO, target: enemyCardGO, value: damage, extra: extra);
-         
 
         if (monsterAttack)
         {
             StartCoroutine(VFX.PlayMonsterHit(cardGO:enemyCardGO));
 
+        }
+    }
+
+    public void OnAttackPreFinish(GameObject attackerCardGO)
+    {
+        // 正常情况销毁这个卡,如果这张卡是回旋镖,并且当前回旋镖没打完,就先别销毁
+        if (attackerCardGO != null)
+        {
+            var attackerCard = attackerCardGO.GetComponent<CardDisplay>();
+            if (attackerCard.card.effectIds.Any(id => id.StartsWith("BounceToRandomEnemy_OnDealDamage")))
+            {
+                // Debug.Log("OnAttackPreFinish: 回旋镖，不销毁");
+                return;
+            }
+            else
+            {
+                // Debug.Log("OnAttackPreFinish: 不是回旋镖，正常销毁");
+                // 不是回旋镖，正常销毁
+                GameEvents.RaiseCardFinished(attackerCardGO);
+            }
         }
     }
 
