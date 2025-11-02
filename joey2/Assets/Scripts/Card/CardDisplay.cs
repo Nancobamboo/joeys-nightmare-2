@@ -22,8 +22,6 @@ public class CardDisplay : MonoBehaviour
     public Image monsterAttackIcon;
     public Image defence;
     public Text defenceText;
-    public Image other;
-    public Text otherText;
 
     public Card card;
 
@@ -67,7 +65,6 @@ public class CardDisplay : MonoBehaviour
         attack.gameObject.SetActive(false);
         defence.gameObject.SetActive(false);
         monster.gameObject.SetActive(false);
-        other.gameObject.SetActive(false);
 
         switch (type)
         {
@@ -91,9 +88,6 @@ public class CardDisplay : MonoBehaviour
                 break;
 
             default:
-                other.gameObject.SetActive(true);
-                otherText.text = string.IsNullOrEmpty(card.description) ? "" : card.description;
-                otherText.gameObject.SetActive(true);
                 break;
         }
     }
