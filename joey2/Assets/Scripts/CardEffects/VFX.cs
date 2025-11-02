@@ -26,12 +26,16 @@ public class VFX : MonoSingleton<VFX>
     /// <summary>
     /// 原始的简单击中特效（保持向后兼容）
     /// </summary>
-    public static IEnumerator PlayHit(GameObject cardGO, GameObject targetCardGO = null, int damage = 0, bool monsterAttack = false, Dictionary<string, object> extra = null)
+    public static IEnumerator PlayHit(GameObject cardGO ,GameObject targetCardGO=null,int damage=-1,bool monsterAttack=false,Dictionary<string,object> extra=null)
     {
         if (cardGO == null) yield break;
         yield return PlayAnimator(cardGO, "UI_Carditem_gongji");
         yield return new WaitForSeconds(0.4f);
-        GameEvents.RaiseAttackPre(cardGO, targetCardGO, damage, monsterAttack, extra);
+        if (damage<0)
+        {
+            damage = cardGO.GetComponent<CardDisplay>().card.currentAttack;
+        }
+        GameEvents.RaiseAttackPre(cardGO,targetCardGO,damage,monsterAttack,extra);
         yield return new WaitForSeconds(0.4f);
         GameEvents.RaiseAttackPreFinish(cardGO);
     }
