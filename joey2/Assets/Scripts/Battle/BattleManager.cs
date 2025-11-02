@@ -7,7 +7,7 @@ using System.Linq;  // 添加这一行
 
 public class BattleManager : MonoSingleton<BattleManager>
 {
-    public int level =1 ;// 关卡等级
+    public int level = 1;// 关卡等级
     public int mode = 0; // 模式 : 0-教学, 1-解密, 2-肉鸽,3-测试
     public List<Transform> envPanels = new List<Transform>();
     public List<List<GameObject>> envCardListList = new List<List<GameObject>>();
@@ -21,36 +21,36 @@ public class BattleManager : MonoSingleton<BattleManager>
     public List<GameObject> itemCardList = new List<GameObject>();
     public GameObject cardPrefab;
 
-    public Image joeyImage ;
+    public Image joeyImage;
 
 
     // 弃牌列表
     public List<GameObject> usedCardList = new List<GameObject>();
 
-	void Start()
-	{
-		// If PData.currentLevel is greater than editor level, use PData (for level progression)
-		// Otherwise, use editor level value and sync to PData
-		if (PData.Instance.currentLevel > level)
-		{
-			// Game progression takes priority
-			level = PData.Instance.currentLevel;
-		}
-		else if (level > 0)
-		{
-			// Editor value takes priority, sync to PData
-			PData.Instance.currentLevel = level;
-		}
-		else if (PData.Instance.currentLevel > 0)
-		{
-			// Use PData value if editor value is 0 or not set
-			level = PData.Instance.currentLevel;
-		}
-		
-		// 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
+    void Start()
+    {
+        // If PData.currentLevel is greater than editor level, use PData (for level progression)
+        // Otherwise, use editor level value and sync to PData
+        if (PData.Instance.currentLevel > level)
+        {
+            // Game progression takes priority
+            level = PData.Instance.currentLevel;
+        }
+        else if (level > 0)
+        {
+            // Editor value takes priority, sync to PData
+            PData.Instance.currentLevel = level;
+        }
+        else if (PData.Instance.currentLevel > 0)
+        {
+            // Use PData value if editor value is 0 or not set
+            level = PData.Instance.currentLevel;
+        }
+
+        // 初始化数据（如需要从 GData 抽卡生成怪物/技能/道具等）
         PhaseManager.Instance.SetGamePhase(GamePhase.battleStart);
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth);
-	}
+    }
 
     void OnEnable()
     {
@@ -86,7 +86,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     }
     public void OnCardFinished(GameObject cardGO)
     {
-        StartCoroutine(VFXStackHelper.FinshCardVFX(cardGO:cardGO));
+        StartCoroutine(VFXStackHelper.FinshCardVFX(cardGO: cardGO));
     }
 
     public GameObject GetRandomEnemy()
@@ -95,7 +95,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     }
 
 
-    public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
+    public void UseAttack(GameObject attakCardGameObject, GameObject targetCardGameObject)
     {
         var attakCard = attakCardGameObject.GetComponent<CardDisplay>();
         if (attakCard == null)
@@ -105,15 +105,15 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, source: attakCardGameObject);
         // GameEvents.RaiseAttackInitiated(attakCardGameObject, targetCardGameObject);
-        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,-1,true));
-        
+        StartCoroutine(VFX.PlayHit(attakCardGameObject, targetCardGameObject, -1, true));
+
     }
-    
-    public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack,Dictionary<string,object> extra=null)
+
+    public void OnAttackPre(GameObject attackerCardGO, GameObject targetCardGO, int damage, bool monsterAttack, Dictionary<string, object> extra = null)
     {
-        ApplyDamageToEnemy(enemy:targetCardGO, damage:damage,monsterAttack:monsterAttack,attackerCardGO:attackerCardGO,extra:extra);
+        ApplyDamageToEnemy(enemy: targetCardGO, damage: damage, monsterAttack: monsterAttack, attackerCardGO: attackerCardGO, extra: extra);
     }
-    public void ApplyDamageToEnemy(GameObject enemy, int damage,bool monsterAttack=false,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
+    public void ApplyDamageToEnemy(GameObject enemy, int damage, bool monsterAttack = false, GameObject attackerCardGO = null, Dictionary<string, object> extra = null)
     {
         var targetCard = enemy.GetComponent<CardDisplay>();
         if (targetCard == null || targetCard.card == null) return;
@@ -121,27 +121,27 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.card.health -= damage;
         if (targetCard.card.health < 0) targetCard.card.health = 0;
         targetCard.ShowCard();
-        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage, monsterAttack:monsterAttack,attackerCardGO:attackerCardGO,extra:extra));
+        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO: enemy, damage: damage, monsterAttack: monsterAttack, attackerCardGO: attackerCardGO, extra: extra));
     }
 
-    public void OnDamageComplete(GameObject enemyCardGO,bool monsterAttack=false,int damage=0,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
+    public void OnDamageComplete(GameObject enemyCardGO, bool monsterAttack = false, int damage = 0, GameObject attackerCardGO = null, Dictionary<string, object> extra = null)
     {
-        SettlementEnemy(enemyCardGO,monsterAttack,damage,attackerCardGO,extra);
+        SettlementEnemy(enemyCardGO, monsterAttack, damage, attackerCardGO, extra);
     }
 
-    public void SettlementEnemy(GameObject enemyCardGO,bool monsterAttack=false,int damage=0,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
+    public void SettlementEnemy(GameObject enemyCardGO, bool monsterAttack = false, int damage = 0, GameObject attackerCardGO = null, Dictionary<string, object> extra = null)
     {
         var enemyCard = enemyCardGO.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
         {
-            GameEvents.RaiseCardFinished(cardGO:enemyCardGO);
+            GameEvents.RaiseCardFinished(cardGO: enemyCardGO);
             EffectRunner.Instance.Raise(CardTrigger.OnKill, source: attackerCardGO, target: enemyCardGO);
         }
         EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, source: attackerCardGO, target: enemyCardGO, value: damage, extra: extra);
 
         if (monsterAttack && enemyCard.card.health > 0)
         {
-            StartCoroutine(VFX.PlayMonsterHit(cardGO:enemyCardGO));
+            StartCoroutine(VFX.PlayMonsterHit(cardGO: enemyCardGO));
 
         }
     }
@@ -149,6 +149,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     public void OnAttackPreFinish(GameObject attackerCardGO)
     {
         // 正常情况销毁这个卡,如果这张卡是回旋镖,并且当前回旋镖没打完,就先别销毁
+        // 如果是双次攻击卡牌，且还没完成第二次攻击，也先别销毁
         if (attackerCardGO != null)
         {
             var attackerCard = attackerCardGO.GetComponent<CardDisplay>();
@@ -157,12 +158,30 @@ public class BattleManager : MonoSingleton<BattleManager>
                 Debug.Log("OnAttackPreFinish: 回旋镖，不销毁");
                 return;
             }
-            else
+
+            // Check if this is a double attack card
+            var tracker = attackerCardGO.GetComponent<DoubleAttackTracker>();
+            if (tracker != null)
             {
-                // Debug.Log("OnAttackPreFinish: 不是回旋镖，正常销毁");
-                // 不是回旋镖，正常销毁
-                GameEvents.RaiseCardFinished(attackerCardGO);
+                // If double attack is completed (isDoubleAttack == false and attackCount >= 2), destroy it
+                // Or if it's still in progress, don't destroy yet
+                if (tracker.isDoubleAttack && tracker.attackCount < 2)
+                {
+                    Debug.Log("OnAttackPreFinish: 双次攻击卡，还未完成第二次攻击，不销毁");
+                    return;
+                }
+                // If attackCount >= 2, the DoubleAttack_OnDealDamage will handle destruction
+                // So we don't destroy here to avoid double destruction
+                else if (tracker.attackCount >= 2)
+                {
+                    Debug.Log("OnAttackPreFinish: 双次攻击卡已完成，由OnDealDamage处理销毁");
+                    return;
+                }
             }
+
+            // Normal card or double attack not applicable, destroy it
+            // Debug.Log("OnAttackPreFinish: 正常销毁");
+            GameEvents.RaiseCardFinished(attackerCardGO);
         }
     }
 
@@ -176,19 +195,19 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("OnCardClicked: CardDisplay 或 card 为空");
             return;
         }
-        if(cd.card.state != CardState.Active)
+        if (cd.card.state != CardState.Active)
         {
             Debug.LogError("OnCardClicked: 卡牌状态不是Active");
             return;
         }
-        
+
         // Check if card id is 6001 (next level card)
         if (cd.card.id == "6001")
         {
             GameEvents.RaiseNextLevelRequested();
             return;
         }
-        
+
         if (cd.card.position == CardPosition.Env)
         {
             OnEnvClicked(cardGameObject);
@@ -197,7 +216,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             OnBagClicked(cardGameObject);
         }
-        else 
+        else
         {
             Debug.LogError("OnCardClicked: 未知的位置");
             return;
@@ -261,13 +280,13 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Trigger OnPlay effect for skill cards
         StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
-        
+
         // Don't move card here - let FinshCardVFX handle the animation and move
         // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:skillCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         // UIGridHelper.RefreshPanel(skillPanel);
-        
+
         // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
-        GameEvents.RaiseCardFinished(cardGO:cardGameObject);
+        GameEvents.RaiseCardFinished(cardGO: cardGameObject);
     }
 
     public void OnBagItemClicked(GameObject cardGameObject)
@@ -275,13 +294,13 @@ public class BattleManager : MonoSingleton<BattleManager>
         StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
         // Trigger OnPlay effect for item cards
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
-        
+
         // Don't move card here - let FinshCardVFX handle the animation and move
         // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:itemCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         // UIGridHelper.RefreshPanel(itemPanel);
-        
+
         // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
-        GameEvents.RaiseCardFinished(cardGO:cardGameObject);
+        GameEvents.RaiseCardFinished(cardGO: cardGameObject);
     }
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)
@@ -291,7 +310,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             // CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:attackPanel, cardId:"1005", state:CardState.Active, position:CardPosition.Bag, attachList:attackCardList);
             return;
         }
-        
+
         cardGameObject.GetComponent<CardDisplay>().card.state = CardState.Inactive;
         GameObject attackCardGameObject = UIGridHelper.GetCardListOrderIndex0(attackPanel);
         UseAttack(attackCardGameObject, cardGameObject);
@@ -299,8 +318,8 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnEnvCardClicked(GameObject cardGO)
     {
-        int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:envCardListList);
-        
+        int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO: cardGO, envCardListList: envCardListList);
+
         if (envListIndex < 0 || envListIndex >= envCardListList.Count)
         {
             Debug.LogError("OnEnvCardClicked: envListIndex 超出范围");
@@ -329,7 +348,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnMonsterAttackPre(GameObject monsterCardGO)
     {
-        UseDefence(attackGO:monsterCardGO);
+        UseDefence(attackGO: monsterCardGO);
     }
     public void UseDefence(GameObject attackGO)
     {
@@ -350,7 +369,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
 
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth - damage);
-        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage:joeyImage,defenceCardGO:defenceGO,damage:damage));
+        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage: joeyImage, defenceCardGO: defenceGO, damage: damage));
 
     }
 
@@ -429,12 +448,12 @@ public class BattleManager : MonoSingleton<BattleManager>
     private void LoadNextLevel()
     {
         int nextLevel = level + 1;
-        
+
         // Save next level to PData before reloading scene
         PData.Instance.currentLevel = nextLevel;
-        
+
         Debug.Log($"Loading next level: {nextLevel}, reloading Battle scene");
-        
+
         // Reload Battle scene with new level
         SceneLoader.Instance.LoadScene("Battle");
     }
@@ -443,7 +462,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         // 加载所有卡牌数据
         GData.Instance.LoadAll();
-        
+
         // Set player health for tutorial levels (1-3) from CSV config
         if (level >= 1 && level <= 4)
         {
@@ -455,7 +474,7 @@ public class BattleManager : MonoSingleton<BattleManager>
                 PData.Instance.SetPlayerHP(playerData.Value.health);
             }
         }
-        
+
         // 抽取环境卡牌
         List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(level);
         for (int i = 0; i < cardIdListEnv.Count; i++)
@@ -467,7 +486,7 @@ public class BattleManager : MonoSingleton<BattleManager>
                 string cardId = cardIdList[j];
                 CardState state = CardState.Inactive;
                 if (j == 0) state = CardState.Active;
-                CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:envPanels[i].transform, cardId:cardId, state:state, position:CardPosition.Env, attachList:oneEnvCardList);
+                CardHelper.CreateCardToTransform(cardPrefab: cardPrefab, parent: envPanels[i].transform, cardId: cardId, state: state, position: CardPosition.Env, attachList: oneEnvCardList);
             }
             envCardListList.Add(oneEnvCardList);
         }
@@ -495,7 +514,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             string cardType = kv.Key;
             List<string> cardIds = kv.Value;
-            
+
             if (cardIds == null || cardIds.Count == 0) continue;
             if (!TryGetPanelAndList(cardType, out var panel, out var list)) continue;
 
@@ -504,14 +523,14 @@ public class BattleManager : MonoSingleton<BattleManager>
                 string cardId = cardIds[j];
                 CardState state = CardState.Inactive;
                 if (j == 0) state = CardState.Active;
-                CardHelper.CreateCardToTransform(cardPrefab:cardPrefab, parent:panel, cardId:cardId, state:state, position:CardPosition.Bag, attachList:list);
+                CardHelper.CreateCardToTransform(cardPrefab: cardPrefab, parent: panel, cardId: cardId, state: state, position: CardPosition.Bag, attachList: list);
             }
-            
+
             // Refresh panel after creating cards to ensure active state is set correctly
             UIGridHelper.RefreshPanel(panel);
         }
         Debug.Log($"attackCardList: {attackCardList.Count}, defenceCardList: {defenceCardList.Count}, skillCardList: {skillCardList.Count}, itemCardList: {itemCardList.Count}");
-        
+
         // Update player attack and defence after game start
         UpdatePlayerAttackAndDefence();
     }
