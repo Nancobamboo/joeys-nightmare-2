@@ -30,7 +30,8 @@ public class VFX : MonoSingleton<VFX>
     {
         if (cardGO == null) yield break;
         yield return PlayAnimator(cardGO, "UI_Carditem_gongji");
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.35f);
+        SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/swing-whoosh-5-198498",startTime:0f));
         if (damage<0)
         {
             damage = cardGO.GetComponent<CardDisplay>().card.currentAttack;
@@ -58,7 +59,7 @@ public class VFX : MonoSingleton<VFX>
                 animator.Rebind();
                 animator.Update(0f);
                 animator.Play(animationName, 0, 0f);
-                Debug.Log($"PlayAnimator: Playing {animationName} animation");
+                // Debug.Log($"PlayAnimator: Playing {animationName} animation");
                 yield return null;
             }
         }
