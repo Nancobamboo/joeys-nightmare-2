@@ -7,7 +7,7 @@ public class VFX : MonoSingleton<VFX>
     /// <summary>
     /// 播放打击特效（新系统）
     /// </summary>
-    public  IEnumerator PlayHitWithSequence(
+    public IEnumerator PlayHitWithSequence(
         GameObject attacker,
         GameObject target,
         VFXSequence sequence)
@@ -26,18 +26,18 @@ public class VFX : MonoSingleton<VFX>
     /// <summary>
     /// 原始的简单击中特效（保持向后兼容）
     /// </summary>
-    public static IEnumerator PlayHit(GameObject cardGO ,GameObject targetCardGO=null,int damage=0,bool monsterAttack=false,Dictionary<string,object> extra=null)
+    public static IEnumerator PlayHit(GameObject cardGO, GameObject targetCardGO = null, int damage = 0, bool monsterAttack = false, Dictionary<string, object> extra = null)
     {
         if (cardGO == null) yield break;
         yield return PlayAnimator(cardGO, "UI_Carditem_gongji");
         yield return new WaitForSeconds(0.4f);
-        GameEvents.RaiseAttackPre(cardGO,targetCardGO,damage,monsterAttack,extra);
+        GameEvents.RaiseAttackPre(cardGO, targetCardGO, damage, monsterAttack, extra);
         yield return new WaitForSeconds(0.4f);
         GameEvents.RaiseAttackPreFinish(cardGO);
     }
 
 
-    public static IEnumerator PlayAnimator(GameObject cardGO,string animationName)
+    public static IEnumerator PlayAnimator(GameObject cardGO, string animationName)
     {
         // TODO: 播放击中特效、抖动、音效等
         Animator animator = cardGO.GetComponentInChildren<Animator>();
@@ -50,8 +50,11 @@ public class VFX : MonoSingleton<VFX>
             }
             else
             {
-                animator.Play(animationName);
-                // Debug.Log("PlayMonsterHit: Playing attack animation");
+                // Reset animator state to ensure animation can play even if previous animation is still playing
+                animator.Rebind();
+                animator.Update(0f);
+                animator.Play(animationName, 0, 0f);
+                Debug.Log($"PlayAnimator: Playing {animationName} animation");
                 yield return null;
             }
         }
@@ -74,7 +77,7 @@ public class VFX : MonoSingleton<VFX>
                 animator.speed = -1f;
                 // 从动画的结尾开始播放（normalizedTime = 1 表示 100%）
                 animator.Play(animationName, 0, 1f);
-                
+
                 // Debug.Log($"PlayAnimatorReverse: Playing {animationName} in reverse");
                 yield return null; // 等一帧让动画开始
                 yield return new WaitForSeconds(0.7f);
