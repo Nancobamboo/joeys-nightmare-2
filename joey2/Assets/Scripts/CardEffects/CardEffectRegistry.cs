@@ -52,20 +52,21 @@ public static class CardEffectRegistry
             if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
             return new DealDamage_UseDefence(baseExtra);
         else if (id == "DoubleAttack_OnPlay")
-        {
-            return new DoubleAttack_OnPlay();
-        }
-        else if (id == "DoubleAttack_OnDealDamage")
-        {
-            return new DoubleAttack_OnDealDamage();
-        }
+            {
+                return new DoubleAttack_OnPlay();
+            }
+            else if (id == "DoubleAttack_OnDealDamage")
+            {
+                return new DoubleAttack_OnDealDamage();
+            }
 
-        // 走原有无参分发
-        return Create(id);
-    }
+            // 走原有无参分发
+            return Create(id);
+        }
 
     public static ICardEffect Create(string id)
     {
         return factory.TryGetValue(id, out var f) ? f() : null;
     }
+}
 }
