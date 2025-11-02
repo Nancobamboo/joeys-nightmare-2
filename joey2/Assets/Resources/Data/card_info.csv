@@ -6,7 +6,7 @@
 1004,Art/Img/img_card_attrack_01,铁剑        ,attack,锋利的铁剑,8,0,0,0,1,
 1005,Art/Img/img_card_attrack_01,双手剑,attack,没有装备防具时，对敌人额外造成5点伤害 ,8,0,0,0,1,
 1006,Art/Img/img_card_attrack_01,重锤        ,attack,缓慢蓄力后，发出致命一击        ,15,0,0,0,1,
-1007,Art/Img/img_card_attrack_01,回旋镖       ,attack,弹射:2,4,0,0,0,1,BounceToRandomEnemy_OnDealDamage:2
+1007,Art/Img/img_card_attrack_01,回旋镖       ,attack,弹射:2,4,0,0,0,1,BounceToRandomEnemy_OnDealDamage:2;LifeSteal_OnDealDamage:3
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

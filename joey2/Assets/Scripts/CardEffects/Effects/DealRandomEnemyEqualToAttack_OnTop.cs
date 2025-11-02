@@ -11,7 +11,7 @@ public class DealRandomEnemyEqualToAttack_OnTop : ICardEffect
     {
         // 取一个随机怪
         var enemy = BattleManager.Instance.GetRandomEnemy();
-        yield return VFX.PlayAnimator(ctx.source, "UI_Carditem_dunpai");
+        yield return VFX.PlayAnimator(ctx.source, "UI_Carditem_gongji");
         if (enemy == null) yield break;
         Debug.Log("DealRandomEnemyEqualToAttack_OnTop: enemy = " + enemy.name);
 
