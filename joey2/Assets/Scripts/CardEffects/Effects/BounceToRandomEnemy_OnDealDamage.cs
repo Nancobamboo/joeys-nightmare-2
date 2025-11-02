@@ -51,7 +51,7 @@ public class BounceToRandomEnemy_OnDealDamage : ICardEffect
                 
                 // 播放弹射VFX，并标记这是弹射伤害
                 yield return VFX.PlayHit(ctx.source, enemy, damage, false, extra: new Dictionary<string, object> { { "isBounce", true } });
-                yield return new WaitForSeconds(0.8f);
+                yield return new WaitForSeconds(0.5f);
 
             }
         }
