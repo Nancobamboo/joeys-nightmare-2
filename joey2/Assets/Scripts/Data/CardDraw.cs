@@ -12,7 +12,7 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     private void LoadTutorialEnvDeck()
     {
         if (_tutorialEnvDeckLoaded) return;
-        
+
         _tutorialEnvDeckCache.Clear();
         var ta = Resources.Load<TextAsset>(TutorialEnvDeckCsvPath);
         if (ta == null)
@@ -110,7 +110,7 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             }
             Debug.LogWarning($"Tutorial env deck for level {level} not found in CSV, using default");
         }
-        
+
         // Normal levels use default deck (keep original logic for now)
         return new List<List<string>>
         {
