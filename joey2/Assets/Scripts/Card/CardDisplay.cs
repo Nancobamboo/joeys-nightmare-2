@@ -86,8 +86,13 @@ public class CardDisplay : MonoBehaviour
                 monster.gameObject.SetActive(true);
                 monsterText.text = card.health.ToString();
                 break;
+            
+            case "other":
+                iconType.gameObject.SetActive(false);
+                break;
 
             default:
+                
                 break;
         }
     }
