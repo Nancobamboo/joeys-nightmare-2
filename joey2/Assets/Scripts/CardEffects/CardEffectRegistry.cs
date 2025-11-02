@@ -51,13 +51,6 @@ public static class CardEffectRegistry
             int baseExtra = 0;
             if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
             return new DealDamage_UseDefence(baseExtra);
-        else if (id == "DoubleAttack_OnPlay")
-        {
-            return new DoubleAttack_OnPlay();
-        }
-        else if (id == "DoubleAttack_OnDealDamage")
-        {
-            return new DoubleAttack_OnDealDamage();
         }
 
         // 走原有无参分发
