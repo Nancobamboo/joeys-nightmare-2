@@ -260,6 +260,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     public void OnBagSkillClicked(GameObject cardGameObject)
     {
         // Trigger OnPlay effect for skill cards
+        StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
         
         // Don't move card here - let FinshCardVFX handle the animation and move
@@ -272,6 +273,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagItemClicked(GameObject cardGameObject)
     {
+        StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
         // Trigger OnPlay effect for item cards
         EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
         
