@@ -49,7 +49,7 @@
 5004,Art/Img/Monster/img_card_SkeletonKnight,骷髅骑士,monster      ,训练有素的骷髅骑士，会格挡首次攻击,8,,15,,2,
 5005,Art/Img/Monster/img_card_bat,吸血蝙蝠,monster      ,攻击时回复血量,,,,,1,
 5006,Art/Img/Monster/img_card_Barrel,木桶,monster,可能藏着好东西,,,,,1,
-5007,Art/Img/Monster/img_card_Bangalore,炸药桶,monster,引爆后会对周围敌人造成10点伤害,,,,,1,
+5007,Art/Img/Monster/img_card_Bangalore,炸药桶,monster,引爆后会对周围敌人造成10点伤害,,,1,,1,Boom_OnKill:10
 ,,,,,,,,,,
 ,,,,,,,,,,
 6001,Art/Img/Other/img_card_attrack_01,传送门,other,传送门,,,,,1,

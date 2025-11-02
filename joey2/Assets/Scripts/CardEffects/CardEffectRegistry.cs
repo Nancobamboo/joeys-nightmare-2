@@ -67,6 +67,12 @@ public static class CardEffectRegistry
             if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
             return new Electric(baseExtra);
         }
+        else if (id == "Boom_OnKill")
+        {
+            int baseExtra = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
+            return new Boom_OnKill(baseExtra);
+        }
 
         // 走原有无参分发
         return Create(id);

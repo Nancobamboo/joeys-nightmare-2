@@ -142,8 +142,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         var enemyCard = enemyCardGO.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
         {
-            GameEvents.RaiseCardFinished(cardGO: enemyCardGO);
-            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: attackerCardGO, target: enemyCardGO);
+            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: enemyCardGO, target: attackerCardGO);
+            GameEvents.RaiseCardFinished(cardGO: enemyCardGO,delay:0.4f);
+            
         }
         EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, source: attackerCardGO, target: enemyCardGO, value: damage, extra: extra);
 
