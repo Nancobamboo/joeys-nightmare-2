@@ -41,6 +41,12 @@ public static class CardEffectRegistry
             if (parts.Length > 1) int.TryParse(parts[1], out bounceCount);
             return new BounceToRandomEnemy_OnDealDamage(bounceCount);
         }
+        else if (id == "ExtraDamage_NoDefence")
+        {
+            int baseExtra = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
+            return new ExtraDamage_NoDefence(baseExtra);
+        }
 
         // 走原有无参分发
         return Create(id);
