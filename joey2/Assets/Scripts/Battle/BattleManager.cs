@@ -294,14 +294,14 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
         // Trigger OnPlay effect for item cards
-        EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
+        // EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
 
         // Don't move card here - let FinshCardVFX handle the animation and move
         // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:itemCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         // UIGridHelper.RefreshPanel(itemPanel);
 
         // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
-        GameEvents.RaiseCardFinished(cardGO: cardGameObject);
+        GameEvents.RaiseCardFinished(cardGO: cardGameObject,delay:0.4f);
     }
 
     public void OnEnvMonsterClicked(GameObject cardGameObject)

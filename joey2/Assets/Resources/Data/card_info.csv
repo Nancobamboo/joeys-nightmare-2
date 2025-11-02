@@ -23,7 +23,7 @@
 ,,,,,,,,,,
 3000,Art/Img/Item/img_card_Blood_bottle,道具牌,item   ,点击使用，恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
 3001,Art/Img/Item/img_card_Blood_bottle,小血瓶  ,item   ,恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
-3002,Art/Img/Item/img_card_Boom,炸弹,item   ,随机引爆场上一名敌人,,,,,3,
+3002,Art/Img/Item/img_card_Boom,炸弹,item   ,随机引爆场上一名敌人,,,,,3,Boom_OnPlay:10
 3003,Art/Img/Item/img_card_HookLock,钩索,item        ,随机装备一件使用过的武器,,,,,1,HookEquipWeaponFromDiscard_OnPlay
 ,,,,,,,,,,
 ,,,,,,,,,,
@@ -34,7 +34,7 @@
 4003,Art/Img/img_card_attrack_01,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
 4004,Art/Img/img_card_attrack_01,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,
 4005,Art/Img/img_card_attrack_01,肉盾冲击,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,,2,
-4006,Art/Img/Skill/img_card_Lightning,连环闪电    ,skill     ,对全场敌人造成3点伤害,0,0,0,0,2,Electric:3
+4006,Art/Img/Skill/img_card_Lightning,连环闪电    ,skill     ,对全场敌人造成8点伤害,0,0,0,0,3,Electric:8
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

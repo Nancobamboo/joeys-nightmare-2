@@ -18,7 +18,7 @@ public class Electric : ICardEffect
     public IEnumerator Execute(CardEffectContext ctx)
     {
         // 获取当前场景所有的怪物
-        List<GameObject> allEnemies = EnemyManager.GetAllEnemies(BattleManager.Instance.envPanels);
+        List<GameObject> allEnemies = BattleManager.Instance.GetAllEnemies();
         if (allEnemies.Count == 0)
         {
             yield break;
