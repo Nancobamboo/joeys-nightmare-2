@@ -23,6 +23,7 @@
 ,,,,,,,,,,
 3000,Art/Img/Item/img_card_Blood_bottle,道具牌,item   ,点击使用，恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
 3001,Art/Img/Item/img_card_Blood_bottle,小血瓶  ,item   ,恢复10点生命值,0,0,0,0,1,HealPlayer_OnPlay:10
+3002,Art/Img/Item/img_card_Boom,炸弹,item   ,随机引爆场上一名敌人,,,,,3,
 3003,Art/Img/Item/img_card_HookLock,钩索,item        ,随机装备一件使用过的武器,,,,,1,HookEquipWeaponFromDiscard_OnPlay
 ,,,,,,,,,,
 ,,,,,,,,,,
