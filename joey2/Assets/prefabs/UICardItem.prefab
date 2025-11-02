@@ -271,6 +271,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoomSize: 1.1
+  enterDelay: 0.2
+  spacingOnEnterEnv: -490
+  spacingOnEnterBag: -460
   pointerIn: 0
 --- !u!1 &2495113706277072694
 GameObject:
@@ -1352,7 +1355,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 0.85
-  m_Text: "\u6728\u5251\u6728\u5251\u6728\u5251\u6728\n\u5251\u6728\u5251\u6728\u6728\u5251\u5251"
+  m_Text: "\u6728\u5251\u6728\u5251\u6728\u5251\u6728\n\u5251\u6728\u5251\u6728\u6728\u5251\u5251222222222222222"
 --- !u!1 &8383656484052508404
 GameObject:
   m_ObjectHideFlags: 0

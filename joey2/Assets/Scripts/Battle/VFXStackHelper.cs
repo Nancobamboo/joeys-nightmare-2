@@ -299,12 +299,18 @@ public static class VFXStackHelper
                 BattleManager.Instance.UpdatePlayerAttackAndDefence();
                 break;
             case "monster":
+                string monsterId = cd.card != null ? cd.card.id : null;
                 int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:BattleManager.Instance.envCardListList);
                 if (envListIndex >= 0 && envListIndex < BattleManager.Instance.envCardListList.Count)
                 {
                     CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
                     UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                     BattleManager.Instance.UpdatePlayerAttackAndDefence();
+
+                    if (!string.IsNullOrEmpty(monsterId))
+                    {
+                        LootDropManager.Instance.HandleMonsterDrop(monsterId, envListIndex);
+                    }
                 }
                 else
                 {
