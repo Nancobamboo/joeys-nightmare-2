@@ -213,7 +213,8 @@ public class BattleManager : MonoSingleton<BattleManager>
         // Check if card id is 6001 (next level card)
         if (cd.card.id == "6001")
         {
-            GameEvents.RaiseNextLevelRequested();
+            SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Other/door",startTime:0.1f));
+            StartCoroutine(LoadNextLevelCoroutine(delay:0.5f));
             return;
         }
 
@@ -458,6 +459,13 @@ public class BattleManager : MonoSingleton<BattleManager>
 
         // Reload Battle scene with new level
         SceneLoader.Instance.LoadScene("Battle");
+    }
+
+
+    public IEnumerator LoadNextLevelCoroutine(float delay=0.5f)
+    {
+        yield return new WaitForSeconds(delay);
+        LoadNextLevel();
     }
 
     public void GameStart()
