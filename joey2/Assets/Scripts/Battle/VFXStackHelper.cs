@@ -148,49 +148,7 @@ public static class VFXStackHelper
         }
 
         // 2. 展示伤害数字
-        GameObject damageUIPrefab = Resources.Load<GameObject>("prefab/UIDamage");
-        GameObject damageInstance = null;
-        if (damageUIPrefab != null)
-        {
-            // 实例化伤害UI
-            damageInstance = Object.Instantiate(damageUIPrefab, cardGO.transform);
-            
-            // 设置位置在卡牌上方
-            damageInstance.transform.localPosition = new Vector3(0f, 180f, 0);
-            
-            // 设置伤害数字文本
-            Transform damageTextTransform = damageInstance.transform.Find("Image/Damage");
-            if (damageTextTransform != null)
-            {
-                Text damageText = damageTextTransform.GetComponent<Text>();
-                if (damageText != null)
-                {
-                    damageText.text = "-" + damage.ToString();
-                    damageText.gameObject.SetActive(true);
-                    // Debug.Log($"PlayDamageVFX: Set damage text to {damageText.text}");
-                }
-                else
-                {
-                    Debug.LogError("PlayDamageVFX: Damage Text component not found");
-                }
-            }
-            else
-            {
-                // Debug.LogError("PlayDamageVFX: Damage transform not found");
-            }
-            
-            // 3. 播放伤害数字动画
-            Animator damageAnimator = damageInstance.GetComponent<Animator>();
-            if (damageAnimator != null)
-            {
-                damageAnimator.Play("UIDamage_kouxue");
-                // Debug.Log("PlayDamageVFX: Playing damage animation");
-            }
-        }
-        else
-        {
-            Debug.LogError("PlayDamageVFX: Failed to load UIDamage prefab");
-        }
+        BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:cardGO.transform,localPositionShift:new Vector3(0f, 180f, 0),damage:damage));
 
         // 4. 播放受击特效
         GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Shouji");
@@ -213,10 +171,6 @@ public static class VFXStackHelper
         if (vfxInstance != null)
         {
             Object.Destroy(vfxInstance);
-        }
-        if (damageInstance != null)
-        {
-            Object.Destroy(damageInstance);
         }
         GameEvents.RaiseDamageComplete(enemyCardGO:cardGO,monsterAttack:monsterAttack,damage:damage,attackerCardGO:attackerCardGO,extra:extra);
 
