@@ -44,10 +44,10 @@ public static class GameEvents
     }
 
     // damage complete
-    public static event Action<GameObject,bool> OnDamageComplete;
-    public static void RaiseDamageComplete(GameObject enemy,bool monsterAttack=false)
+    public static event Action<GameObject,bool,int,GameObject,Dictionary<string,object>> OnDamageComplete;
+    public static void RaiseDamageComplete(GameObject enemyCardGO,bool monsterAttack=false,int damage=0,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
     {
-        OnDamageComplete?.Invoke(enemy,monsterAttack);
+        OnDamageComplete?.Invoke(enemyCardGO, monsterAttack, damage, attackerCardGO, extra);
     }
 
 
@@ -59,10 +59,10 @@ public static class GameEvents
     }
 
 
-    public static event Action<GameObject,GameObject,int,bool> OnAttackPre;
-    public static void RaiseAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
+    public static event Action<GameObject,GameObject,int,bool,Dictionary<string,object>> OnAttackPre;
+    public static void RaiseAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack,Dictionary<string,object> extra=null)
     {
-        OnAttackPre?.Invoke(attackerCardGO,targetCardGO,damage,monsterAttack);
+        OnAttackPre?.Invoke(attackerCardGO,targetCardGO,damage,monsterAttack,extra);
     }
 
     public static event Action<GameObject> OnAttackPreFinish;

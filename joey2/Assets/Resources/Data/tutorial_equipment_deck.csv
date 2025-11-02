@@ -11,4 +11,7 @@ level,type,cardIds
 3,defence,
 3,skill,
 3,item,
-
+4,attack,
+4,defence,
+4,skill,
+4,item,

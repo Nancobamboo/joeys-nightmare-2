@@ -35,6 +35,12 @@ public static class CardEffectRegistry
             if (parts.Length > 1) int.TryParse(parts[1], out healAmount);
             return new HealPlayer_OnPlay(healAmount);
         }
+        else if (id == "BounceToRandomEnemy_OnDealDamage")
+        {
+            int bounceCount = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out bounceCount);
+            return new BounceToRandomEnemy_OnDealDamage(bounceCount);
+        }
 
         // 走原有无参分发
         return Create(id);
