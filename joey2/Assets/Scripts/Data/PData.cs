@@ -6,6 +6,7 @@ using UnityEngine;
 
 public sealed class PData : PureSingleton<PData>
 {
+	public int lastPlayerHealth { get; set; } = 30;
 	public int playerHealth { get; set; } = 30;
 	public int playerMaxHealth { get; set; } = 30;
 	public int playerAttack { get; set; } = 0;
@@ -15,6 +16,7 @@ public sealed class PData : PureSingleton<PData>
 
 	public void SetPlayerHP(int hp)
 	{
+		lastPlayerHealth = playerHealth;
 		playerHealth = hp;
 		GameEvents.RaiseHPChanged(playerHealth);
 	}

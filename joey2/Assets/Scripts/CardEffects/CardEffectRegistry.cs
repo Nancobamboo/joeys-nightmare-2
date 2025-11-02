@@ -66,6 +66,11 @@ public static class CardEffectRegistry
         else if (id == "DoubleAttack_OnPlay")
         {
             return new DoubleAttack_OnPlay();
+        else if (id == "Electric")
+        {
+            int baseExtra = 0;
+            if (parts.Length > 1) int.TryParse(parts[1], out baseExtra);
+            return new Electric(baseExtra);
         }
 
         // 走原有无参分发
