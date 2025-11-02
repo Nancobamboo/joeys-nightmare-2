@@ -63,6 +63,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnMonsterAttackPreFinish += OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested += OnNextLevelRequested;
         GameEvents.OnCardFinished += OnCardFinished;
+        GameEvents.OnHPChanged += OnHPChanged;
 
     }
     void OnDisable()
@@ -76,22 +77,29 @@ public class BattleManager : MonoSingleton<BattleManager>
         GameEvents.OnMonsterAttackPreFinish -= OnMonsterAttackPreFinish;
         GameEvents.OnNextLevelRequested -= OnNextLevelRequested;
         GameEvents.OnCardFinished -= OnCardFinished;
-
+        GameEvents.OnHPChanged -= OnHPChanged;
     }
 
-
+    public void OnHPChanged(int hp)
+    {
+        StartCoroutine(VFXStackHelper.ChangeJoeyImage(joeyImage: joeyImage));
+    }
     public void OnMonsterAttackPreFinish(GameObject monsterCardGO)
     {
         monsterCardGO.GetComponent<CardDisplay>().card.state = CardState.Active;
     }
-    public void OnCardFinished(GameObject cardGO)
+    public void OnCardFinished(GameObject cardGO,float delay=0f)
     {
-        StartCoroutine(VFXStackHelper.FinshCardVFX(cardGO: cardGO));
+        StartCoroutine(VFXStackHelper.FinshCardVFX(cardGO: cardGO,delay:delay));
     }
 
     public GameObject GetRandomEnemy()
     {
         return EnemyManager.GetRandomEnemy(envPanels);
+    }
+    public List<GameObject> GetAllEnemies()
+    {
+        return EnemyManager.GetAllEnemies(envPanels);
     }
 
 
@@ -242,15 +250,9 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagClicked(GameObject cardGameObject)
     {
-        if (cardGameObject.GetComponent<CardDisplay>().card.type == "attack")
-        {
-            OnBagAttackClicked(cardGameObject);
-        }
-        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "defence")
-        {
-            OnBagDefenceClicked(cardGameObject);
-        }
-        else if (cardGameObject.GetComponent<CardDisplay>().card.type == "skill")
+        EffectRunner.Instance.Raise(CardTrigger.OnPlay, source: cardGameObject);
+        cardGameObject.GetComponent<CardDisplay>().card.state = CardState.Inactive;
+        if (cardGameObject.GetComponent<CardDisplay>().card.type == "skill")
         {
             OnBagSkillClicked(cardGameObject);
         }
@@ -260,7 +262,6 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         else
         {
-            Debug.LogError("OnBagClicked: 未知的位置");
             return;
         }
     }
@@ -279,14 +280,14 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         // Trigger OnPlay effect for skill cards
         StartCoroutine(VFX.PlayAnimator(cardGameObject, "UI_Carditem_dunpai"));
-        EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
+        // EffectRunner.Instance.Raise(CardTrigger.OnPlay, cardGameObject);
 
         // Don't move card here - let FinshCardVFX handle the animation and move
         // CardHelper.MoveCard(cardGO:cardGameObject, fromCardList:skillCardList, toCardList:usedCardList, state:CardState.Used, position:CardPosition.Used);
         // UIGridHelper.RefreshPanel(skillPanel);
 
         // Trigger card finished animation - FinshCardVFX will handle moving the card after animation
-        GameEvents.RaiseCardFinished(cardGO: cardGameObject);
+        GameEvents.RaiseCardFinished(cardGO: cardGameObject,delay:0.4f);
     }
 
     public void OnBagItemClicked(GameObject cardGameObject)
@@ -326,7 +327,7 @@ public class BattleManager : MonoSingleton<BattleManager>
             return;
         }
         // 从 env 的 list 中移除卡
-        // StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/swing-whoosh-5-198498",startTime:0f));
+        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/deal_cards",startTime:0f));
         StartCoroutine(VFXStackHelper.PlayAppearDisappearVFX(cardGO:cardGO, envListIndex:envListIndex));
         PhaseManager.Instance.SetGamePhase(GamePhase.playerEnd);
     }
@@ -369,7 +370,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
 
         PData.Instance.SetPlayerHP(PData.Instance.playerHealth - damage);
-        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(joeyImage: joeyImage, defenceCardGO: defenceGO, damage: damage));
+        StartCoroutine(VFXStackHelper.PlayDamageToPlayerVFX(defenceCardGO: defenceGO, damage: damage));
 
     }
 
@@ -462,6 +463,7 @@ public class BattleManager : MonoSingleton<BattleManager>
     {
         // 加载所有卡牌数据
         GData.Instance.LoadAll();
+        StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/shuffle_cards",startTime:0f));
 
         // Set player health for tutorial levels (1-3) from CSV config
         if (level >= 1 && level <= 4)
