@@ -103,11 +103,10 @@ public class BattleManager : MonoSingleton<BattleManager>
             Debug.LogError("UseAttack: attakCard 为空");
             return;
         }
-        
+        EffectRunner.Instance.Raise(CardTrigger.OnPlay, source: attakCardGameObject);
         // GameEvents.RaiseAttackInitiated(attakCardGameObject, targetCardGameObject);
+        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,-1,true));
         
-        int attackValue = attakCard.card.attack;
-        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,true));
     }
     
     public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack,Dictionary<string,object> extra=null)
@@ -140,7 +139,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         }
         EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, source: attackerCardGO, target: enemyCardGO, value: damage, extra: extra);
 
-        if (monsterAttack)
+        if (monsterAttack && enemyCard.card.health > 0)
         {
             StartCoroutine(VFX.PlayMonsterHit(cardGO:enemyCardGO));
 
