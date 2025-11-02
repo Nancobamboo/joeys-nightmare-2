@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class BattleManager : MonoSingleton<BattleManager>
 {
     public int level =1 ;// 关卡等级
+    public int mode = 0; // 模式 : 0-教学, 1-解密, 2-肉鸽,3-测试
     public List<Transform> envPanels = new List<Transform>();
     public List<List<GameObject>> envCardListList = new List<List<GameObject>>();
     public Transform attackPanel;
@@ -93,24 +94,23 @@ public class BattleManager : MonoSingleton<BattleManager>
     public void UseAttack(GameObject attakCardGameObject,GameObject targetCardGameObject)
     {
         var attakCard = attakCardGameObject.GetComponent<CardDisplay>();
-        var targetCard = targetCardGameObject.GetComponent<CardDisplay>();
-        if (attakCard == null || targetCard == null)
+        if (attakCard == null)
         {
-            Debug.LogError("UseAttack: attakCard 或 targetCard 为空");
+            Debug.LogError("UseAttack: attakCard 为空");
             return;
         }
         
-        GameEvents.RaiseAttackInitiated(attakCardGameObject, targetCardGameObject);
+        // GameEvents.RaiseAttackInitiated(attakCardGameObject, targetCardGameObject);
         
         int attackValue = attakCard.card.attack;
-        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,false));
+        StartCoroutine(VFX.PlayHit(attakCardGameObject,targetCardGameObject,attackValue,true));
     }
     
-    public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack)
+    public void OnAttackPre(GameObject attackerCardGO,GameObject targetCardGO,int damage,bool monsterAttack,Dictionary<string,object> extra=null)
     {
-        ApplyDamageToEnemy(enemy:targetCardGO, damage:damage,monsterAttack:monsterAttack);
+        ApplyDamageToEnemy(enemy:targetCardGO, damage:damage,monsterAttack:monsterAttack,attackerCardGO:attackerCardGO,extra:extra);
     }
-    public void ApplyDamageToEnemy(GameObject enemy, int damage,bool monsterAttack=false)
+    public void ApplyDamageToEnemy(GameObject enemy, int damage,bool monsterAttack=false,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
     {
         var targetCard = enemy.GetComponent<CardDisplay>();
         if (targetCard == null || targetCard.card == null) return;
@@ -118,31 +118,29 @@ public class BattleManager : MonoSingleton<BattleManager>
         targetCard.card.health -= damage;
         if (targetCard.card.health < 0) targetCard.card.health = 0;
         targetCard.ShowCard();
-        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage, monsterAttack:monsterAttack));
+        StartCoroutine(VFXStackHelper.PlayDamageVFX(cardGO:enemy, damage:damage, monsterAttack:monsterAttack,attackerCardGO:attackerCardGO,extra:extra));
     }
 
-    public void OnDamageComplete(GameObject enemy,bool monsterAttack=false)
+    public void OnDamageComplete(GameObject enemyCardGO,bool monsterAttack=false,int damage=0,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
     {
-        SettlementEnemy(enemy,monsterAttack);
+        SettlementEnemy(enemyCardGO,monsterAttack,damage,attackerCardGO,extra);
     }
 
-    public void SettlementEnemy(GameObject enemy,bool monsterAttack=false)
+    public void SettlementEnemy(GameObject enemyCardGO,bool monsterAttack=false,int damage=0,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
     {
-        var enemyCard = enemy.GetComponent<CardDisplay>();
+        var enemyCard = enemyCardGO.GetComponent<CardDisplay>();
         if (enemyCard.card.health <= 0)
         {
-            GameEvents.RaiseCardFinished(cardGO:enemy);
-            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: null, target: enemy);
+            GameEvents.RaiseCardFinished(cardGO:enemyCardGO);
+            EffectRunner.Instance.Raise(CardTrigger.OnKill, source: attackerCardGO, target: enemyCardGO);
         }
-        else 
+        EffectRunner.Instance.Raise(CardTrigger.OnDealDamage, source: attackerCardGO, target: enemyCardGO, value: damage, extra: extra);
+         
+
+        if (monsterAttack)
         {
-            if (!monsterAttack)
-            {
-                if (!DoubleAttack_OnPlay.IsInDoubleAttackSequence())
-                {
-                    StartCoroutine(VFX.PlayMonsterHit(cardGO:enemy));
-                }
-            }
+            StartCoroutine(VFX.PlayMonsterHit(cardGO:enemyCardGO));
+
         }
     }
 
@@ -420,7 +418,7 @@ public class BattleManager : MonoSingleton<BattleManager>
         GData.Instance.LoadAll();
         
         // Set player health for tutorial levels (1-3) from CSV config
-        if (level >= 1 && level <= 3)
+        if (level >= 1 && level <= 4)
         {
             var playerData = GData.Instance.GetTutorialPlayerData(level);
             if (playerData.HasValue)
@@ -449,7 +447,7 @@ public class BattleManager : MonoSingleton<BattleManager>
 
         // Tutorial levels (1-3) use CSV config equipment deck
         Dictionary<string, List<string>> equipmentDeck;
-        if (level >= 1 && level <= 3)
+        if (level >= 1 && level <= 4)
         {
             // Load tutorial deck from CSV
             equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(level);

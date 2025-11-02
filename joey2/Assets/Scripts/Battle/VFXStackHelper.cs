@@ -123,7 +123,7 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage,bool monsterAttack=false)
+    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage,bool monsterAttack=false,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
     {
         if (cardGO == null) yield break;
         // 获取Canvas
@@ -218,7 +218,7 @@ public static class VFXStackHelper
         {
             Object.Destroy(damageInstance);
         }
-        GameEvents.RaiseDamageComplete(cardGO,monsterAttack);
+        GameEvents.RaiseDamageComplete(enemyCardGO:cardGO,monsterAttack:monsterAttack,damage:damage,attackerCardGO:attackerCardGO,extra:extra);
 
 
     }
@@ -324,9 +324,16 @@ public static class VFXStackHelper
                 break;
             case "monster":
                 int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:BattleManager.Instance.envCardListList);
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
-                UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
-                BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                if (envListIndex >= 0 && envListIndex < BattleManager.Instance.envCardListList.Count)
+                {
+                    CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                    UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
+                    BattleManager.Instance.UpdatePlayerAttackAndDefence();
+                }
+                else
+                {
+                    Debug.LogError($"FinshCardVFX: 无法找到怪物卡牌 {cardGO.name} 的环境列表索引 (envListIndex={envListIndex})");
+                }                
                 break;
             default:
                 Debug.LogError("FinshCardVFX: 未知的位置");

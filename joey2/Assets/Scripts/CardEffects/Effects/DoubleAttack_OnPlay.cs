@@ -21,7 +21,7 @@ public class DoubleAttack_OnPlay : ICardEffect
         {
             GameEvents.OnAttackInitiated += OnAttackInitiated;
             GameEvents.OnAttackPreFinish += OnAttackPreFinish;
-            GameEvents.OnDamageComplete += OnDamageComplete;
+            // GameEvents.OnDamageComplete += OnDamageComplete;
             isSubscribed = true;
         }
         
