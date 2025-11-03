@@ -49,14 +49,14 @@ public class CardEvents : MonoBehaviour, IPointerDownHandler,IPointerEnterHandle
 
         var cd = GetCardDisplay();
         // Debug.Log($"CardClick: {id}");
-        if (cd.card.state == CardState.Active)
+        if (cd.card.state != CardState.Active)
         {
-            // Debug.Log($"CardClick: {cd.card.id}");
-            GameEvents.RaiseCardClicked(cd.gameObject); // 广播全局事件
+            return;
+            
         }
         else
         {
-            Debug.LogError("ClickCard: 未知的状态");
+            GameEvents.RaiseCardClicked(cd.gameObject); // 广播全局事件
         }
 
     }

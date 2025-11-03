@@ -349,8 +349,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/Defence",startTime:0f));
             defenceValue = defenceGO.GetComponent<CardDisplay>().card.defence;
+            EffectRunner.Instance.Raise(CardTrigger.UseDefence, source: defenceGO, target: attackGO);
         }
-        EffectRunner.Instance.Raise(CardTrigger.UseDefence, source: defenceGO, target: attackGO);
+        
 
         int attackValue = attackGO.GetComponent<CardDisplay>().card.attack;
         int damage = 0;
