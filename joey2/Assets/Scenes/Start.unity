@@ -1405,6 +1405,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIStart
       objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1056335579}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LoadBattleScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: StartScene, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475627864679115846, guid: a8e499f9740ec774c8d86b257c21ac79, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
