@@ -29,7 +29,7 @@
 ,,,,,,,,,,
 ,,,,,,,,,,
 4000,Art/Img/Skill/img_card_double,技能牌,skill     ,"点击使用：下次使用攻击牌时会攻击两次",0,0,0,0,2,DoubleAttack_OnPlay
-4001,Art/Img/img_card_attrack_01,连击       ,skill     ,点击使用：下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay
+4001,Art/Img/Skill/img_card_double,连击       ,skill     ,点击使用：下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay
 4002,Art/Img/img_card_attrack_01,痛击       ,skill     ,下次攻击使怪物处于两层易伤效果,0,0,0,0,1,
 4003,Art/Img/img_card_attrack_01,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
 4004,Art/Img/img_card_attrack_01,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,

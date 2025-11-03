@@ -15,7 +15,7 @@ level,type,cardIds
 4,defence,
 4,skill,
 4,item,
-5,attack,1007
+5,attack,1006;1007
 5,defence,2004;2003
-5,skill,3001
-5,item,3003
+5,item,3001;3003
+5,skill,4001
