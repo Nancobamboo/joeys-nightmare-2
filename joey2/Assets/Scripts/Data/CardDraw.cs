@@ -100,8 +100,8 @@ public sealed class CardDraw : PureSingleton<CardDraw>
 
     public List<List<string>> DrawCardEnv(int level)
     {
-        // Tutorial levels (1-3) use CSV config
-        if (level >= 1 && level <= 4)
+        // Tutorial levels (1-5) use CSV config
+        if (level >= 1 && level <= 5)
         {
             LoadTutorialEnvDeck();
             if (_tutorialEnvDeckCache.ContainsKey(level))
