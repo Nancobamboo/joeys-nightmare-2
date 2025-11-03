@@ -23,7 +23,7 @@
 ,,,,,,,,,,
 3000,Art/Img/Item/img_card_Blood_bottle,道具牌,item   ,点击使用：恢复10点生命值,0,0,0,0,2,HealPlayer_OnPlay:10
 3001,Art/Img/Item/img_card_Blood_bottle,小血瓶  ,item   ,点击使用：恢复10点生命值,0,0,0,0,2,HealPlayer_OnPlay:10
-3002,Art/Img/Item/img_card_Boom,炸弹,item   ,点击使用：对随机敌人及两侧目标各造成10点伤害,,,,,3,Boom_OnPlay:10
+3002,Art/Img/Item/img_card_Boom,炸弹,item   ,点击使用：对随机敌人及两侧目标造成10点伤害,,,,,3,Boom_OnPlay:10
 3003,Art/Img/Item/img_card_HookLock,钩索,item        ,点击使用：从弃牌堆随机抽一张武器牌置入手牌,,,,,2,HookEquipWeaponFromDiscard_OnPlay
 ,,,,,,,,,,
 ,,,,,,,,,,
