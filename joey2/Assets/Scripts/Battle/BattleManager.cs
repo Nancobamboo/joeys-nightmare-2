@@ -262,7 +262,8 @@ public class BattleManager : MonoSingleton<BattleManager>
 
     public void OnBagDefenceClicked(GameObject cardGameObject)
     {
-        // Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+        Debug.Log($"OnBagDefenceClicked: {cardGameObject.name}");
+        Debug.Log($"OnBagDefenceClicked: {cardGameObject.GetComponent<CardDisplay>().card.state}");
     }
 
     public void OnBagSkillClicked(GameObject cardGameObject)
@@ -348,8 +349,9 @@ public class BattleManager : MonoSingleton<BattleManager>
         {
             SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/Defence",startTime:0f));
             defenceValue = defenceGO.GetComponent<CardDisplay>().card.defence;
+            EffectRunner.Instance.Raise(CardTrigger.UseDefence, source: defenceGO, target: attackGO);
         }
-        EffectRunner.Instance.Raise(CardTrigger.UseDefence, source: defenceGO, target: attackGO);
+        
 
         int attackValue = attackGO.GetComponent<CardDisplay>().card.attack;
         int damage = 0;
