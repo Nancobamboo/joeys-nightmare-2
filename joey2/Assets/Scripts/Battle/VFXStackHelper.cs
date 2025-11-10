@@ -83,25 +83,25 @@ public static class VFXStackHelper
         switch (cardGO.GetComponent<CardDisplay>().card.type)
         {
             case "attack":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.attackCardList, state:CardState.Active, position:CardPosition.Bag);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.envCardListList[envListIndex], toCardList: BattleManager.Instance.attackCardList, state: CardState.Active, position: CardPosition.Bag);
                 cardGO.transform.SetParent(BattleManager.Instance.attackPanel);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.attackPanel);
                 break;
             case "defence":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.defenceCardList, state:CardState.Active, position:CardPosition.Bag);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.envCardListList[envListIndex], toCardList: BattleManager.Instance.defenceCardList, state: CardState.Active, position: CardPosition.Bag);
                 cardGO.transform.SetParent(BattleManager.Instance.defencePanel);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.defencePanel);
                 break;
             case "skill":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.skillCardList, state:CardState.Active, position:CardPosition.Bag);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.envCardListList[envListIndex], toCardList: BattleManager.Instance.skillCardList, state: CardState.Active, position: CardPosition.Bag);
                 cardGO.transform.SetParent(BattleManager.Instance.skillPanel);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.skillPanel);
                 break;
             case "item":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.itemCardList, state:CardState.Active, position:CardPosition.Bag);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.envCardListList[envListIndex], toCardList: BattleManager.Instance.itemCardList, state: CardState.Active, position: CardPosition.Bag);
                 cardGO.transform.SetParent(BattleManager.Instance.itemPanel);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.itemPanel);
@@ -126,16 +126,16 @@ public static class VFXStackHelper
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
-            
+
             // 使用缓动函数（EaseOutQuad）
             float easeT = 1f - (1f - t) * (1f - t);
-            
+
             // 插值位置
             flyingCard.transform.position = Vector3.Lerp(startWorldPosition, targetWorldPosition, easeT);
-            
+
             // 插值缩放
             flyingCard.transform.localScale = Vector3.Lerp(startScale, targetScale, easeT);
-            
+
             yield return null;
         }
         // 确保最终位置准确
@@ -148,7 +148,7 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage,bool monsterAttack=false,GameObject attackerCardGO=null,Dictionary<string,object> extra=null)
+    public static IEnumerator PlayDamageVFX(GameObject cardGO, int damage, bool monsterAttack = false, GameObject attackerCardGO = null, Dictionary<string, object> extra = null)
     {
         if (cardGO == null) yield break;
         // 获取Canvas
@@ -173,13 +173,13 @@ public static class VFXStackHelper
         }
 
         // 2. 展示伤害数字
-        BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:cardGO.transform,localPositionShift:new Vector3(0f, 180f, 0),damage:damage));
+        BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform: cardGO.transform, localPositionShift: new Vector3(0f, 180f, 0), damage: damage));
 
         // 4. 播放受击特效
         GameObject vfxPrefab = Resources.Load<GameObject>("VFX/VFX_Shouji");
         GameObject vfxInstance = Object.Instantiate(vfxPrefab, canvas.transform);
         vfxInstance.transform.position = cardGO.transform.position; // 使用相同的坐标设置方式
-        
+
         // 5. 播放震动特效
         if (CameraShake.Instance != null)
         {
@@ -190,14 +190,14 @@ public static class VFXStackHelper
         {
             Debug.LogWarning("PlayDamageVFX: CameraShake.Instance is null");
         }
-        
-        
+
+
         yield return new WaitForSeconds(1f);
         if (vfxInstance != null)
         {
             Object.Destroy(vfxInstance);
         }
-        GameEvents.RaiseDamageComplete(enemyCardGO:cardGO,monsterAttack:monsterAttack,damage:damage,attackerCardGO:attackerCardGO,extra:extra);
+        GameEvents.RaiseDamageComplete(enemyCardGO: cardGO, monsterAttack: monsterAttack, damage: damage, attackerCardGO: attackerCardGO, extra: extra);
 
 
     }
@@ -208,7 +208,7 @@ public static class VFXStackHelper
         PData.Instance.canOperate = false;
         // 获取Canvas
         Canvas canvas = BattleManager.Instance.joeyImage.GetComponentInParent<Canvas>();
-        GameObject vfxInstance=null;
+        GameObject vfxInstance = null;
 
         if (damage > 0)
         {
@@ -224,7 +224,7 @@ public static class VFXStackHelper
             }
 
             // 3. 展示伤害数字
-            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:BattleManager.Instance.joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform: BattleManager.Instance.joeyImage.transform, localPositionShift: new Vector3(100f, 190f, 0), damage: damage));
             // 4. 播放屏幕震动
             BattleManager.Instance.StartCoroutine(CameraShake.Instance.ShakeLight());
             yield return new WaitForSeconds(0.6f);
@@ -239,18 +239,18 @@ public static class VFXStackHelper
 
             // 1.5 盾牌受击动画
             yield return VFX.PlayAnimator(defenceCardGO, "UI_Carditem_dunpai");
-            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform:BattleManager.Instance.joeyImage.transform,localPositionShift:new Vector3(100f, 190f, 0),damage:damage));
+            BattleManager.Instance.StartCoroutine(VFXDamageHelper.PlayDamageVFX(transform: BattleManager.Instance.joeyImage.transform, localPositionShift: new Vector3(100f, 190f, 0), damage: damage));
             yield return new WaitForSeconds(0.4f);
-            
+
 
         }
-        
+
         PData.Instance.canOperate = true;
 
         // 触发伤害完成事件
         GameEvents.RaiseDamageToPlayerComplete();
         GameEvents.RaiseCardFinished(defenceCardGO);
-        
+
         // Check if player is dead and trigger game over event
         if (PData.Instance.playerHealth <= 0)
         {
@@ -259,7 +259,7 @@ public static class VFXStackHelper
     }
 
 
-    public static IEnumerator FinshCardVFX(GameObject cardGO,float delay=0f)
+    public static IEnumerator FinshCardVFX(GameObject cardGO, float delay = 0f)
     {
         if (cardGO == null) yield break;
         yield return new WaitForSeconds(delay);
@@ -279,32 +279,32 @@ public static class VFXStackHelper
         switch (cd.card.type)
         {
             case "attack":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.attackCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.attackCardList, toCardList: BattleManager.Instance.usedCardList, state: CardState.Used, position: CardPosition.Used);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.attackPanel);
                 BattleManager.Instance.UpdatePlayerAttackAndDefence();
                 break;
             case "defence":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.defenceCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.defenceCardList, toCardList: BattleManager.Instance.usedCardList, state: CardState.Used, position: CardPosition.Used);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.defencePanel);
                 BattleManager.Instance.UpdatePlayerAttackAndDefence();
                 break;
             case "skill":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.skillCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.skillCardList, toCardList: BattleManager.Instance.usedCardList, state: CardState.Used, position: CardPosition.Used);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.skillPanel);
                 BattleManager.Instance.UpdatePlayerAttackAndDefence();
                 break;
             case "item":
-                CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.itemCardList, toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.itemCardList, toCardList: BattleManager.Instance.usedCardList, state: CardState.Used, position: CardPosition.Used);
                 UIGridHelper.RefreshPanel(BattleManager.Instance.itemPanel);
                 BattleManager.Instance.UpdatePlayerAttackAndDefence();
                 break;
             case "monster":
-                SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath:"Audio/SFX/Battle/MonsterFly",startTime:0.55f));
+                SFX.Instance.StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/Battle/MonsterFly", startTime: 0.55f));
                 string monsterId = cd.card != null ? cd.card.id : null;
-                int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO:cardGO, envCardListList:BattleManager.Instance.envCardListList);
+                int envListIndex = UIGridHelper.FindEnvListIndexByCardGO(cardGO: cardGO, envCardListList: BattleManager.Instance.envCardListList);
                 if (envListIndex >= 0 && envListIndex < BattleManager.Instance.envCardListList.Count)
                 {
-                    CardHelper.MoveCard(cardGO:cardGO, fromCardList:BattleManager.Instance.envCardListList[envListIndex], toCardList:BattleManager.Instance.usedCardList, state:CardState.Used, position:CardPosition.Used);
+                    CardHelper.MoveCard(cardGO: cardGO, fromCardList: BattleManager.Instance.envCardListList[envListIndex], toCardList: BattleManager.Instance.usedCardList, state: CardState.Used, position: CardPosition.Used);
                     UIGridHelper.RefreshPanel(BattleManager.Instance.envPanels[envListIndex]);
                     BattleManager.Instance.UpdatePlayerAttackAndDefence();
 
@@ -316,7 +316,7 @@ public static class VFXStackHelper
                 else
                 {
                     Debug.LogError($"FinshCardVFX: 无法找到怪物卡牌 {cardGO.name} 的环境列表索引 (envListIndex={envListIndex})");
-                }                
+                }
                 break;
             default:
                 Debug.LogError("FinshCardVFX: 未知的位置");

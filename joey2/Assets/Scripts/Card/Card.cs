@@ -4,16 +4,16 @@ using UnityEngine;
 
 public enum CardState
 {
-    Default,Active,Inactive,Used
+    Default, Active, Inactive, Used
 }
 
 public enum CardPosition
 {
-    Default,Deck,Sell,Buy,Env,Bag,Used
+    Default, Deck, Sell, Buy, Env, Bag, Used
 }
 
 
-public class Card 
+public class Card
 {
     public string id;
     public string type;
@@ -36,8 +36,9 @@ public class Card
     public CardPosition position;
     public CardPosition lastPosition;
     public List<string> effectIds = new List<string>();
+    public int UniqueId;
 
-    public  Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, List<string> _effectIds)
+    public Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, List<string> _effectIds)
     {
         this.id = _id;
         this.type = _type;
@@ -95,7 +96,7 @@ public class Card
             {
                 this.cardFrame = "Art/UI/bg_card_golden";
             }
-            else 
+            else
             {
                 Debug.LogError("Card stars is not valid: " + _stars);
                 this.cardFrame = null;
@@ -106,6 +107,7 @@ public class Card
         this.lastState = CardState.Default;
         this.position = CardPosition.Default;
         this.lastPosition = CardPosition.Default;
+        this.UniqueId = 0;
     }
     public void SetState(CardState state)
     {
@@ -125,7 +127,21 @@ public class Card
     }
     public Card Clone()
     {
-        var c =  new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
+        var c = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
         return c;
+    }
+
+    public ECardType GetCardType()
+    {
+        return (ECardType)System.Enum.Parse(typeof(ECardType), type);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+        }
     }
 }

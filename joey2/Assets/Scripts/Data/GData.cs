@@ -14,7 +14,7 @@ public sealed class GData : PureSingleton<GData>
 
 	// 路径策略（简单直观）
 	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
-	// private string LibraryCsvPath = "Data/library_data";
+													 // private string LibraryCsvPath = "Data/library_data";
 	private string DeckCsvPath = "Data/deck_data";
 	private string TutorialEquipmentDeckCsvPath = "Data/tutorial_equipment_deck";
 	private string TutorialPlayerDataCsvPath = "Data/tutorial_player_data";
@@ -22,12 +22,12 @@ public sealed class GData : PureSingleton<GData>
 	private bool _tutorialEquipmentDeckLoaded = false;
 	private Dictionary<int, (int health, int maxHealth)> _tutorialPlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool _tutorialPlayerDataLoaded = false;
-    private bool _cardsLoaded = false;
-    // private bool _libraryLoaded = false;
-    private bool _deckLoaded = false;
-    private System.DateTime _cardsMTime = System.DateTime.MinValue;
-    // private System.DateTime _libraryMTime = System.DateTime.MinValue;
-    private System.DateTime _deckMTime = System.DateTime.MinValue;
+	private bool _cardsLoaded = false;
+	// private bool _libraryLoaded = false;
+	private bool _deckLoaded = false;
+	private System.DateTime _cardsMTime = System.DateTime.MinValue;
+	// private System.DateTime _libraryMTime = System.DateTime.MinValue;
+	private System.DateTime _deckMTime = System.DateTime.MinValue;
 	// 一键加载/保存
 	public void LoadAll(bool force = false)
 	{
@@ -46,15 +46,15 @@ public sealed class GData : PureSingleton<GData>
 	// ---------------- 卡牌数据（原 Store 的纯 C# 版本） ----------------
 	public void LoadCards(bool force = false)
 	{
-        if (!force && _cardsLoaded && !FileChanged(CardCsvPath, ref _cardsMTime)) return;
+		if (!force && _cardsLoaded && !FileChanged(CardCsvPath, ref _cardsMTime)) return;
 		CardDict.Clear();
 		var ta = Resources.Load<TextAsset>(CardCsvPath);
-        // Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
-        var lines = ta.text.Split('\n');
-        // Debug.Log($"Lines: {lines.Length}");
-        if (lines.Length == 0) { _cardsLoaded = true; return; }
-        // Debug.Log($"Lines: {lines[0]}");
-        // 解析表头索引
+		// Debug.Log($"CardCsvPath: {CardCsvPath}, ta: {ta}, text: {ta.text}");
+		var lines = ta.text.Split('\n');
+		// Debug.Log($"Lines: {lines.Length}");
+		if (lines.Length == 0) { _cardsLoaded = true; return; }
+		// Debug.Log($"Lines: {lines[0]}");
+		// 解析表头索引
 		var header = lines[0].Split(',');
 		var idx = new Dictionary<string, int>();
 		for (int i = 0; i < header.Length; i++)
@@ -71,19 +71,19 @@ public sealed class GData : PureSingleton<GData>
 		int DefenceIdx = idx.ContainsKey("defence") ? idx["defence"] : -1;
 		int HealthIdx = idx.ContainsKey("health") ? idx["health"] : -1;
 		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
-        int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
-        int EffectIdsIdx = idx.ContainsKey("effectIds") ? idx["effectIds"] : -1;
+		int StarsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
+		int EffectIdsIdx = idx.ContainsKey("effectIds") ? idx["effectIds"] : -1;
 
-        // Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
+		// Debug.Log($"IdIdx: {IdIdx}, CardImageIdx: {CardImageIdx}, TypeIdx: {TypeIdx}, CardNameIdx: {CardNameIdx}, DescriptionIdx: {DescriptionIdx}, AttackIdx: {AttackIdx}, DefenceIdx: {DefenceIdx}, HealthIdx: {HealthIdx}, PriceIdx: {PriceIdx}, StarsIdx: {StarsIdx}");
 
 		for (int i = 1; i < lines.Length; i++)
 		{
 			var line = lines[i];
-			if (string.IsNullOrWhiteSpace(line) ) continue;
+			if (string.IsNullOrWhiteSpace(line)) continue;
 
 			// Parse CSV line handling quoted fields
 			var values = ParseCSVLine(line);
-            if (values == null || values.Length == 0 || string.IsNullOrEmpty(values[0])) continue;
+			if (values == null || values.Length == 0 || string.IsNullOrEmpty(values[0])) continue;
 			// 取值函数
 			string Get(int index)
 			{
@@ -99,34 +99,34 @@ public sealed class GData : PureSingleton<GData>
 				Debug.LogWarning($"[GData] 第 {i} 行无法解析整数值: '{value}', 使用默认值 {defaultValue}");
 				return defaultValue;
 			}
-            string id = Get(IdIdx);
-            string cardImage = Get(CardImageIdx);
-            string type = Get(TypeIdx);
-            string cardName = Get(CardNameIdx);
-            string description = Get(DescriptionIdx);
-            int attack = GetInt(AttackIdx, 0);
-            int defence = GetInt(DefenceIdx, 0);
-            int health = GetInt(HealthIdx, 0);
-            int price = GetInt(PriceIdx, 0);
-            int stars = GetInt(StarsIdx, 0);
-            List<string> effectIds = new List<string>();
-            if (EffectIdsIdx >= 0)
-            {
-                string eff = Get(EffectIdsIdx);
-                var parts = eff.Split(new char[]{';','|'}, System.StringSplitOptions.RemoveEmptyEntries);
-                for (int k = 0; k < parts.Length; k++)
-                {
-                    var eid = parts[k].Trim();
-                    if (!string.IsNullOrEmpty(eid)) effectIds.Add(eid);
-                }
-            }
+			string id = Get(IdIdx);
+			string cardImage = Get(CardImageIdx);
+			string type = Get(TypeIdx);
+			string cardName = Get(CardNameIdx);
+			string description = Get(DescriptionIdx);
+			int attack = GetInt(AttackIdx, 0);
+			int defence = GetInt(DefenceIdx, 0);
+			int health = GetInt(HealthIdx, 0);
+			int price = GetInt(PriceIdx, 0);
+			int stars = GetInt(StarsIdx, 0);
+			List<string> effectIds = new List<string>();
+			if (EffectIdsIdx >= 0)
+			{
+				string eff = Get(EffectIdsIdx);
+				var parts = eff.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+				for (int k = 0; k < parts.Length; k++)
+				{
+					var eid = parts[k].Trim();
+					if (!string.IsNullOrEmpty(eid)) effectIds.Add(eid);
+				}
+			}
 
-            var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
+			var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
 
-            CardDict[id] = card;
+			CardDict[id] = card;
 		}
 		_cardsLoaded = true;
-        Debug.Log("Cards loaded: " + CardDict.Count);
+		Debug.Log("Cards loaded: " + CardDict.Count);
 	}
 
 	// Parse CSV line handling quoted fields with commas
@@ -135,11 +135,11 @@ public sealed class GData : PureSingleton<GData>
 		var values = new List<string>();
 		bool inQuotes = false;
 		string currentValue = "";
-		
+
 		for (int i = 0; i < line.Length; i++)
 		{
 			char c = line[i];
-			
+
 			if (c == '"')
 			{
 				// Toggle quote state, but don't add quote to value
@@ -156,7 +156,7 @@ public sealed class GData : PureSingleton<GData>
 			}
 		}
 		values.Add(currentValue); // Add last value
-		
+
 		return values.ToArray();
 	}
 
@@ -167,6 +167,11 @@ public sealed class GData : PureSingleton<GData>
 		var values = new List<Card>(CardDict.Values);
 		int idx = Random.Range(0, values.Count);
 		return values[idx];
+	}
+
+	public Card GetCardConfigById(string cardId)
+	{
+		return CardDict[cardId];
 	}
 
 	// ---------------- 牌库/卡组（原 ItemData 的纯 C# 版本） ----------------
@@ -201,14 +206,14 @@ public sealed class GData : PureSingleton<GData>
 	private Dictionary<string, List<string>> LoadTypeListCsv(string path)
 	{
 		var dict = new Dictionary<string, List<string>>();
-        var lines = Resources.Load<TextAsset>(path).text.Split('\n');
+		var lines = Resources.Load<TextAsset>(path).text.Split('\n');
 		for (int i = 1; i < lines.Length; i++)
 		{
-			
+
 			var line = lines[i];
 			if (string.IsNullOrWhiteSpace(line)) continue;
 			var values = line.Split(',');
-            if (string.IsNullOrEmpty(values[0])) continue;
+			if (string.IsNullOrEmpty(values[0])) continue;
 			if (values.Length < 2) continue;
 			var id = values[0].Trim();
 			var type = values[1].Trim();
@@ -250,26 +255,26 @@ public sealed class GData : PureSingleton<GData>
 			Debug.LogError("保存 CSV 失败: " + path + " => " + e.Message);
 		}
 	}
-    private bool FileChanged(string path, ref System.DateTime cachedTime)
-    {
-        var t = SafeGetWriteTime(path);
-        if (t != cachedTime)
-        {
-            cachedTime = t;
-            return true; // 变了，需要重载
-        }
-        return false; // 没变，跳过
-    }
-    private System.DateTime SafeGetWriteTime(string path)
-    {
-        return File.Exists(path) ? File.GetLastWriteTimeUtc(path) : System.DateTime.MinValue;
-    }
+	private bool FileChanged(string path, ref System.DateTime cachedTime)
+	{
+		var t = SafeGetWriteTime(path);
+		if (t != cachedTime)
+		{
+			cachedTime = t;
+			return true; // 变了，需要重载
+		}
+		return false; // 没变，跳过
+	}
+	private System.DateTime SafeGetWriteTime(string path)
+	{
+		return File.Exists(path) ? File.GetLastWriteTimeUtc(path) : System.DateTime.MinValue;
+	}
 
 	// ---------------- 教程装备卡组 ---------------- 
 	public void LoadTutorialEquipmentDeck(bool force = false)
 	{
 		if (!force && _tutorialEquipmentDeckLoaded) return;
-		
+
 		_tutorialEquipmentDeckCache.Clear();
 		var ta = Resources.Load<TextAsset>(TutorialEquipmentDeckCsvPath);
 		if (ta == null)
@@ -355,7 +360,7 @@ public sealed class GData : PureSingleton<GData>
 	public void LoadTutorialPlayerData(bool force = false)
 	{
 		if (!force && _tutorialPlayerDataLoaded) return;
-		
+
 		_tutorialPlayerDataCache.Clear();
 		var ta = Resources.Load<TextAsset>(TutorialPlayerDataCsvPath);
 		if (ta == null)
