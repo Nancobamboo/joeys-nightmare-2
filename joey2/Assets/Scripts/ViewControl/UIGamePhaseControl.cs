@@ -310,13 +310,13 @@ public class UIGamePhaseControl : YViewControl
 		int damage = attackCard.currentAttack;
 		for (int i = 0; i < attackCount; i++)
 		{
-			attackCardControl.CardEffect.OnDealDamage();
+			attackCardControl.CardEffect?.OnDealDamage();
 			enemyCardControl.CallCardTakeDamage(damage);
-			enemyCardControl.CardEffect.OnTakeDamage();
+			enemyCardControl.CardEffect?.OnTakeDamage();
 
 			if (enemyCardControl.Card.currentHealth <= 0)
 			{
-				enemyCardControl.CardEffect.OnKill();
+				enemyCardControl.CardEffect?.OnKill();
 				enemyCardControl.Return();
 				break;
 			}
