@@ -18,6 +18,7 @@ public class UIGamePhaseControl : YViewControl
 	private Dictionary<int, List<UICardSimpleControl>> m_EnvCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private static int UniqueIdGen = 0;
+	private DataJoeyPlayer m_DataJoeyPlayer;
 
 	public static EResType GetResType()
 	{
@@ -28,13 +29,14 @@ public class UIGamePhaseControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIGamePhaseView>();
+		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
 		RegistAction(EActionId.AppHp, AppHp);
 		RegistAction(EActionId.AppAttack, AppAttack);
 		RegistAction(EActionId.AppDefence, AppDefence);
 		RegistAction(EActionId.RemoveCard, RemoveCard);
 		RegistAction(EActionId.MoveCard, MoveCard);
-		RegistAction(EActionId.TakeEnemy, TakeEnemy);
-		RegistAction(EActionId.TakePlayerEnemy, TakePlayerEnemy);
+		RegistAction(EActionId.TakeEnemyDamage, TakeEnemyDamage);
+		RegistAction(EActionId.TakePlayerDamage, TakePlayerDamage);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -61,30 +63,27 @@ public class UIGamePhaseControl : YViewControl
 	void AppHp(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
-		PData.Instance.playerHealth += delta;
-		OnHPChanged(PData.Instance.playerHealth);
+		m_DataJoeyPlayer.playerHealth += delta;
+		OnHPChanged(m_DataJoeyPlayer.playerHealth);
 	}
 
 	void AppAttack(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
-		PData.Instance.playerAttack += delta;
-		OnAttackChanged(PData.Instance.playerAttack);
+		m_DataJoeyPlayer.playerAttack += delta;
+		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 	}
 
 	void AppDefence(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
-		PData.Instance.playerDefence += delta;
-		OnDefenceChanged(PData.Instance.playerDefence);
+		m_DataJoeyPlayer.playerDefence += delta;
+		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
 	}
 
 	public void SetData()
 	{
-		m_View.TextHeart.text = PData.Instance.playerHealth.ToString();
-		m_View.AttackNum.text = PData.Instance.playerAttack.ToString();
-		m_View.DefenceNum.text = PData.Instance.playerDefence.ToString();
-		m_View.TxtCoin.text = "0";
+		RefreshView();
 
 		m_EnvPanels.Clear();
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
@@ -95,6 +94,14 @@ public class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	private void RefreshView()
+	{
+		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
+		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
+		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
+		m_View.TxtCoin.text = "0";
+	}
+
 	public void ChangeJoeyImage()
 	{
 		StartCoroutine(ChangeJoeyImageCoroutine());
@@ -102,15 +109,15 @@ public class UIGamePhaseControl : YViewControl
 
 	IEnumerator ChangeJoeyImageCoroutine()
 	{
-		if (PData.Instance.playerHealth < PData.Instance.lastPlayerHealth)
+		if (m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.lastPlayerHealth)
 		{
 			m_View.JoeyImage.sprite = sadSprite;
 		}
-		else if (PData.Instance.playerHealth > PData.Instance.lastPlayerHealth)
+		else if (m_DataJoeyPlayer.playerHealth > m_DataJoeyPlayer.lastPlayerHealth)
 		{
 			m_View.JoeyImage.sprite = happySprite;
 		}
-		else if (PData.Instance.playerHealth <= 0)
+		else if (m_DataJoeyPlayer.playerHealth <= 0)
 		{
 			m_View.JoeyImage.sprite = deathSprite;
 		}
@@ -294,25 +301,56 @@ public class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	void TakeEnemy(object[] paraArray)
+	void TakeEnemyDamage(object[] paraArray)
 	{
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[0];
-
+		int attackCount = (int)paraArray[1];
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
-		if (attackCardControl != null)
+		Card attackCard = attackCardControl.Card;
+		int damage = attackCard.currentAttack;
+		for (int i = 0; i < attackCount; i++)
 		{
-			Card attackCard = attackCardControl.Card;
-			int damage = attackCard.currentAttack;
-
+			attackCardControl.CardEffect.OnDealDamage();
 			enemyCardControl.CallCardTakeDamage(damage);
+			enemyCardControl.CardEffect.OnTakeDamage();
 
-			RemoveBagCard(ECardType.attack, attackCardControl);
-			attackCardControl.gameObject.SetActive(false);
+			if (enemyCardControl.Card.currentHealth <= 0)
+			{
+				enemyCardControl.CardEffect.OnKill();
+				enemyCardControl.Return();
+				break;
+			}
+			else
+			{
+				int enemyAttack = enemyCardControl.Card.currentAttack;
+				YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, enemyAttack);
+			}
 		}
+		RemoveBagCard(ECardType.attack, attackCardControl);
 	}
 
-	void TakePlayerEnemy(object[] paraArray)
+	void TakePlayerDamage(object[] paraArray)
 	{
+		int enemyAttack = (int)paraArray[0];
+		int defenceValue = 0;
+		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
+		if (defenceCardControl != null)
+		{
+			defenceValue = defenceCardControl.Card.currentDefence;
+		}
+		int damage = 0;
+		if (defenceValue < enemyAttack)
+		{
+			damage = enemyAttack - defenceValue;
+		}
+		m_DataJoeyPlayer.playerHealth -= damage;
+		if (m_DataJoeyPlayer.playerHealth < 0)
+		{
+			m_DataJoeyPlayer.playerHealth = 0;
+		}
+		OnHPChanged(m_DataJoeyPlayer.playerHealth);
+		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
+		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
 	}
 
 	protected override void OnReturn()
