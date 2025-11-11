@@ -39,6 +39,7 @@ public class JoeyGameControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<JoeyGameView>();
 		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 
 	void Start()
