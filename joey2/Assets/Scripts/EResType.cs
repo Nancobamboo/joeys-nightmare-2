@@ -7,6 +7,7 @@ public enum EResType
     UICounter,
     UICardSimple,
     UIGamePhase,
+    UIPause,
     UIUpper,
     LevelEnemy,
     SoundEffect,

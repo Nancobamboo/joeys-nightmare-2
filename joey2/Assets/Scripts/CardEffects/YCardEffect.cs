@@ -30,6 +30,7 @@ public enum EEffectType
     Buff,
     Debuff,
     ReflectDamage,
+    LifeSteal,
     Other
 }
 
@@ -77,25 +78,15 @@ public class YCardEffect
     {
     }
 
+    public virtual void OnDead()
+    {
+    }
+
     public virtual void UseDefence()
     {
     }
 
-    public virtual void OnTurnStart_Player()
-    {
-    }
 
-    public virtual void OnTurnEnd_Player()
-    {
-    }
-
-    public virtual void OnTurnStart_Enemy()
-    {
-    }
-
-    public virtual void OnTurnEnd_Enemy()
-    {
-    }
 
     public virtual int GetEffectValue(EEffectType effectType)
     {
@@ -110,6 +101,8 @@ public class YCardEffect
             case EEffectType.Debuff:
                 return 0;
             case EEffectType.ReflectDamage:
+                return 0;
+            case EEffectType.LifeSteal:
                 return 0;
             case EEffectType.Other:
                 return 0;
