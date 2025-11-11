@@ -9,7 +9,7 @@ public enum ECardEffectId
 {
     BounceToRandomEnemy_OnDealDamage,
     ExtraDamage_OnDealDamage,
-    Boom_OnKill,
+    Boom_OnDead,
     DealRandomEnemyEqualToAttack_OnTop,
     DealDamage_UseDefence,
     Boom_OnPlay,

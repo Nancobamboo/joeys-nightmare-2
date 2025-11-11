@@ -170,8 +170,8 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ExtraDamage_OnDealDamage:
 				effect = new YExtraDamage_OnDealDamage(effectValue);
 				break;
-			case ECardEffectId.Boom_OnKill:
-				effect = new YBoom_OnKill(effectValue);
+			case ECardEffectId.Boom_OnDead:
+				effect = new YBoom_OnDead(effectValue);
 				break;
 			case ECardEffectId.DealRandomEnemyEqualToAttack_OnTop:
 				effect = new YDealRandomEnemyEqualToAttack_OnTop();
