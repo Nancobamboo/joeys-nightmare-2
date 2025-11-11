@@ -141,6 +141,11 @@ public class UICardSimpleControl : YViewControl
 
 	public YCardEffect GetCardEffect()
 	{
+		if (cachedCard.effectIds == null || cachedCard.effectIds.Count == 0)
+        {
+			return null;
+		}
+
 		string effectId = cachedCard.effectIds[0];
 		ECardEffectId effectIdEnum = (ECardEffectId)System.Enum.Parse(typeof(ECardEffectId), effectId);
 		int effectValue = cachedCard.effectValues[0];
