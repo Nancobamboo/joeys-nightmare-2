@@ -31,6 +31,7 @@ public enum EEffectType
     Debuff,
     ReflectDamage,
     LifeSteal,
+
     Other
 }
 
@@ -51,6 +52,11 @@ public class YCardEffect
     {
     }
 
+    public virtual void OnEnterBag()
+    {
+
+    }
+
 
     public virtual void OnDealDamage()
     {
@@ -60,16 +66,6 @@ public class YCardEffect
     {
     }
 
-    public async UniTaskVoid DelayStopVFX(float delayTime)
-    {
-        var cts = new CancellationTokenSource();
-        CancelTokenList.Add(cts);
-        await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
-        if (CardControl != null && CardControl.gameObject != null)
-        {
-            CardControl.StopVFX();
-        }
-    }
 
     public virtual void OnKill()
     {
@@ -115,6 +111,18 @@ public class YCardEffect
                 return 0;
         }
     }
+
+    public async UniTaskVoid DelayStopVFX(float delayTime)
+    {
+        var cts = new CancellationTokenSource();
+        CancelTokenList.Add(cts);
+        await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            CardControl.StopVFX();
+        }
+    }
+
 
     public void StopAllEffects()
     {
