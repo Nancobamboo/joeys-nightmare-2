@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public enum ECardEffectId
 {
@@ -37,6 +39,7 @@ public class YCardEffect
 {
     public ECardEffectId Id;
     public UICardSimpleControl CardControl;
+    public List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 
     public void SetData(UICardSimpleControl cardControl)
     {
@@ -57,6 +60,17 @@ public class YCardEffect
 
     public virtual void OnTakeDamage()
     {
+    }
+
+    public async UniTaskVoid DelayStopVFX(float delayTime)
+    {
+        var cts = new CancellationTokenSource();
+        CancelTokenList.Add(cts);
+        await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            CardControl.StopVFX();
+        }
     }
 
     public virtual void OnKill()
@@ -102,6 +116,20 @@ public class YCardEffect
             default:
                 return 0;
         }
+    }
+
+    public void StopAllEffects()
+    {
+        for (int i = 0; i < CancelTokenList.Count; i++)
+        {
+            var cts = CancelTokenList[i];
+            if (cts != null && !cts.IsCancellationRequested)
+            {
+                cts.Cancel();
+                cts.Dispose();
+            }
+        }
+        CancelTokenList.Clear();
     }
 }
 
