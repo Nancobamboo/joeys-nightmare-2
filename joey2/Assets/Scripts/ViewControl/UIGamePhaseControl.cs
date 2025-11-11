@@ -306,7 +306,7 @@ public class UIGamePhaseControl : YViewControl
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[0];
 		int attackCount = (int)paraArray[1];
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
-		Card attackCard = attackCardControl.Card;
+		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
 		for (int i = 0; i < attackCount; i++)
 		{
@@ -314,7 +314,7 @@ public class UIGamePhaseControl : YViewControl
 			enemyCardControl.CallCardTakeDamage(damage);
 			enemyCardControl.CardEffect?.OnTakeDamage();
 
-			if (enemyCardControl.Card.currentHealth <= 0)
+			if (enemyCardControl.CardData.currentHealth <= 0)
 			{
 				enemyCardControl.CardEffect?.OnKill();
 				enemyCardControl.Return();
@@ -322,7 +322,7 @@ public class UIGamePhaseControl : YViewControl
 			}
 			else
 			{
-				int enemyAttack = enemyCardControl.Card.currentAttack;
+				int enemyAttack = enemyCardControl.CardData.currentAttack;
 				YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, enemyAttack);
 			}
 		}
@@ -336,7 +336,7 @@ public class UIGamePhaseControl : YViewControl
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		if (defenceCardControl != null)
 		{
-			defenceValue = defenceCardControl.Card.currentDefence;
+			defenceValue = defenceCardControl.CardData.currentDefence;
 		}
 		int damage = 0;
 		if (defenceValue < enemyAttack)

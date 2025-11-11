@@ -24,8 +24,8 @@ public class UICardSimpleControl : YViewControl
 
 
 	public ECardType CardType => cachedCardType;
-	public Card Card => cachedCard;
-	private Dictionary<string, List<GameObject>> TriggerEffectDict = new Dictionary<string, List<GameObject>>();
+	public Card CardData => cachedCard;
+	private List<GameObject> EffectEntityList = new List<GameObject>();
 
 	public YCardEffect CardEffect;
 
@@ -142,13 +142,18 @@ public class UICardSimpleControl : YViewControl
 	public YCardEffect GetCardEffect()
 	{
 		if (cachedCard.effectIds == null || cachedCard.effectIds.Count == 0)
-        {
-			return null;
+		{
+			return GetDefaultEffect();
 		}
 
 		string effectId = cachedCard.effectIds[0];
-		ECardEffectId effectIdEnum = (ECardEffectId)System.Enum.Parse(typeof(ECardEffectId), effectId);
-		int effectValue = cachedCard.effectValues[0];
+		ECardEffectId effectIdEnum;
+		if (!System.Enum.TryParse<ECardEffectId>(effectId, out effectIdEnum))
+		{
+			return GetDefaultEffect();
+		}
+
+		int effectValue = cachedCard.effectValues.Count > 0 ? cachedCard.effectValues[0] : 0;
 
 		YCardEffect effect = null;
 		switch (effectIdEnum)
@@ -196,9 +201,16 @@ public class UICardSimpleControl : YViewControl
 				effect = new YHealPlayer_OnPlay(effectValue);
 				break;
 			default:
-				return null;
+				return GetDefaultEffect();
 		}
 
+		effect.SetData(this);
+		return effect;
+	}
+
+	private YCardEffect GetDefaultEffect()
+	{
+		YDefaultEffect effect = new YDefaultEffect();
 		effect.SetData(this);
 		return effect;
 	}
@@ -282,7 +294,7 @@ public class UICardSimpleControl : YViewControl
 		return Resources.Load<Sprite>(path);
 	}
 
-	public void PlayVFX(string cardTrigger = null, List<string> cardEffects = null, string animName = null)
+	public void PlayVFX(List<string> cardEffects = null, string animName = null)
 	{
 		if (!string.IsNullOrEmpty(animName))
 		{
@@ -291,12 +303,6 @@ public class UICardSimpleControl : YViewControl
 
 		if (cardEffects != null && cardEffects.Count > 0)
 		{
-			if (!TriggerEffectDict.ContainsKey(cardTrigger))
-			{
-				TriggerEffectDict[cardTrigger] = new List<GameObject>();
-			}
-			var list = TriggerEffectDict[cardTrigger];
-
 			for (int i = 0; i < cardEffects.Count; i++)
 			{
 				string effectName = cardEffects[i];
@@ -305,40 +311,41 @@ public class UICardSimpleControl : YViewControl
 				instance.transform.SetParent(transform);
 				instance.transform.localPosition = Vector3.zero;
 				instance.transform.localRotation = Quaternion.identity;
-				list.Add(instance);
+				EffectEntityList.Add(instance);
 			}
 		}
 	}
 
-	public void StopVFX(string cardTrigger)
+	public void StopVFX()
 	{
 		m_View.Anim.CrossFade("Idle", 0.1f, 0);
 
-		if (TriggerEffectDict.TryGetValue(cardTrigger, out var list))
+		for (int i = 0; i < EffectEntityList.Count; i++)
 		{
-			for (int i = 0; i < list.Count; i++)
+			var go = EffectEntityList[i];
+			if (go != null)
 			{
-				var go = list[i];
 				Destroy(go);
 			}
-			list.Clear();
 		}
+		EffectEntityList.Clear();
 	}
 
 	protected override void OnReturn()
 	{
+		CardEffect.StopAllEffects();
 		YActionSystem.Instance.DispatchAction(EActionId.RemoveCard, cachedCard.UniqueId);
 
-		foreach (var kv in TriggerEffectDict)
+		for (int i = 0; i < EffectEntityList.Count; i++)
 		{
-			var list = kv.Value;
-			for (int i = 0; i < list.Count; i++)
+			var go = EffectEntityList[i];
+			if (go != null)
 			{
-				Destroy(list[i]);
+				Destroy(go);
 			}
-			list.Clear();
 		}
-		TriggerEffectDict.Clear();
+		gameObject.SetActive(false);
+		EffectEntityList.Clear();
 		base.OnReturn();
 	}
 }
