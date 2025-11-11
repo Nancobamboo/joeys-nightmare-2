@@ -21,14 +21,19 @@ public class UIPauseControl : YViewControl
 
 	void OnResumeClick()
 	{
+		gameObject.SetActive(false);
 	}
 
 	void OnRestartClick()
 	{
+		JoeyGameControl.Instance.EnterBattleStart();
+		gameObject.SetActive(false);
 	}
 
 	void OnReturnToMainMenuClick()
 	{
+		JoeyGameControl.Instance.ReturnToMainMenu();
+		gameObject.SetActive(false);
 	}
 
 	public void SetData()
@@ -38,6 +43,6 @@ public class UIPauseControl : YViewControl
 
 	protected override void OnReturn()
 	{
-		base.OnReturn();
+		gameObject.SetActive(false);
 	}
 }

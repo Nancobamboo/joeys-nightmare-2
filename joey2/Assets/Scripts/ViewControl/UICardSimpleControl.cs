@@ -22,6 +22,7 @@ public class UICardSimpleControl : YViewControl
 	private ECardType cachedCardType;
 	private bool IsEnv;
 	private int m_EnvIndex = -1;
+	public Transform CacheTrans;
 
 
 	public ECardType CardType => cachedCardType;
@@ -39,6 +40,7 @@ public class UICardSimpleControl : YViewControl
 	protected override void OnInit()
 	{
 		base.OnInit();
+		CacheTrans = transform;
 		m_View = CreateView<UICardSimpleView>();
 		m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
 
@@ -87,10 +89,11 @@ public class UICardSimpleControl : YViewControl
 		{
 			switch (cachedCardType)
 			{
-
 				case ECardType.skill:
+					CardEffect?.UseSkill();
 					break;
 				case ECardType.item:
+					CardEffect?.UseItem();
 					break;
 			}
 		}
@@ -98,8 +101,8 @@ public class UICardSimpleControl : YViewControl
 
 	public void CallCardTakeDamage(int damage)
 	{
-		Debug.Log("CallCardTakeDamage");
 		cachedCard.TakeDamage(damage);
+		CardEffect?.OnTakeDamage();
 		RefreshCard();
 	}
 
@@ -302,7 +305,7 @@ public class UICardSimpleControl : YViewControl
 			{
 				string effectName = cardEffects[i];
 				var vfxPrefab = Resources.Load<GameObject>("VFX/" + effectName);
-				var instance = Instantiate(vfxPrefab, transform);
+				var instance = Instantiate(vfxPrefab, CacheTrans);
 
 				EffectEntityList.Add(instance);
 			}

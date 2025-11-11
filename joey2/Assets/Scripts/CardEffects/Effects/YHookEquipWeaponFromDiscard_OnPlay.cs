@@ -10,9 +10,9 @@ public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 		Id = ECardEffectId.HookEquipWeaponFromDiscard_OnPlay;
 	}
 
-	public override void OnPlay()
+	public override void UseSkill()
 	{
-		base.OnPlay();
+		base.UseSkill();
 	}
 }
 

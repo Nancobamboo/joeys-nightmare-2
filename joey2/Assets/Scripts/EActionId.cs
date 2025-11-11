@@ -8,6 +8,7 @@ public enum EActionId
 	MoveCard,
 	TakeEnemyDamage,
 	TakePlayerDamage,
+	BoomEnvCard,
 	TryLoadScene,
 	Upper
 }

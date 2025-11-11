@@ -12,9 +12,9 @@ public class YHealPlayer_OnPlay : YCardEffect
 		Id = ECardEffectId.HealPlayer_OnPlay;
 	}
 
-	public override void OnPlay()
+	public override void UseSkill()
 	{
-		base.OnPlay();
+		base.UseSkill();
 	}
 
 	public override int GetEffectValue(EEffectType effectType)
