@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
-public class YBoom_OnKill : YCardEffect
+public class YBoom_OnDead : YCardEffect
 {
 	public int baseExtra;
 
-	public YBoom_OnKill(int baseExtra)
+	public YBoom_OnDead(int baseExtra)
 	{
 		this.baseExtra = Mathf.Max(0, baseExtra);
-		Id = ECardEffectId.Boom_OnKill;
+		Id = ECardEffectId.Boom_OnDead;
 	}
 
-	public override void OnKill()
+	public override void OnDead()
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{
