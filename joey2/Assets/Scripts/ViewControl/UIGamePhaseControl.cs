@@ -220,7 +220,8 @@ public class UIGamePhaseControl : YViewControl
 			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
 		}
 		m_BagCardDict[cardTypeInt].Add(cardControl);
-		//cardControl.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+		cardControl.IsEnv = false;
+		cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 	}
 
 	private void RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -293,10 +294,19 @@ public class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	private void RemoveEnvCardFromDict(int index, UICardSimpleControl cardControl)
+	{
+		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
+		{
+			cardList.Remove(cardControl);
+		}
+	}
+
 	void BoomEnvCard(object[] paraArray)
 	{
 		int envIndex = (int)paraArray[0];
 		int damage = (int)paraArray[1];
+		UICardSimpleControl cardControl = paraArray.Length > 2 ? (UICardSimpleControl)paraArray[2] : null;
 
 		if (envIndex == -1)
 		{
@@ -306,6 +316,12 @@ public class UIGamePhaseControl : YViewControl
 				return;
 			}
 		}
+		Debug.Log("BoomEnvCard: envIndex = " + envIndex);
+		foreach (var kvp in m_EnvCardDict)
+		{
+			Debug.Log("BoomEnvCard: envIndex = " + kvp.Key + " " + kvp.Value.Count);
+		}
+
 
 		int[] indices = { envIndex - 1, envIndex, envIndex + 1 };
 		for (int i = 0; i < indices.Length; i++)
@@ -328,6 +344,11 @@ public class UIGamePhaseControl : YViewControl
 					}
 				}
 			}
+		}
+
+		if (cardControl != null)
+		{
+			RemoveBagCard(cardControl.CardType, cardControl);
 		}
 	}
 
@@ -385,6 +406,7 @@ public class UIGamePhaseControl : YViewControl
 			Vector3 startWorldPos = cardControl.CacheTrans.position;
 			Vector3 startScale = Vector3.one;
 
+			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
 			AddBagCard(cardType, cardControl);
 			cardControl.CardEffect?.OnEnterBag();
 

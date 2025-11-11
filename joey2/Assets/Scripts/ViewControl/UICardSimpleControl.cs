@@ -20,7 +20,7 @@ public class UICardSimpleControl : YViewControl
 	private UICardSimpleView m_View;
 	private Card cachedCard;
 	private ECardType cachedCardType;
-	private bool IsEnv;
+	public bool IsEnv;
 	private int m_EnvIndex = -1;
 	public Transform CacheTrans;
 
@@ -101,6 +101,7 @@ public class UICardSimpleControl : YViewControl
 
 	public void CallCardTakeDamage(int damage)
 	{
+		Debug.Log(CardData.cardName);
 		cachedCard.TakeDamage(damage);
 		CardEffect?.OnTakeDamage();
 		RefreshCard();
@@ -149,14 +150,16 @@ public class UICardSimpleControl : YViewControl
 			return GetDefaultEffect();
 		}
 
-		string effectId = cachedCard.effectIds[0];
+		string effectIdStr = cachedCard.effectIds[0];
+		string effectId;
+		int effectValue;
+		cachedCard.ParseEffectId(effectIdStr, out effectId, out effectValue);
+
 		ECardEffectId effectIdEnum;
 		if (!System.Enum.TryParse<ECardEffectId>(effectId, out effectIdEnum))
 		{
 			return GetDefaultEffect();
 		}
-
-		int effectValue = cachedCard.effectValues.Count > 0 ? cachedCard.effectValues[0] : 0;
 
 		YCardEffect effect = null;
 		switch (effectIdEnum)

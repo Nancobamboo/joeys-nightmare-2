@@ -24,7 +24,7 @@ public class YBoom_OnPlay : YCardEffect
 			DelayStopVFX(0.65f).Forget();
 		}
 
-		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra);
+		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

@@ -145,4 +145,28 @@ public class Card
             currentHealth = 0;
         }
     }
+
+    public void ParseEffectId(string effectIdStr, out string effectId, out int effectValue)
+    {
+        effectId = effectIdStr;
+        effectValue = 0;
+
+        if (string.IsNullOrEmpty(effectIdStr))
+        {
+            return;
+        }
+
+        string[] parts = effectIdStr.Split(':');
+        if (parts.Length > 0)
+        {
+            effectId = parts[0].Trim();
+        }
+        if (parts.Length > 1)
+        {
+            if (int.TryParse(parts[1].Trim(), out int value))
+            {
+                effectValue = value;
+            }
+        }
+    }
 }
