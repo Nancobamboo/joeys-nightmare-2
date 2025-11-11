@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class YBoom_OnPlay : YCardEffect
 {
@@ -13,9 +14,17 @@ public class YBoom_OnPlay : YCardEffect
 		Id = ECardEffectId.Boom_OnPlay;
 	}
 
-	public override void OnPlay()
+	public override void UseItem()
 	{
-		base.OnPlay();
+		if (CardControl != null && CardControl.gameObject != null)
+		{
+			var vfxNames = new List<string> { "VFX_boom" };
+			CardControl.PlayVFX(vfxNames, animName: null);
+			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
+			DelayStopVFX(0.65f).Forget();
+		}
+
+		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra);
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

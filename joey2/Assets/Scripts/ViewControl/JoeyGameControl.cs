@@ -26,6 +26,7 @@ public class JoeyGameControl : YViewControl
 	private EGamePhase m_LastGamePhase = EGamePhase.Default;
 	private UIGamePhaseControl m_GamePhaseControl;
 	private DataJoeyPlayer m_DataJoeyPlayer;
+	private UIPauseControl m_PauseControl;
 
 	public static EResType GetResType()
 	{
@@ -52,6 +53,8 @@ public class JoeyGameControl : YViewControl
 
 	void Update()
 	{
+		CheckButtonInput();
+
 		if (m_CurrentGamePhase != m_LastGamePhase)
 		{
 			m_LastGamePhase = m_CurrentGamePhase;
@@ -86,6 +89,22 @@ public class JoeyGameControl : YViewControl
 					break;
 				default:
 					break;
+			}
+		}
+	}
+
+	void CheckButtonInput()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			if (m_PauseControl == null)
+			{
+				m_PauseControl = Asset.OpenUI<UIPauseControl>();
+			}
+			else
+			{
+				bool isActive = m_PauseControl.gameObject.activeSelf;
+				m_PauseControl.gameObject.SetActive(!isActive);
 			}
 		}
 	}
