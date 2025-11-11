@@ -6,6 +6,7 @@ public enum EResType
     UIGuideTip,
     UICounter,
     UICardSimple,
+    UIGameOver,
     UIGamePhase,
     UIPause,
     UIUpper,

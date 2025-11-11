@@ -956,7 +956,7 @@ public class YProcessViewEditor : EditorWindow
             sw.Close();
             sw.Dispose();
             Debug.Log(realDiskCSFilePath + " Save Succeed");
-            var exPath = Application.dataPath + "/Scripts/Model/EResType.cs";
+            var exPath = Application.dataPath + "/Scripts/EResType.cs";
             var lines = File.ReadAllLines(exPath);
             List<string> list = new List<string>();
             bool isAdded = false;
