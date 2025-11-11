@@ -7,8 +7,8 @@ public enum EActionId
 	AppDefence,
 	RemoveCard,
 	MoveCard,
-	TakeEnemy,
-	TakePlayerEnemy,
+	TakeEnemyDamage,
+	TakePlayerDamage,
 	TryLoadScene,
 	Upper
 }

@@ -27,6 +27,7 @@ public enum EEffectType
     Heal,
     Buff,
     Debuff,
+    ReflectDamage,
     Other
 }
 
@@ -93,6 +94,8 @@ public class YCardEffect
             case EEffectType.Buff:
                 return 0;
             case EEffectType.Debuff:
+                return 0;
+            case EEffectType.ReflectDamage:
                 return 0;
             case EEffectType.Other:
                 return 0;
