@@ -19,6 +19,8 @@ public class UIGamePhaseControl : YViewControl
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private static int UniqueIdGen = 0;
 	private DataJoeyPlayer m_DataJoeyPlayer;
+	private List<Card> UsedCardList = new List<Card>();
+	private UIGameOverControl m_GameOverControl;
 
 	public static EResType GetResType()
 	{
@@ -33,7 +35,6 @@ public class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AppHp, AppHp);
 		RegistAction(EActionId.AppAttack, AppAttack);
 		RegistAction(EActionId.AppDefence, AppDefence);
-		RegistAction(EActionId.RemoveCard, RemoveCard);
 		RegistAction(EActionId.MoveCard, MoveCard);
 		RegistAction(EActionId.TakeEnemyDamage, TakeEnemyDamage);
 		RegistAction(EActionId.TakePlayerDamage, TakePlayerDamage);
@@ -42,6 +43,13 @@ public class UIGamePhaseControl : YViewControl
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
 		happySprite = Resources.Load<Sprite>("Art/Img/joey/joey_happy");
 		deathSprite = Resources.Load<Sprite>("Art/Img/joey/joey_weekup");
+
+		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
+		{
+			Transform child = m_View.EnvPanels.GetChild(i);
+			VerticalLayoutGroup vlg = child.GetComponent<VerticalLayoutGroup>();
+			m_EnvPanels.Add(vlg);
+		}
 	}
 
 	void OnHPChanged(int hp)
@@ -84,14 +92,7 @@ public class UIGamePhaseControl : YViewControl
 	public void SetData()
 	{
 		RefreshView();
-
-		m_EnvPanels.Clear();
-		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
-		{
-			Transform child = m_View.EnvPanels.GetChild(i);
-			VerticalLayoutGroup vlg = child.GetComponent<VerticalLayoutGroup>();
-			m_EnvPanels.Add(vlg);
-		}
+		ClearAllCard();
 	}
 
 	private void RefreshView()
@@ -133,6 +134,7 @@ public class UIGamePhaseControl : YViewControl
 			{
 				m_CardSimplePool[i].gameObject.SetActive(true);
 				m_CardSimplePool[i].transform.SetParent(parent);
+				m_CardSimplePool[i].transform.localScale = Vector3.one;
 				return m_CardSimplePool[i];
 			}
 		}
@@ -197,7 +199,7 @@ public class UIGamePhaseControl : YViewControl
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
 			UICardSimpleControl cardControl = GetCardSimple(parent.transform);
-			cardControl.SetData(card, isEnv: true);
+			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
 		}
 	}
@@ -215,6 +217,7 @@ public class UIGamePhaseControl : YViewControl
 			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
 		}
 		m_BagCardDict[cardTypeInt].Add(cardControl);
+		cardControl.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 	}
 
 	private void RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -223,6 +226,14 @@ public class UIGamePhaseControl : YViewControl
 		if (m_BagCardDict.ContainsKey(cardTypeInt))
 		{
 			m_BagCardDict[cardTypeInt].Remove(cardControl);
+			RemoveCardData(cardControl.CardData.UniqueId);
+			cardControl.Return();
+
+			UICardSimpleControl newLastBagCard = GetLastBagCard(cardType);
+			if (newLastBagCard != null)
+			{
+				newLastBagCard.CardEffect?.OnBecomeTopOfPile();
+			}
 		}
 	}
 
@@ -260,13 +271,36 @@ public class UIGamePhaseControl : YViewControl
 		if (m_EnvCardDict.ContainsKey(index))
 		{
 			m_EnvCardDict[index].Remove(cardControl);
+			RemoveCardData(cardControl.CardData.UniqueId);
+			cardControl.Return();
 		}
 	}
 
-	void RemoveCard(object[] paraArray)
+	void RemoveCardData(int uniqueId)
 	{
-		int uniqueId = (int)paraArray[0];
-		m_CardDict.Remove(uniqueId);
+		if (m_CardDict.ContainsKey(uniqueId))
+		{
+			Card card = m_CardDict[uniqueId];
+			UsedCardList.Add(card);
+			m_CardDict.Remove(uniqueId);
+		}
+	}
+
+	public void ClearAllCard()
+	{
+		for (int i = 0; i < m_CardSimplePool.Count; i++)
+		{
+			if (m_CardSimplePool[i] != null && m_CardSimplePool[i].gameObject.activeSelf)
+			{
+				m_CardSimplePool[i].Return();
+			}
+		}
+
+		m_CardDict.Clear();
+		m_EnvCardDict.Clear();
+		m_BagCardDict.Clear();
+		UsedCardList.Clear();
+		UniqueIdGen = 0;
 	}
 
 	void MoveCard(object[] paraArray)
@@ -278,6 +312,7 @@ public class UIGamePhaseControl : YViewControl
 		{
 			ECardType cardType = cardControl.CardType;
 			AddBagCard(cardType, cardControl);
+			cardControl.CardEffect?.OnEnterBag();
 
 			Transform parent = null;
 			switch (cardType)
@@ -305,6 +340,7 @@ public class UIGamePhaseControl : YViewControl
 	{
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[0];
 		int attackCount = (int)paraArray[1];
+		int envIndex = (int)paraArray[2];
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
@@ -316,8 +352,9 @@ public class UIGamePhaseControl : YViewControl
 
 			if (enemyCardControl.CardData.currentHealth <= 0)
 			{
-				enemyCardControl.CardEffect?.OnKill();
-				enemyCardControl.Return();
+				attackCardControl.CardEffect?.OnKill();
+				enemyCardControl.CardEffect?.OnDead();
+				RemoveEnvCard(envIndex, enemyCardControl);
 				break;
 			}
 			else
@@ -351,6 +388,23 @@ public class UIGamePhaseControl : YViewControl
 		OnHPChanged(m_DataJoeyPlayer.playerHealth);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
+
+		if (defenceCardControl != null)
+		{
+			RemoveBagCard(ECardType.defence, defenceCardControl);
+		}
+
+		if (m_DataJoeyPlayer.playerHealth <= 0)
+		{
+			if (m_GameOverControl == null)
+			{
+				m_GameOverControl = this.Asset.OpenUI<UIGameOverControl>();
+			}
+			else
+			{
+				m_GameOverControl.gameObject.SetActive(true);
+			}
+		}
 	}
 
 	protected override void OnReturn()

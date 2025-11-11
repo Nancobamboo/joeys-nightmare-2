@@ -21,10 +21,12 @@ public class UICardSimpleControl : YViewControl
 	private Card cachedCard;
 	private ECardType cachedCardType;
 	private bool IsEnv;
+	private int m_EnvIndex = -1;
 
 
 	public ECardType CardType => cachedCardType;
 	public Card CardData => cachedCard;
+	public int EnvIndex => m_EnvIndex;
 	private List<GameObject> EffectEntityList = new List<GameObject>();
 
 	public YCardEffect CardEffect;
@@ -70,7 +72,7 @@ public class UICardSimpleControl : YViewControl
 		{
 			if (cachedCardType == ECardType.monster)
 			{
-				YActionSystem.Instance.DispatchAction(EActionId.TakeEnemyDamage, this, 1);
+				YActionSystem.Instance.DispatchAction(EActionId.TakeEnemyDamage, this, 1, m_EnvIndex);
 			}
 			else if (cachedCardType == ECardType.other)
 			{
@@ -213,17 +215,12 @@ public class UICardSimpleControl : YViewControl
 		return effect;
 	}
 
-	public new void Return()
-	{
-		YActionSystem.Instance.DispatchAction(EActionId.RemoveCard, cachedCard.UniqueId);
-		gameObject.SetActive(false);
-	}
-
-	public void SetData(Card card, bool isEnv = false)
+	public void SetData(Card card, bool isEnv = false, int envIndex = -1)
 	{
 		cachedCard = card;
 		cachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
 		IsEnv = isEnv;
+		m_EnvIndex = envIndex;
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
@@ -296,7 +293,7 @@ public class UICardSimpleControl : YViewControl
 	{
 		if (!string.IsNullOrEmpty(animName))
 		{
-			m_View.Anim.CrossFade(animName, 0.1f, 0);
+			m_View.Anim.CrossFade(animName, 0, 0);
 		}
 
 		if (cardEffects != null && cardEffects.Count > 0)
@@ -305,10 +302,8 @@ public class UICardSimpleControl : YViewControl
 			{
 				string effectName = cardEffects[i];
 				var vfxPrefab = Resources.Load<GameObject>("VFX/" + effectName);
-				var instance = Instantiate(vfxPrefab);
-				instance.transform.SetParent(transform);
-				instance.transform.localPosition = Vector3.zero;
-				instance.transform.localRotation = Quaternion.identity;
+				var instance = Instantiate(vfxPrefab, transform);
+
 				EffectEntityList.Add(instance);
 			}
 		}
@@ -316,7 +311,7 @@ public class UICardSimpleControl : YViewControl
 
 	public void StopVFX()
 	{
-		m_View.Anim.CrossFade("Idle", 0.1f, 0);
+		m_View.Anim.CrossFade("idle", 0, 0);
 
 		for (int i = 0; i < EffectEntityList.Count; i++)
 		{
@@ -331,8 +326,8 @@ public class UICardSimpleControl : YViewControl
 
 	protected override void OnReturn()
 	{
+
 		CardEffect.StopAllEffects();
-		YActionSystem.Instance.DispatchAction(EActionId.RemoveCard, cachedCard.UniqueId);
 
 		for (int i = 0; i < EffectEntityList.Count; i++)
 		{

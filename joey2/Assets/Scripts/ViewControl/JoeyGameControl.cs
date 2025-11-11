@@ -190,6 +190,16 @@ public class JoeyGameControl : YViewControl
 		SetGamePhase(EGamePhase.battleStart);
 	}
 
+	public void EnterBattleStart()
+	{
+		SetGamePhase(EGamePhase.battleStart);
+	}
+
+	public void ReturnToMainMenu()
+	{
+		SceneLoader.Instance.LoadScene("Start");
+	}
+
 	public void SetData()
 	{
 		;
