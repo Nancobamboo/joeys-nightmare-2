@@ -302,6 +302,21 @@ public class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	private bool DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex)
+	{
+		cardControl.CallCardTakeDamage(damage);
+
+		if (cardControl.CardData.currentHealth <= 0 && cardControl.CardType == ECardType.monster)
+		{
+			RemoveEnvCard(envIndex, cardControl);
+
+			cardControl.CardEffect?.OnDead();
+			return true;
+		}
+
+		return false;
+	}
+
 	void BoomEnvCard(object[] paraArray)
 	{
 		int envIndex = (int)paraArray[0];
@@ -332,16 +347,7 @@ public class UIGamePhaseControl : YViewControl
 				if (cardList != null && cardList.Count > 0)
 				{
 					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
-					if (lastCard != null && lastCard.gameObject.activeSelf)
-					{
-						lastCard.CallCardTakeDamage(damage);
-
-						if (lastCard.CardType == ECardType.monster && lastCard.CardData.currentHealth <= 0)
-						{
-							lastCard.CardEffect?.OnDead();
-							RemoveEnvCard(index, lastCard);
-						}
-					}
+					DealDamageToEnvCard(lastCard, damage, index);
 				}
 			}
 		}
@@ -475,13 +481,10 @@ public class UIGamePhaseControl : YViewControl
 		for (int i = 0; i < attackCount; i++)
 		{
 			attackCardControl.CardEffect?.OnDealDamage();
-			enemyCardControl.CallCardTakeDamage(damage);
 
-			if (enemyCardControl.CardData.currentHealth <= 0)
+			if (DealDamageToEnvCard(enemyCardControl, damage, envIndex))
 			{
 				attackCardControl.CardEffect?.OnKill();
-				enemyCardControl.CardEffect?.OnDead();
-				RemoveEnvCard(envIndex, enemyCardControl);
 				break;
 			}
 			else
