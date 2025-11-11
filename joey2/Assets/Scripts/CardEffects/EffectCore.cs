@@ -17,6 +17,7 @@ public enum CardTrigger
     OnTurnEnd_Enemy        // 敌方回合结束
 }
 
+
 public struct CardEffectContext
 {
     public GameObject source;           // 触发效果的卡
