@@ -90,8 +90,6 @@ public class UICardSimpleControl : YViewControl
 					break;
 				case ECardType.item:
 					break;
-				case ECardType.other:
-					break;
 			}
 		}
 	}

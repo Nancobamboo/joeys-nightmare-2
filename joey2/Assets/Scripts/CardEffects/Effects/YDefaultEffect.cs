@@ -15,7 +15,7 @@ public class YDefaultEffect : YCardEffect
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
-            var vfxNames = new List<string> { "VFX_boom" };
+            var vfxNames = new List<string> {  };
             CardControl.PlayVFX(vfxNames, animName: "UI_Carditem_gongji");
 
             float delayTime = Random.Range(0.5f, 1.5f);
