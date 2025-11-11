@@ -36,6 +36,7 @@ public class Card
     public CardPosition position;
     public CardPosition lastPosition;
     public List<string> effectIds = new List<string>();
+    public List<int> effectValues = new List<int>();
     public int UniqueId;
 
     public Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, List<string> _effectIds)

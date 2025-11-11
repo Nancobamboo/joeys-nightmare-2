@@ -26,6 +26,8 @@ public class UICardSimpleControl : YViewControl
 	public Card Card => cachedCard;
 	private Dictionary<string, List<GameObject>> TriggerEffectDict = new Dictionary<string, List<GameObject>>();
 
+	private List<YCardEffect> m_CardEffectList = new List<YCardEffect>();
+
 	public static EResType GetResType()
 	{
 		return EResType.UICardSimple;
@@ -78,6 +80,19 @@ public class UICardSimpleControl : YViewControl
 				YActionSystem.Instance.DispatchAction(EActionId.MoveCard, IsEnv, this);
 			}
 		}
+		else
+		{
+			switch (cachedCardType)
+			{
+
+				case ECardType.skill:
+					break;
+				case ECardType.item:
+					break;
+				case ECardType.other:
+					break;
+			}
+		}
 	}
 
 	public void CallCardTakeDamage(int damage)
@@ -123,6 +138,72 @@ public class UICardSimpleControl : YViewControl
 		SetStars(cachedCard.stars);
 	}
 
+	public List<YCardEffect> GetCardEffect()
+	{
+		List<YCardEffect> effectList = new List<YCardEffect>();
+
+		for (int i = 0; i < cachedCard.effectIds.Count; i++)
+		{
+			string effectId = cachedCard.effectIds[i];
+			ECardEffectId effectIdEnum = (ECardEffectId)System.Enum.Parse(typeof(ECardEffectId), effectId);
+			int effectValue = cachedCard.effectValues[i];
+
+			YCardEffect effect = null;
+			switch (effectIdEnum)
+			{
+				case ECardEffectId.BounceToRandomEnemy_OnDealDamage:
+					effect = new YBounceToRandomEnemy_OnDealDamage(effectValue);
+					break;
+				case ECardEffectId.ExtraDamage_OnDealDamage:
+					effect = new YExtraDamage_OnDealDamage(effectValue);
+					break;
+				case ECardEffectId.Boom_OnKill:
+					effect = new YBoom_OnKill(effectValue);
+					break;
+				case ECardEffectId.DealRandomEnemyEqualToAttack_OnTop:
+					effect = new YDealRandomEnemyEqualToAttack_OnTop();
+					break;
+				case ECardEffectId.DealDamage_UseDefence:
+					effect = new YDealDamage_UseDefence(effectValue);
+					break;
+				case ECardEffectId.Boom_OnPlay:
+					effect = new YBoom_OnPlay(effectValue);
+					break;
+				case ECardEffectId.DoubleAttack_OnDealDamage:
+					effect = new YDoubleAttack_OnDealDamage();
+					break;
+				case ECardEffectId.ExtraDamage_NoDefence:
+					effect = new YExtraDamage_NoDefence(effectValue);
+					break;
+				case ECardEffectId.Electric:
+					effect = new YElectric(effectValue);
+					break;
+				case ECardEffectId.DoubleAttack_OnPlay:
+					effect = new YDoubleAttack_OnPlay();
+					break;
+				case ECardEffectId.HookEquipWeaponFromDiscard_OnDefence:
+					effect = new YHookEquipWeaponFromDiscard_OnDefence();
+					break;
+				case ECardEffectId.HookEquipWeaponFromDiscard_OnPlay:
+					effect = new YHookEquipWeaponFromDiscard_OnPlay();
+					break;
+				case ECardEffectId.LifeSteal_OnDealDamage:
+					effect = new YLifeSteal_OnDealDamage(effectValue);
+					break;
+				case ECardEffectId.HealPlayer_OnPlay:
+					effect = new YHealPlayer_OnPlay(effectValue);
+					break;
+				default:
+					continue;
+			}
+
+			effect.SetData(this);
+			effectList.Add(effect);
+		}
+
+		return effectList;
+	}
+
 	public void SetData(Card card, bool isEnv = false)
 	{
 		cachedCard = card;
@@ -137,6 +218,7 @@ public class UICardSimpleControl : YViewControl
 
 		SetTypeUI(card);
 		SetStars(card.stars);
+		m_CardEffectList = GetCardEffect();
 	}
 
 	private void SetTypeUI(Card card)
