@@ -51,9 +51,6 @@ public class YCardEffect
     {
     }
 
-    public virtual void OnPlay()
-    {
-    }
 
     public virtual void OnDealDamage()
     {
@@ -86,7 +83,15 @@ public class YCardEffect
     {
     }
 
-
+    public virtual void UseSkill()
+    {
+    }
+    public virtual void UseItem()
+    {
+    }
+    public virtual void UseAttack()
+    {
+    }
 
     public virtual int GetEffectValue(EEffectType effectType)
     {
