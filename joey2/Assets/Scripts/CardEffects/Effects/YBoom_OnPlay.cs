@@ -23,7 +23,10 @@ public class YBoom_OnPlay : YCardEffect
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
 
-		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
+		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
+		}, 0.2f);
 		return 0.65f;
 	}
 

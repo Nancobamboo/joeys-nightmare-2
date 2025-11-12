@@ -2,16 +2,20 @@
 using System.Collections;
 using UnityEngine;
 
-public class YDoubleAttack_OnPlay : YCardEffect
+public class YDoubleAttack_OnPlay : YDefaultEffect
 {
 	public YDoubleAttack_OnPlay()
 	{
 		Id = ECardEffectId.DoubleAttack_OnPlay;
 	}
 
-	public override float UseSkill()
+	public override int GetEffectValue(EEffectType effectType)
 	{
-		return base.UseSkill();
+		if (effectType == EEffectType.ExtraTime)
+		{
+			return 1;
+		}
+		return base.GetEffectValue(effectType);
 	}
 }
 

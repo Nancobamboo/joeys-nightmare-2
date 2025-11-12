@@ -16,10 +16,13 @@ public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { };
-			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_pailai, EVFXLife.SelfLife, 0.65f);
+			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
 		}
 
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+		}, .2f);
 		return 0.65f;
 	}
 }

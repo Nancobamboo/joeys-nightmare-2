@@ -46,6 +46,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.BoomEnvCard, BoomEnvCard);
 		RegistAction(EActionId.UseBagCard, UseBagCard);
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
+		RegistAction(EActionId.AttackRandomEnemy, AttackRandomEnemy);
+		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -283,7 +285,25 @@ public partial class UIGamePhaseControl : YViewControl
 		return null;
 	}
 
-	private UICardSimpleControl GetFirstCard()
+	private UICardSimpleControl GetLastEnvCard(int envIndex)
+	{
+		if (m_EnvCardDict.TryGetValue(envIndex, out List<UICardSimpleControl> cardList))
+		{
+			if (cardList != null && cardList.Count > 0)
+			{
+				return cardList[cardList.Count - 1];
+			}
+		}
+		return null;
+	}
+
+	public bool HasBagCard(ECardType cardType)
+	{
+		List<UICardSimpleControl> cardList = GetBagCardList(cardType);
+		return cardList != null && cardList.Count > 0;
+	}
+
+	private UICardSimpleControl GetFistCard()
 	{
 		Card card = GData.Instance.GetCardConfigById("1003").Clone();
 		UniqueIdGen++;
@@ -349,7 +369,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (envIndex == -1)
 		{
-			envIndex = FindFirstEnemy();
+			envIndex = FindRandomEnemy();
 			if (envIndex == -1)
 			{
 				return;
@@ -382,8 +402,9 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private int FindFirstEnemy()
+	private int FindRandomEnemy()
 	{
+		List<int> enemyIndices = new List<int>();
 		foreach (var kvp in m_EnvCardDict)
 		{
 			if (kvp.Value != null && kvp.Value.Count > 0)
@@ -391,11 +412,15 @@ public partial class UIGamePhaseControl : YViewControl
 				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
 				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
 				{
-					return kvp.Key;
+					enemyIndices.Add(kvp.Key);
 				}
 			}
 		}
-		return -1;
+		if (enemyIndices.Count == 0)
+		{
+			return -1;
+		}
+		return enemyIndices[Random.Range(0, enemyIndices.Count)];
 	}
 
 	void RemoveCardData(int uniqueId)
@@ -507,13 +532,13 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
 		if (attackCardControl == null)
 		{
-			attackCardControl = GetFirstCard();
+			attackCardControl = GetFistCard();
 		}
+		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraTime) ?? 0;
 		Card attackCard = attackCardControl.CardData;
-		int damage = attackCard.currentAttack;
+		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 
-		float delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
-		await UniTask.WaitForSeconds(delayTime);
+		float delayTime;
 
 		for (int i = 0; i < attackCount; i++)
 		{
@@ -529,15 +554,20 @@ public partial class UIGamePhaseControl : YViewControl
 			else
 			{
 				int enemyAttack = enemyCardControl.CardData.currentAttack;
-				YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, enemyAttack);
+				YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, enemyAttack, enemyCardControl, envIndex);
 			}
 		}
+		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
+		await UniTask.WaitForSeconds(delayTime);
 		RemoveBagCard(ECardType.attack, attackCardControl).Forget();
 	}
 
 	async void TakePlayerDamage(object[] paraArray)
 	{
 		int enemyAttack = (int)paraArray[0];
+		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[1];
+		int envIndex = (int)paraArray[2];
+
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		if (defenceCardControl != null)
@@ -562,6 +592,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (defenceCardControl != null)
 		{
+			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+			if (reflectDamage > 0)
+			{
+				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex);
+			}
 			RemoveBagCard(ECardType.defence, defenceCardControl).Forget();
 		}
 
@@ -643,6 +678,99 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.SetData(selectedCard);
 		AddBagCard(selectedCardType, cardControl);
 		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife, 0f);
+	}
+
+	async void AttackRandomEnemy(object[] paraArray)
+	{
+		UICardSimpleControl attackCardControl = paraArray.Length > 0 ? (UICardSimpleControl)paraArray[0] : null;
+		if (attackCardControl == null)
+		{
+			attackCardControl = GetLastBagCard(ECardType.attack);
+			if (attackCardControl == null)
+			{
+				attackCardControl = GetFistCard();
+			}
+		}
+
+		int envIndex = FindRandomEnemy();
+		if (envIndex == -1)
+		{
+			return;
+		}
+
+		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+		if (enemyCardControl == null)
+		{
+			return;
+		}
+
+		int attackCount = 1;
+		Card attackCard = attackCardControl.CardData;
+		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+
+		float delayTime;
+
+		for (int i = 0; i < attackCount; i++)
+		{
+			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
+			await UniTask.WaitForSeconds(delayTime);
+
+			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+			{
+				delayTime = attackCardControl.CardEffect?.OnKill() ?? 0.5f;
+				await UniTask.WaitForSeconds(delayTime);
+				break;
+			}
+		}
+	}
+
+	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex)
+	{
+		if (enemyCardControl == null)
+		{
+			return;
+		}
+
+		await DealDamageToEnvCard(enemyCardControl, damage, envIndex);
+	}
+
+	async void TakeAllEnemyDamage(object[] paraArray)
+	{
+		UICardSimpleControl skillCardControl = GetLastBagCard(ECardType.skill);
+		if (skillCardControl == null)
+		{
+			return;
+		}
+
+		int damage = skillCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+		if (damage <= 0)
+		{
+			return;
+		}
+
+		List<int> enemyIndices = new List<int>();
+		foreach (var kvp in m_EnvCardDict)
+		{
+			if (kvp.Value != null && kvp.Value.Count > 0)
+			{
+				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
+				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
+				{
+					enemyIndices.Add(kvp.Key);
+				}
+			}
+		}
+
+		foreach (int envIndex in enemyIndices)
+		{
+			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+			if (enemyCardControl != null)
+			{
+				await DealDamageToEnvCard(enemyCardControl, damage, envIndex);
+			}
+		}
+
+		RemoveBagCard(ECardType.skill, skillCardControl).Forget();
 	}
 
 	protected override void OnReturn()

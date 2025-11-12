@@ -32,7 +32,7 @@ public enum EEffectType
     ReflectDamage,
     LifeSteal,
     Boom,
-
+    ExtraTime,
     Other
 }
 
@@ -92,7 +92,7 @@ public class YCardEffect
 
     public virtual float OnDealDamage()
     {
-        return 0.5f;
+        return 0.4f;
     }
 
     public virtual float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
@@ -145,6 +145,8 @@ public class YCardEffect
             case EEffectType.ReflectDamage:
                 return 0;
             case EEffectType.LifeSteal:
+                return 0;
+            case EEffectType.ExtraTime:
                 return 0;
             case EEffectType.Other:
                 return 0;

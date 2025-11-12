@@ -11,6 +11,8 @@ public enum EActionId
 	BoomEnvCard,
 	UseBagCard,
 	AddCardFromDiscard,
+	AttackRandomEnemy,
+	TakeAllEnemyDamage,
 	TryLoadScene,
 	Upper
 }
