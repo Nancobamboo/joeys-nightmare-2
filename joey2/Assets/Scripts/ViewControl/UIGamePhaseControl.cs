@@ -766,7 +766,7 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
 			if (enemyCardControl != null)
 			{
-				await DealDamageToEnvCard(enemyCardControl, damage, envIndex);
+				await DealDamageToEnvCard(enemyCardControl, damage, envIndex,EEffectType.Electric);
 			}
 		}
 

@@ -33,6 +33,7 @@ public enum EEffectType
     LifeSteal,
     Boom,
     ExtraTime,
+    Electric,
     Other
 }
 

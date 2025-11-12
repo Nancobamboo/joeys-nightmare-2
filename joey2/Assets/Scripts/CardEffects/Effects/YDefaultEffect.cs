@@ -55,6 +55,9 @@ public class YDefaultEffect : YCardEffect
                     CardControl.PlayVFX(boomVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, 0.65f);
                     SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
                     return 0.65f;
+                case EEffectType.Electric:
+                    PlayElectricEffectAsync().Forget();
+                    return 1.65f; // 雷弹特效时间(0.65f) + 延迟(0.5f) + 默认特效平均时间(0.5f)
                 default:
                     var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
                     float delayTime = Random.Range(0.5f, 1.5f);
@@ -64,7 +67,20 @@ public class YDefaultEffect : YCardEffect
         }
         return base.OnTakeDamage(effectType);
     }
-
+    private async UniTaskVoid PlayElectricEffectAsync()
+    {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            // 先播放雷弹特效
+            var electricVfxNames = new List<EVFXName> { EVFXName.VFX_LeiDan };
+            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, 0.65f);
+            await UniTask.WaitForSeconds(0.65f);
+            // 执行default分支的特效
+            var damageVfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
+            float delayTime = Random.Range(0.5f, 1.5f);
+            CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, delayTime);
+        }
+    }
     public override float OnDead()
     {
         if (CardControl != null && CardControl.gameObject != null)
