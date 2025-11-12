@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
 
 public partial class UIGamePhaseControl : YViewControl
 {
 	private UIGamePhaseView m_View;
+	private SingleDelayAction m_MoveCardDelayAction = new SingleDelayAction();
 
 	private Sprite sadSprite;
 	private Sprite sleepSprite;
@@ -18,7 +20,6 @@ public partial class UIGamePhaseControl : YViewControl
 	private Dictionary<int, Card> m_CardDict = new Dictionary<int, Card>();
 	private Dictionary<int, List<UICardSimpleControl>> m_EnvCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
-	private Dictionary<int, Tween> m_LastTweenDict = new Dictionary<int, Tween>();
 	private static int UniqueIdGen = 0;
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private List<Card> UsedCardList = new List<Card>();
@@ -426,7 +427,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			ECardType cardType = cardControl.CardType;
 
-			Vector3 startWorldPos = cardControl.CacheTrans.position;
+			Vector3 startWorldPos = cardControl.CacheTrans.parent.position;
 			Vector3 startScale = Vector3.one;
 
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
@@ -452,33 +453,40 @@ public partial class UIGamePhaseControl : YViewControl
 					return;
 			}
 
-			layout.enabled = false;
-			cardControl.CacheTrans.SetParent(layout.transform);
-			Vector3 endWorldPos = cardControl.CacheTrans.position;
+			Vector3 endScale = new Vector3(0.8f, 0.8f, 1.0f);
+			float duration = .45f;
 
-			cardControl.CacheTrans.position = startWorldPos;
-			cardControl.CacheTrans.localScale = startScale;
-
-			int cardTypeInt = (int)cardType;
-			Tween moveTween = cardControl.CacheTrans.DOMove(endWorldPos, 0.45f).SetEase(Ease.OutQuad);
-			Tween scaleTween = cardControl.CacheTrans.DOScale(new Vector3(0.8f, 0.8f, 1.0f), 0.45f).SetEase(Ease.OutQuad);
-
-			if (m_LastTweenDict.TryGetValue(cardTypeInt, out Tween oldTween))
+			m_MoveCardDelayAction.AddDelayCall(() =>
 			{
-				oldTween.Kill();
-			}
-			m_LastTweenDict[cardTypeInt] = moveTween;
-
-			moveTween.OnComplete(() =>
-			{
-				if (m_LastTweenDict.TryGetValue(cardTypeInt, out Tween lastTween) && lastTween == moveTween)
-				{
-					layout.enabled = true;
-					m_LastTweenDict.Remove(cardTypeInt);
-					cardControl.SetMoving(false);
-				}
-			});
+				MoveCardAnimation(cardControl, startWorldPos, layout.transform.position, startScale, endScale, duration, layout).Forget();
+			}, 0f);
 		}
+	}
+
+	private async UniTaskVoid MoveCardAnimation(UICardSimpleControl cardControl, Vector3 startPos, Vector3 endPos, Vector3 startScale, Vector3 endScale, float duration, VerticalLayoutGroup layout)
+	{
+		layout.enabled = false;
+		cardControl.CacheTrans.SetParent(layout.transform);
+
+		Debug.Log("MoveCardAnimation: startPos = " + startPos + ", endPos = " + endPos + ", startScale = " + startScale + ", endScale = " + endScale + ", duration = " + duration);
+		float elapsed = 0f;
+		while (elapsed < duration)
+		{
+			elapsed += Time.deltaTime;
+			float t = elapsed / duration;
+
+			cardControl.CacheTrans.position = Vector3.Lerp(startPos, endPos, t);
+			cardControl.CacheTrans.localScale = Vector3.Lerp(startScale, endScale, t);
+
+			Debug.Log($"MoveCard Animation - Position: {cardControl.CacheTrans.position}, Scale: {cardControl.CacheTrans.localScale}, t: {t}");
+
+			await UniTask.Yield();
+		}
+
+		cardControl.CacheTrans.position = endPos;
+		cardControl.CacheTrans.localScale = endScale;
+		layout.enabled = true;
+		cardControl.SetMoving(false);
 	}
 
 	void TakeEnemyDamage(object[] paraArray)
