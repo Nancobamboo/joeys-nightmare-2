@@ -478,6 +478,7 @@ GameObject:
   - component: {fileID: 1649133492931171194}
   - component: {fileID: 4416405969398626140}
   - component: {fileID: 287875919152844429}
+  - component: {fileID: 1672908072842346862}
   m_Layer: 5
   m_Name: UICardSimple
   m_TagString: Untagged
@@ -611,8 +612,10 @@ MonoBehaviour:
   - Target: {fileID: 6146416255285513828}
     Components:
     - {fileID: 287875919152844429}
+    - {fileID: 1672908072842346862}
     VarNameArray:
     - BtnCard
+    - Trigger
 --- !u!114 &287875919152844429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -657,6 +660,19 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1672908072842346862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3508177458809045839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b287b1c07d73f1345a9a0264d4c12d0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates: []
 --- !u!1 &3538546241438865608
 GameObject:
   m_ObjectHideFlags: 0

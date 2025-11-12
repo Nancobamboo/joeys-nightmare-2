@@ -202,6 +202,7 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl cardControl = GetCardSimple(parent);
 			cardControl.SetData(card);
 			AddBagCard(cardType, cardControl);
+			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife, 0f);
 		}
 	}
 
@@ -216,6 +217,7 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl cardControl = GetCardSimple(parent.transform);
 			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
+			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife, 0f);
 		}
 	}
 
@@ -224,7 +226,7 @@ public partial class UIGamePhaseControl : YViewControl
 		return m_CardDict[uniqueId];
 	}
 
-	private void AddBagCard(ECardType cardType, UICardSimpleControl cardControl)
+	private void AddBagCard(ECardType cardType, UICardSimpleControl cardControl, bool isMoveCard = false)
 	{
 		int cardTypeInt = (int)cardType;
 		if (!m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
@@ -233,7 +235,10 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		m_BagCardDict[cardTypeInt].Add(cardControl);
 		cardControl.IsEnv = false;
-		cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+		if (!isMoveCard)
+		{
+			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+		}
 	}
 
 	private void RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -314,9 +319,9 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private bool DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex)
+	private bool DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage)
 	{
-		cardControl.CallCardTakeDamage(damage);
+		cardControl.CallCardTakeDamage(damage, effectType);
 
 		if (cardControl.CardData.currentHealth <= 0 && cardControl.CardType == ECardType.monster)
 		{
@@ -359,7 +364,7 @@ public partial class UIGamePhaseControl : YViewControl
 				if (cardList != null && cardList.Count > 0)
 				{
 					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
-					DealDamageToEnvCard(lastCard, damage, index);
+					DealDamageToEnvCard(lastCard, damage, index, EEffectType.Boom);
 				}
 			}
 		}
@@ -416,7 +421,7 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		bool isEnv = (bool)paraArray[0];
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[1];
-
+		cardControl.SetMoving(true);
 		if (isEnv)
 		{
 			ECardType cardType = cardControl.CardType;
@@ -425,7 +430,7 @@ public partial class UIGamePhaseControl : YViewControl
 			Vector3 startScale = Vector3.one;
 
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
-			AddBagCard(cardType, cardControl);
+			AddBagCard(cardType, cardControl, true);
 			cardControl.CardEffect?.OnEnterBag();
 
 			VerticalLayoutGroup layout = null;
@@ -470,6 +475,7 @@ public partial class UIGamePhaseControl : YViewControl
 				{
 					layout.enabled = true;
 					m_LastTweenDict.Remove(cardTypeInt);
+					cardControl.SetMoving(false);
 				}
 			});
 		}
