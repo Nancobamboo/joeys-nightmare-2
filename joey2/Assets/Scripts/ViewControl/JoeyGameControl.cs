@@ -267,6 +267,15 @@ public class JoeyGameControl : YViewControl
 		m_GlobalDelayAction.AddDelayCall(action, delayTime);
 	}
 
+	public bool HasBagCard(ECardType cardType)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.HasBagCard(cardType);
+		}
+		return false;
+	}
+
 	protected override void OnReturn()
 	{
 		m_GlobalDelayAction.Cancel();

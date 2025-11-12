@@ -14,17 +14,24 @@ public class YBoom_OnDead : YCardEffect
 		Id = ECardEffectId.Boom_OnDead;
 	}
 
-	public override void OnDead()
+	public override float OnDead()
 	{
 		if (!IsEffecting)
 		{
 			IsEffecting = true;
+			if (CardControl != null && CardControl.gameObject != null)
+			{
+				var vfxNames = new List<EVFXName> { };
+				CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_feitian, EVFXLife.SelfLife, 0f);
+			}
 			int envIndex = CardControl.EnvIndex;
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 			{
 				YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, envIndex, baseExtra);
-			}, 1f);
+			}, .7f);
+			return 0.5f;
 		}
+		return base.OnDead();
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

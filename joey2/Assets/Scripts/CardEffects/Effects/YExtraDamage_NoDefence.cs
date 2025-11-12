@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class YExtraDamage_NoDefence : YCardEffect
+public class YExtraDamage_NoDefence : YDefaultEffect
 {
     public int baseExtra;
 
@@ -12,16 +12,16 @@ public class YExtraDamage_NoDefence : YCardEffect
         Id = ECardEffectId.ExtraDamage_NoDefence;
     }
 
-    public override void UseSkill()
-    {
-        base.UseSkill();
-    }
 
     public override int GetEffectValue(EEffectType effectType)
     {
         if (effectType == EEffectType.Damage)
         {
-            return baseExtra;
+            if (!JoeyGameControl.Instance.HasBagCard(ECardType.defence))
+            {
+                return baseExtra;
+            }
+            return 0;
         }
         return base.GetEffectValue(effectType);
     }

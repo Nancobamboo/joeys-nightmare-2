@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 {
@@ -10,9 +11,19 @@ public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 		Id = ECardEffectId.HookEquipWeaponFromDiscard_OnPlay;
 	}
 
-	public override void UseSkill()
+	public override float UseItem()
 	{
-		base.UseSkill();
+		if (CardControl != null && CardControl.gameObject != null)
+		{
+			var vfxNames = new List<EVFXName> { };
+			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
+		}
+
+		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+		}, .2f);
+		return 0.65f;
 	}
 }
 

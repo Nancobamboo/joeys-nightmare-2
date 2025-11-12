@@ -9,6 +9,10 @@ public enum EActionId
 	TakeEnemyDamage,
 	TakePlayerDamage,
 	BoomEnvCard,
+	UseBagCard,
+	AddCardFromDiscard,
+	AttackRandomEnemy,
+	TakeAllEnemyDamage,
 	TryLoadScene,
 	Upper
 }

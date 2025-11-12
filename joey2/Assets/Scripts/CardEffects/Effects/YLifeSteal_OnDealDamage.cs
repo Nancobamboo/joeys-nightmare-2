@@ -12,9 +12,9 @@ public class YLifeSteal_OnDealDamage : YCardEffect
 		Id = ECardEffectId.LifeSteal_OnDealDamage;
 	}
 
-	public override void OnDealDamage()
+	public override float OnDealDamage()
 	{
-		base.OnDealDamage();
+		return base.OnDealDamage();
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

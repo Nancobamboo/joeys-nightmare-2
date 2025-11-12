@@ -14,16 +14,20 @@ public class YBoom_OnPlay : YCardEffect
 		Id = ECardEffectId.Boom_OnPlay;
 	}
 
-	public override void UseItem()
+	public override float UseItem()
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { EVFXName.VFX_boom };
-			CardControl.PlayVFX(vfxNames, ECardAnimName.None, EVFXLife.SelfLife, 0.65f);
+			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
 
-		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
+		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
+		}, 0.2f);
+		return 0.65f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)
