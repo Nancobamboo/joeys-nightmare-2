@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class UIGamePhaseControl : YViewControl
+public partial class UIGamePhaseControl : YViewControl
 {
 	private UIGamePhaseView m_View;
 
@@ -23,6 +23,7 @@ public class UIGamePhaseControl : YViewControl
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private List<Card> UsedCardList = new List<Card>();
 	private UIGameOverControl m_GameOverControl;
+	private Transform[] m_EffectRoots;
 
 	public static EResType GetResType()
 	{
@@ -53,6 +54,17 @@ public class UIGamePhaseControl : YViewControl
 			VerticalLayoutGroup vlg = child.GetComponent<VerticalLayoutGroup>();
 			m_EnvPanels.Add(vlg);
 		}
+
+		m_EffectRoots = new Transform[] { m_View.EffectRoot0, m_View.EffectRoot1, m_View.EffectRoot2, m_View.EffectRoot3, m_View.EffectRoot4 };
+	}
+
+	public Transform GetEffectRoot(int envIndex)
+	{
+		if (envIndex >= 0 && envIndex < m_EffectRoots.Length)
+		{
+			return m_EffectRoots[envIndex];
+		}
+		return null;
 	}
 
 	void OnHPChanged(int hp)

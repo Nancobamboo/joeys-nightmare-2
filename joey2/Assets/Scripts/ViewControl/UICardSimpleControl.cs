@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public enum ECardType
 {
@@ -28,7 +30,8 @@ public class UICardSimpleControl : YViewControl
 	public ECardType CardType => cachedCardType;
 	public Card CardData => cachedCard;
 	public int EnvIndex => m_EnvIndex;
-	private List<GameObject> EffectEntityList = new List<GameObject>();
+	private List<Transform> EffectEntityList = new List<Transform>();
+	private List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 
 	public YCardEffect CardEffect;
 
@@ -295,52 +298,75 @@ public class UICardSimpleControl : YViewControl
 		return Resources.Load<Sprite>(path);
 	}
 
-	public void PlayVFX(List<string> cardEffects = null, string animName = null)
+	public void PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.None, EVFXLife vfxLife = EVFXLife.CardLife, float delayTime = .5f)
 	{
-		if (!string.IsNullOrEmpty(animName))
+		if (animName != ECardAnimName.None)
 		{
-			m_View.Anim.CrossFade(animName, 0, 0);
+			m_View.Anim.CrossFade(animName.ToString(), 0, 0);
 		}
 
-		if (cardEffects != null && cardEffects.Count > 0)
+		if (vfxNames != null && vfxNames.Count > 0)
 		{
-			for (int i = 0; i < cardEffects.Count; i++)
+			for (int i = 0; i < vfxNames.Count; i++)
 			{
-				string effectName = cardEffects[i];
-				var vfxPrefab = Resources.Load<GameObject>("VFX/" + effectName);
-				var instance = Instantiate(vfxPrefab, CacheTrans);
+				EVFXName vfxName = vfxNames[i];
+				if (vfxLife == EVFXLife.SelfLife)
+				{
+					JoeyGameControl.Instance.PlayEnvVFX(vfxName, m_EnvIndex, delayTime);
+				}
+				else if (vfxLife == EVFXLife.CardLife)
+				{
+					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, CacheTrans);
+					EffectEntityList.Add(vfxTransform);
 
-				EffectEntityList.Add(instance);
+					DelayHideCardLifeVFX(vfxTransform, delayTime).Forget();
+
+				}
 			}
 		}
 	}
 
-	public void StopVFX()
-	{
-		m_View.Anim.CrossFade("idle", 0, 0);
 
-		for (int i = 0; i < EffectEntityList.Count; i++)
+	public async UniTaskVoid DelayHideCardLifeVFX(Transform vfxTransform, float delayTime)
+	{
+		var cts = new CancellationTokenSource();
+		CancelTokenList.Add(cts);
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
+		if (vfxTransform != null && vfxTransform.gameObject != null)
 		{
-			var go = EffectEntityList[i];
-			if (go != null)
+			JoeyGameControl.Instance.ReturnVFXPool(vfxTransform, m_EnvIndex);
+			EffectEntityList.Remove(vfxTransform);
+		}
+		CancelTokenList.Remove(cts);
+		cts.Dispose();
+	}
+
+
+
+	public void StopAllEffects()
+	{
+		for (int i = 0; i < CancelTokenList.Count; i++)
+		{
+			var cts = CancelTokenList[i];
+			if (cts != null && !cts.IsCancellationRequested)
 			{
-				Destroy(go);
+				cts.Cancel();
+				cts.Dispose();
 			}
 		}
-		EffectEntityList.Clear();
+		CancelTokenList.Clear();
 	}
 
 	protected override void OnReturn()
 	{
-
-		CardEffect.StopAllEffects();
+		StopAllEffects();
 
 		for (int i = 0; i < EffectEntityList.Count; i++)
 		{
 			var go = EffectEntityList[i];
 			if (go != null)
 			{
-				Destroy(go);
+				JoeyGameControl.Instance.ReturnVFXPool(go, m_EnvIndex);
 			}
 		}
 		gameObject.SetActive(false);

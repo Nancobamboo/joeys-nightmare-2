@@ -3,18 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public enum EGamePhase
 {
 	Default,
-	battleStart,
-	playerStart,
-	playerAction,
-	playerEnd,
-	enemyStart,
-	enemyAction,
-	enemyEnd,
-	battleEnd
+	BattleStart,
+	PlayerStart,
 }
 
 public class JoeyGameControl : YViewControl
@@ -27,6 +22,8 @@ public class JoeyGameControl : YViewControl
 	private UIGamePhaseControl m_GamePhaseControl;
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private UIPauseControl m_PauseControl;
+	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
+	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 
 	public static EResType GetResType()
 	{
@@ -49,7 +46,7 @@ public class JoeyGameControl : YViewControl
 		{
 			m_DataJoeyPlayer.currentLevel = 1;
 		}
-		SetGamePhase(EGamePhase.battleStart);
+		SetGamePhase(EGamePhase.BattleStart);
 	}
 
 	void Update()
@@ -64,29 +61,11 @@ public class JoeyGameControl : YViewControl
 				case EGamePhase.Default:
 					Default();
 					break;
-				case EGamePhase.battleStart:
+				case EGamePhase.BattleStart:
 					BattleStart();
 					break;
-				case EGamePhase.playerStart:
+				case EGamePhase.PlayerStart:
 					PlayerStart();
-					break;
-				case EGamePhase.playerAction:
-					PlayerAction();
-					break;
-				case EGamePhase.playerEnd:
-					PlayerEnd();
-					break;
-				case EGamePhase.enemyStart:
-					EnemyStart();
-					break;
-				case EGamePhase.enemyAction:
-					EnemyAction();
-					break;
-				case EGamePhase.enemyEnd:
-					EnemyEnd();
-					break;
-				case EGamePhase.battleEnd:
-					BattleEnd();
 					break;
 				default:
 					break;
@@ -117,41 +96,11 @@ public class JoeyGameControl : YViewControl
 	private void BattleStart()
 	{
 		SetLevelData();
-		SetGamePhase(EGamePhase.playerStart);
+		SetGamePhase(EGamePhase.PlayerStart);
 	}
 
 	private void PlayerStart()
 	{
-		SetGamePhase(EGamePhase.playerAction);
-	}
-
-	private void PlayerAction()
-	{
-	}
-
-	private void PlayerEnd()
-	{
-		SetGamePhase(EGamePhase.enemyStart);
-	}
-
-	private void EnemyStart()
-	{
-		SetGamePhase(EGamePhase.enemyAction);
-	}
-
-	private void EnemyAction()
-	{
-		SetGamePhase(EGamePhase.enemyEnd);
-	}
-
-	private void EnemyEnd()
-	{
-		SetGamePhase(EGamePhase.battleEnd);
-	}
-
-	private void BattleEnd()
-	{
-		SetGamePhase(EGamePhase.Default);
 	}
 
 	public void SetGamePhase(EGamePhase gamePhase)
@@ -207,12 +156,12 @@ public class JoeyGameControl : YViewControl
 	{
 		m_DataJoeyPlayer.currentLevel++;
 		await UniTask.WaitForSeconds(0.5f);
-		SetGamePhase(EGamePhase.battleStart);
+		SetGamePhase(EGamePhase.BattleStart);
 	}
 
 	public void EnterBattleStart()
 	{
-		SetGamePhase(EGamePhase.battleStart);
+		SetGamePhase(EGamePhase.BattleStart);
 	}
 
 	public void ReturnToMainMenu()
@@ -225,8 +174,104 @@ public class JoeyGameControl : YViewControl
 		;
 	}
 
+	public void PlayVFX(EVFXName vfxName, Transform parent, float delayTime)
+	{
+		int key = (int)vfxName;
+
+		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
+		{
+			string prefabPath = "VFX/" + vfxName.ToString();
+			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			pool = new MonoBehaviourPool<Transform>(() =>
+			{
+				GameObject instance = Instantiate(prefab, parent);
+				instance.gameObject.name = vfxName.ToString();
+
+				return instance.transform;
+			});
+			VFXPoolDict[key] = pool;
+		}
+
+		Transform vfxTransform = pool.Get();
+		vfxTransform.SetParent(parent);
+		vfxTransform.localPosition = Vector3.zero;
+
+		var cts = new CancellationTokenSource();
+		CancelTokenDict[vfxTransform] = cts;
+
+		DelayHideVFX(vfxTransform, delayTime, cts, key).Forget();
+	}
+
+	public Transform GetVFX(EVFXName vfxName, Transform parent)
+	{
+		int key = (int)vfxName;
+
+		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
+		{
+			string prefabPath = "VFX/" + vfxName.ToString();
+			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			pool = new MonoBehaviourPool<Transform>(() =>
+			{
+				GameObject instance = Instantiate(prefab, parent);
+				instance.gameObject.name = vfxName.ToString();
+
+				return instance.transform;
+			});
+			VFXPoolDict[key] = pool;
+		}
+
+		Transform vfxTransform = pool.Get();
+		vfxTransform.SetParent(parent);
+		vfxTransform.localPosition = Vector3.zero;
+
+		return vfxTransform;
+	}
+
+	public void PlayEnvVFX(EVFXName vfxName, int envIndex, float delayTime)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
+			if (effectRoot != null)
+			{
+				PlayVFX(vfxName, effectRoot, delayTime);
+			}
+		}
+	}
+
+	public void ReturnVFXPool(Transform vfxTransform, int envIndex)
+	{
+		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
+		vfxTransform.SetParent(effectRoot);
+		vfxTransform.localPosition = Vector3.zero;
+	}
+
+	private async UniTaskVoid DelayHideVFX(Transform vfxTransform, float delayTime, CancellationTokenSource cts, int key)
+	{
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
+		if (vfxTransform != null && vfxTransform.gameObject != null && VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
+		{
+			pool.Release(vfxTransform);
+		}
+		if (CancelTokenDict.TryGetValue(vfxTransform, out CancellationTokenSource tokenSource))
+		{
+			CancelTokenDict.Remove(vfxTransform);
+			tokenSource.Dispose();
+		}
+	}
+
 	protected override void OnReturn()
 	{
+		foreach (var kvp in CancelTokenDict)
+		{
+			var cts = kvp.Value;
+			if (cts != null && !cts.IsCancellationRequested)
+			{
+				cts.Cancel();
+				cts.Dispose();
+			}
+		}
+		CancelTokenDict.Clear();
 		base.OnReturn();
 	}
 }

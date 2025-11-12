@@ -15,11 +15,9 @@ public class YDefaultEffect : YCardEffect
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
-            var vfxNames = new List<string> {  };
-            CardControl.PlayVFX(vfxNames, animName: "UI_Carditem_gongji");
-
+            var vfxNames = new List<EVFXName> { };
             float delayTime = Random.Range(0.5f, 1.5f);
-            DelayStopVFX(delayTime).Forget();
+            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife, delayTime);
         }
     }
 
@@ -27,11 +25,9 @@ public class YDefaultEffect : YCardEffect
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
-            var vfxNames = new List<string> { "VFX_Shouji" };
-            CardControl.PlayVFX(vfxNames, animName: "UI_Carditem_shouji");
-
+            var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
             float delayTime = Random.Range(0.5f, 1.5f);
-            DelayStopVFX(delayTime).Forget();
+            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, delayTime);
         }
     }
 }
