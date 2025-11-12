@@ -18,10 +18,9 @@ public class YBoom_OnDead : YCardEffect
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{
-			var vfxNames = new List<string> { "VFX_boom" };
-			CardControl.PlayVFX(vfxNames, animName: null);
+			var vfxNames = new List<EVFXName> { EVFXName.VFX_boom };
+			CardControl.PlayVFX(vfxNames, ECardAnimName.None, EVFXLife.SelfLife, 0.65f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
-			DelayStopVFX(0.65f).Forget();
 		}
 
 		int envIndex = CardControl.EnvIndex;

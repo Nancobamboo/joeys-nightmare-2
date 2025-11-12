@@ -35,13 +35,43 @@ public enum EEffectType
     Other
 }
 
+public enum EVFXName
+{
+    VFX_appear,
+    VFX_boom,
+    VFX_disappear,
+    VFX_Dun,
+    VFX_Dunsui,
+    VFX_glow,
+    VFX_LeiDan,
+    VFX_Shouji
+}
+
+public enum ECardAnimName
+{
+    None,
+    UI_Carditem_shouji,
+    UI_Carditem_xiaoshi,
+    UI_Carditem_dunpai,
+    UI_Carditem_gongji,
+    UI_Carditem_guaiwugongji,
+    UI_Carditem_diaoluo_anim,
+    UI_Carditem_feitian,
+    UI_Carditem_pailai
+}
+
+public enum EVFXLife
+{
+    CardLife,
+    SelfLife
+}
+
 
 
 public class YCardEffect
 {
     public ECardEffectId Id;
     public UICardSimpleControl CardControl;
-    public List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 
     public void SetData(UICardSimpleControl cardControl)
     {
@@ -112,30 +142,5 @@ public class YCardEffect
         }
     }
 
-    public async UniTaskVoid DelayStopVFX(float delayTime)
-    {
-        var cts = new CancellationTokenSource();
-        CancelTokenList.Add(cts);
-        await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
-        if (CardControl != null && CardControl.gameObject != null)
-        {
-            CardControl.StopVFX();
-        }
-    }
-
-
-    public void StopAllEffects()
-    {
-        for (int i = 0; i < CancelTokenList.Count; i++)
-        {
-            var cts = CancelTokenList[i];
-            if (cts != null && !cts.IsCancellationRequested)
-            {
-                cts.Cancel();
-                cts.Dispose();
-            }
-        }
-        CancelTokenList.Clear();
-    }
 }
 

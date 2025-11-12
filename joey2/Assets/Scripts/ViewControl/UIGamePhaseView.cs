@@ -14,6 +14,11 @@ public class UIGamePhaseView : YBaseView
 	public VerticalLayoutGroup DefencePanel;
 	public VerticalLayoutGroup AttackPanel;
 	public Image JoeyImage;
+	public RectTransform EffectRoot0;
+	public RectTransform EffectRoot1;
+	public RectTransform EffectRoot2;
+	public RectTransform EffectRoot3;
+	public RectTransform EffectRoot4;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -30,5 +35,10 @@ public class UIGamePhaseView : YBaseView
 		DefencePanel = viewItemList[7].Target.GetComponent<VerticalLayoutGroup>();
 		AttackPanel = viewItemList[8].Target.GetComponent<VerticalLayoutGroup>();
 		JoeyImage = viewItemList[9].Target.GetComponent<Image>();
+		EffectRoot0 = viewItemList[10].Target.GetComponent<RectTransform>();
+		EffectRoot1 = viewItemList[11].Target.GetComponent<RectTransform>();
+		EffectRoot2 = viewItemList[12].Target.GetComponent<RectTransform>();
+		EffectRoot3 = viewItemList[13].Target.GetComponent<RectTransform>();
+		EffectRoot4 = viewItemList[14].Target.GetComponent<RectTransform>();
 	}
 }
