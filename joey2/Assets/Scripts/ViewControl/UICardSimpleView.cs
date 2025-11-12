@@ -18,6 +18,7 @@ public class UICardSimpleView : YBaseView
 	public GameObject Defence;
 	public GameObject StarLayout;
 	public Button BtnCard;
+	public EventTriggerListener Trigger;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -38,5 +39,6 @@ public class UICardSimpleView : YBaseView
 		Defence = viewItemList[11].Target.gameObject;
 		StarLayout = viewItemList[12].Target.gameObject;
 		BtnCard = viewItemList[13].Target.GetComponent<Button>();
+		Trigger = viewItemList[13].Target.GetComponent<EventTriggerListener>();
 	}
 }

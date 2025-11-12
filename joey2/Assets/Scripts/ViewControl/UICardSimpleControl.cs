@@ -32,6 +32,8 @@ public class UICardSimpleControl : YViewControl
 	public int EnvIndex => m_EnvIndex;
 	private List<Transform> EffectEntityList = new List<Transform>();
 	private List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
+	private Vector3 m_OriginalScale;
+	private bool m_IsMoving;
 
 	public YCardEffect CardEffect;
 
@@ -47,7 +49,31 @@ public class UICardSimpleControl : YViewControl
 		m_View = CreateView<UICardSimpleView>();
 		m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
 
+		if (m_View.Trigger != null)
+		{
+			m_View.Trigger.onEnter = OnPointerEnter;
+			m_View.Trigger.onExit = OnPointerExit;
+		}
+
 		SetRaycastTargetFalse();
+	}
+
+	private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
+	{
+		if (m_IsMoving) return;
+		m_OriginalScale = CacheTrans.localScale;
+		CacheTrans.localScale = m_OriginalScale * 1.1f;
+	}
+
+	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
+	{
+		if (m_IsMoving) return;
+		CacheTrans.localScale = m_OriginalScale;
+	}
+
+	public void SetMoving(bool isMoving)
+	{
+		m_IsMoving = isMoving;
 	}
 
 	private void SetRaycastTargetFalse()
@@ -102,11 +128,11 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
-	public void CallCardTakeDamage(int damage)
+	public void CallCardTakeDamage(int damage, EEffectType effectType = EEffectType.Damage)
 	{
 		Debug.Log(CardData.cardName);
 		cachedCard.TakeDamage(damage);
-		CardEffect?.OnTakeDamage();
+		CardEffect?.OnTakeDamage(effectType);
 		RefreshCard();
 	}
 

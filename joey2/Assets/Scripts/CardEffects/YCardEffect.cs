@@ -31,6 +31,7 @@ public enum EEffectType
     Debuff,
     ReflectDamage,
     LifeSteal,
+    Boom,
 
     Other
 }
@@ -72,6 +73,7 @@ public class YCardEffect
 {
     public ECardEffectId Id;
     public UICardSimpleControl CardControl;
+    public bool IsEffecting;
 
     public void SetData(UICardSimpleControl cardControl)
     {
@@ -92,7 +94,7 @@ public class YCardEffect
     {
     }
 
-    public virtual void OnTakeDamage()
+    public virtual void OnTakeDamage(EEffectType effectType = EEffectType.Damage)
     {
     }
 

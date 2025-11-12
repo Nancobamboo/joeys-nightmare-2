@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using System;
 
 public enum EGamePhase
 {
@@ -24,6 +25,8 @@ public class JoeyGameControl : YViewControl
 	private UIPauseControl m_PauseControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
+	private Action m_GlobalDelayAction;
+	private CancellationTokenSource m_GlobalDelayToken;
 
 	public static EResType GetResType()
 	{
@@ -260,8 +263,45 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
+	public void AddGlobalDelayCall(Action action, float delayTime)
+	{
+		if (m_GlobalDelayToken != null && !m_GlobalDelayToken.IsCancellationRequested)
+		{
+			m_GlobalDelayToken.Cancel();
+			m_GlobalDelayToken.Dispose();
+			if (m_GlobalDelayAction != null)
+			{
+				m_GlobalDelayAction.Invoke();
+			}
+		}
+
+		m_GlobalDelayAction = action;
+		m_GlobalDelayToken = new CancellationTokenSource();
+		DelayCall(action, delayTime, m_GlobalDelayToken).Forget();
+	}
+
+	private async UniTaskVoid DelayCall(Action action, float delayTime, CancellationTokenSource cts)
+	{
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
+		if (!cts.IsCancellationRequested && action != null)
+		{
+			action.Invoke();
+		}
+		m_GlobalDelayToken?.Dispose();
+		m_GlobalDelayToken = null;
+		m_GlobalDelayAction = null;
+	}
+
 	protected override void OnReturn()
 	{
+		if (m_GlobalDelayToken != null && !m_GlobalDelayToken.IsCancellationRequested)
+		{
+			m_GlobalDelayToken.Cancel();
+			m_GlobalDelayToken.Dispose();
+		}
+		m_GlobalDelayToken = null;
+		m_GlobalDelayAction = null;
+
 		foreach (var kvp in CancelTokenDict)
 		{
 			var cts = kvp.Value;
