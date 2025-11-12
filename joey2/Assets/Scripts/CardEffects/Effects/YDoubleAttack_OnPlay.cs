@@ -9,9 +9,9 @@ public class YDoubleAttack_OnPlay : YCardEffect
 		Id = ECardEffectId.DoubleAttack_OnPlay;
 	}
 
-	public override void UseSkill()
+	public override float UseSkill()
 	{
-		base.UseSkill();
+		return base.UseSkill();
 	}
 }
 

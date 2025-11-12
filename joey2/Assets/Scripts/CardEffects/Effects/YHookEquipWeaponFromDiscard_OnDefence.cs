@@ -10,9 +10,9 @@ public class YHookEquipWeaponFromDiscard_OnDefence : YCardEffect
 		Id = ECardEffectId.HookEquipWeaponFromDiscard_OnDefence;
 	}
 
-	public override void UseDefence()
+	public override float UseDefence()
 	{
-		base.UseDefence();
+		return base.UseDefence();
 	}
 }
 

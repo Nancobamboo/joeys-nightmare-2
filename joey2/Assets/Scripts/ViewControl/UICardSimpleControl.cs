@@ -119,10 +119,8 @@ public class UICardSimpleControl : YViewControl
 			switch (cachedCardType)
 			{
 				case ECardType.skill:
-					CardEffect?.UseSkill();
-					break;
 				case ECardType.item:
-					CardEffect?.UseItem();
+					YActionSystem.Instance.DispatchAction(EActionId.UseBagCard, this);
 					break;
 			}
 		}

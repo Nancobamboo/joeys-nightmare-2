@@ -80,45 +80,54 @@ public class YCardEffect
         CardControl = cardControl;
     }
 
-    public virtual void OnBecomeTopOfPile()
+    public virtual float OnBecomeTopOfPile()
     {
+        return 0.5f;
     }
 
-    public virtual void OnEnterBag()
+    public virtual float OnEnterBag()
     {
-
+        return 0f;
     }
 
-
-    public virtual void OnDealDamage()
+    public virtual float OnDealDamage()
     {
+        return 0.5f;
     }
 
-    public virtual void OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public virtual float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
     {
+        return 0.45f;
     }
 
-
-    public virtual void OnKill()
+    public virtual float OnKill()
     {
+        return 0.5f;
     }
 
-    public virtual void OnDead()
+    public virtual float OnDead()
     {
+        return 0.5f;
     }
 
-    public virtual void UseDefence()
+    public virtual float UseDefence()
     {
+        return 0.5f;
     }
 
-    public virtual void UseSkill()
+    public virtual float UseSkill()
     {
+        return 0.5f;
     }
-    public virtual void UseItem()
+
+    public virtual float UseItem()
     {
+        return 0.5f;
     }
-    public virtual void UseAttack()
+
+    public virtual float UseAttack()
     {
+        return 0.5f;
     }
 
     public virtual int GetEffectValue(EEffectType effectType)

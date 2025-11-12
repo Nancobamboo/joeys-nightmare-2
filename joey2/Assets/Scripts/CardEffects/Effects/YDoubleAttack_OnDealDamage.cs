@@ -10,9 +10,9 @@ public class YDoubleAttack_OnDealDamage : YCardEffect
 		Id = ECardEffectId.DoubleAttack_OnDealDamage;
 	}
 
-	public override void OnDealDamage()
+	public override float OnDealDamage()
 	{
-		base.OnDealDamage();
+		return base.OnDealDamage();
 	}
 }
 

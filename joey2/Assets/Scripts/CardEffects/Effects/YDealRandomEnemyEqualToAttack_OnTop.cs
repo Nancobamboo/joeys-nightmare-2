@@ -9,9 +9,9 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YCardEffect
 		Id = ECardEffectId.DealRandomEnemyEqualToAttack_OnTop;
 	}
 
-	public override void OnBecomeTopOfPile()
+	public override float OnBecomeTopOfPile()
 	{
-		base.OnBecomeTopOfPile();
+		return base.OnBecomeTopOfPile();
 	}
 }
 

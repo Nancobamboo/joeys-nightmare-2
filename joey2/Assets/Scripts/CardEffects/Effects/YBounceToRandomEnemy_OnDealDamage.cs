@@ -13,9 +13,9 @@ public class YBounceToRandomEnemy_OnDealDamage : YCardEffect
 		Id = ECardEffectId.BounceToRandomEnemy_OnDealDamage;
 	}
 
-	public override void OnDealDamage()
+	public override float OnDealDamage()
 	{
-		base.OnDealDamage();
+		return base.OnDealDamage();
 	}
 }
 

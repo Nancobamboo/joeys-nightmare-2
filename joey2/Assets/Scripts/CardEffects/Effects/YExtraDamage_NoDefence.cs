@@ -12,9 +12,9 @@ public class YExtraDamage_NoDefence : YCardEffect
         Id = ECardEffectId.ExtraDamage_NoDefence;
     }
 
-    public override void UseSkill()
+    public override float UseSkill()
     {
-        base.UseSkill();
+        return base.UseSkill();
     }
 
     public override int GetEffectValue(EEffectType effectType)

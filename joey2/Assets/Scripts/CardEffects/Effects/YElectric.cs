@@ -13,9 +13,9 @@ public class YElectric : YCardEffect
 		Id = ECardEffectId.Electric;
 	}
 
-	public override void UseSkill()
+	public override float UseSkill()
 	{
-		base.UseSkill();
+		return base.UseSkill();
 	}
 
 	public override int GetEffectValue(EEffectType effectType)
