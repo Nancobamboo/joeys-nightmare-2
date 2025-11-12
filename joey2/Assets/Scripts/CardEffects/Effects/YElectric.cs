@@ -18,16 +18,19 @@ public class YElectric : YCardEffect
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{
-			var vfxNames = new List<EVFXName> { };
-			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
+			var vfxNames = new List<EVFXName> {  };
+			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife, 0.4f);
 		}
 
 		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 		{
-			YActionSystem.Instance.DispatchAction(EActionId.TakeAllEnemyDamage);
-		}, 0.2f);
+			var vfxNames = new List<EVFXName> {  };
+			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.6f);
 
-		return 0.65f;
+			YActionSystem.Instance.DispatchAction(EActionId.TakeAllEnemyDamage);
+		}, 0.4f);
+
+		return 1f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)
