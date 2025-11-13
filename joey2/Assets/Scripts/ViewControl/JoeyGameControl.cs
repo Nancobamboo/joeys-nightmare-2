@@ -216,6 +216,7 @@ public class JoeyGameControl : YViewControl
 			{
 				GameObject instance = Instantiate(prefab, parent);
 				instance.gameObject.name = vfxName.ToString();
+				instance.transform.localPosition = Vector3.zero;
 
 				return instance.transform;
 			});
@@ -225,6 +226,7 @@ public class JoeyGameControl : YViewControl
 		Transform vfxTransform = pool.Get();
 		vfxTransform.SetParent(parent);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.gameObject.SetActive(true);
 
 		return vfxTransform;
 	}

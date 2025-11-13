@@ -9,6 +9,7 @@ public enum EResType
     UIGameOver,
     UIGamePhase,
     UIPause,
+	UIDamageText,
     UIUpper,
     LevelEnemy,
     SoundEffect,
