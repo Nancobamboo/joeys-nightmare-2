@@ -28,27 +28,15 @@ public class UIDamageTextControl : YViewControl
 
 		if (damage > 0)
 		{
-			if (m_View.Damage != null)
-			{
-				m_View.Damage.text = "-" + damage.ToString();
-				m_View.Damage.gameObject.SetActive(true);
-			}
-			if (m_View.Add != null)
-			{
-				m_View.Add.gameObject.SetActive(false);
-			}
+			m_View.Damage.text = "-" + damage.ToString();
+			m_View.Damage.gameObject.SetActive(true);
+			m_View.Add.gameObject.SetActive(false);
 		}
 		else if (damage < 0)
 		{
-			if (m_View.Add != null)
-			{
-				m_View.Add.text = "+" + (-damage).ToString();
-				m_View.Add.gameObject.SetActive(true);
-			}
-			if (m_View.Damage != null)
-			{
-				m_View.Damage.gameObject.SetActive(false);
-			}
+			m_View.Add.text = "+" + (-damage).ToString();
+			m_View.Add.gameObject.SetActive(true);
+			m_View.Damage.gameObject.SetActive(false);
 		}
 
 		if (m_Animator != null)
@@ -67,14 +55,9 @@ public class UIDamageTextControl : YViewControl
 
 	protected override void OnReturn()
 	{
-		if (m_View.Damage != null)
-		{
-			m_View.Damage.gameObject.SetActive(false);
-		}
-		if (m_View.Add != null)
-		{
-			m_View.Add.gameObject.SetActive(false);
-		}
+		m_View.Damage.gameObject.SetActive(false);
+		m_View.Add.gameObject.SetActive(false);
+		gameObject.SetActive(false);
 		base.OnReturn();
 	}
 }

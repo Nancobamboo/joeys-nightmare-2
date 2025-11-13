@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +30,8 @@ public partial class UIGamePhaseControl : YViewControl
 	private List<Card> UsedCardList = new List<Card>();
 	private UIGameOverControl m_GameOverControl;
 	private Transform[] m_EffectRoots;
-	private Dictionary<UICardSimpleControl, Action> m_CardActionDict = new Dictionary<UICardSimpleControl, Action>();
+	private Queue<UICardSimpleControl> m_CardActionQueue = new Queue<UICardSimpleControl>();
+	public UICardSimpleControl CurrentEffectCard;
 
 	public static EResType GetResType()
 	{
@@ -52,6 +54,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
 		RegistAction(EActionId.AttackRandomEnemy, AttackRandomEnemy);
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
+		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
+		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -259,7 +263,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private async UniTaskVoid RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
+	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
 	{
 		int cardTypeInt = (int)cardType;
 		if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
@@ -370,6 +374,8 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardData.currentHealth <= 0 && cardControl.CardType == ECardType.monster)
 		{
+			string monsterId = cardControl.CardData.id;
+			List<Card> dropCards = GetMonsterDropCard(monsterId);
 
 			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime);
@@ -378,10 +384,100 @@ public partial class UIGamePhaseControl : YViewControl
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime);
 
+			if (dropCards != null && dropCards.Count > 0)
+			{
+				AddEnvDropCard(dropCards, envIndex);
+			}
+
 			return true;
 		}
 
 		return false;
+	}
+
+	private List<Card> GetMonsterDropCard(string monsterId)
+	{
+		if (string.IsNullOrEmpty(monsterId))
+		{
+			return null;
+		}
+
+		if (!LootDropManager.Instance.TryGetDropCards(monsterId, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
+		{
+			return null;
+		}
+
+		List<Card> dropCards = new List<Card>();
+		for (int i = 0; i < cardIds.Count; i++)
+		{
+			Card card = CreateCard(cardIds[i]);
+			dropCards.Add(card);
+		}
+
+		return dropCards;
+	}
+
+	private void AddEnvDropCard(List<Card> dropCards, int centerIndex)
+	{
+		if (dropCards == null || dropCards.Count == 0)
+		{
+			return;
+		}
+
+		if (m_EnvPanels == null || m_EnvPanels.Count == 0)
+		{
+			return;
+		}
+
+		centerIndex = Mathf.Clamp(centerIndex, 0, m_EnvPanels.Count - 1);
+
+		var usedIndices = new HashSet<int>();
+		var offsetPattern = BuildOffsetPattern(m_EnvPanels.Count);
+
+		for (int i = 0; i < dropCards.Count; i++)
+		{
+			int panelIndex = FindPanelIndex(centerIndex, usedIndices, offsetPattern, m_EnvPanels.Count);
+			if (panelIndex < 0)
+			{
+				panelIndex = centerIndex;
+			}
+
+			panelIndex = Mathf.Clamp(panelIndex, 0, m_EnvPanels.Count - 1);
+			VerticalLayoutGroup parent = m_EnvPanels[panelIndex];
+			UICardSimpleControl cardControl = GetCardSimple(parent.transform);
+			cardControl.SetData(dropCards[i], isEnv: true, envIndex: panelIndex);
+			AddEnvCard(panelIndex, cardControl);
+			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+
+			usedIndices.Add(panelIndex);
+		}
+	}
+
+	private List<int> BuildOffsetPattern(int panelCount)
+	{
+		var offsets = new List<int>();
+		offsets.Add(0);
+		int step = 1;
+		while (offsets.Count < panelCount * 2)
+		{
+			offsets.Add(-step);
+			offsets.Add(step);
+			step++;
+		}
+		return offsets;
+	}
+
+	private int FindPanelIndex(int centerIndex, HashSet<int> usedIndices, List<int> offsetPattern, int panelCount)
+	{
+		for (int i = 0; i < offsetPattern.Count; i++)
+		{
+			int candidate = centerIndex + offsetPattern[i];
+			if (candidate < 0 || candidate >= panelCount) continue;
+			if (usedIndices.Contains(candidate)) continue;
+			return candidate;
+		}
+
+		return Mathf.Clamp(centerIndex, 0, panelCount - 1);
 	}
 
 	async void BoomEnvCard(object[] paraArray)
@@ -523,6 +619,10 @@ public partial class UIGamePhaseControl : YViewControl
 					cardControl.CacheTrans.localScale = endScale;
 					layout.enabled = true;
 					cardControl.SetMoving(false);
+					if (CurrentEffectCard != null)
+					{
+						CurrentEffectCard.IsEffecting = false;
+					}
 				}
 			);
 		}
@@ -567,7 +667,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(1f);
 		}
 
-		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraTime) ?? 0;
+		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 
@@ -592,12 +692,13 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime);
-		RemoveBagCard(ECardType.attack, attackCardControl).Forget();
+		await RemoveBagCard(ECardType.attack, attackCardControl);
 		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime);
 		}
+		enemyCardControl.IsEffecting = false;
 	}
 
 	async void TakePlayerDamage(object[] paraArray)
@@ -610,11 +711,14 @@ public partial class UIGamePhaseControl : YViewControl
 
 	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex)
 	{
+		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
+		await UniTask.WaitForSeconds(delayTime);
+
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		if (defenceCardControl != null)
 		{
-			float delayTime = defenceCardControl.CardEffect?.UseDefence() ?? 0.5f;
+			delayTime = defenceCardControl.CardEffect?.UseDefence() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime);
 			defenceValue = defenceCardControl.CardData.currentDefence;
 		}
@@ -643,7 +747,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex);
 			}
-			RemoveBagCard(ECardType.defence, defenceCardControl).Forget();
+			await RemoveBagCard(ECardType.defence, defenceCardControl);
 			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished() ?? 0f;
 			if (finishDelayTime > 0f)
 			{
@@ -680,11 +784,15 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		await UniTask.WaitForSeconds(delayTime);
-		RemoveBagCard(cardType, cardControl).Forget();
+		await RemoveBagCard(cardType, cardControl);
 		float finishDelayTime = cardControl.CardEffect?.OnUseFinished() ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime);
+		}
+		if (CurrentEffectCard != null)
+		{
+			CurrentEffectCard.IsEffecting = false;
 		}
 	}
 
@@ -824,17 +932,67 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	public void AddCardAction(UICardSimpleControl cardControl, Action action)
+	void AddCardToQueue(object[] paraArray)
 	{
-		if (cardControl != null && action != null)
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		if (cardControl != null && !m_CardActionQueue.Contains(cardControl))
 		{
-			m_CardActionDict[cardControl] = action;
+			m_CardActionQueue.Enqueue(cardControl);
+		}
+	}
+
+	void AddEffectValueToBagCard(object[] paraArray)
+	{
+		ECardType targetCardType = paraArray.Length > 0 && paraArray[0] is ECardType ? (ECardType)paraArray[0] : ECardType.attack;
+		EEffectType effectType = paraArray.Length > 1 && paraArray[1] is EEffectType ? (EEffectType)paraArray[1] : EEffectType.Other;
+		int value = paraArray.Length > 2 && paraArray[2] is int ? (int)paraArray[2] : 0;
+
+		UICardSimpleControl lastBagCard = GetLastBagCard(targetCardType);
+		if (lastBagCard != null && lastBagCard.CardEffect != null)
+		{
+			lastBagCard.CardEffect.AddEffectValue(effectType, value);
+		}
+	}
+
+	void Update()
+	{
+		if (CurrentEffectCard == null && m_CardActionQueue.Count > 0)
+		{
+			CurrentEffectCard = m_CardActionQueue.Dequeue();
+			if (CurrentEffectCard != null)
+			{
+				CurrentEffectCard.OnBtnRealClick();
+			}
+		}
+
+		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting)
+		{
+			CurrentEffectCard = null;
+		}
+	}
+
+	public void ClearCardQueue()
+	{
+		while (m_CardActionQueue.Count > 0)
+		{
+			UICardSimpleControl cardControl = m_CardActionQueue.Dequeue();
+			cardControl.IsEffecting = false;
+			cardControl.Return();
+		}
+
+		if (CurrentEffectCard != null)
+		{
+			CurrentEffectCard.IsEffecting = false;
+			CurrentEffectCard.Return();
+			CurrentEffectCard = null;
 		}
 	}
 
 	protected override void OnReturn()
 	{
 		m_MoveCardDelayAction.Cancel();
+		m_CardActionQueue.Clear();
+		CurrentEffectCard = null;
 		base.OnReturn();
 	}
 }

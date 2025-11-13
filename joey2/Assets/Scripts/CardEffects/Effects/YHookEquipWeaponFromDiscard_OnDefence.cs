@@ -17,6 +17,7 @@ public class YHookEquipWeaponFromDiscard_OnDefence : YCardEffect
 		{
 			var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
 			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+			SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
 			return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
 		}
 		return base.UseDefence();

@@ -28,6 +28,7 @@ public class YDefaultEffect : YCardEffect
         {
             var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
             float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
+            SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
             return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
         }
         return base.UseDefence();
@@ -61,6 +62,7 @@ public class YDefaultEffect : YCardEffect
                 default:
                     var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
                     float shoujiDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
+                    SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
                     return shoujiDelayTime;
             }
         }
@@ -72,11 +74,13 @@ public class YDefaultEffect : YCardEffect
         {
             // 先播放雷弹特效
             var electricVfxNames = new List<EVFXName> { EVFXName.VFX_LeiDan };
-            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
+            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
+            SFX.PlayAudio("Audio/SFX/Battle/electric", 1.0f, 0f);
             await UniTask.WaitForSeconds(0.65f);
             // 执行default分支的特效
             var damageVfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
-            CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
+            CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
+            SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
         }
     }
     public override float OnBeDying()

@@ -13,6 +13,8 @@ public enum EActionId
 	AddCardFromDiscard,
 	AttackRandomEnemy,
 	TakeAllEnemyDamage,
+	AddCardToQueue,
 	TryLoadScene,
+	AddEffectValueToBagCard,
 	Upper
 }

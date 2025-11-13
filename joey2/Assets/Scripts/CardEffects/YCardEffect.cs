@@ -32,9 +32,10 @@ public enum EEffectType
     ReflectDamage,
     LifeSteal,
     Boom,
-    ExtraTime,
+    ExtraAttackCnt,
     Electric,
-    Other
+    Other,
+    Upper
 }
 
 public enum EVFXName
@@ -74,7 +75,7 @@ public class YCardEffect
 {
     public ECardEffectId Id;
     public UICardSimpleControl CardControl;
-    public bool IsEffecting;
+    private int[] m_EffectValues = new int[(int)EEffectType.Upper];
 
     public void SetData(UICardSimpleControl cardControl)
     {
@@ -148,26 +149,20 @@ public class YCardEffect
 
     public virtual int GetEffectValue(EEffectType effectType)
     {
-        switch (effectType)
+        int index = (int)effectType;
+        if (index >= 0 && index < m_EffectValues.Length)
         {
-            case EEffectType.Damage:
-                return 0;
-            case EEffectType.Heal:
-                return 0;
-            case EEffectType.Buff:
-                return 0;
-            case EEffectType.Debuff:
-                return 0;
-            case EEffectType.ReflectDamage:
-                return 0;
-            case EEffectType.LifeSteal:
-                return 0;
-            case EEffectType.ExtraTime:
-                return 0;
-            case EEffectType.Other:
-                return 0;
-            default:
-                return 0;
+            return m_EffectValues[index];
+        }
+        return 0;
+    }
+
+    public virtual void AddEffectValue(EEffectType effectType, int value)
+    {
+        int index = (int)effectType;
+        if (index >= 0 && index < m_EffectValues.Length)
+        {
+            m_EffectValues[index] += value;
         }
     }
 

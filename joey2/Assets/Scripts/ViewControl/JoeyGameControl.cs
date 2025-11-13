@@ -157,7 +157,11 @@ public class JoeyGameControl : YViewControl
 	public async void LoadNextLevel()
 	{
 		m_DataJoeyPlayer.currentLevel++;
+
+		m_GamePhaseControl.ClearCardQueue();
 		await UniTask.WaitForSeconds(0.5f);
+
+
 		SetGamePhase(EGamePhase.BattleStart);
 	}
 

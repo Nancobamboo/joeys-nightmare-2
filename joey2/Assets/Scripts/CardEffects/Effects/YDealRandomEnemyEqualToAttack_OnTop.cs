@@ -16,7 +16,7 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 		if (CardControl != null && CardControl.CardData != null)
 		{
 			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraTime) ?? 0);
+			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 			{
 				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
@@ -30,7 +30,7 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 		if (CardControl != null && CardControl.CardData != null)
 		{
 			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraTime) ?? 0);
+			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 			{
 				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
