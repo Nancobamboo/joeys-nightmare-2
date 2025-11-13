@@ -25,7 +25,7 @@ public class UICardSimpleControl : YViewControl
 	public bool IsEnv;
 	public int EnvIndex = -1;
 	public Transform CacheTrans;
-
+	public bool IsEffecting;
 
 	public ECardType CardType => cachedCardType;
 	public Card CardData => cachedCard;
@@ -98,8 +98,17 @@ public class UICardSimpleControl : YViewControl
 
 	void OnBtnCardClick()
 	{
+		if (!IsEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
+		{
+			return;
+		}
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToQueue, this);
+		IsEffecting = true;
 
+	}
 
+	public void OnBtnRealClick()
+	{
 		if (IsEnv)
 		{
 			if (cachedCardType == ECardType.monster)
@@ -117,15 +126,7 @@ public class UICardSimpleControl : YViewControl
 		}
 		else
 		{
-			if (CardEffect != null && CardEffect.IsEffecting)
-			{
-				return;
-			}
 
-			if (CardEffect != null)
-			{
-				CardEffect.IsEffecting = true;
-			}
 			switch (cachedCardType)
 			{
 				case ECardType.skill:
@@ -281,10 +282,7 @@ public class UICardSimpleControl : YViewControl
 		SetTypeUI(card);
 		SetStars(card.stars);
 		CardEffect = GetCardEffect();
-		if (CardEffect != null)
-		{
-			CardEffect.IsEffecting = false;
-		}
+		IsEffecting = false;
 	}
 
 	private void SetTypeUI(Card card)
