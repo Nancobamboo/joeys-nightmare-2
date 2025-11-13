@@ -19,15 +19,17 @@ public class YBoom_OnPlay : YCardEffect
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { EVFXName.VFX_boom };
-			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
+			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
+			return maxDelayTime;
 		}
+		return base.UseItem();
+	}
 
-		JoeyGameControl.Instance.AddGlobalDelayCall(() =>
-		{
-			YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, CardControl);
-		}, 0.2f);
-		return 0.65f;
+	public override void OnUseFinished()
+	{
+
+		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra);
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

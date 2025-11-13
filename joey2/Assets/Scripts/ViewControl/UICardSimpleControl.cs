@@ -99,6 +99,8 @@ public class UICardSimpleControl : YViewControl
 
 	void OnBtnCardClick()
 	{
+
+
 		if (IsEnv)
 		{
 			if (cachedCardType == ECardType.monster)
@@ -116,6 +118,15 @@ public class UICardSimpleControl : YViewControl
 		}
 		else
 		{
+			if (CardEffect != null && CardEffect.IsEffecting)
+			{
+				return;
+			}
+
+			if (CardEffect != null)
+			{
+				CardEffect.IsEffecting = true;
+			}
 			switch (cachedCardType)
 			{
 				case ECardType.skill:
@@ -264,6 +275,10 @@ public class UICardSimpleControl : YViewControl
 		SetTypeUI(card);
 		SetStars(card.stars);
 		CardEffect = GetCardEffect();
+		if (CardEffect != null)
+		{
+			CardEffect.IsEffecting = false;
+		}
 	}
 
 	private void SetTypeUI(Card card)
@@ -322,32 +337,44 @@ public class UICardSimpleControl : YViewControl
 		return Resources.Load<Sprite>(path);
 	}
 
-	public void PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.None, EVFXLife vfxLife = EVFXLife.CardLife, float delayTime = .5f)
+	public float PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.None, EVFXLife vfxLife = EVFXLife.CardLife)
 	{
 		if (animName != ECardAnimName.None)
 		{
 			m_View.Anim.CrossFade(animName.ToString(), 0, 0);
 		}
 
+		float maxDelayTime = 0f;
 		if (vfxNames != null && vfxNames.Count > 0)
 		{
 			for (int i = 0; i < vfxNames.Count; i++)
 			{
 				EVFXName vfxName = vfxNames[i];
+				float delayTime = DataSystem.Instance.GetVFXDelayTime(vfxName);
+				if (delayTime > maxDelayTime)
+				{
+					maxDelayTime = delayTime;
+				}
+			}
+
+			for (int i = 0; i < vfxNames.Count; i++)
+			{
+				EVFXName vfxName = vfxNames[i];
 				if (vfxLife == EVFXLife.SelfLife)
 				{
-					JoeyGameControl.Instance.PlayEnvVFX(vfxName, m_EnvIndex, delayTime);
+					JoeyGameControl.Instance.PlayEnvVFX(vfxName, m_EnvIndex, maxDelayTime);
 				}
 				else if (vfxLife == EVFXLife.CardLife)
 				{
 					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, CacheTrans);
 					EffectEntityList.Add(vfxTransform);
 
-					DelayHideCardLifeVFX(vfxTransform, delayTime).Forget();
+					DelayHideCardLifeVFX(vfxTransform, maxDelayTime).Forget();
 
 				}
 			}
 		}
+		return maxDelayTime;
 	}
 
 

@@ -18,8 +18,8 @@ public class YDealDamage_UseDefence : YCardEffect
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
-			float delayTime = Random.Range(0.5f, 1.5f);
-			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife, delayTime);
+			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
+			return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
 		}
 		return base.UseDefence();
 	}

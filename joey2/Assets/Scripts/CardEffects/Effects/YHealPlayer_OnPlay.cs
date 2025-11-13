@@ -19,11 +19,15 @@ public class YHealPlayer_OnPlay : YCardEffect
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { };
-			CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
+			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
+			return maxDelayTime > 0f ? maxDelayTime : base.UseItem();
 		}
+		return base.UseItem();
+	}
 
+	public override void OnUseFinished()
+	{
 		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
-		return 0.65f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)
