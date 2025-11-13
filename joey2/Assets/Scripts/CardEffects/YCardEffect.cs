@@ -106,6 +106,11 @@ public class YCardEffect
         return 0.5f;
     }
 
+    public virtual float OnBeDying()
+    {
+        return 0.5f;
+    }
+
     public virtual float OnDead()
     {
         return 0.5f;
@@ -129,6 +134,10 @@ public class YCardEffect
     public virtual float UseAttack()
     {
         return 0.5f;
+    }
+
+    public virtual void OnUseFinished()
+    {
     }
 
     public virtual int GetEffectValue(EEffectType effectType)

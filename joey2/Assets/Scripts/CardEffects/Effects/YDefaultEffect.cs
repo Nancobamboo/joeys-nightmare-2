@@ -16,7 +16,8 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
-            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife, 0.65f);
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
+            return maxDelayTime > 0f ? maxDelayTime : base.UseAttack();
         }
         return base.UseAttack();
     }
@@ -27,8 +28,8 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
-            float delayTime = Random.Range(0.5f, 1.5f);
-            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife, delayTime);
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
+            return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
         }
         return base.UseDefence();
     }
@@ -38,8 +39,8 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
-            float delayTime = Random.Range(0.5f, 1.5f);
-            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife, delayTime);
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+            return maxDelayTime > 0f ? maxDelayTime : base.OnDealDamage();
         }
         return base.OnDealDamage();
     }
@@ -52,17 +53,16 @@ public class YDefaultEffect : YCardEffect
             {
                 case EEffectType.Boom:
                     var boomVfxNames = new List<EVFXName> { EVFXName.VFX_boom };
-                    CardControl.PlayVFX(boomVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, 0.65f);
+                    float boomDelayTime = CardControl.PlayVFX(boomVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
                     SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
-                    return 0.65f;
+                    return boomDelayTime;
                 case EEffectType.Electric:
                     PlayElectricEffectAsync().Forget();
                     return 1.65f; // 雷弹特效时间(0.65f) + 延迟(0.5f) + 默认特效平均时间(0.5f)
                 default:
                     var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
-                    float delayTime = Random.Range(0.5f, 1.5f);
-                    CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, delayTime);
-                    return delayTime;
+                    float shoujiDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
+                    return shoujiDelayTime;
             }
         }
         return base.OnTakeDamage(effectType);
@@ -73,12 +73,11 @@ public class YDefaultEffect : YCardEffect
         {
             // 先播放雷弹特效
             var electricVfxNames = new List<EVFXName> { EVFXName.VFX_LeiDan };
-            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, 0.65f);
+            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
             await UniTask.WaitForSeconds(0.65f);
             // 执行default分支的特效
             var damageVfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
-            float delayTime = Random.Range(0.5f, 1.5f);
-            CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife, delayTime);
+            CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
         }
     }
     public override float OnDead()
@@ -86,7 +85,8 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
-            CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_feitian, EVFXLife.SelfLife, 0f);
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_feitian, EVFXLife.SelfLife);
+            return maxDelayTime > 0f ? maxDelayTime : base.OnDead();
         }
         return base.OnDead();
     }
