@@ -17,11 +17,10 @@ public class YDefaultEffect : YCardEffect
         {
             var vfxNames = new List<EVFXName> { };
             float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-            return maxDelayTime > 0f ? maxDelayTime : base.UseAttack();
+            return maxDelayTime;
         }
         return base.UseAttack();
     }
-
 
     public override float UseDefence()
     {
@@ -80,15 +79,15 @@ public class YDefaultEffect : YCardEffect
             CardControl.PlayVFX(damageVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
         }
     }
-    public override float OnDead()
+    public override float OnBeDying()
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
             float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_feitian, EVFXLife.SelfLife);
-            return maxDelayTime > 0f ? maxDelayTime : base.OnDead();
+            return maxDelayTime > 0f ? maxDelayTime : base.OnBeDying();
         }
-        return base.OnDead();
+        return base.OnBeDying();
     }
 }
 

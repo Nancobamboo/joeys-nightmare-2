@@ -43,5 +43,13 @@ public class MonoBehaviourPool<T> where T : Component
         }
     }
 
+    public void ForEach(Action<T> action)
+    {
+        foreach (var obj in m_Pool)
+        {
+            action(obj);
+        }
+    }
+
     public int Count => m_Pool.Count;
 }

@@ -13,20 +13,10 @@ public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 
 	public override float UseItem()
 	{
-		if (CardControl != null && CardControl.gameObject != null)
-		{
-			var vfxNames = new List<EVFXName> { };
-			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-			return maxDelayTime > 0f ? maxDelayTime : base.UseItem();
-		}
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+
 		return base.UseItem();
 	}
 
-	public override void OnUseFinished()
-	{
-
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
-
-	}
 }
 

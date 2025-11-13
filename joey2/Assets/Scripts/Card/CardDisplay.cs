@@ -86,13 +86,13 @@ public class CardDisplay : MonoBehaviour
                 monster.gameObject.SetActive(true);
                 monsterText.text = card.health.ToString();
                 break;
-            
+
             case "other":
                 iconType.gameObject.SetActive(false);
                 break;
 
             default:
-                
+
                 break;
         }
     }
@@ -121,7 +121,7 @@ public class CardDisplay : MonoBehaviour
 
         if (!string.IsNullOrEmpty(animName))
         {
-            CardAnimator.CrossFade(animName, 0.1f, 0);
+            CardAnimator.Play(animName, 0, 0);
         }
 
         if (cardEffects != null && cardEffects.Count > 0)
@@ -153,7 +153,7 @@ public class CardDisplay : MonoBehaviour
 
     public void StopVFX(string cardTrigger)
     {
-        CardAnimator.CrossFade("Idle", 0.1f, 0);
+        CardAnimator.Play("Idle", 0, 0);
 
         if (TriggerEffectDict != null && TriggerEffectDict.TryGetValue(cardTrigger, out var list) && list != null)
         {

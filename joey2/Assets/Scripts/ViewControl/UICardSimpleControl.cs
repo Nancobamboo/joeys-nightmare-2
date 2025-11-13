@@ -23,13 +23,12 @@ public class UICardSimpleControl : YViewControl
 	private Card cachedCard;
 	private ECardType cachedCardType;
 	public bool IsEnv;
-	private int m_EnvIndex = -1;
+	public int EnvIndex = -1;
 	public Transform CacheTrans;
 
 
 	public ECardType CardType => cachedCardType;
 	public Card CardData => cachedCard;
-	public int EnvIndex => m_EnvIndex;
 	private List<Transform> EffectEntityList = new List<Transform>();
 	private List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 	private Vector3 m_OriginalScale;
@@ -105,7 +104,7 @@ public class UICardSimpleControl : YViewControl
 		{
 			if (cachedCardType == ECardType.monster)
 			{
-				YActionSystem.Instance.DispatchAction(EActionId.TakeEnemyDamage, this, 1, m_EnvIndex);
+				YActionSystem.Instance.DispatchAction(EActionId.TakeEnemyDamage, this, 1, EnvIndex);
 			}
 			else if (cachedCardType == ECardType.other)
 			{
@@ -261,10 +260,17 @@ public class UICardSimpleControl : YViewControl
 
 	public void SetData(Card card, bool isEnv = false, int envIndex = -1)
 	{
+		RectTransform animRect = m_View.Anim.transform as RectTransform;
+		if (animRect != null)
+		{
+			animRect.anchoredPosition = Vector2.zero;
+		}
+		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
 		cachedCard = card;
 		cachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
 		IsEnv = isEnv;
-		m_EnvIndex = envIndex;
+		EnvIndex = envIndex;
+		m_IsMoving = false;
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
@@ -337,14 +343,30 @@ public class UICardSimpleControl : YViewControl
 		return Resources.Load<Sprite>(path);
 	}
 
-	public float PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.None, EVFXLife vfxLife = EVFXLife.CardLife)
+	public float PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.Idle, EVFXLife vfxLife = EVFXLife.CardLife)
 	{
-		if (animName != ECardAnimName.None)
+		RectTransform animRect = m_View.Anim.transform as RectTransform;
+		if (animRect != null)
 		{
-			m_View.Anim.CrossFade(animName.ToString(), 0, 0);
+			animRect.anchoredPosition = new Vector2(0, 0);
+
+		}
+
+		if (animName != ECardAnimName.Idle)
+		{
+			m_View.Anim.Play(animName.ToString(), 0, 0);
 		}
 
 		float maxDelayTime = 0f;
+		if (animName != ECardAnimName.Idle)
+		{
+			float animDelayTime = DataSystem.Instance.GetAnimDelayTime(animName);
+			if (animDelayTime > maxDelayTime)
+			{
+				maxDelayTime = animDelayTime;
+			}
+		}
+
 		if (vfxNames != null && vfxNames.Count > 0)
 		{
 			for (int i = 0; i < vfxNames.Count; i++)
@@ -362,7 +384,14 @@ public class UICardSimpleControl : YViewControl
 				EVFXName vfxName = vfxNames[i];
 				if (vfxLife == EVFXLife.SelfLife)
 				{
-					JoeyGameControl.Instance.PlayEnvVFX(vfxName, m_EnvIndex, maxDelayTime);
+					if (EnvIndex >= 0)
+					{
+						JoeyGameControl.Instance.PlayEnvVFX(vfxName, EnvIndex, maxDelayTime);
+					}
+					else
+					{
+						JoeyGameControl.Instance.PlayVFX(vfxName, CacheTrans, maxDelayTime);
+					}
 				}
 				else if (vfxLife == EVFXLife.CardLife)
 				{
@@ -385,7 +414,7 @@ public class UICardSimpleControl : YViewControl
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: cts.Token);
 		if (vfxTransform != null && vfxTransform.gameObject != null)
 		{
-			JoeyGameControl.Instance.ReturnVFXPool(vfxTransform, m_EnvIndex);
+			JoeyGameControl.Instance.ReturnVFXPool(vfxTransform, EnvIndex);
 			EffectEntityList.Remove(vfxTransform);
 		}
 		CancelTokenList.Remove(cts);
@@ -417,9 +446,16 @@ public class UICardSimpleControl : YViewControl
 			var go = EffectEntityList[i];
 			if (go != null)
 			{
-				JoeyGameControl.Instance.ReturnVFXPool(go, m_EnvIndex);
+				JoeyGameControl.Instance.ReturnVFXPool(go, EnvIndex);
 			}
 		}
+		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
+		RectTransform animRect = m_View.Anim.transform as RectTransform;
+		if (animRect != null)
+		{
+			animRect.anchoredPosition = Vector2.zero;
+		}
+		m_IsMoving = false;
 		gameObject.SetActive(false);
 		EffectEntityList.Clear();
 		base.OnReturn();

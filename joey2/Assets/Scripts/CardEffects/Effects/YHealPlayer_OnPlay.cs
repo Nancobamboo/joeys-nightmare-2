@@ -16,18 +16,13 @@ public class YHealPlayer_OnPlay : YCardEffect
 
 	public override float UseItem()
 	{
-		if (CardControl != null && CardControl.gameObject != null)
-		{
-			var vfxNames = new List<EVFXName> { };
-			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-			return maxDelayTime > 0f ? maxDelayTime : base.UseItem();
-		}
 		return base.UseItem();
 	}
 
-	public override void OnUseFinished()
+	public override float OnUseFinished()
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
+		return 0;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

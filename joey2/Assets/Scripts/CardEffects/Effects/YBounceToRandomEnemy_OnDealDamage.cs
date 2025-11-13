@@ -1,9 +1,10 @@
 // Scripts/CardEffects/Effects/YBounceToRandomEnemy_OnDealDamage.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class YBounceToRandomEnemy_OnDealDamage : YCardEffect
+public class YBounceToRandomEnemy_OnDealDamage : YDefaultEffect
 {
 	public int bounceCount;
 
@@ -15,6 +16,12 @@ public class YBounceToRandomEnemy_OnDealDamage : YCardEffect
 
 	public override float OnDealDamage()
 	{
+		base.OnDealDamage();
+		if (CardControl != null && CardControl.CardData != null)
+		{
+			int damage = CardControl.CardData.currentAttack;
+			YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, bounceCount);
+		}
 		return base.OnDealDamage();
 	}
 }

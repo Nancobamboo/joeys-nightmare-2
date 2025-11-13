@@ -51,7 +51,7 @@ public enum EVFXName
 
 public enum ECardAnimName
 {
-    None,
+    Idle,
     UI_Carditem_shouji,
     UI_Carditem_xiaoshi,
     UI_Carditem_dunpai,
@@ -113,7 +113,7 @@ public class YCardEffect
 
     public virtual float OnDead()
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float UseDefence()
@@ -123,12 +123,17 @@ public class YCardEffect
 
     public virtual float UseSkill()
     {
-        return 0.5f;
+        var vfxNames = new List<EVFXName> { };
+        float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
+        return maxDelayTime;
     }
 
     public virtual float UseItem()
     {
-        return 0.5f;
+
+        var vfxNames = new List<EVFXName> { };
+        float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
+        return maxDelayTime;
     }
 
     public virtual float UseAttack()
@@ -136,8 +141,9 @@ public class YCardEffect
         return 0.5f;
     }
 
-    public virtual void OnUseFinished()
+    public virtual float OnUseFinished()
     {
+        return 0f;
     }
 
     public virtual int GetEffectValue(EEffectType effectType)

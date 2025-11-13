@@ -279,7 +279,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -683,7 +683,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -1045,7 +1045,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -1147,7 +1147,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -1524,7 +1524,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -1774,7 +1774,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -1997,7 +1997,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -2059,7 +2059,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -2822,7 +2822,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 7
+  m_ChildAlignment: 4
   m_Spacing: -460
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0

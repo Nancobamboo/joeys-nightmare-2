@@ -25,14 +25,12 @@ public class YElectric : YCardEffect
 		return base.UseSkill();
 	}
 
-	public override void OnUseFinished()
+	public override float OnUseFinished()
 	{
 
-		var vfxNames = new List<EVFXName> { };
-		CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-
-		YActionSystem.Instance.DispatchAction(EActionId.TakeAllEnemyDamage);
-
+		int damage = GetEffectValue(EEffectType.Damage);
+		YActionSystem.Instance.DispatchAction(EActionId.TakeAllEnemyDamage, damage);
+		return 0;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

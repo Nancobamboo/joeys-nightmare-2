@@ -22,9 +22,10 @@ public class YHookEquipWeaponFromDiscard_OnDefence : YCardEffect
 		return base.UseDefence();
 	}
 
-	public override void OnUseFinished()
+	public override float OnUseFinished()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard, ECardType.attack);
+		return 0f;
 	}
 }
 
