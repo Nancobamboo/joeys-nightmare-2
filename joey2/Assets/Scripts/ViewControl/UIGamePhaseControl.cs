@@ -322,19 +322,40 @@ public partial class UIGamePhaseControl : YViewControl
 		return cardList != null && cardList.Count > 0;
 	}
 
-	private UICardSimpleControl GetFistCard()
+	private UICardSimpleControl GetSpecialCardSimpleById(string cardId)
 	{
-		Card card = GData.Instance.GetCardConfigById("1003").Clone();
-		UniqueIdGen++;
-		card.UniqueId = UniqueIdGen;
-		m_CardDict[UniqueIdGen] = card;
+		Card card = CreateCard(cardId);
+		ECardType cardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
 
-		Transform parent = m_View.AttackPanel.transform;
-		m_View.AttackPanel.enabled = false;
+		Transform parent = null;
+		switch (cardType)
+		{
+			case ECardType.attack:
+				parent = m_View.AttackPanel.transform;
+				break;
+			case ECardType.defence:
+				parent = m_View.DefencePanel.transform;
+				break;
+			case ECardType.skill:
+				parent = m_View.SkillPanel.transform;
+				break;
+			case ECardType.item:
+				parent = m_View.ItemPanel.transform;
+				break;
+			default:
+				return null;
+		}
+
 		UICardSimpleControl cardControl = GetCardSimple(parent);
 		cardControl.SetData(card);
-		AddBagCard(ECardType.attack, cardControl);
-		//m_View.AttackPanel.enabled = true;
+		AddBagCard(cardType, cardControl);
+		return cardControl;
+	}
+
+	private UICardSimpleControl GetFistCard()
+	{
+		UICardSimpleControl cardControl = GetSpecialCardSimpleById("1003");
+
 		return cardControl;
 	}
 
@@ -623,6 +644,7 @@ public partial class UIGamePhaseControl : YViewControl
 				{
 					cardControl.CacheTrans.position = endPos;
 					cardControl.CacheTrans.localScale = endScale;
+					cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 					layout.enabled = true;
 					cardControl.SetMoving(false);
 					if (CurrentEffectCard != null)
@@ -964,7 +986,7 @@ public partial class UIGamePhaseControl : YViewControl
 	void AddCardToQueue(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		if (cardControl != null && !m_CardActionQueue.Contains(cardControl))
+		if (cardControl != null && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
 			m_CardActionQueue.Enqueue(cardControl);
 		}
