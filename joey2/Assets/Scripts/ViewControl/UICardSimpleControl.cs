@@ -347,6 +347,7 @@ public class UICardSimpleControl : YViewControl
 
 	public float PlayVFX(List<EVFXName> vfxNames, ECardAnimName animName = ECardAnimName.Idle, EVFXLife vfxLife = EVFXLife.CardLife)
 	{
+		vfxLife = EVFXLife.CardLife;
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)
 		{

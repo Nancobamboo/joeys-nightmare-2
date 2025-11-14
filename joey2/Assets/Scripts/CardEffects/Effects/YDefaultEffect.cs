@@ -57,10 +57,10 @@ public class YDefaultEffect : YCardEffect
                     var boomVfxNames = new List<EVFXName> { EVFXName.VFX_boom };
                     float boomDelayTime = CardControl.PlayVFX(boomVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
                     SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
-                    return boomDelayTime;
+                    return 0;
                 case EEffectType.Electric:
                     PlayElectricEffectAsync().Forget();
-                    return 1.65f; // 雷弹特效时间(0.65f) + 延迟(0.5f) + 默认特效平均时间(0.5f)
+                    return 0f;
                 default:
                     var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
                     float shoujiDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
