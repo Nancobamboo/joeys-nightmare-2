@@ -19,10 +19,10 @@ public class YHealPlayer_OnPlay : YCardEffect
 		return base.UseItem();
 	}
 
-	public override float OnUseFinished()
+	public override float OnRemoveCard()
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
-		return 0;
+		return 0f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

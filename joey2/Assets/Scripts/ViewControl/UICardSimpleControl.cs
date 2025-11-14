@@ -137,12 +137,13 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
-	public void CallCardTakeDamage(int damage, EEffectType effectType = EEffectType.Damage)
+	public float CallCardTakeDamage(int damage, EEffectType effectType = EEffectType.Damage)
 	{
 		Debug.Log(CardData.cardName);
 		cachedCard.TakeDamage(damage);
-		CardEffect?.OnTakeDamage(effectType);
+		float delayTime = CardEffect?.OnTakeDamage(effectType) ?? 0f;
 		RefreshCard();
+		return delayTime;
 	}
 
 	public void RefreshCard()

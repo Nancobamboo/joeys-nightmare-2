@@ -10,7 +10,7 @@ public class YDoubleAttack_OnPlay : YCardEffect
 		AddEffectValue(EEffectType.ExtraAttackCnt, 1);
 	}
 
-	public override float OnUseFinished()
+	public override float OnRemoveCard()
 	{
 		int extraAttackCnt = GetEffectValue(EEffectType.ExtraAttackCnt);
 		YActionSystem.Instance.DispatchAction(EActionId.AddEffectValueToBagCard, ECardType.attack, EEffectType.ExtraAttackCnt, extraAttackCnt);

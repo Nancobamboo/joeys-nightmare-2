@@ -11,19 +11,19 @@ public class YHookEquipWeaponFromDiscard_OnDefence : YCardEffect
 		Id = ECardEffectId.HookEquipWeaponFromDiscard_OnDefence;
 	}
 
-	public override float UseDefence()
+	public override float UseDefence(bool isOverflow = false)
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{
 			var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
 			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
 			SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
-			return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
+			return maxDelayTime > 0f ? maxDelayTime : base.UseDefence(isOverflow);
 		}
-		return base.UseDefence();
+		return base.UseDefence(isOverflow);
 	}
 
-	public override float OnUseFinished()
+	public override float OnRemoveCard()
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard, ECardType.attack);
 		return 0f;

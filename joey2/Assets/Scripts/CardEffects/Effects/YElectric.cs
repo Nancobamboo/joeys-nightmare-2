@@ -25,12 +25,11 @@ public class YElectric : YCardEffect
 		return base.UseSkill();
 	}
 
-	public override float OnUseFinished()
+	public override float OnRemoveCard()
 	{
-
 		int damage = GetEffectValue(EEffectType.Damage);
 		YActionSystem.Instance.DispatchAction(EActionId.TakeAllEnemyDamage, damage);
-		return 0;
+		return 0f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

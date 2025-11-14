@@ -16,11 +16,10 @@ public class YBoom_OnPlay : YCardEffect
 
 
 
-	public override float OnUseFinished()
+	public override float OnRemoveCard()
 	{
-
 		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra);
-		return 0;
+		return 0f;
 	}
 
 	public override int GetEffectValue(EEffectType effectType)

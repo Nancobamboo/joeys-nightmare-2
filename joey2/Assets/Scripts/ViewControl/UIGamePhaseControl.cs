@@ -110,6 +110,7 @@ public partial class UIGamePhaseControl : YViewControl
 	void AppHp(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
+		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_DataJoeyPlayer.playerHealth += delta;
 		OnHPChanged(m_DataJoeyPlayer.playerHealth);
 	}
@@ -171,6 +172,7 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.CacheTrans.SetParent(parent);
 		cardControl.CacheTrans.localScale = Vector3.one;
 		cardControl.CacheTrans.localPosition = Vector3.zero;
+		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		return cardControl;
 	}
 
@@ -366,8 +368,12 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		if (cardControl.CardType == ECardType.monster)
 		{
-			cardControl.CallCardTakeDamage(damage, effectType);
+			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
+			if (delayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(delayTime);
+			}
 		}
 
 
@@ -672,6 +678,8 @@ public partial class UIGamePhaseControl : YViewControl
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 
 		float delayTime;
+		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
+		await UniTask.WaitForSeconds(delayTime);
 
 		for (int i = 0; i < attackCount; i++)
 		{
@@ -690,13 +698,17 @@ public partial class UIGamePhaseControl : YViewControl
 				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
 			}
 		}
-		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
-		await UniTask.WaitForSeconds(delayTime);
-		await RemoveBagCard(ECardType.attack, attackCardControl);
+
 		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime);
+		}
+		await RemoveBagCard(ECardType.attack, attackCardControl);
+		float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+		if (removeDelayTime > 0f)
+		{
+			await UniTask.WaitForSeconds(removeDelayTime);
 		}
 		enemyCardControl.IsEffecting = false;
 	}
@@ -718,15 +730,17 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		if (defenceCardControl != null)
 		{
-			delayTime = defenceCardControl.CardEffect?.UseDefence() ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime);
 			defenceValue = defenceCardControl.CardData.currentDefence;
+			bool isOverflow = defenceValue < enemyAttack;
+			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
+			await UniTask.WaitForSeconds(delayTime);
 		}
 		int damage = 0;
 		if (defenceValue < enemyAttack)
 		{
 			damage = enemyAttack - defenceValue;
 		}
+		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_DataJoeyPlayer.playerHealth -= damage;
 		if (m_DataJoeyPlayer.playerHealth < 0)
 		{
@@ -747,11 +761,16 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex);
 			}
-			await RemoveBagCard(ECardType.defence, defenceCardControl);
 			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished() ?? 0f;
 			if (finishDelayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(finishDelayTime);
+			}
+			await RemoveBagCard(ECardType.defence, defenceCardControl);
+			float removeDelayTime = defenceCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+			if (removeDelayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(removeDelayTime);
 			}
 		}
 
@@ -784,11 +803,16 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		await UniTask.WaitForSeconds(delayTime);
-		await RemoveBagCard(cardType, cardControl);
 		float finishDelayTime = cardControl.CardEffect?.OnUseFinished() ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime);
+		}
+		await RemoveBagCard(cardType, cardControl);
+		float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
+		if (removeDelayTime > 0f)
+		{
+			await UniTask.WaitForSeconds(removeDelayTime);
 		}
 		if (CurrentEffectCard != null)
 		{

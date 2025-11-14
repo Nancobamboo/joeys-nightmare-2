@@ -13,25 +13,27 @@ public class YDefaultEffect : YCardEffect
 
     public override float UseAttack()
     {
-        if (CardControl != null && CardControl.gameObject != null)
-        {
-            var vfxNames = new List<EVFXName> { };
-            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-            return maxDelayTime;
-        }
         return base.UseAttack();
     }
 
-    public override float UseDefence()
+    public override float UseDefence(bool isOverflow = false)
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
-            var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
+            List<EVFXName> vfxNames;
+            if (isOverflow)
+            {
+                vfxNames = new List<EVFXName> { EVFXName.VFX_Dunsui };
+            }
+            else
+            {
+                vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
+            }
             float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
             SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
-            return maxDelayTime > 0f ? maxDelayTime : base.UseDefence();
+            return maxDelayTime > 0f ? maxDelayTime : base.UseDefence(isOverflow);
         }
-        return base.UseDefence();
+        return base.UseDefence(isOverflow);
     }
 
     public override float OnDealDamage()
@@ -93,5 +95,6 @@ public class YDefaultEffect : YCardEffect
         }
         return base.OnBeDying();
     }
+
 }
 

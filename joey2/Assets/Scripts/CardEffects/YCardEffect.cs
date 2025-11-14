@@ -84,7 +84,7 @@ public class YCardEffect
 
     public virtual float OnBecomeTopOfPile()
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float OnEnterBag()
@@ -94,22 +94,22 @@ public class YCardEffect
 
     public virtual float OnDealDamage()
     {
-        return 0.4f;
+        return 0f;
     }
 
     public virtual float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
     {
-        return 0.45f;
+        return 0f;
     }
 
     public virtual float OnKill()
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float OnBeDying()
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float OnDead()
@@ -117,32 +117,38 @@ public class YCardEffect
         return 0f;
     }
 
-    public virtual float UseDefence()
+    public virtual float UseDefence(bool isOverflow = false)
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float UseSkill()
     {
-        var vfxNames = new List<EVFXName> { };
-        float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-        return maxDelayTime;
+        return 0f;
     }
 
     public virtual float UseItem()
     {
-
-        var vfxNames = new List<EVFXName> { };
-        float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
-        return maxDelayTime;
+        return 0f;
     }
 
     public virtual float UseAttack()
     {
-        return 0.5f;
+        return 0f;
     }
 
     public virtual float OnUseFinished()
+    {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            var vfxNames = new List<EVFXName> { };
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_diaoluo_anim, EVFXLife.SelfLife);
+            return maxDelayTime;
+        }
+        return 0f;
+    }
+
+    public virtual float OnRemoveCard()
     {
         return 0f;
     }
