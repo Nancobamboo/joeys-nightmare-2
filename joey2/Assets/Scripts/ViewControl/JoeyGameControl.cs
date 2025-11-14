@@ -249,6 +249,7 @@ public class JoeyGameControl : YViewControl
 
 	public void ReturnVFXPool(Transform vfxTransform, int envIndex)
 	{
+		vfxTransform.gameObject.SetActive(false);
 		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
 		vfxTransform.SetParent(effectRoot);
 		vfxTransform.localPosition = Vector3.zero;

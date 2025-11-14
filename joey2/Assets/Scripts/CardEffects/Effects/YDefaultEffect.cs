@@ -76,7 +76,7 @@ public class YDefaultEffect : YCardEffect
         {
             // 先播放雷弹特效
             var electricVfxNames = new List<EVFXName> { EVFXName.VFX_LeiDan };
-            CardControl.PlayVFX(electricVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
+            CardControl.PlayVFX(electricVfxNames, ECardAnimName.Idle, EVFXLife.CardLife);
             SFX.PlayAudio("Audio/SFX/Battle/electric", 1.0f, 0f);
             await UniTask.WaitForSeconds(0.65f);
             // 执行default分支的特效
