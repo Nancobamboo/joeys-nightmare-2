@@ -173,6 +173,7 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.CacheTrans.localScale = Vector3.one;
 		cardControl.CacheTrans.localPosition = Vector3.zero;
 		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
+		cardControl.CacheTrans.SetAsLastSibling();
 		return cardControl;
 	}
 
@@ -538,7 +539,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (kvp.Value != null && kvp.Value.Count > 0)
 			{
 				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
-				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
+				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster && lastCard.CardData.currentHealth > 0)
 				{
 					enemyIndices.Add(kvp.Key);
 				}
@@ -591,7 +592,6 @@ public partial class UIGamePhaseControl : YViewControl
 
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
 			AddBagCard(cardType, cardControl, true);
-			cardControl.CardEffect?.OnEnterBag();
 			//await UniTask.WaitForSeconds(delayTime);
 
 			VerticalLayoutGroup layout = null;
@@ -627,8 +627,11 @@ public partial class UIGamePhaseControl : YViewControl
 					cardControl.SetMoving(false);
 					if (CurrentEffectCard != null)
 					{
+						CurrentEffectCard.CardEffect?.OnEnterBag();
+
 						CurrentEffectCard.IsEffecting = false;
 					}
+
 				}
 			);
 		}
@@ -901,12 +904,14 @@ public partial class UIGamePhaseControl : YViewControl
 			return;
 		}
 
+		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
 		for (int i = 0; i < attackTime; i++)
 		{
 			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
 			{
 				break;
 			}
+			Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
 			enemyCardControl = GetLastEnvCard(envIndex);
 			if (enemyCardControl == null)
 			{

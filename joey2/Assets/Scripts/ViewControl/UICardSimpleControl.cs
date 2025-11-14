@@ -102,9 +102,12 @@ public class UICardSimpleControl : YViewControl
 		{
 			return;
 		}
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardToQueue, this);
+		if (IsEffecting)
+		{
+			return;
+		}
 		IsEffecting = true;
-
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToQueue, this);
 	}
 
 	public void OnBtnRealClick()
