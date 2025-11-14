@@ -21,27 +21,28 @@ public class UIDamageTextControl : YViewControl
 		m_Animator = GetComponent<Animator>();
 	}
 
-	public void SetData(int damage, Transform parent, Vector3 localPositionShift)
+	public void SetData(int value, Transform parent, Vector3 localPositionShift, bool isDamage = true)
 	{
 		CacheTrans.SetParent(parent);
 		CacheTrans.localPosition = localPositionShift;
 
-		if (damage > 0)
+		if (isDamage)
 		{
-			m_View.Damage.text = "-" + damage.ToString();
+			m_View.Damage.text = "-" + value.ToString();
 			m_View.Damage.gameObject.SetActive(true);
 			m_View.Add.gameObject.SetActive(false);
 		}
-		else if (damage < 0)
+		else
 		{
-			m_View.Add.text = "+" + (-damage).ToString();
+			m_View.Add.text = "+" + value.ToString();
 			m_View.Add.gameObject.SetActive(true);
 			m_View.Damage.gameObject.SetActive(false);
 		}
 
 		if (m_Animator != null)
 		{
-			m_Animator.Play("UIDamage_kouxue");
+			string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
+			m_Animator.Play(animName);
 		}
 
 		DelayReturn().Forget();
