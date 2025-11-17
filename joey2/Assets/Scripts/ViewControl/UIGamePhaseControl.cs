@@ -110,23 +110,7 @@ public partial class UIGamePhaseControl : YViewControl
 	void AppHp(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
-		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
-		int oldHealth = m_DataJoeyPlayer.playerHealth;
-		m_DataJoeyPlayer.playerHealth += delta;
-		if (m_DataJoeyPlayer.playerHealth > m_DataJoeyPlayer.playerMaxHealth)
-		{
-			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.playerMaxHealth;
-		}
-		OnHPChanged(m_DataJoeyPlayer.playerHealth);
-
-		if (delta > 0)
-		{
-			int actualHeal = m_DataJoeyPlayer.playerHealth - oldHealth;
-			if (actualHeal > 0)
-			{
-				ShowDamageText(actualHeal, m_View.JoeyImage.transform, new Vector3(100f, 190f, 0), false);
-			}
-		}
+		AppHp(delta);
 	}
 
 	void AppAttack(object[] paraArray)
@@ -530,39 +514,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (envIndex == -1)
 		{
-			envIndex = FindRandomEnemy();
-			if (envIndex == -1)
-			{
-				return;
-			}
-		}
-		Debug.Log("BoomEnvCard: envIndex = " + envIndex);
-		foreach (var kvp in m_EnvCardDict)
-		{
-			Debug.Log("BoomEnvCard: envIndex = " + kvp.Key + " " + kvp.Value.Count);
-		}
-
-		int[] indices;
-		if (excludeSelf)
-		{
-			indices = new int[] { envIndex - 1, envIndex + 1 };
+			await BoomEnvCardRandom(damage);
 		}
 		else
 		{
-			indices = new int[] { envIndex - 1, envIndex, envIndex + 1 };
-		}
-
-		for (int i = 0; i < indices.Length; i++)
-		{
-			int index = indices[i];
-			if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
-			{
-				if (cardList != null && cardList.Count > 0)
-				{
-					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
-					await DealDamageToEnvCard(lastCard, damage, index, EEffectType.Boom);
-				}
-			}
+			await BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
 		}
 	}
 
@@ -862,98 +818,21 @@ public partial class UIGamePhaseControl : YViewControl
 	void AddCardFromDiscard(object[] paraArray)
 	{
 		ECardType specialCardType = paraArray.Length > 0 && paraArray[0] is ECardType ? (ECardType)paraArray[0] : ECardType.other;
-
-		List<Card> availableCards = new List<Card>();
-		for (int i = UsedCardList.Count - 1; i >= 0; i--)
+		if (specialCardType == ECardType.attack)
 		{
-			Card card = UsedCardList[i];
-			ECardType cardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
-			if (specialCardType != ECardType.other)
-			{
-				if (cardType == specialCardType)
-				{
-					availableCards.Add(card);
-				}
-			}
-			else
-			{
-				if (cardType != ECardType.monster)
-				{
-					availableCards.Add(card);
-				}
-			}
+			AddCardFromDiscardAttack();
 		}
-
-		if (availableCards.Count == 0)
+		else
 		{
-			return;
+			AddCardFromDiscardByType(specialCardType);
 		}
-
-		Card selectedCard = availableCards[Random.Range(0, availableCards.Count)];
-		UsedCardList.Remove(selectedCard);
-		m_CardDict[selectedCard.UniqueId] = selectedCard;
-
-		ECardType selectedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), selectedCard.type);
-		Transform parent = null;
-		switch (selectedCardType)
-		{
-			case ECardType.attack:
-				parent = m_View.AttackPanel.transform;
-				break;
-			case ECardType.defence:
-				parent = m_View.DefencePanel.transform;
-				break;
-			case ECardType.skill:
-				parent = m_View.SkillPanel.transform;
-				break;
-			case ECardType.item:
-				parent = m_View.ItemPanel.transform;
-				break;
-			default:
-				return;
-		}
-
-		UICardSimpleControl cardControl = GetCardSimple(parent);
-		cardControl.SetData(selectedCard);
-		AddBagCard(selectedCardType, cardControl);
-		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 	}
 
 	async void AttackRandomEnemy(object[] paraArray)
 	{
 		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
 		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
-		if (damage <= 0)
-		{
-			return;
-		}
-
-		int envIndex = FindRandomEnemy();
-		if (envIndex == -1)
-		{
-			return;
-		}
-
-		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
-		if (enemyCardControl == null)
-		{
-			return;
-		}
-
-		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
-		for (int i = 0; i < attackTime; i++)
-		{
-			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
-			{
-				break;
-			}
-			Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
-			enemyCardControl = GetLastEnvCard(envIndex);
-			if (enemyCardControl == null)
-			{
-				break;
-			}
-		}
+		await AttackRandomEnemy(damage, attackTime);
 	}
 
 	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex)
@@ -969,32 +848,7 @@ public partial class UIGamePhaseControl : YViewControl
 	async void TakeAllEnemyDamage(object[] paraArray)
 	{
 		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
-		if (damage <= 0)
-		{
-			return;
-		}
-
-		List<int> enemyIndices = new List<int>();
-		foreach (var kvp in m_EnvCardDict)
-		{
-			if (kvp.Value != null && kvp.Value.Count > 0)
-			{
-				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
-				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
-				{
-					enemyIndices.Add(kvp.Key);
-				}
-			}
-		}
-
-		foreach (int envIndex in enemyIndices)
-		{
-			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
-			if (enemyCardControl != null)
-			{
-				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric);
-			}
-		}
+		await TakeAllEnemyDamage(damage);
 	}
 
 	void AddCardToQueue(object[] paraArray)
@@ -1011,12 +865,7 @@ public partial class UIGamePhaseControl : YViewControl
 		ECardType targetCardType = paraArray.Length > 0 && paraArray[0] is ECardType ? (ECardType)paraArray[0] : ECardType.attack;
 		EEffectType effectType = paraArray.Length > 1 && paraArray[1] is EEffectType ? (EEffectType)paraArray[1] : EEffectType.Other;
 		int value = paraArray.Length > 2 && paraArray[2] is int ? (int)paraArray[2] : 0;
-
-		UICardSimpleControl lastBagCard = GetLastBagCard(targetCardType);
-		if (lastBagCard != null && lastBagCard.CardEffect != null)
-		{
-			lastBagCard.CardEffect.AddEffectValue(effectType, value);
-		}
+		AddEffectValueToBagCard(targetCardType, effectType, value);
 	}
 
 	void Update()
