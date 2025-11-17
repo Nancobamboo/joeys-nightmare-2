@@ -42,3 +42,36 @@ public class YElectric : YCardEffect
 	}
 }
 
+public partial class UIGamePhaseControl
+{
+	public async UniTask TakeAllEnemyDamage(int damage)
+	{
+		if (damage <= 0)
+		{
+			return;
+		}
+
+		List<int> enemyIndices = new List<int>();
+		foreach (KeyValuePair<int, List<UICardSimpleControl>> kvp in m_EnvCardDict)
+		{
+			if (kvp.Value != null && kvp.Value.Count > 0)
+			{
+				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
+				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
+				{
+					enemyIndices.Add(kvp.Key);
+				}
+			}
+		}
+
+		foreach (int envIndex in enemyIndices)
+		{
+			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+			if (enemyCardControl != null)
+			{
+				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric);
+			}
+		}
+	}
+}
+

@@ -32,3 +32,16 @@ public class YBoom_OnPlay : YCardEffect
 	}
 }
 
+public partial class UIGamePhaseControl
+{
+	public async UniTask BoomEnvCardRandom(int boomDamage)
+	{
+		int envIndex = FindRandomEnemy();
+		if (envIndex == -1)
+		{
+			return;
+		}
+		await BoomEnvCardAtPosition(envIndex, boomDamage, false);
+	}
+}
+
