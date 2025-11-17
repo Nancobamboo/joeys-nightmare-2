@@ -13,10 +13,18 @@ public class YHookEquipWeaponFromDiscard_OnPlay : YCardEffect
 
 	public override float UseItem()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard);
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardFromDiscard, ECardType.attack);
 
 		return base.UseItem();
 	}
 
+}
+
+public partial class UIGamePhaseControl
+{
+	public void AddCardFromDiscardAttack()
+	{
+		AddCardFromDiscardByType(ECardType.attack);
+	}
 }
 

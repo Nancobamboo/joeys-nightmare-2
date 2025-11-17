@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class YBoom_OnDead : YCardEffect
 {
@@ -43,6 +44,41 @@ public class YBoom_OnDead : YCardEffect
 			return baseExtra;
 		}
 		return base.GetEffectValue(effectType);
+	}
+}
+
+public partial class UIGamePhaseControl
+{
+	public async UniTask BoomEnvCardAtPosition(int envIndex, int boomDamage, bool isExcludeSelf)
+	{
+		Debug.Log("BoomEnvCard: envIndex = " + envIndex);
+		foreach (KeyValuePair<int, List<UICardSimpleControl>> kvp in m_EnvCardDict)
+		{
+			Debug.Log("BoomEnvCard: envIndex = " + kvp.Key + " " + kvp.Value.Count);
+		}
+
+		int[] indices;
+		if (isExcludeSelf)
+		{
+			indices = new int[] { envIndex - 1, envIndex + 1 };
+		}
+		else
+		{
+			indices = new int[] { envIndex - 1, envIndex, envIndex + 1 };
+		}
+
+		for (int i = 0; i < indices.Length; i++)
+		{
+			int index = indices[i];
+			if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
+			{
+				if (cardList != null && cardList.Count > 0)
+				{
+					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
+					await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom);
+				}
+			}
+		}
 	}
 }
 

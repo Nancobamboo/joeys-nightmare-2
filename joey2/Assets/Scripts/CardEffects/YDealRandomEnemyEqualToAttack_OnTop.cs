@@ -15,6 +15,8 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
+			CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+
 			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
 			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
@@ -29,6 +31,7 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
+			CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
 			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
 			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
@@ -37,6 +40,44 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 			}, 0.4f);
 		}
 		return base.OnEnterBag();
+	}
+}
+
+public partial class UIGamePhaseControl
+{
+	public async UniTask AttackRandomEnemy(int damage, int attackTime)
+	{
+		if (damage <= 0)
+		{
+			return;
+		}
+
+		int envIndex = FindRandomEnemy();
+		if (envIndex == -1)
+		{
+			return;
+		}
+
+		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+		if (enemyCardControl == null)
+		{
+			return;
+		}
+
+		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
+		for (int i = 0; i < attackTime; i++)
+		{
+			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+			{
+				break;
+			}
+			Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
+			enemyCardControl = GetLastEnvCard(envIndex);
+			if (enemyCardControl == null)
+			{
+				break;
+			}
+		}
 	}
 }
 
