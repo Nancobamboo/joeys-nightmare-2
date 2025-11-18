@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1234081450117707069}
   - component: {fileID: 7956780090727340219}
   - component: {fileID: 8954939261801264083}
+  - component: {fileID: 5815275189386955748}
   m_Layer: 5
   m_Name: UIStart
   m_TagString: Untagged
@@ -91,6 +92,19 @@ MonoBehaviour:
     Components:
     - {fileID: 1890202861250984657}
     VarNameArray: []
+--- !u!114 &5815275189386955748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690997599169198259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41dde803fab3e7e4e95d00cadf7c02d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDirty: 0
 --- !u!1 &1799067590994117861
 GameObject:
   m_ObjectHideFlags: 0

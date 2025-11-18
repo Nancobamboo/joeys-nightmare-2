@@ -20,7 +20,9 @@ public enum ECardEffectId
     HookEquipWeaponFromDiscard_OnDefence,
     HookEquipWeaponFromDiscard_OnPlay,
     LifeSteal_OnDealDamage,
-    HealPlayer_OnPlay
+    HealPlayer_OnPlay,
+    AutoBoomMoney,
+    StealMoney
 }
 
 public enum EEffectType
@@ -170,6 +172,11 @@ public class YCardEffect
         {
             m_EffectValues[index] += value;
         }
+    }
+
+    public virtual int OnBuffValueChange(EBuffType buffType, int value)
+    {
+        return value;
     }
 
 }
