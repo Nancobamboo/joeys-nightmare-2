@@ -9,6 +9,7 @@ public class DataJoeyPlayer : IData
 	public int playerAttack;
 	public int playerDefence;
 	public int currentLevel;
+	public int Coin;
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -17,6 +18,7 @@ public class DataJoeyPlayer : IData
 		playerAttack = (int)jobject["playerAttack"];
 		playerDefence = (int)jobject["playerDefence"];
 		currentLevel = (int)jobject["currentLevel"];
+		Coin = (int)jobject["Coin"];
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -26,6 +28,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("playerAttack", playerAttack);
 		jobject.Add("playerDefence", playerDefence);
 		jobject.Add("currentLevel", currentLevel);
+		jobject.Add("Coin", Coin);
 	}
 }
 public partial class DataSystem

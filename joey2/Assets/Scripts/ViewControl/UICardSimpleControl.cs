@@ -17,6 +17,12 @@ public enum ECardType
 	other
 }
 
+public enum EBuffType
+{
+	Counter,
+	Upper
+}
+
 public class UICardSimpleControl : YViewControl
 {
 	private UICardSimpleView m_View;
@@ -35,6 +41,8 @@ public class UICardSimpleControl : YViewControl
 	private bool m_IsMoving;
 
 	public YCardEffect CardEffect;
+
+	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 
 	public static EResType GetResType()
 	{
@@ -185,6 +193,19 @@ public class UICardSimpleControl : YViewControl
 		SetStars(cachedCard.stars);
 	}
 
+	public void UpdateBuffValue()
+	{
+		for (int i = 0; i < m_BuffValueArray.Length; i++)
+		{
+			if (m_BuffValueArray[i] != 0)
+			{
+				EBuffType buffType = (EBuffType)i;
+				int newValue = CardEffect?.OnBuffValueChange(buffType, m_BuffValueArray[i]) ?? m_BuffValueArray[i];
+				m_BuffValueArray[i] = newValue;
+			}
+		}
+	}
+
 	public YCardEffect GetCardEffect()
 	{
 		if (cachedCard.effectIds == null || cachedCard.effectIds.Count == 0)
@@ -247,6 +268,12 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.HealPlayer_OnPlay:
 				effect = new YHealPlayer_OnPlay(effectValue);
+				break;
+			case ECardEffectId.AutoBoomMoney:
+				effect = new YAutoBoomMoney(effectValue);
+				break;
+			case ECardEffectId.StealMoney:
+				effect = new YStealMoney(effectValue);
 				break;
 			default:
 				return GetDefaultEffect();

@@ -43,23 +43,7 @@ public partial class UIGamePhaseControl
 {
 	public void AppHp(int delta)
 	{
-		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
-		int oldHealth = m_DataJoeyPlayer.playerHealth;
-		m_DataJoeyPlayer.playerHealth += delta;
-		if (m_DataJoeyPlayer.playerHealth > m_DataJoeyPlayer.playerMaxHealth)
-		{
-			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.playerMaxHealth;
-		}
-		OnHPChanged(m_DataJoeyPlayer.playerHealth);
-
-		if (delta > 0)
-		{
-			int actualHeal = m_DataJoeyPlayer.playerHealth - oldHealth;
-			if (actualHeal > 0)
-			{
-				ShowDamageText(actualHeal, m_View.JoeyImage.transform, new Vector3(100f, 190f, 0), false);
-			}
-		}
+		ApplyPlayerHealthChange(delta, true);
 	}
 }
 
