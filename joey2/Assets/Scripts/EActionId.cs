@@ -8,6 +8,7 @@ public enum EActionId
 	MoveCard,
 	TakeEnemyDamage,
 	TakePlayerDamage,
+	TakePlayerBoomDamage,
 	BoomEnvCard,
 	UseBagCard,
 	AddCardFromDiscard,
@@ -16,5 +17,8 @@ public enum EActionId
 	AddCardToQueue,
 	TryLoadScene,
 	AddEffectValueToBagCard,
+	StealCoin,
+	ReturnCoin,
+	EscapeMonkey,
 	Upper
 }

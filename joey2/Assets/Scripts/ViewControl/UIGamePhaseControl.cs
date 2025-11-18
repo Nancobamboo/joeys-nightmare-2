@@ -49,6 +49,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.MoveCard, MoveCard);
 		RegistAction(EActionId.TakeEnemyDamage, TakeEnemyDamage);
 		RegistAction(EActionId.TakePlayerDamage, TakePlayerDamage);
+		RegistAction(EActionId.TakePlayerBoomDamage, TakePlayerBoomDamage);
 		RegistAction(EActionId.BoomEnvCard, BoomEnvCard);
 		RegistAction(EActionId.UseBagCard, UseBagCard);
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
@@ -56,6 +57,9 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
 		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
+		RegistAction(EActionId.StealCoin, StealCoin);
+		RegistAction(EActionId.ReturnCoin, ReturnCoin);
+		RegistAction(EActionId.EscapeMonkey, EscapeMonkey);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -107,6 +111,45 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.DefenceNum.text = defence.ToString();
 	}
 
+	private void ApplyPlayerHealthChange(int delta, bool isHeal = false)
+	{
+		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
+		m_DataJoeyPlayer.playerHealth += delta;
+		if (m_DataJoeyPlayer.playerHealth < 0)
+		{
+			m_DataJoeyPlayer.playerHealth = 0;
+		}
+		if (isHeal && m_DataJoeyPlayer.playerHealth > m_DataJoeyPlayer.playerMaxHealth)
+		{
+			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.playerMaxHealth;
+		}
+		if (delta != 0)
+		{
+			int actualChange = isHeal ? (m_DataJoeyPlayer.playerHealth - m_DataJoeyPlayer.lastPlayerHealth) : Mathf.Abs(delta);
+			if (actualChange > 0)
+			{
+				ShowDamageText(actualChange, m_View.JoeyImage.transform, new Vector3(100f, 190f, 0), !isHeal);
+			}
+		}
+		OnHPChanged(m_DataJoeyPlayer.playerHealth);
+		CheckGameOver();
+	}
+
+	private void CheckGameOver()
+	{
+		if (m_DataJoeyPlayer.playerHealth <= 0)
+		{
+			if (m_GameOverControl == null)
+			{
+				m_GameOverControl = this.Asset.OpenUI<UIGameOverControl>();
+			}
+			else
+			{
+				m_GameOverControl.gameObject.SetActive(true);
+			}
+		}
+	}
+
 	void AppHp(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
@@ -138,7 +181,13 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
 		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
 		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
-		m_View.TxtCoin.text = "0";
+		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
+	}
+
+	private void OnCoinChanged(int coin)
+	{
+		m_DataJoeyPlayer.Coin = coin;
+		m_View.TxtCoin.text = coin.ToString();
 	}
 
 	public void ChangeJoeyImage()
@@ -181,7 +230,7 @@ public partial class UIGamePhaseControl : YViewControl
 		damageTextControl.SetData(damage, parent, localPositionShift, isDamage);
 	}
 
-	private Card CreateCard(string cardId)
+	public Card CreateCard(string cardId)
 	{
 		Card card = GData.Instance.GetCardConfigById(cardId).Clone();
 		UniqueIdGen++;
@@ -735,17 +784,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			damage = enemyAttack - defenceValue;
 		}
-		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
-		m_DataJoeyPlayer.playerHealth -= damage;
-		if (m_DataJoeyPlayer.playerHealth < 0)
-		{
-			m_DataJoeyPlayer.playerHealth = 0;
-		}
-		if (damage > 0)
-		{
-			ShowDamageText(damage, m_View.JoeyImage.transform, new Vector3(100f, 190f, 0));
-		}
-		OnHPChanged(m_DataJoeyPlayer.playerHealth);
+		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
 
@@ -768,18 +807,17 @@ public partial class UIGamePhaseControl : YViewControl
 				await UniTask.WaitForSeconds(removeDelayTime);
 			}
 		}
+	}
 
-		if (m_DataJoeyPlayer.playerHealth <= 0)
+	void TakePlayerBoomDamage(object[] paraArray)
+	{
+		int damage = (int)paraArray[0];
+		if (damage > 0)
 		{
-			if (m_GameOverControl == null)
-			{
-				m_GameOverControl = this.Asset.OpenUI<UIGameOverControl>();
-			}
-			else
-			{
-				m_GameOverControl.gameObject.SetActive(true);
-			}
+			JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_boom, m_View.JoeyImage.transform, 0f);
+			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
+		ApplyPlayerHealthChange(-damage);
 	}
 
 	async void UseBagCard(object[] paraArray)
@@ -856,6 +894,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		if (cardControl != null && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
+			cardControl.UpdateBuffValue();
 			m_CardActionQueue.Enqueue(cardControl);
 		}
 	}
@@ -899,6 +938,40 @@ public partial class UIGamePhaseControl : YViewControl
 			CurrentEffectCard.IsEffecting = false;
 			CurrentEffectCard.Return();
 			CurrentEffectCard = null;
+		}
+	}
+
+	void StealCoin(object[] paraArray)
+	{
+		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
+		int amount = (int)paraArray[1];
+		m_DataJoeyPlayer.Coin -= amount;
+		if (m_DataJoeyPlayer.Coin < 0)
+		{
+			m_DataJoeyPlayer.Coin = 0;
+		}
+		stealMoneyEffect.AddStolenCoin(amount);
+		OnCoinChanged(m_DataJoeyPlayer.Coin);
+	}
+
+	void ReturnCoin(object[] paraArray)
+	{
+		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
+		int stolenAmount = stealMoneyEffect.GetStolenCoinAmount();
+		if (stolenAmount > 0)
+		{
+			m_DataJoeyPlayer.Coin += stolenAmount;
+			OnCoinChanged(m_DataJoeyPlayer.Coin);
+		}
+	}
+
+	void EscapeMonkey(object[] paraArray)
+	{
+		UICardSimpleControl monkeyCard = (UICardSimpleControl)paraArray[0];
+		if (monkeyCard != null && monkeyCard.IsEnv)
+		{
+			int envIndex = monkeyCard.EnvIndex;
+			RemoveEnvCard(envIndex, monkeyCard);
 		}
 	}
 
