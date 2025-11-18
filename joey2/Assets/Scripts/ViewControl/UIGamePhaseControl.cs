@@ -230,7 +230,7 @@ public partial class UIGamePhaseControl : YViewControl
 		damageTextControl.SetData(damage, parent, localPositionShift, isDamage);
 	}
 
-	private Card CreateCard(string cardId)
+	public Card CreateCard(string cardId)
 	{
 		Card card = GData.Instance.GetCardConfigById(cardId).Clone();
 		UniqueIdGen++;

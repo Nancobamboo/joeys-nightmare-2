@@ -27,6 +27,11 @@ public class JoeyGameControl : YViewControl
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 
+	public bool IsDebug = false;
+	public string[] DebugEnvCardIds = new string[0];
+	public string[] DebugBagCardIds = new string[0];
+	public int DebugLevelId = 1;
+
 	public static EResType GetResType()
 	{
 		return EResType.None;
@@ -115,9 +120,11 @@ public class JoeyGameControl : YViewControl
 		GData.Instance.LoadAll();
 		StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/shuffle_cards", startTime: 0f));
 
-		if (m_DataJoeyPlayer.currentLevel >= 1 && m_DataJoeyPlayer.currentLevel <= 5)
+		int levelId = IsDebug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
+
+		if (levelId >= 1 && levelId <= 5)
 		{
-			var playerData = GData.Instance.GetTutorialPlayerData(m_DataJoeyPlayer.currentLevel);
+			var playerData = GData.Instance.GetTutorialPlayerData(levelId);
 			m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
 			m_DataJoeyPlayer.playerHealth = playerData.Value.health;
 			m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
@@ -125,7 +132,7 @@ public class JoeyGameControl : YViewControl
 
 		m_GamePhaseControl.SetData();
 
-		List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(m_DataJoeyPlayer.currentLevel);
+		List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(levelId);
 		for (int i = 0; i < cardIdListEnv.Count; i++)
 		{
 			List<string> cardIdList = cardIdListEnv[i];
@@ -133,9 +140,9 @@ public class JoeyGameControl : YViewControl
 		}
 
 		Dictionary<string, List<string>> equipmentDeck;
-		if (m_DataJoeyPlayer.currentLevel >= 1 && m_DataJoeyPlayer.currentLevel <= 5)
+		if (levelId >= 1 && levelId <= 5)
 		{
-			equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(m_DataJoeyPlayer.currentLevel);
+			equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(levelId);
 		}
 		else
 		{
@@ -151,6 +158,40 @@ public class JoeyGameControl : YViewControl
 			Debug.Log("cardType: " + cardTypeStr + " " + cardType.ToString());
 
 			m_GamePhaseControl.AddCardList(cardType: cardType, cardIds: cardIds);
+		}
+
+		if (IsDebug)
+		{
+			if (DebugEnvCardIds != null && DebugEnvCardIds.Length > 0)
+			{
+				List<string> debugEnvCardList = new List<string>(DebugEnvCardIds);
+				m_GamePhaseControl.AddEnvCardList(cardIds: debugEnvCardList, index: 0);
+			}
+
+			if (DebugBagCardIds != null && DebugBagCardIds.Length > 0)
+			{
+				Dictionary<ECardType, List<string>> bagCardDict = new Dictionary<ECardType, List<string>>();
+				for (int i = 0; i < DebugBagCardIds.Length; i++)
+				{
+					string cardId = DebugBagCardIds[i];
+					if (string.IsNullOrEmpty(cardId))
+					{
+						continue;
+					}
+					Card card = m_GamePhaseControl.CreateCard(cardId);
+					ECardType cardType = card.GetCardType();
+					if (!bagCardDict.ContainsKey(cardType))
+					{
+						bagCardDict[cardType] = new List<string>();
+					}
+					bagCardDict[cardType].Add(cardId);
+				}
+
+				foreach (var kv in bagCardDict)
+				{
+					m_GamePhaseControl.AddCardList(cardType: kv.Key, cardIds: kv.Value);
+				}
+			}
 		}
 	}
 
