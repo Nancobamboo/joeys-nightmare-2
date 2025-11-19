@@ -122,13 +122,12 @@ public class JoeyGameControl : YViewControl
 
 		int levelId = IsDebug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
-		if (levelId >= 1 && levelId <= 5)
-		{
-			var playerData = GData.Instance.GetTutorialPlayerData(levelId);
-			m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
-			m_DataJoeyPlayer.playerHealth = playerData.Value.health;
-			m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
-		}
+
+		var playerData = GData.Instance.GetTutorialPlayerData(levelId);
+		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
+		m_DataJoeyPlayer.playerHealth = playerData.Value.health;
+		m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
+
 
 		m_GamePhaseControl.SetData();
 
@@ -140,14 +139,9 @@ public class JoeyGameControl : YViewControl
 		}
 
 		Dictionary<string, List<string>> equipmentDeck;
-		if (levelId >= 1 && levelId <= 5)
-		{
-			equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(levelId);
-		}
-		else
-		{
-			equipmentDeck = GData.Instance.DeckItemDict;
-		}
+
+		equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(levelId);
+
 
 		foreach (var kv in equipmentDeck)
 		{
