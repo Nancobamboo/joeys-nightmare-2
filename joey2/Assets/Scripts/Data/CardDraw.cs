@@ -100,18 +100,13 @@ public sealed class CardDraw : PureSingleton<CardDraw>
 
     public List<List<string>> DrawCardEnv(int level)
     {
-        // Tutorial levels (1-5) use CSV config
-        if (level >= 1 && level <= 5)
+        LoadTutorialEnvDeck();
+        if (_tutorialEnvDeckCache.ContainsKey(level))
         {
-            LoadTutorialEnvDeck();
-            if (_tutorialEnvDeckCache.ContainsKey(level))
-            {
-                return _tutorialEnvDeckCache[level];
-            }
-            Debug.LogWarning($"Tutorial env deck for level {level} not found in CSV, using default");
+            return _tutorialEnvDeckCache[level];
         }
 
-        // Normal levels use default deck (keep original logic for now)
+        Debug.LogWarning($"Tutorial env deck for level {level} not found in CSV, using default");
         return new List<List<string>>
         {
             new List<string> { "1001", "1002" },
