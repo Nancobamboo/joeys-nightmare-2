@@ -16,8 +16,10 @@ public class YPermanentAttackBoost : YDefaultEffect
     {
         if (CardControl != null && CardControl.CardData != null)
         {
-            string cardId = CardControl.CardData.id;
-            JoeyGameControl.Instance.AddEffectDamageCard(cardId, deltaPara);
+            Card cardData = CardControl.CardData;
+            cardData.attack += deltaPara;
+            cardData.currentAttack += deltaPara;
+            CardControl.RefreshCard();
         }
         return base.OnKill();
     }

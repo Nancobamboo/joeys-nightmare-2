@@ -310,20 +310,6 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
 		cardControl.AddBuffRelicList(m_DataJoeyPlayer.BuffRelicList);
-		if (cardControl.CardData != null && cardControl.CardEffect != null)
-		{
-			string cardId = cardControl.CardData.id;
-			int damageValue = m_DataJoeyPlayer.GetEffectDamageCardDictData(cardId);
-			if (damageValue != 0)
-			{
-				cardControl.CardEffect.AddEffectValue(EEffectType.Damage, damageValue);
-			}
-			int defenceValue = m_DataJoeyPlayer.GetEffectDefenceCardDictData(cardId);
-			if (defenceValue != 0)
-			{
-				cardControl.CardEffect.AddEffectValue(EEffectType.Defence, defenceValue);
-			}
-		}
 	}
 
 	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -450,13 +436,15 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage)
 	{
+		CancellationToken token = (m_CurrentEffectCardCts != null && !m_CurrentEffectCardCts.IsCancellationRequested) ? m_CurrentEffectCardCts.Token : CancellationToken.None;
+
 		if (cardControl.CardType == ECardType.monster)
 		{
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
 			if (delayTime > 0f)
 			{
-				await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+				await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 			}
 		}
 
@@ -468,11 +456,11 @@ public partial class UIGamePhaseControl : YViewControl
 			List<Card> dropCards = GetMonsterDropCard(monsterId);
 
 			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 
 			RemoveEnvCard(envIndex, cardControl);
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 
 			if (dropCards != null && dropCards.Count > 0)
 			{
@@ -883,9 +871,15 @@ public partial class UIGamePhaseControl : YViewControl
 
 	async void AttackRandomEnemy(object[] paraArray)
 	{
-		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
-		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
-		await AttackRandomEnemy(damage, attackTime);
+		try
+		{
+			int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
+			int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
+			await AttackRandomEnemy(damage, attackTime);
+		}
+		catch (OperationCanceledException)
+		{
+		}
 	}
 
 	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex)

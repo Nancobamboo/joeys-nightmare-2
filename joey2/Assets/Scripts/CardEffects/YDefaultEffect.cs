@@ -41,7 +41,8 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
-            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+            ECardAnimName animName = CardControl.CardType == ECardType.monster ? ECardAnimName.UI_Carditem_guaiwugongji : ECardAnimName.UI_Carditem_gongji;
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, animName, EVFXLife.CardLife);
             return maxDelayTime > 0f ? maxDelayTime : base.OnDealDamage();
         }
         return base.OnDealDamage();

@@ -47,36 +47,42 @@ public partial class UIGamePhaseControl
 {
 	public async UniTask AttackRandomEnemy(int damage, int attackTime)
 	{
-		if (damage <= 0)
+		try
 		{
-			return;
-		}
-
-		int envIndex = FindRandomEnemy();
-		if (envIndex == -1)
-		{
-			return;
-		}
-
-		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
-		if (enemyCardControl == null)
-		{
-			return;
-		}
-
-		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
-		for (int i = 0; i < attackTime; i++)
-		{
-			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+			if (damage <= 0)
 			{
-				break;
+				return;
 			}
-			Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
-			enemyCardControl = GetLastEnvCard(envIndex);
+
+			int envIndex = FindRandomEnemy();
+			if (envIndex == -1)
+			{
+				return;
+			}
+
+			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
 			if (enemyCardControl == null)
 			{
-				break;
+				return;
 			}
+
+			Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
+			for (int i = 0; i < attackTime; i++)
+			{
+				if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+				{
+					break;
+				}
+				Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
+				enemyCardControl = GetLastEnvCard(envIndex);
+				if (enemyCardControl == null)
+				{
+					break;
+				}
+			}
+		}
+		catch (System.OperationCanceledException)
+		{
 		}
 	}
 }

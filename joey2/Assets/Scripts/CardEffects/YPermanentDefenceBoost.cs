@@ -16,8 +16,10 @@ public class YPermanentDefenceBoost : YDefaultEffect
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
-			string cardId = CardControl.CardData.id;
-			JoeyGameControl.Instance.AddEffectDefenceCard(cardId, deltaPara);
+			Card cardData = CardControl.CardData;
+			cardData.defence += deltaPara;
+			cardData.currentDefence += deltaPara;
+			CardControl.RefreshCard();
 		}
 		return base.UseDefence(isOverflow);
 	}

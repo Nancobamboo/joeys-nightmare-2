@@ -222,12 +222,12 @@ public class UICardSimpleControl : YViewControl
 
 	public YCardEffect GetCardEffect()
 	{
-		if (cachedCard.effectIds == null || cachedCard.effectIds.Count == 0)
+		if (string.IsNullOrEmpty(cachedCard.effectId))
 		{
 			return GetDefaultEffect();
 		}
 
-		string effectIdStr = cachedCard.effectIds[0];
+		string effectIdStr = cachedCard.effectId;
 		string effectId;
 		int effectValue;
 		cachedCard.ParseEffectId(effectIdStr, out effectId, out effectValue);

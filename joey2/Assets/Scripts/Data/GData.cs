@@ -109,19 +109,21 @@ public sealed class GData : PureSingleton<GData>
 			int health = GetInt(HealthIdx, 0);
 			int price = GetInt(PriceIdx, 0);
 			int stars = GetInt(StarsIdx, 0);
-			List<string> effectIds = new List<string>();
+			string effectId = string.Empty;
 			if (EffectIdsIdx >= 0)
 			{
 				string eff = Get(EffectIdsIdx);
-				var parts = eff.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
-				for (int k = 0; k < parts.Length; k++)
+				if (!string.IsNullOrEmpty(eff))
 				{
-					var eid = parts[k].Trim();
-					if (!string.IsNullOrEmpty(eid)) effectIds.Add(eid);
+					var parts = eff.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+					if (parts.Length > 0)
+					{
+						effectId = parts[0].Trim();
+					}
 				}
 			}
 
-			var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
+			var card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectId);
 
 			CardDict[id] = card;
 		}

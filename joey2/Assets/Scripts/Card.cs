@@ -1,19 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json.Linq;
 
-public enum CardState
-{
-    Default, Active, Inactive, Used
-}
-
-public enum CardPosition
-{
-    Default, Deck, Sell, Buy, Env, Bag, Used
-}
-
-
-public class Card
+public class Card : IData
 {
     public string id;
     public string type;
@@ -31,15 +21,15 @@ public class Card
     public int price;
     public int currentPrice;
     public int stars;
-    public CardState state;
-    public CardState lastState;
-    public CardPosition position;
-    public CardPosition lastPosition;
-    public List<string> effectIds = new List<string>();
-    public List<int> effectValues = new List<int>();
+    public string effectId;
     public int UniqueId;
 
-    public Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, List<string> _effectIds)
+    public Card()
+    {
+
+    }
+
+    public Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, string _effectId)
     {
         this.id = _id;
         this.type = _type;
@@ -103,32 +93,13 @@ public class Card
                 this.cardFrame = null;
             }
         }
-        this.effectIds = _effectIds;
-        this.state = CardState.Default;
-        this.lastState = CardState.Default;
-        this.position = CardPosition.Default;
-        this.lastPosition = CardPosition.Default;
+        this.effectId = _effectId;
         this.UniqueId = 0;
     }
-    public void SetState(CardState state)
-    {
-        if (state != this.state)
-        {
-            this.lastState = this.state;
-            this.state = state;
-        }
-    }
-    public void SetPosition(CardPosition position)
-    {
-        if (position != this.position)
-        {
-            this.lastPosition = this.position;
-            this.position = position;
-        }
-    }
+
     public Card Clone()
     {
-        var c = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectIds);
+        var c = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectId);
         return c;
     }
 
@@ -168,5 +139,49 @@ public class Card
                 effectValue = value;
             }
         }
+    }
+
+    public void LoadFromJson(JObject jobject)
+    {
+        id = (string)jobject["id"];
+        type = (string)jobject["type"];
+        iconType = (string)jobject["iconType"];
+        cardImage = (string)jobject["cardImage"];
+        cardFrame = (string)jobject["cardFrame"];
+        cardName = (string)jobject["cardName"];
+        description = (string)jobject["description"];
+        attack = (int)jobject["attack"];
+        currentAttack = (int)jobject["currentAttack"];
+        defence = (int)jobject["defence"];
+        currentDefence = (int)jobject["currentDefence"];
+        health = (int)jobject["health"];
+        currentHealth = (int)jobject["currentHealth"];
+        price = (int)jobject["price"];
+        currentPrice = (int)jobject["currentPrice"];
+        stars = (int)jobject["stars"];
+        effectId = (string)jobject["effectId"];
+        UniqueId = (int)jobject["UniqueId"];
+    }
+
+    public void SaveToJson(JObject jobject)
+    {
+        jobject.Add("id", id);
+        jobject.Add("type", type);
+        jobject.Add("iconType", iconType);
+        jobject.Add("cardImage", cardImage);
+        jobject.Add("cardFrame", cardFrame);
+        jobject.Add("cardName", cardName);
+        jobject.Add("description", description);
+        jobject.Add("attack", attack);
+        jobject.Add("currentAttack", currentAttack);
+        jobject.Add("defence", defence);
+        jobject.Add("currentDefence", currentDefence);
+        jobject.Add("health", health);
+        jobject.Add("currentHealth", currentHealth);
+        jobject.Add("price", price);
+        jobject.Add("currentPrice", currentPrice);
+        jobject.Add("stars", stars);
+        jobject.Add("effectId", effectId);
+        jobject.Add("UniqueId", UniqueId);
     }
 }
