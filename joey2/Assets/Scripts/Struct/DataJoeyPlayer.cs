@@ -13,6 +13,8 @@ public class DataJoeyPlayer : IData
 	public int currentLevel;
 	public int Coin;
 	public List<int> BuffRelicList = new List<int>();
+	public Dictionary<string, int> EffectDamageCardDict = new Dictionary<string, int>();
+	public Dictionary<string, int> EffectDefenceCardDict = new Dictionary<string, int>();
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -23,6 +25,22 @@ public class DataJoeyPlayer : IData
 		currentLevel = (int)jobject["currentLevel"];
 		Coin = (int)jobject["Coin"];
 		JsonUtil.ToList(jobject, "BuffRelicList", ref BuffRelicList);
+		var EffectDamageCardKey = new List<string>();
+		JsonUtil.ToList(jobject, "EffectDamageCardKey", ref EffectDamageCardKey);
+		var EffectDamageCardValue = new List<int>();
+		JsonUtil.ToList(jobject, "EffectDamageCardValue", ref EffectDamageCardValue);
+		for (int i = 0; i < EffectDamageCardKey.Count; i++)
+		{
+			EffectDamageCardDict[EffectDamageCardKey[i]] = EffectDamageCardValue[i];
+		}
+		var EffectDefenceCardKey = new List<string>();
+		JsonUtil.ToList(jobject, "EffectDefenceCardKey", ref EffectDefenceCardKey);
+		var EffectDefenceCardValue = new List<int>();
+		JsonUtil.ToList(jobject, "EffectDefenceCardValue", ref EffectDefenceCardValue);
+		for (int i = 0; i < EffectDefenceCardKey.Count; i++)
+		{
+			EffectDefenceCardDict[EffectDefenceCardKey[i]] = EffectDefenceCardValue[i];
+		}
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -34,6 +52,14 @@ public class DataJoeyPlayer : IData
 		jobject.Add("currentLevel", currentLevel);
 		jobject.Add("Coin", Coin);
 		jobject.Add("BuffRelicList", JsonUtil.ToJArray(BuffRelicList));
+		var EffectDamageCardKey = EffectDamageCardDict.Keys.ToList();
+		jobject.Add("EffectDamageCardKey", JsonUtil.ToJArray(EffectDamageCardKey));
+		var EffectDamageCardValue = EffectDamageCardDict.Values.ToList();
+		jobject.Add("EffectDamageCardValue", JsonUtil.ToJArray(EffectDamageCardValue));
+		var EffectDefenceCardKey = EffectDefenceCardDict.Keys.ToList();
+		jobject.Add("EffectDefenceCardKey", JsonUtil.ToJArray(EffectDefenceCardKey));
+		var EffectDefenceCardValue = EffectDefenceCardDict.Values.ToList();
+		jobject.Add("EffectDefenceCardValue", JsonUtil.ToJArray(EffectDefenceCardValue));
 	}
 	public void AddBuffRelicListData(int data)
 	{
@@ -46,6 +72,34 @@ public class DataJoeyPlayer : IData
 	public int GetBuffRelicListData(int dataIndex)
 	{
 		return BuffRelicList[dataIndex];
+	}
+	public void AddEffectDamageCardDictData(string dataKey, int value)
+	{
+		EffectDamageCardDict[dataKey] = GetEffectDamageCardDictData(dataKey) + value;
+	}
+	public void RemoveEffectDamageCardDictData(string dataKey)
+	{
+		EffectDamageCardDict.Remove(dataKey);
+	}
+	public int GetEffectDamageCardDictData(string dataKey)
+	{
+		int result = 0;
+		EffectDamageCardDict.TryGetValue(dataKey, out result);
+		return result;
+	}
+	public void AddEffectDefenceCardDictData(string dataKey, int value)
+	{
+		EffectDefenceCardDict[dataKey] = GetEffectDefenceCardDictData(dataKey) + value;
+	}
+	public void RemoveEffectDefenceCardDictData(string dataKey)
+	{
+		EffectDefenceCardDict.Remove(dataKey);
+	}
+	public int GetEffectDefenceCardDictData(string dataKey)
+	{
+		int result = 0;
+		EffectDefenceCardDict.TryGetValue(dataKey, out result);
+		return result;
 	}
 }
 public partial class DataSystem

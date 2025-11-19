@@ -340,6 +340,16 @@ public class JoeyGameControl : YViewControl
 		m_DataJoeyPlayer.AddBuffRelicListData((int)buffType);
 	}
 
+	public void AddEffectDamageCard(string cardId, int deltaPara)
+	{
+		m_DataJoeyPlayer.AddEffectDamageCardDictData(cardId, deltaPara);
+	}
+
+	public void AddEffectDefenceCard(string cardId, int deltaPara)
+	{
+		m_DataJoeyPlayer.AddEffectDefenceCardDictData(cardId, deltaPara);
+	}
+
 	protected override void OnReturn()
 	{
 		m_GlobalDelayAction.Cancel();

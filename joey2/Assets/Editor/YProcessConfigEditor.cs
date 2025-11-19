@@ -37,6 +37,7 @@ public class YProcessConfigEditor : EditorWindow
         "List<string>",
         "Dictionary<int, int>",
         "Dictionary<int, string>",
+        "Dictionary<string, int>",
         "bool",
     };
 
@@ -373,13 +374,13 @@ public class YProcessConfigEditor : EditorWindow
             Debug.Log(e.Message);
         }
     }
-    
+
 
     public void GenConfigCode()
     {
-        if(ExportName.Contains("Config"))
+        if (ExportName.Contains("Config"))
         {
-            ExportName = ExportName.Remove(0,6);
+            ExportName = ExportName.Remove(0, 6);
         }
 
 
@@ -424,7 +425,7 @@ public class YProcessConfigEditor : EditorWindow
             {
                 if (TypeArray[i] == "enum")
                 {
-                    codeStr += "\t\t" + ConfigNameArray[i] + " = (E" + ConfigNameArray[i] 
+                    codeStr += "\t\t" + ConfigNameArray[i] + " = (E" + ConfigNameArray[i]
                         + ")(int)jobject[\"" + ConfigNameArray[i] + "\"];\n";
                 }
                 else
@@ -439,7 +440,7 @@ public class YProcessConfigEditor : EditorWindow
         var className = "Config" + ExportName;
         codeStr += "public partial class ConfigSystem \n{\n\tDictionary<int, " + className + "> m_" + ExportName + "Dict = new Dictionary<int, " + className + ">();\n\n\t";
         codeStr += "public " + className + " Get" + className + "ById(int id)\n\t{\n\t\t";
-        codeStr += className + " result = null;\n\t\tm_" + ExportName +"Dict.TryGetValue(id, out result);\n\t\t";
+        codeStr += className + " result = null;\n\t\tm_" + ExportName + "Dict.TryGetValue(id, out result);\n\t\t";
         codeStr += "return result;\n\t}\n\n";
 
         codeStr += "\tpublic void Load" + className + "()\n\t{\n\t\tLoadJsonConfig(\"Configs/Config_" + ExportName + "\", \"" + ConfigNameArray[0] + "\", ref m_" + ExportName + "Dict);";
@@ -447,7 +448,7 @@ public class YProcessConfigEditor : EditorWindow
 
         try
         {
-                        
+
             StreamWriter sw;
             sw = new StreamWriter(new FileStream(realDiskCSFilePath, FileMode.Create, FileAccess.ReadWrite));
 
@@ -478,13 +479,13 @@ public class YProcessConfigEditor : EditorWindow
                     break;
                 }
             }
-            if(!isAdded)
+            if (!isAdded)
             {
-                
+
                 for (int i = 0; i < lines.Length; i++)
                 {
                     list.Add(lines[i]);
-                    if (!isAdded && lines[i].Contains("LoadConfig") && lines[i+1].Contains("}"))
+                    if (!isAdded && lines[i].Contains("LoadConfig") && lines[i + 1].Contains("}"))
                     {
                         isAdded = true;
                         list.Add("\t\tLoad" + className + "();");
@@ -493,7 +494,7 @@ public class YProcessConfigEditor : EditorWindow
                 }
                 File.WriteAllLines(exPath, list.ToArray());
             }
-                    }
+        }
         catch (Exception e)
         {
             Debug.Log(e.Message);
@@ -516,13 +517,13 @@ public class YProcessConfigEditor : EditorWindow
 
         foreach (var item in TypeArray)
         {
-            if(item.Contains("List") || item.Contains("Dict"))
+            if (item.Contains("List") || item.Contains("Dict"))
             {
                 useList = true;
             }
         }
 
-        if(useList)
+        if (useList)
         {
             codeStr += "using System.Collections.Generic;\nusing System.Linq;\n";
         }
@@ -535,11 +536,11 @@ public class YProcessConfigEditor : EditorWindow
             {
                 codeStr += "\tpublic E" + ConfigNameArray[i] + " " + ConfigNameArray[i] + ";\n";
             }
-            else if(TypeArray[i].Contains("List"))
+            else if (TypeArray[i].Contains("List"))
             {
-                codeStr += "\tpublic " + TypeArray[i] + " " + ConfigNameArray[i] + " = new "+ TypeArray[i] + "();\n";
+                codeStr += "\tpublic " + TypeArray[i] + " " + ConfigNameArray[i] + " = new " + TypeArray[i] + "();\n";
             }
-            else if(TypeArray[i].Contains("Dict"))
+            else if (TypeArray[i].Contains("Dict"))
             {
                 codeStr += "\tpublic " + TypeArray[i] + " " + ConfigNameArray[i] + " = new " + TypeArray[i] + "();\n";
             }
@@ -574,8 +575,8 @@ public class YProcessConfigEditor : EditorWindow
 
                     codeStr += "\t\tfor(int i = 0; i < " + prefixKey + ".Count; i++" + ")\n\t\t{\n\t\t\t" + ConfigNameArray[i] + "[" + prefixKey + "[i]] = " + prefixValue + "[i];\n\t\t}\n";
                     funcIndexs.Add(i);
-                } 
-                else if(TypeArray[i] == "Dictionary<int, string>")
+                }
+                else if (TypeArray[i] == "Dictionary<int, string>")
                 {
                     string preifix = ConfigNameArray[i].Substring(0, ConfigNameArray[i].Length - 4);
                     string prefixKey = preifix + "Key";
@@ -583,6 +584,19 @@ public class YProcessConfigEditor : EditorWindow
                     codeStr += "\t\tvar " + prefixKey + " = new List<int>();\n";
                     codeStr += "\t\tJsonUtil.ToList(jobject, \"" + prefixKey + "\", ref " + prefixKey + ");\n";
                     codeStr += "\t\tvar " + prefixValue + " = new List<string>();\n";
+                    codeStr += "\t\tJsonUtil.ToList(jobject, \"" + prefixValue + "\", ref " + prefixValue + ");\n";
+
+                    codeStr += "\t\tfor(int i = 0; i < " + prefixKey + ".Count; i++" + ")\n\t\t{\n\t\t\t" + ConfigNameArray[i] + "[" + prefixKey + "[i]] = " + prefixValue + "[i];\n\t\t}\n";
+                    funcIndexs.Add(i);
+                }
+                else if (TypeArray[i] == "Dictionary<string, int>")
+                {
+                    string preifix = ConfigNameArray[i].Substring(0, ConfigNameArray[i].Length - 4);
+                    string prefixKey = preifix + "Key";
+                    string prefixValue = preifix + "Value";
+                    codeStr += "\t\tvar " + prefixKey + " = new List<string>();\n";
+                    codeStr += "\t\tJsonUtil.ToList(jobject, \"" + prefixKey + "\", ref " + prefixKey + ");\n";
+                    codeStr += "\t\tvar " + prefixValue + " = new List<int>();\n";
                     codeStr += "\t\tJsonUtil.ToList(jobject, \"" + prefixValue + "\", ref " + prefixValue + ");\n";
 
                     codeStr += "\t\tfor(int i = 0; i < " + prefixKey + ".Count; i++" + ")\n\t\t{\n\t\t\t" + ConfigNameArray[i] + "[" + prefixKey + "[i]] = " + prefixValue + "[i];\n\t\t}\n";
@@ -652,6 +666,17 @@ public class YProcessConfigEditor : EditorWindow
                     codeStr += "\t\tvar " + prefixValue + " = " + ConfigNameArray[i] + ".Values.ToList();\n";
                     codeStr += "\t\t" + "jobject.Add(\"" + prefixValue + "\", JsonUtil.ToJArray(" + prefixValue + "));\n";
                 }
+                else if (TypeArray[i] == "Dictionary<string, int>")
+                {
+                    string preifix = ConfigNameArray[i].Substring(0, ConfigNameArray[i].Length - 4);
+                    string prefixKey = preifix + "Key";
+                    string prefixValue = preifix + "Value";
+
+                    codeStr += "\t\tvar " + prefixKey + " = " + ConfigNameArray[i] + ".Keys.ToList();\n";
+                    codeStr += "\t\t" + "jobject.Add(\"" + prefixKey + "\", JsonUtil.ToJArray(" + prefixKey + "));\n";
+                    codeStr += "\t\tvar " + prefixValue + " = " + ConfigNameArray[i] + ".Values.ToList();\n";
+                    codeStr += "\t\t" + "jobject.Add(\"" + prefixValue + "\", JsonUtil.ToJArray(" + prefixValue + "));\n";
+                }
                 else
                 {
                     string prefix = ConfigNameArray[i].Substring(0, ConfigNameArray[i].Length - 4) + "List";
@@ -689,11 +714,11 @@ public class YProcessConfigEditor : EditorWindow
                     codeStr += "\tpublic void Remove" + ConfigNameArray[funcIndexs[i]] + "Data(" + typeName + " data)\n";
                     codeStr += "\t{\n\t\t" + ConfigNameArray[funcIndexs[i]] + ".Remove(data);\n\t}\n";
 
-                    codeStr += "\tpublic "+ typeName+ " Get" + ConfigNameArray[funcIndexs[i]] + "Data(int dataIndex)\n";
+                    codeStr += "\tpublic " + typeName + " Get" + ConfigNameArray[funcIndexs[i]] + "Data(int dataIndex)\n";
                     codeStr += "\t{\n\t\treturn " + ConfigNameArray[funcIndexs[i]] + "[dataIndex];\n\t}\n";
 
                 }
-                else if(TypeArray[funcIndexs[i]].Contains("Dict"))
+                else if (TypeArray[funcIndexs[i]].Contains("Dict"))
                 {
 
                     if (TypeArray[funcIndexs[i]] == "Dictionary<int, int>")
@@ -733,6 +758,25 @@ public class YProcessConfigEditor : EditorWindow
                         codeStr += "\t\treturn result;\n\t}\n";
 
                     }
+                    else if (TypeArray[funcIndexs[i]] == "Dictionary<string, int>")
+                    {
+                        int number = TypeArray[funcIndexs[i]].Length - 17;
+
+                        //var typeName = TypeArray[funcIndexs[i]].Substring(18, number);
+                        //typeName = typeName.Replace(" ", "");
+                        codeStr += "\tpublic void Add" + ConfigNameArray[funcIndexs[i]] + "Data(string dataKey, int value)\n";
+
+                        codeStr += "\t{\n\t\t" + ConfigNameArray[funcIndexs[i]] + "[dataKey] = Get" + ConfigNameArray[funcIndexs[i]] + "Data(dataKey) + " + "value;\n\t}\n";
+
+                        codeStr += "\tpublic void Remove" + ConfigNameArray[funcIndexs[i]] + "Data(string dataKey)\n";
+                        codeStr += "\t{\n\t\t" + ConfigNameArray[funcIndexs[i]] + ".Remove(dataKey);\n\t}\n";
+
+                        codeStr += "\tpublic int Get" + ConfigNameArray[funcIndexs[i]] + "Data(string dataKey)\n";
+                        codeStr += "\t{\n\t\tint result = 0;\n";
+                        codeStr += "\t\t" + ConfigNameArray[funcIndexs[i]] + ".TryGetValue(dataKey, out result);\n";
+                        codeStr += "\t\treturn result;\n\t}\n";
+
+                    }
                     else
                     {
                         int number = TypeArray[funcIndexs[i]].Length - 17;
@@ -758,7 +802,7 @@ public class YProcessConfigEditor : EditorWindow
 
 
 
-        codeStr +="}\n";
+        codeStr += "}\n";
         var className = "Data" + ExportName;
 
         if (!ExportName.Contains("Item"))
@@ -778,13 +822,13 @@ public class YProcessConfigEditor : EditorWindow
 
         try
         {
-                                    StreamWriter sw;
+            StreamWriter sw;
             sw = new StreamWriter(new FileStream(realDiskCSFilePath, FileMode.Create, FileAccess.ReadWrite));
 
             sw.Write(codeStr);
             sw.Close();
             sw.Dispose();
-  
+
             if (className.Contains("TMP"))
             {
                 return;
@@ -809,7 +853,7 @@ public class YProcessConfigEditor : EditorWindow
             }
             if (!isAdded && !ExportName.Contains("Item"))
             {
-                
+
                 for (int i = 0; i < lines.Length; i++)
                 {
                     list.Add(lines[i]);
@@ -822,7 +866,7 @@ public class YProcessConfigEditor : EditorWindow
                 }
                 File.WriteAllLines(exPath, list.ToArray());
             }
-                    }
+        }
         catch (Exception e)
         {
             Debug.Log(e.Message);
@@ -837,7 +881,7 @@ public class YProcessConfigEditor : EditorWindow
 
         for (int i = 0; i < ConfigNameArray.Length; i++)
         {
-            codeStr += "\tpublic static uint Prop_" + ConfigNameArray[i] + " = 1 << "+ (i+1) +";\n";
+            codeStr += "\tpublic static uint Prop_" + ConfigNameArray[i] + " = 1 << " + (i + 1) + ";\n";
         }
 
         codeStr += "\tpublic override YModelType GetModelType()\n\t{\n";
