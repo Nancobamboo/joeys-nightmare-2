@@ -22,7 +22,11 @@ public enum ECardEffectId
     LifeSteal_OnDealDamage,
     HealPlayer_OnPlay,
     AutoBoomMoney,
-    StealMoney
+    StealMoney,
+    GravityShoes,
+    RomeoMonkey,
+    JulietMonkey,
+    BadMonkey
 }
 
 public enum EEffectType
