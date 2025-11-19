@@ -20,5 +20,8 @@ public enum EActionId
 	StealCoin,
 	ReturnCoin,
 	EscapeMonkey,
+	SwapEnvCard,
+	RomeoMonkeyDead,
+	JulietMonkeyDead,
 	Upper
 }

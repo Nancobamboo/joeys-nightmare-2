@@ -23,6 +23,7 @@ public class JoeyGameControl : YViewControl
 	private UIGamePhaseControl m_GamePhaseControl;
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private UIPauseControl m_PauseControl;
+	private UIGameOverControl m_GameOverControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
@@ -84,6 +85,10 @@ public class JoeyGameControl : YViewControl
 	{
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{
+			if (m_GameOverControl != null && m_GameOverControl.gameObject.activeSelf)
+			{
+				return;
+			}
 			if (m_PauseControl == null)
 			{
 				m_PauseControl = Asset.OpenUI<UIPauseControl>();
@@ -316,6 +321,23 @@ public class JoeyGameControl : YViewControl
 			return m_GamePhaseControl.HasBagCard(cardType);
 		}
 		return false;
+	}
+
+	public void ShowGameOver()
+	{
+		if (m_GameOverControl == null)
+		{
+			m_GameOverControl = Asset.OpenUI<UIGameOverControl>();
+		}
+		else
+		{
+			m_GameOverControl.gameObject.SetActive(true);
+		}
+	}
+
+	public void AddBuffRelic(EBuffType buffType)
+	{
+		m_DataJoeyPlayer.AddBuffRelicListData((int)buffType);
 	}
 
 	protected override void OnReturn()

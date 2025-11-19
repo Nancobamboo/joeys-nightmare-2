@@ -206,6 +206,20 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
+	public void AddBuff(EBuffType buffType, int value)
+	{
+		m_BuffValueArray[(int)buffType] += value;
+	}
+
+	public void AddBuffRelicList(List<int> buffRelicList)
+	{
+		for (int i = 0; i < buffRelicList.Count; i++)
+		{
+			EBuffType buffType = (EBuffType)buffRelicList[i];
+			AddBuff(buffType, 1);
+		}
+	}
+
 	public YCardEffect GetCardEffect()
 	{
 		if (cachedCard.effectIds == null || cachedCard.effectIds.Count == 0)
@@ -274,6 +288,18 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.StealMoney:
 				effect = new YStealMoney(effectValue);
+				break;
+			case ECardEffectId.GravityShoes:
+				effect = new YGravityShoes();
+				break;
+			case ECardEffectId.RomeoMonkey:
+				effect = new YRomeoMonkey();
+				break;
+			case ECardEffectId.JulietMonkey:
+				effect = new YJulietMonkey();
+				break;
+			case ECardEffectId.BadMonkey:
+				effect = new YBadMonkey(effectValue);
 				break;
 			default:
 				return GetDefaultEffect();
@@ -486,6 +512,10 @@ public class UICardSimpleControl : YViewControl
 			animRect.anchoredPosition = Vector2.zero;
 		}
 		m_IsMoving = false;
+		for (int i = 0; i < m_BuffValueArray.Length; i++)
+		{
+			m_BuffValueArray[i] = 0;
+		}
 		gameObject.SetActive(false);
 		EffectEntityList.Clear();
 		base.OnReturn();

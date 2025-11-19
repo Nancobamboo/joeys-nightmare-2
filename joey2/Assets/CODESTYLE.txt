@@ -18,6 +18,12 @@ Project Code Style
 - Use explicit access modifiers
 - Avoid var when type is non-obvious
 - Use readonly where appropriate
+- Do not use foreach for value type arrays; use for loop instead
 
 5) JSON
 - Use float/double as needed; do not force integers
+
+6) Card Effects
+- When a CardEffect needs to call a method in UIGamePhaseControl, implement the specific method in a partial class UIGamePhaseControl at the bottom of the CardEffect file
+- The wrapper method in UIGamePhaseControl.cs should extract parameters from object[] and call the partial class method
+- Example: YElectric.cs implements TakeAllEnemyDamage(int damage) in partial class, UIGamePhaseControl.cs has TakeAllEnemyDamage(object[] paraArray) wrapper
