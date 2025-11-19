@@ -301,6 +301,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BadMonkey:
 				effect = new YBadMonkey(effectValue);
 				break;
+			case ECardEffectId.PermanentAttackBoost:
+				effect = new YPermanentAttackBoost(effectValue);
+				break;
+			case ECardEffectId.PermanentDefenceBoost:
+				effect = new YPermanentDefenceBoost(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}

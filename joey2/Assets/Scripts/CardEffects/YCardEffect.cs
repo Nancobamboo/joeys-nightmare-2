@@ -26,7 +26,9 @@ public enum ECardEffectId
     GravityShoes,
     RomeoMonkey,
     JulietMonkey,
-    BadMonkey
+    BadMonkey,
+    PermanentAttackBoost,
+    PermanentDefenceBoost
 }
 
 public enum EEffectType
@@ -41,6 +43,7 @@ public enum EEffectType
     ExtraAttackCnt,
     Electric,
     Other,
+    Defence,
     Upper
 }
 

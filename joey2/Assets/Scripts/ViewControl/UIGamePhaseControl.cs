@@ -310,6 +310,20 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
 		cardControl.AddBuffRelicList(m_DataJoeyPlayer.BuffRelicList);
+		if (cardControl.CardData != null && cardControl.CardEffect != null)
+		{
+			string cardId = cardControl.CardData.id;
+			int damageValue = m_DataJoeyPlayer.GetEffectDamageCardDictData(cardId);
+			if (damageValue != 0)
+			{
+				cardControl.CardEffect.AddEffectValue(EEffectType.Damage, damageValue);
+			}
+			int defenceValue = m_DataJoeyPlayer.GetEffectDefenceCardDictData(cardId);
+			if (defenceValue != 0)
+			{
+				cardControl.CardEffect.AddEffectValue(EEffectType.Defence, defenceValue);
+			}
+		}
 	}
 
 	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -775,7 +789,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		if (defenceCardControl != null)
 		{
-			defenceValue = defenceCardControl.CardData.currentDefence;
+			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
