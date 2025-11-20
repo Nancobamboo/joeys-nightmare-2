@@ -12,7 +12,7 @@ public class DataJoeyPlayer : IData
 	public int playerDefence;
 	public int currentLevel;
 	public int Coin;
-	public List<int> BuffRelicList = new List<int>();
+	public List<int> RelicList = new List<int>();
 	public Dictionary<int, Card> SelfCardDict = new Dictionary<int, Card>();
 	public int UniqueIdGen;
 	public void LoadFromJson(JObject jobject)
@@ -24,10 +24,10 @@ public class DataJoeyPlayer : IData
 		playerDefence = (int)jobject["playerDefence"];
 		currentLevel = (int)jobject["currentLevel"];
 		Coin = (int)jobject["Coin"];
-		JsonUtil.ToList(jobject, "BuffRelicList", ref BuffRelicList);
+		JsonUtil.ToList(jobject, "BuffRelicList", ref RelicList);
 		var SelfCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "SelfCardList", ref SelfCardList);
-		foreach(var item in SelfCardList)
+		foreach (var item in SelfCardList)
 		{
 			SelfCardDict[item.UniqueId] = item;
 		}
@@ -42,22 +42,22 @@ public class DataJoeyPlayer : IData
 		jobject.Add("playerDefence", playerDefence);
 		jobject.Add("currentLevel", currentLevel);
 		jobject.Add("Coin", Coin);
-		jobject.Add("BuffRelicList", JsonUtil.ToJArray(BuffRelicList));
+		jobject.Add("BuffRelicList", JsonUtil.ToJArray(RelicList));
 		var SelfCardList = SelfCardDict.Values.ToList();
 		jobject.Add("SelfCardList", JsonUtil.ToJArray(SelfCardList));
 		jobject.Add("UniqueIdGen", UniqueIdGen);
 	}
-	public void AddBuffRelicListData(int data)
+	public void AddRelicListData(int data)
 	{
-		BuffRelicList.Add(data);
+		RelicList.Add(data);
 	}
-	public void RemoveBuffRelicListData(int data)
+	public void RemoveRelicListData(int data)
 	{
-		BuffRelicList.Remove(data);
+		RelicList.Remove(data);
 	}
-	public int GetBuffRelicListData(int dataIndex)
+	public int GetRelicListData(int dataIndex)
 	{
-		return BuffRelicList[dataIndex];
+		return RelicList[dataIndex];
 	}
 	public void AddSelfCardDictData(Card item)
 	{

@@ -337,9 +337,9 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
-	public void AddBuffRelic(EBuffType buffType)
+	public void AddRelic(ERelicType relicType)
 	{
-		m_DataJoeyPlayer.AddBuffRelicListData((int)buffType);
+		m_DataJoeyPlayer.AddRelicListData((int)relicType);
 	}
 
 	public void AddSelfCard(string cardId)

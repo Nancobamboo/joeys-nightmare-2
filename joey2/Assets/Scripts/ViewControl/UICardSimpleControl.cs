@@ -20,7 +20,16 @@ public enum ECardType
 public enum EBuffType
 {
 	Counter,
+
 	Upper
+}
+
+
+public enum ERelicType
+{
+	LifeSteal,
+	EnvAttack,
+	EnvDefence,
 }
 
 public class UICardSimpleControl : YViewControl
@@ -211,12 +220,36 @@ public class UICardSimpleControl : YViewControl
 		m_BuffValueArray[(int)buffType] += value;
 	}
 
-	public void AddBuffRelicList(List<int> buffRelicList)
+	public void AddRelicList(List<int> relicList)
 	{
-		for (int i = 0; i < buffRelicList.Count; i++)
+		if (cachedCard == null)
 		{
-			EBuffType buffType = (EBuffType)buffRelicList[i];
-			AddBuff(buffType, 1);
+			return;
+		}
+		for (int i = 0; i < relicList.Count; i++)
+		{
+			ERelicType relicType = (ERelicType)relicList[i];
+			switch (relicType)
+			{
+				case ERelicType.EnvAttack:
+					if (IsEnv)
+					{
+						cachedCard.attack += 1;
+						cachedCard.currentAttack += 1;
+					}
+					break;
+				case ERelicType.EnvDefence:
+					if (IsEnv)
+					{
+						cachedCard.defence += 1;
+						cachedCard.currentDefence += 1;
+					}
+					break;
+			}
+		}
+		if (IsEnv)
+		{
+			RefreshCard();
 		}
 	}
 
@@ -306,6 +339,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.PermanentDefenceBoost:
 				effect = new YPermanentDefenceBoost(effectValue);
+				break;
+			case ECardEffectId.MoveWeaponToEnv:
+				effect = new YMoveWeaponToEnv();
 				break;
 			default:
 				return GetDefaultEffect();

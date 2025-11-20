@@ -63,6 +63,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.SwapEnvCard, SwapEnvCard);
 		RegistAction(EActionId.RomeoMonkeyDead, RomeoMonkeyDead);
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
+		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -210,7 +211,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.JoeyImage.sprite = sleepSprite;
 	}
 
-	private UICardSimpleControl GetCardSimple(Transform parent)
+	private UICardSimpleControl GetCardSimple(Transform parent, bool IsEnv)
 	{
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
 		cardControl.CacheTrans.SetParent(parent);
@@ -218,6 +219,8 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.CacheTrans.localPosition = Vector3.zero;
 		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		cardControl.CacheTrans.SetAsLastSibling();
+		cardControl.IsEnv = IsEnv;
+		cardControl.AddRelicList(m_DataJoeyPlayer.RelicList);
 		return cardControl;
 	}
 
@@ -265,7 +268,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
-			UICardSimpleControl cardControl = GetCardSimple(parent);
+			UICardSimpleControl cardControl = GetCardSimple(parent, false);
 			cardControl.SetData(card);
 			AddBagCard(cardType, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
@@ -280,7 +283,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
-			UICardSimpleControl cardControl = GetCardSimple(parent.transform);
+			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
 			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
@@ -321,7 +324,7 @@ public partial class UIGamePhaseControl : YViewControl
 					continue;
 			}
 			m_CardDict[card.UniqueId] = card;
-			UICardSimpleControl cardControl = GetCardSimple(parent);
+			UICardSimpleControl cardControl = GetCardSimple(parent, false);
 			cardControl.SetData(card);
 			AddBagCard(cardType, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
@@ -342,7 +345,6 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
-		cardControl.AddBuffRelicList(m_DataJoeyPlayer.BuffRelicList);
 	}
 
 	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
@@ -425,7 +427,7 @@ public partial class UIGamePhaseControl : YViewControl
 				return null;
 		}
 
-		UICardSimpleControl cardControl = GetCardSimple(parent);
+		UICardSimpleControl cardControl = GetCardSimple(parent, false);
 		cardControl.SetData(card);
 		AddBagCard(cardType, cardControl);
 		return cardControl;
@@ -555,7 +557,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 			panelIndex = Mathf.Clamp(panelIndex, 0, m_EnvPanels.Count - 1);
 			VerticalLayoutGroup parent = m_EnvPanels[panelIndex];
-			UICardSimpleControl cardControl = GetCardSimple(parent.transform);
+			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
 			cardControl.SetData(dropCards[i], isEnv: true, envIndex: panelIndex);
 			AddEnvCard(panelIndex, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
@@ -626,6 +628,12 @@ public partial class UIGamePhaseControl : YViewControl
 			return -1;
 		}
 		return enemyIndices[Random.Range(0, enemyIndices.Count)];
+	}
+
+	void AddEnvCardFromBag(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		AddEnvCardFromBag(cardControl);
 	}
 
 	void RemoveCardData(int uniqueId)

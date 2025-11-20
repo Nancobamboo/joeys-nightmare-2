@@ -65,5 +65,11 @@ public partial class DataSystem
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
         return card;
     }
+
+    public bool HasRelic(ERelicType relicType)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        return dataJoeyPlayer.RelicList.Contains((int)relicType);
+    }
 }
 

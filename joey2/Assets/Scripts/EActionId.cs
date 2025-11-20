@@ -23,5 +23,6 @@ public enum EActionId
 	SwapEnvCard,
 	RomeoMonkeyDead,
 	JulietMonkeyDead,
+	AddEnvCardFromBag,
 	Upper
 }

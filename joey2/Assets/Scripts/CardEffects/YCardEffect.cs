@@ -28,7 +28,8 @@ public enum ECardEffectId
     JulietMonkey,
     BadMonkey,
     PermanentAttackBoost,
-    PermanentDefenceBoost
+    PermanentDefenceBoost,
+    MoveWeaponToEnv
 }
 
 public enum EEffectType
