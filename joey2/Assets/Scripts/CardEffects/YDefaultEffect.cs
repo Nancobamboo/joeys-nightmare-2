@@ -13,6 +13,10 @@ public class YDefaultEffect : YCardEffect
 
     public override float UseAttack()
     {
+        if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+        {
+            YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+        }
         return base.UseAttack();
     }
 
