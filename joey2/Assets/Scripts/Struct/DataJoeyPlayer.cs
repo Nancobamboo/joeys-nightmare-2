@@ -14,6 +14,7 @@ public class DataJoeyPlayer : IData
 	public int Coin;
 	public List<int> BuffRelicList = new List<int>();
 	public Dictionary<int, Card> SelfCardDict = new Dictionary<int, Card>();
+	public int UniqueIdGen;
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -26,10 +27,11 @@ public class DataJoeyPlayer : IData
 		JsonUtil.ToList(jobject, "BuffRelicList", ref BuffRelicList);
 		var SelfCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "SelfCardList", ref SelfCardList);
-		foreach (var item in SelfCardList)
+		foreach(var item in SelfCardList)
 		{
 			SelfCardDict[item.UniqueId] = item;
 		}
+		UniqueIdGen = (int)jobject["UniqueIdGen"];
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -43,6 +45,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("BuffRelicList", JsonUtil.ToJArray(BuffRelicList));
 		var SelfCardList = SelfCardDict.Values.ToList();
 		jobject.Add("SelfCardList", JsonUtil.ToJArray(SelfCardList));
+		jobject.Add("UniqueIdGen", UniqueIdGen);
 	}
 	public void AddBuffRelicListData(int data)
 	{

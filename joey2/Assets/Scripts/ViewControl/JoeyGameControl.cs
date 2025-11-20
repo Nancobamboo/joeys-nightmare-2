@@ -136,6 +136,8 @@ public class JoeyGameControl : YViewControl
 
 		m_GamePhaseControl.SetData();
 
+		m_GamePhaseControl.AddSelfCardList();
+
 		List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(levelId);
 		for (int i = 0; i < cardIdListEnv.Count; i++)
 		{
@@ -338,6 +340,13 @@ public class JoeyGameControl : YViewControl
 	public void AddBuffRelic(EBuffType buffType)
 	{
 		m_DataJoeyPlayer.AddBuffRelicListData((int)buffType);
+	}
+
+	public void AddSelfCard(string cardId)
+	{
+		Card card = DataSystem.Instance.CreateCard(cardId);
+		m_DataJoeyPlayer.AddSelfCardDictData(card);
+		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 
 	protected override void OnReturn()

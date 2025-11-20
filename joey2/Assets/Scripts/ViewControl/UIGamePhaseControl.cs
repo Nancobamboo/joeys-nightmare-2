@@ -25,7 +25,6 @@ public partial class UIGamePhaseControl : YViewControl
 	private Dictionary<int, Card> m_CardDict = new Dictionary<int, Card>();
 	private Dictionary<int, List<UICardSimpleControl>> m_EnvCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
-	private static int UniqueIdGen = 0;
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private List<Card> UsedCardList = new List<Card>();
 	private Transform[] m_EffectRoots;
@@ -230,10 +229,8 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public Card CreateCard(string cardId)
 	{
-		Card card = GData.Instance.GetCardConfigById(cardId).Clone();
-		UniqueIdGen++;
-		card.UniqueId = UniqueIdGen;
-		m_CardDict[UniqueIdGen] = card;
+		Card card = DataSystem.Instance.CreateCard(cardId);
+		m_CardDict[card.UniqueId] = card;
 		return card;
 	}
 
@@ -293,6 +290,42 @@ public partial class UIGamePhaseControl : YViewControl
 	public Card GetCardDataById(int uniqueId)
 	{
 		return m_CardDict[uniqueId];
+	}
+
+	public void AddSelfCardList()
+	{
+		foreach (KeyValuePair<int, Card> kvp in m_DataJoeyPlayer.SelfCardDict)
+		{
+			Card card = kvp.Value;
+			ECardType cardType = card.GetCardType();
+			Transform parent = null;
+			switch (cardType)
+			{
+				case ECardType.attack:
+					parent = m_View.AttackPanel.transform;
+					break;
+				case ECardType.defence:
+					parent = m_View.DefencePanel.transform;
+					break;
+				case ECardType.skill:
+					parent = m_View.SkillPanel.transform;
+					break;
+				case ECardType.item:
+					parent = m_View.ItemPanel.transform;
+					break;
+				case ECardType.monster:
+				case ECardType.other:
+					parent = m_View.EnvPanels.transform;
+					break;
+				default:
+					continue;
+			}
+			m_CardDict[card.UniqueId] = card;
+			UICardSimpleControl cardControl = GetCardSimple(parent);
+			cardControl.SetData(card);
+			AddBagCard(cardType, cardControl);
+			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		}
 	}
 
 	private void AddBagCard(ECardType cardType, UICardSimpleControl cardControl, bool isMoveCard = false)
@@ -618,7 +651,6 @@ public partial class UIGamePhaseControl : YViewControl
 		m_EnvCardDict.Clear();
 		m_BagCardDict.Clear();
 		UsedCardList.Clear();
-		UniqueIdGen = 0;
 	}
 
 	async void MoveCard(object[] paraArray)
