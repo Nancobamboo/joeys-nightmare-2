@@ -56,5 +56,14 @@ public partial class DataSystem
         }
         return 0f;
     }
+
+    public Card CreateCard(string cardId)
+    {
+        Card card = GData.Instance.GetCardConfigById(cardId).Clone();
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.UniqueIdGen++;
+        card.UniqueId = dataJoeyPlayer.UniqueIdGen;
+        return card;
+    }
 }
 
