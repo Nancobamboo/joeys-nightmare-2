@@ -8,23 +8,19 @@ using UnityEngine.UI;
 public class UIBuildControl : YViewControl
 {
 	private UIBuildView m_View;
-	private List<UICardSimpleControl> DeckCardList = new List<UICardSimpleControl>();
-	private List<UICardSimpleControl> EquipedCardList = new List<UICardSimpleControl>();
+	private List<UIBuildCardControl> DeckCardList = new List<UIBuildCardControl>();
+	private List<UIBuildCardControl> EquipedCardList = new List<UIBuildCardControl>();
 	DataJoeyPlayer m_PlayerData;
 
 	private List<int> DeckCardUniqueIdList = new List<int>();
 	private List<int> EquipedCardUniqueIdList = new List<int>();
-	private string m_CurrentCardType = "attack";
-
-
+	private ECardType m_CurrentCardType = ECardType.attack;
 
 
 	public static EResType GetResType()
 	{
 		return EResType.UIBuild;
 	}
-
-
 
 
 	protected override void OnInit()
@@ -37,66 +33,6 @@ public class UIBuildControl : YViewControl
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
-		InitTestCards();      // ← 仅测试时调用
-		SetData();
-		OnBtnAttackClick();
-	}
-	void InitTestCards()
-	{
-		m_PlayerData.SelfCardDict.Clear();
-		m_PlayerData.EquipedAttackList.Clear();
-		m_PlayerData.EquipedDefenceList.Clear();
-		m_PlayerData.EquipedItemList.Clear();
-		m_PlayerData.EquipedSkillList.Clear();
-		m_PlayerData.MaxEquipedAttackNum = 3;
-		m_PlayerData.MaxEquipedDefenceNum = 3;
-		m_PlayerData.MaxEquipedItemNum = 3;
-		m_PlayerData.MaxEquipedSkillNum = 3;
-
-		AddTestCard(1001, "attack", "测试剑-1", 5, 0, 0);
-		AddTestCard(1002, "attack", "测试剑-2", 7, 0, 0);
-		AddTestCard(1003, "attack", "测试剑-3", 9, 0, 0);
-
-		AddTestCard(2001, "defence", "测试盾-1", 0, 4, 0);
-		AddTestCard(2002, "defence", "测试盾-2", 0, 6, 0);
-
-		AddTestCard(3001, "item", "治疗药水", 0, 0, 0);
-		AddTestCard(4001, "skill", "火球术", 10, 0, 0);
-
-		m_PlayerData.EquipedAttackList.Add(1001);
-		m_PlayerData.EquipedDefenceList.Add(2001);
-		m_PlayerData.EquipedItemList.Add(3001);
-		m_PlayerData.EquipedSkillList.Add(4001);
-
-		m_PlayerData.UniqueIdGen = 5000;
-		Debug.Log("InitTestCards");
-	}
-
-	void AddTestCard(int uniqueId, string type, string name, int attack, int defence, int health)
-	{
-		var card = new Card
-		{
-			id = $"test_{uniqueId}",
-			type = type,
-			iconType = $"Art/UI/icon_{type}",
-			cardImage = "Art/UI/card_icon_test",
-			cardFrame = "Art/UI/card_bg_normal",
-			cardName = name,
-			description = "测试用卡牌",
-			attack = attack,
-			currentAttack = attack,
-			defence = defence,
-			currentDefence = defence,
-			health = health,
-			currentHealth = health,
-			price = 0,
-			currentPrice = 0,
-			stars = 1,
-			effectId = string.Empty,
-			UniqueId = uniqueId
-		};
-
-		m_PlayerData.SelfCardDict[uniqueId] = card;
 	}
 
 
@@ -108,23 +44,23 @@ public class UIBuildControl : YViewControl
 
 	void OnBtnAttackClick()
 	{
-		SetDeckAndEquipedCardId("attack");
+		SetDeckAndEquipedCardId(ECardType.attack);
 	}
 	void OnBtnDefenceClick()
 	{
-		SetDeckAndEquipedCardId("defence");
+		SetDeckAndEquipedCardId(ECardType.defence);
 	}
 	void OnBtnItemClick()
 	{
-		SetDeckAndEquipedCardId("item");
+		SetDeckAndEquipedCardId(ECardType.item);
 	}
 	void OnBtnSkillClick()
 	{
-		SetDeckAndEquipedCardId("skill");
+		SetDeckAndEquipedCardId(ECardType.skill);
 	}
 
 
-	void SetDeckAndEquipedCardId(string cardType = "attack")
+	void SetDeckAndEquipedCardId(ECardType cardType = ECardType.attack)
 	{
 		m_CurrentCardType = cardType;
 		DeckCardUniqueIdList.Clear();
@@ -133,12 +69,13 @@ public class UIBuildControl : YViewControl
 		{
 			int cardUniqueId = kvp.Key;
 			var card = kvp.Value;
-			if (card.type != cardType)
+			ECardType cardECardType = card.GetCardType();
+			if (cardECardType != cardType)
 			{
 				continue;
 			}
 
-			if (cardType == "attack")
+			if (cardType == ECardType.attack)
 			{
 				if (m_PlayerData.EquipedAttackList.Contains(cardUniqueId))
 				{
@@ -149,7 +86,7 @@ public class UIBuildControl : YViewControl
 					DeckCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
-			else if (cardType == "defence")
+			else if (cardType == ECardType.defence)
 			{
 				if (m_PlayerData.EquipedDefenceList.Contains(cardUniqueId))
 				{
@@ -160,7 +97,7 @@ public class UIBuildControl : YViewControl
 					DeckCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
-			else if (cardType == "item")
+			else if (cardType == ECardType.item)
 			{
 				if (m_PlayerData.EquipedItemList.Contains(cardUniqueId))
 				{
@@ -171,7 +108,7 @@ public class UIBuildControl : YViewControl
 					DeckCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
-			else if (cardType == "skill")
+			else if (cardType == ECardType.skill)
 			{
 				if (m_PlayerData.EquipedSkillList.Contains(cardUniqueId))
 				{
@@ -200,13 +137,13 @@ public class UIBuildControl : YViewControl
 				m_PlayerData.SelfCardDict.TryGetValue(DeckCardUniqueIdList[i], out var card))
 			{
 				control.gameObject.SetActive(true);
-				control.SetData(card);
-				control.BindBuildClick(OnBuildCardClick, true, false);
+				control.SetData(card, true, false);
+				control.BuildClickHandler = OnBuildCardClick;
 			}
 			else
 			{
 				control.gameObject.SetActive(false);
-				control.BindBuildClick(null, false, false);
+				control.BuildClickHandler = null;
 			}
 		}
 	}
@@ -220,22 +157,22 @@ public class UIBuildControl : YViewControl
 				m_PlayerData.SelfCardDict.TryGetValue(EquipedCardUniqueIdList[i], out var card))
 			{
 				control.gameObject.SetActive(true);
-				control.SetData(card);
-				control.BindBuildClick(OnBuildCardClick, false, true);
+				control.SetData(card, false, true);
+				control.BuildClickHandler = OnBuildCardClick;
 			}
 			else
 			{
 				control.gameObject.SetActive(false);
-				control.BindBuildClick(null, false, false);
+				control.BuildClickHandler = null;
 			}
 		}
 	}
 
 
-	void OnBuildCardClick(UICardSimpleControl control)
+	void OnBuildCardClick(UIBuildCardControl control)
 	{
 		int uniqueId = control.CardData.UniqueId;
-		bool changed = control.IsBuildDeck
+		bool changed = control.m_IsDeckSlot
 			? TryMoveFromDeckToEquiped(uniqueId)
 			: TryMoveFromEquipedToDeck(uniqueId);
 
@@ -269,14 +206,14 @@ public class UIBuildControl : YViewControl
 		return true;
 	}
 
-	List<int> GetEquipedListByType(string cardType, out int maxNum)
+	List<int> GetEquipedListByType(ECardType cardType, out int maxNum)
 	{
 		switch (cardType)
 		{
-			case "attack": maxNum = m_PlayerData.MaxEquipedAttackNum; return m_PlayerData.EquipedAttackList;
-			case "defence": maxNum = m_PlayerData.MaxEquipedDefenceNum; return m_PlayerData.EquipedDefenceList;
-			case "item": maxNum = m_PlayerData.MaxEquipedItemNum; return m_PlayerData.EquipedItemList;
-			case "skill": maxNum = m_PlayerData.MaxEquipedSkillNum; return m_PlayerData.EquipedSkillList;
+			case ECardType.attack: maxNum = m_PlayerData.MaxEquipedAttackNum; return m_PlayerData.EquipedAttackList;
+			case ECardType.defence: maxNum = m_PlayerData.MaxEquipedDefenceNum; return m_PlayerData.EquipedDefenceList;
+			case ECardType.item: maxNum = m_PlayerData.MaxEquipedItemNum; return m_PlayerData.EquipedItemList;
+			case ECardType.skill: maxNum = m_PlayerData.MaxEquipedSkillNum; return m_PlayerData.EquipedSkillList;
 			default: maxNum = 0; return DeckCardUniqueIdList;
 		}
 	}
@@ -287,26 +224,25 @@ public class UIBuildControl : YViewControl
 
 		for (int i = 0; i < 18; i++)
 		{
-			UICardSimpleControl cardControl = Asset.OpenUI<UICardSimpleControl>(null);
+			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(null);
 			cardControl.CacheTrans.SetParent(m_View.Content);
 			cardControl.CacheTrans.localScale = Vector3.one;
 			cardControl.CacheTrans.localPosition = Vector3.zero;
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
-			//cardControl.CacheTrans.SetAsLastSibling();
 			DeckCardList.Add(cardControl);
 		}
 
 		for (int i = 0; i < 6; i++)
 		{
-			UICardSimpleControl cardControl = Asset.OpenUI<UICardSimpleControl>(null);
+			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(null);
 			cardControl.CacheTrans.SetParent(itemArray[i]);
 			cardControl.CacheTrans.localScale = Vector3.one;
 			cardControl.CacheTrans.localPosition = Vector3.zero;
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
-			//cardControl.CacheTrans.SetAsLastSibling();
 			EquipedCardList.Add(cardControl);
 		}
 
+		OnBtnAttackClick();
 	}
 
 	protected override void OnReturn()
