@@ -38,6 +38,8 @@ public class UICardSimpleControl : YViewControl
 	private Card cachedCard;
 	private ECardType cachedCardType;
 	public bool IsEnv;
+	public bool IsBuildDeck=false;
+	public bool IsBuildEquiped=false;
 	public int EnvIndex = -1;
 	public Transform CacheTrans;
 	public bool IsEffecting;
@@ -113,8 +115,24 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
+	public System.Action<UICardSimpleControl> BuildClickHandler;
+
+	public void BindBuildClick(System.Action<UICardSimpleControl> handler, bool isDeckSlot, bool isEquipedSlot)
+	{
+		BuildClickHandler = handler;
+		IsBuildDeck = isDeckSlot;
+		IsBuildEquiped = isEquipedSlot;
+	}
+
+
+
 	void OnBtnCardClick()
 	{
+		if (IsBuildDeck || IsBuildEquiped)
+		{
+			BuildClickHandler?.Invoke(this);
+			return;
+		}
 		if (!IsEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
 		{
 			return;
@@ -129,6 +147,14 @@ public class UICardSimpleControl : YViewControl
 
 	public void OnBtnRealClick()
 	{
+		if (IsBuildDeck)
+		{
+			return;
+		}
+		if (IsBuildEquiped)
+		{
+			return;
+		}
 		if (IsEnv)
 		{
 			if (cachedCardType == ECardType.monster)
@@ -571,4 +597,5 @@ public class UICardSimpleControl : YViewControl
 		EffectEntityList.Clear();
 		base.OnReturn();
 	}
+
 }
