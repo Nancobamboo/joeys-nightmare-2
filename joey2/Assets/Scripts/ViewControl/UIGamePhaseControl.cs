@@ -64,6 +64,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.RomeoMonkeyDead, RomeoMonkeyDead);
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
+		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
+		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -659,6 +661,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_EnvCardDict.Clear();
 		m_BagCardDict.Clear();
 		UsedCardList.Clear();
+		ClearGrimReaperData();
 	}
 
 	async void MoveCard(object[] paraArray)
@@ -943,7 +946,14 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		if (cardControl != null && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
-			cardControl.UpdateBuffValue();
+			for (int i = 0; i < m_EnvPanels.Count; i++)
+			{
+				UICardSimpleControl lastCard = GetLastEnvCard(i);
+				if (lastCard != null)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
 			m_CardActionQueue.Enqueue(cardControl);
 		}
 	}
@@ -1011,6 +1021,22 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.Return();
 		}
 
+	}
+
+	void CreateGrimReaperClone(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		CreateGrimReaperClone(cardControl);
+	}
+
+	void GrimReaperCloneTakeDamage(object[] paraArray)
+	{
+		UICardSimpleControl cloneCardControl = (UICardSimpleControl)paraArray[0];
+		UICardSimpleControl originalGrimReaper = (UICardSimpleControl)paraArray[1];
+		if (cloneCardControl != null && originalGrimReaper != null)
+		{
+			GrimReaperCloneTakeDamage(cloneCardControl, originalGrimReaper);
+		}
 	}
 
 	void StealCoin(object[] paraArray)

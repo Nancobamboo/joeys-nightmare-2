@@ -86,7 +86,7 @@ public partial class UIGamePhaseControl
 				return;
 		}
 
-		UICardSimpleControl cardControl = GetCardSimple(parent);
+		UICardSimpleControl cardControl = GetCardSimple(parent, false);
 		cardControl.SetData(selectedCard);
 		AddBagCard(selectedCardType, cardControl);
 		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);

@@ -24,5 +24,7 @@ public enum EActionId
 	RomeoMonkeyDead,
 	JulietMonkeyDead,
 	AddEnvCardFromBag,
+	CreateGrimReaperClone,
+	GrimReaperCloneTakeDamage,
 	Upper
 }

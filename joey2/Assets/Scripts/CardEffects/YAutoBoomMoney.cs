@@ -13,6 +13,15 @@ public class YAutoBoomMoney : YDefaultEffect
         Id = ECardEffectId.AutoBoomMoney;
     }
 
+    public override void SetData(UICardSimpleControl cardControl)
+    {
+        base.SetData(cardControl);
+        if (CardControl != null)
+        {
+            CardControl.AddBuff(EBuffType.Counter, 7);
+        }
+    }
+
     public override int OnBuffValueChange(EBuffType buffType, int value)
     {
         if (buffType == EBuffType.Counter)
