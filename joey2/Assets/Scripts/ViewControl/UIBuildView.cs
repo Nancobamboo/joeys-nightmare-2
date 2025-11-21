@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class UIBuildView : YBaseView
 {
 	public Button BtnClose;
@@ -19,9 +20,9 @@ public class UIBuildView : YBaseView
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
-		if(itemRef == null) return;
+		if (itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
-		if(viewItemList == null || viewItemList.Count == 0) return;
+		if (viewItemList == null || viewItemList.Count == 0) return;
 		BtnClose = viewItemList[0].Target.GetComponent<Button>();
 		Content = viewItemList[1].Target.GetComponent<RectTransform>();
 		Item1 = viewItemList[2].Target.GetComponent<RectTransform>();

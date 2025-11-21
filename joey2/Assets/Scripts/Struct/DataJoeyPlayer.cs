@@ -20,6 +20,10 @@ public class DataJoeyPlayer : IData
 	public List<int> EquipedDefenceList = new List<int>();
 	public List<int> EquipedItemList = new List<int>();
 	public List<int> EquipedSkillList = new List<int>();
+	public int MaxEquipedAttackNum = 3;
+	public int MaxEquipedDefenceNum = 3;
+	public int MaxEquipedItemNum = 3;
+	public int MaxEquipedSkillNum = 3;
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -42,6 +46,10 @@ public class DataJoeyPlayer : IData
 		JsonUtil.ToList(jobject, "EquipedDefenceList", ref EquipedDefenceList);
 		JsonUtil.ToList(jobject, "EquipedItemList", ref EquipedItemList);
 		JsonUtil.ToList(jobject, "EquipedSkillList", ref EquipedSkillList);
+		MaxEquipedAttackNum = (int)jobject["MaxEquipedAttackNum"];
+		MaxEquipedDefenceNum = (int)jobject["MaxEquipedDefenceNum"];
+		MaxEquipedItemNum = (int)jobject["MaxEquipedItemNum"];
+		MaxEquipedSkillNum = (int)jobject["MaxEquipedSkillNum"];
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -61,6 +69,10 @@ public class DataJoeyPlayer : IData
 		jobject.Add("EquipedDefenceList", JsonUtil.ToJArray(EquipedDefenceList));
 		jobject.Add("EquipedItemList", JsonUtil.ToJArray(EquipedItemList));
 		jobject.Add("EquipedSkillList", JsonUtil.ToJArray(EquipedSkillList));
+		jobject.Add("MaxEquipedAttackNum", MaxEquipedAttackNum);
+		jobject.Add("MaxEquipedDefenceNum", MaxEquipedDefenceNum);
+		jobject.Add("MaxEquipedItemNum", MaxEquipedItemNum);
+		jobject.Add("MaxEquipedSkillNum", MaxEquipedSkillNum);
 	}
 	public void AddRelicListData(int data)
 	{
