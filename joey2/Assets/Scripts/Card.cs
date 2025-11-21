@@ -71,26 +71,17 @@ public class Card : IData
         this.stars = _stars;
         if (_type == "other")
         {
-            this.cardFrame = "Art/UI/bg_card_character";
+            this.cardFrame = "Art/UI/card_bg_end";
         }
         else
         {
-            if (_stars == 1)
+            if (_stars == 3)
             {
-                this.cardFrame = "Art/UI/bg_card_write";
-            }
-            else if (_stars == 2)
-            {
-                this.cardFrame = "Art/UI/bg_card_silver";
-            }
-            else if (_stars == 3)
-            {
-                this.cardFrame = "Art/UI/bg_card_golden";
+                this.cardFrame = "Art/UI/card_bg_boss";
             }
             else
             {
-                Debug.LogError("Card stars is not valid: " + _stars);
-                this.cardFrame = null;
+                this.cardFrame = "Art/UI/card_bg_normal";
             }
         }
         this.effectId = _effectId;
