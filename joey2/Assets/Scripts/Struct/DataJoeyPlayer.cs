@@ -14,7 +14,12 @@ public class DataJoeyPlayer : IData
 	public int Coin;
 	public List<int> RelicList = new List<int>();
 	public Dictionary<int, Card> SelfCardDict = new Dictionary<int, Card>();
+	public List<int> BuildList = new List<int>();
 	public int UniqueIdGen;
+	public List<int> EquipedAttackList = new List<int>();
+	public List<int> EquipedDefenceList = new List<int>();
+	public List<int> EquipedItemList = new List<int>();
+	public List<int> EquipedSkillList = new List<int>();
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -24,14 +29,19 @@ public class DataJoeyPlayer : IData
 		playerDefence = (int)jobject["playerDefence"];
 		currentLevel = (int)jobject["currentLevel"];
 		Coin = (int)jobject["Coin"];
-		JsonUtil.ToList(jobject, "BuffRelicList", ref RelicList);
+		JsonUtil.ToList(jobject, "RelicList", ref RelicList);
 		var SelfCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "SelfCardList", ref SelfCardList);
 		foreach (var item in SelfCardList)
 		{
 			SelfCardDict[item.UniqueId] = item;
 		}
+		JsonUtil.ToList(jobject, "BuildList", ref BuildList);
 		UniqueIdGen = (int)jobject["UniqueIdGen"];
+		JsonUtil.ToList(jobject, "EquipedAttackList", ref EquipedAttackList);
+		JsonUtil.ToList(jobject, "EquipedDefenceList", ref EquipedDefenceList);
+		JsonUtil.ToList(jobject, "EquipedItemList", ref EquipedItemList);
+		JsonUtil.ToList(jobject, "EquipedSkillList", ref EquipedSkillList);
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -42,10 +52,15 @@ public class DataJoeyPlayer : IData
 		jobject.Add("playerDefence", playerDefence);
 		jobject.Add("currentLevel", currentLevel);
 		jobject.Add("Coin", Coin);
-		jobject.Add("BuffRelicList", JsonUtil.ToJArray(RelicList));
+		jobject.Add("RelicList", JsonUtil.ToJArray(RelicList));
 		var SelfCardList = SelfCardDict.Values.ToList();
 		jobject.Add("SelfCardList", JsonUtil.ToJArray(SelfCardList));
+		jobject.Add("BuildList", JsonUtil.ToJArray(BuildList));
 		jobject.Add("UniqueIdGen", UniqueIdGen);
+		jobject.Add("EquipedAttackList", JsonUtil.ToJArray(EquipedAttackList));
+		jobject.Add("EquipedDefenceList", JsonUtil.ToJArray(EquipedDefenceList));
+		jobject.Add("EquipedItemList", JsonUtil.ToJArray(EquipedItemList));
+		jobject.Add("EquipedSkillList", JsonUtil.ToJArray(EquipedSkillList));
 	}
 	public void AddRelicListData(int data)
 	{
@@ -72,6 +87,66 @@ public class DataJoeyPlayer : IData
 		Card result = null;
 		SelfCardDict.TryGetValue(dataId, out result);
 		return result;
+	}
+	public void AddBuildListData(int data)
+	{
+		BuildList.Add(data);
+	}
+	public void RemoveBuildListData(int data)
+	{
+		BuildList.Remove(data);
+	}
+	public int GetBuildListData(int dataIndex)
+	{
+		return BuildList[dataIndex];
+	}
+	public void AddEquipedAttackListData(int data)
+	{
+		EquipedAttackList.Add(data);
+	}
+	public void RemoveEquipedAttackListData(int data)
+	{
+		EquipedAttackList.Remove(data);
+	}
+	public int GetEquipedAttackListData(int dataIndex)
+	{
+		return EquipedAttackList[dataIndex];
+	}
+	public void AddEquipedDefenceListData(int data)
+	{
+		EquipedDefenceList.Add(data);
+	}
+	public void RemoveEquipedDefenceListData(int data)
+	{
+		EquipedDefenceList.Remove(data);
+	}
+	public int GetEquipedDefenceListData(int dataIndex)
+	{
+		return EquipedDefenceList[dataIndex];
+	}
+	public void AddEquipedItemListData(int data)
+	{
+		EquipedItemList.Add(data);
+	}
+	public void RemoveEquipedItemListData(int data)
+	{
+		EquipedItemList.Remove(data);
+	}
+	public int GetEquipedItemListData(int dataIndex)
+	{
+		return EquipedItemList[dataIndex];
+	}
+	public void AddEquipedSkillListData(int data)
+	{
+		EquipedSkillList.Add(data);
+	}
+	public void RemoveEquipedSkillListData(int data)
+	{
+		EquipedSkillList.Remove(data);
+	}
+	public int GetEquipedSkillListData(int dataIndex)
+	{
+		return EquipedSkillList[dataIndex];
 	}
 }
 public partial class DataSystem
