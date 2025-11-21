@@ -29,7 +29,10 @@ public enum ECardEffectId
     BadMonkey,
     PermanentAttackBoost,
     PermanentDefenceBoost,
-    MoveWeaponToEnv
+    MoveWeaponToEnv,
+    Ghost,
+    GrimReaper,
+    GrimReaperClone
 }
 
 public enum EEffectType
@@ -87,7 +90,7 @@ public class YCardEffect
     public UICardSimpleControl CardControl;
     private int[] m_EffectValues = new int[(int)EEffectType.Upper];
 
-    public void SetData(UICardSimpleControl cardControl)
+    public virtual void SetData(UICardSimpleControl cardControl)
     {
         CardControl = cardControl;
     }

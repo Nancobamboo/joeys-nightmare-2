@@ -343,6 +343,15 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.MoveWeaponToEnv:
 				effect = new YMoveWeaponToEnv();
 				break;
+			case ECardEffectId.Ghost:
+				effect = new YGhost();
+				break;
+			case ECardEffectId.GrimReaper:
+				effect = new YGrimReaper();
+				break;
+			case ECardEffectId.GrimReaperClone:
+				effect = new YGrimReaperClone();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

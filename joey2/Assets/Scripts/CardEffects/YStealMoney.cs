@@ -14,6 +14,15 @@ public class YStealMoney : YDefaultEffect
         Id = ECardEffectId.StealMoney;
     }
 
+    public override void SetData(UICardSimpleControl cardControl)
+    {
+        base.SetData(cardControl);
+        if (CardControl != null)
+        {
+            CardControl.AddBuff(EBuffType.Counter, 3);
+        }
+    }
+
     public override float OnDealDamage()
     {
         if (CardControl != null)
