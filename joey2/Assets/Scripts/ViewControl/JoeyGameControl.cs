@@ -29,6 +29,7 @@ public class JoeyGameControl : YViewControl
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 
 	public bool IsDebug = false;
+	public bool IsGuide = false;
 	public string[] DebugEnvCardIds = new string[0];
 	public string[] DebugBagCardIds = new string[0];
 	public int DebugLevelId = 1;
@@ -136,7 +137,10 @@ public class JoeyGameControl : YViewControl
 
 		m_GamePhaseControl.SetData();
 
-		m_GamePhaseControl.AddSelfCardList();
+		if (!IsGuide)
+		{
+			m_GamePhaseControl.AddSelfCardList();
+		}
 
 		List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(levelId);
 		for (int i = 0; i < cardIdListEnv.Count; i++)
