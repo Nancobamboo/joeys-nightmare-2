@@ -329,6 +329,11 @@ public class JoeyGameControl : YViewControl
 		return false;
 	}
 
+	public bool IsPlayerHalfHealth()
+	{
+		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;
+	}
+
 	public void ShowGameOver()
 	{
 		if (m_GameOverControl == null)

@@ -352,6 +352,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.GrimReaperClone:
 				effect = new YGrimReaperClone();
 				break;
+			case ECardEffectId.ExtraDamage_HalfHealth:
+				effect = new YExtraDamage_HalfHealth(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}

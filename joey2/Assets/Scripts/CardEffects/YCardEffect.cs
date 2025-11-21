@@ -32,7 +32,8 @@ public enum ECardEffectId
     MoveWeaponToEnv,
     Ghost,
     GrimReaper,
-    GrimReaperClone
+    GrimReaperClone,
+    ExtraDamage_HalfHealth
 }
 
 public enum EEffectType
