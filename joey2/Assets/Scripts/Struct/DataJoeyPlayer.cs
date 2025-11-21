@@ -14,7 +14,6 @@ public class DataJoeyPlayer : IData
 	public int Coin;
 	public List<int> RelicList = new List<int>();
 	public Dictionary<int, Card> SelfCardDict = new Dictionary<int, Card>();
-	public List<int> BuildList = new List<int>();
 	public int UniqueIdGen;
 	public List<int> EquipedAttackList = new List<int>();
 	public List<int> EquipedDefenceList = new List<int>();
@@ -40,7 +39,6 @@ public class DataJoeyPlayer : IData
 		{
 			SelfCardDict[item.UniqueId] = item;
 		}
-		JsonUtil.ToList(jobject, "BuildList", ref BuildList);
 		UniqueIdGen = (int)jobject["UniqueIdGen"];
 		JsonUtil.ToList(jobject, "EquipedAttackList", ref EquipedAttackList);
 		JsonUtil.ToList(jobject, "EquipedDefenceList", ref EquipedDefenceList);
@@ -63,7 +61,6 @@ public class DataJoeyPlayer : IData
 		jobject.Add("RelicList", JsonUtil.ToJArray(RelicList));
 		var SelfCardList = SelfCardDict.Values.ToList();
 		jobject.Add("SelfCardList", JsonUtil.ToJArray(SelfCardList));
-		jobject.Add("BuildList", JsonUtil.ToJArray(BuildList));
 		jobject.Add("UniqueIdGen", UniqueIdGen);
 		jobject.Add("EquipedAttackList", JsonUtil.ToJArray(EquipedAttackList));
 		jobject.Add("EquipedDefenceList", JsonUtil.ToJArray(EquipedDefenceList));
@@ -99,18 +96,6 @@ public class DataJoeyPlayer : IData
 		Card result = null;
 		SelfCardDict.TryGetValue(dataId, out result);
 		return result;
-	}
-	public void AddBuildListData(int data)
-	{
-		BuildList.Add(data);
-	}
-	public void RemoveBuildListData(int data)
-	{
-		BuildList.Remove(data);
-	}
-	public int GetBuildListData(int dataIndex)
-	{
-		return BuildList[dataIndex];
 	}
 	public void AddEquipedAttackListData(int data)
 	{
