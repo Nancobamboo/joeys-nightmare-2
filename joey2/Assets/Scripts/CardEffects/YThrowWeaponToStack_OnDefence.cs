@@ -37,6 +37,7 @@ public partial class UIGamePhaseControl
 	public void ThrowWeaponToEnv(UICardSimpleControl cardControl)
 	{
 		UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
+		// TODO judge whether the weapon card is fist
 		if (weaponCard != null)
 		{
 			YActionSystem.Instance.DispatchAction(EActionId.AddEnvCardFromBag, weaponCard);

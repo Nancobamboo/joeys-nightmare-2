@@ -35,7 +35,8 @@ public enum ECardEffectId
     GrimReaperClone,
     ExtraDamage_HalfHealth,
     ThrowWeaponToStack_OnDefence,
-    HealPlayer_OnDefense
+    HealPlayer_OnDefense,
+    AddKnifeToEnv_OnDefense
 }
 
 public enum EEffectType

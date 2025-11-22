@@ -361,6 +361,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.HealPlayer_OnDefense:
 				effect = new YHealPlayer_OnDefense();
 				break;
+			case ECardEffectId.AddKnifeToEnv_OnDefense:
+				effect = new YAddKnifeToEnv_OnDefense();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

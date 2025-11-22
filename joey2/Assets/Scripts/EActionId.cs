@@ -28,5 +28,6 @@ public enum EActionId
 	GrimReaperCloneTakeDamage,
 	ThrowWeaponToEnv,
 	HealPlayerOnDefense,
+	AddKnifeToEnv,
 	Upper
 }
