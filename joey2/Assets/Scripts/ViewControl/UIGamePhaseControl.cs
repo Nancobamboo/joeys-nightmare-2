@@ -66,6 +66,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
+		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -636,6 +637,12 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		AddEnvCardFromBag(cardControl);
+	}
+
+	void ThrowWeaponToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		ThrowWeaponToEnv(cardControl);
 	}
 
 	void RemoveCardData(int uniqueId)

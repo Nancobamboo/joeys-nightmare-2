@@ -33,7 +33,8 @@ public enum ECardEffectId
     Ghost,
     GrimReaper,
     GrimReaperClone,
-    ExtraDamage_HalfHealth
+    ExtraDamage_HalfHealth,
+    ThrowWeaponToStack_OnDefence
 }
 
 public enum EEffectType
