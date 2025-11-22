@@ -69,7 +69,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
-		RegistAction(EActionId.AddKnifeToEnv, AddKnifeToEnv);
+		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
+		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -647,10 +648,16 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		ThrowWeaponToEnv(cardControl);
 	}
-	void AddKnifeToEnv(object[] paraArray)
+	void AddCardToEnv(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		AddKnifeToEnv(cardControl);
+		string cardId = (string)paraArray[1];
+		AddCardToEnv(cardControl, cardId);
+	}
+	void DoubleLastWeaponAttack(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		DoubleLastWeaponAttack(cardControl);
 	}
 
 	void HealPlayerOnDefense(object[] paraArray)

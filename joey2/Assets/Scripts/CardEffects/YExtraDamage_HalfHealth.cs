@@ -19,7 +19,7 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
         {
             if (JoeyGameControl.Instance.IsPlayerHalfHealth())
             {
-                return baseExtra;
+                return base.GetEffectValue(effectType) + baseExtra;
             }
             return 0;
         }

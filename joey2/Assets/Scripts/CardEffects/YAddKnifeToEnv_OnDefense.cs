@@ -28,16 +28,16 @@ public class YAddKnifeToEnv_OnDefense : YCardEffect
 
     public override float OnRemoveCard()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.AddKnifeToEnv, CardControl);
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1004");
 		return 0f;
 	}
 }
 
 public partial class UIGamePhaseControl
 {
-	public void AddKnifeToEnv(UICardSimpleControl cardControl)
+	public void AddCardToEnv(UICardSimpleControl cardControl, string cardId)
 	{
-        if (cardControl == null || cardControl.CardData == null)
+        if (cardControl == null || cardControl.CardData == null || string.IsNullOrEmpty(cardId))
         {
             return;
         }		
@@ -46,7 +46,7 @@ public partial class UIGamePhaseControl
             return;
         }
         // TODO fix card id to knife card id
-        Card knifeCard = CreateCard("1004");
+        Card knifeCard = CreateCard(cardId);
         int randomIndex = Random.Range(0, m_EnvPanels.Count);
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
         m_CardDict[knifeCard.UniqueId] = knifeCard;

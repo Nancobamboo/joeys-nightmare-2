@@ -364,6 +364,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.AddKnifeToEnv_OnDefense:
 				effect = new YAddKnifeToEnv_OnDefense();
 				break;
+			case ECardEffectId.ApeWine:
+				effect = new YApeWine();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

@@ -36,7 +36,8 @@ public enum ECardEffectId
     ExtraDamage_HalfHealth,
     ThrowWeaponToStack_OnDefence,
     HealPlayer_OnDefense,
-    AddKnifeToEnv_OnDefense
+    AddKnifeToEnv_OnDefense,
+    ApeWine
 }
 
 public enum EEffectType
