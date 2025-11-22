@@ -20,6 +20,7 @@
 2003,Art/Img/Defence/img_card_Koilonychia,刃甲,defence,受击时：反弹5点伤害,5,5,,,3,DealDamage_UseDefence:5
 2004,Art/Img/Defence/img_card_HandGuard,护手,defence,受击时：从弃牌堆随机抽一张武器牌置入手牌,0,5,,,3,HookEquipWeaponFromDiscard_OnDefence
 2005,Art/Img/Defence/img_card_BreakTheShield,手滑盾,defence,亡语:丢弃当前攻击手牌到环境中,0,12,,,1,ThrowWeaponToStack_OnDefence
+2006,Art/Img/Defence/img_card_BreakTheShield,血魔盾,defence,回复和抵挡伤害相同数值的生命,0,12,,,1,HealPlayer_OnDefense
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

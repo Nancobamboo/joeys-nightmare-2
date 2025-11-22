@@ -358,6 +358,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ThrowWeaponToStack_OnDefence:
 				effect = new YThrowWeaponToStack_OnDefence();
 				break;
+			case ECardEffectId.HealPlayer_OnDefense:
+				effect = new YHealPlayer_OnDefense();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

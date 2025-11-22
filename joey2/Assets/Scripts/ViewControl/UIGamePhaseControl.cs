@@ -32,6 +32,7 @@ public partial class UIGamePhaseControl : YViewControl
 	public UICardSimpleControl CurrentEffectCard;
 	private CancellationTokenSource m_CurrentEffectCardCts;
 	private bool IsEnvDirty = false;
+	private int currentMonsterAttack = 0;
 
 	public static EResType GetResType()
 	{
@@ -67,6 +68,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
+		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -645,6 +647,17 @@ public partial class UIGamePhaseControl : YViewControl
 		ThrowWeaponToEnv(cardControl);
 	}
 
+	void HealPlayerOnDefense(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		Debug.Log($"currentMonsterAttack: {currentMonsterAttack}");
+		if (currentMonsterAttack > 0)
+		{
+			ApplyPlayerHealthChange(currentMonsterAttack, true);
+		}
+		currentMonsterAttack = 0;
+	}
+
 	void RemoveCardData(int uniqueId)
 	{
 		if (m_CardDict.TryGetValue(uniqueId, out Card card))
@@ -820,6 +833,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex)
 	{
+		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 
@@ -860,6 +874,7 @@ public partial class UIGamePhaseControl : YViewControl
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 			}
 		}
+		currentMonsterAttack = 0;
 	}
 
 	void TakePlayerBoomDamage(object[] paraArray)
