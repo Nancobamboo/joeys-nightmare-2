@@ -352,6 +352,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.GrimReaperClone:
 				effect = new YGrimReaperClone();
 				break;
+			case ECardEffectId.HookDefenceFromDiscard_OnRemoveCard:
+				effect = new HookDefenceFromDiscard_OnRemoveCard();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

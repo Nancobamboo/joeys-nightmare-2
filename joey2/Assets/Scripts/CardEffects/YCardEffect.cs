@@ -32,7 +32,8 @@ public enum ECardEffectId
     MoveWeaponToEnv,
     Ghost,
     GrimReaper,
-    GrimReaperClone
+    GrimReaperClone,
+    HookDefenceFromDiscard_OnRemoveCard
 }
 
 public enum EEffectType
@@ -189,6 +190,7 @@ public class YCardEffect
     {
         return value;
     }
+    
 
 }
 
