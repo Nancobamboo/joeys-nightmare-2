@@ -71,6 +71,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
+		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -653,6 +654,13 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		string cardId = (string)paraArray[1];
 		AddCardToEnv(cardControl, cardId);
+	}
+	void AddCardsToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		List<Card> cards = (List<Card>)paraArray[1];
+		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
+		AddEnvDropCard(cards, envIndex);
 	}
 	void DoubleLastWeaponAttack(object[] paraArray)
 	{

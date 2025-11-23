@@ -30,5 +30,6 @@ public enum EActionId
 	HealPlayerOnDefense,
 	AddCardToEnv,
 	DoubleLastWeaponAttack,
+	AddCardsToEnv,
 	Upper
 }

@@ -367,6 +367,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ApeWine:
 				effect = new YApeWine();
 				break;
+			case ECardEffectId.GiftBox:
+				effect = new YGiftBox(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}

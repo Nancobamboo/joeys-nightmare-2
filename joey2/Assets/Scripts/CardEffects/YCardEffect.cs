@@ -37,7 +37,8 @@ public enum ECardEffectId
     ThrowWeaponToStack_OnDefence,
     HealPlayer_OnDefense,
     AddKnifeToEnv_OnDefense,
-    ApeWine
+    ApeWine,
+    GiftBox
 }
 
 public enum EEffectType
