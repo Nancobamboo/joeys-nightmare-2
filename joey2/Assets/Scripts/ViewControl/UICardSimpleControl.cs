@@ -372,8 +372,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.DartScroll:
 				effect = new YDartScroll();
+				break;
 			case ECardEffectId.HookDefenceFromDiscard_OnRemoveCard:
-				effect = new HookDefenceFromDiscard_OnRemoveCard();
+				effect = new YHookDefenceFromDiscard_OnRemoveCard();
 				break;
 			default:
 				return GetDefaultEffect();
