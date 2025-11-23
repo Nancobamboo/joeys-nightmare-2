@@ -39,7 +39,7 @@ public enum ECardEffectId
     AddKnifeToEnv_OnDefense,
     ApeWine,
     GiftBox,
-    DartScroll
+    DartScroll,
     HookDefenceFromDiscard_OnRemoveCard
 }
 
