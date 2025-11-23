@@ -40,6 +40,7 @@ public enum ECardEffectId
     ApeWine,
     GiftBox,
     DartScroll
+    HookDefenceFromDiscard_OnRemoveCard
 }
 
 public enum EEffectType
@@ -196,6 +197,7 @@ public class YCardEffect
     {
         return value;
     }
+    
 
 }
 

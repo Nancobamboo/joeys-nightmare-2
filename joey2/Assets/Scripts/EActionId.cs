@@ -31,5 +31,6 @@ public enum EActionId
 	AddCardToEnv,
 	DoubleLastWeaponAttack,
 	AddCardsToEnv,
+  HookDefenceFromDiscard_OnRemoveCard,
 	Upper
 }
