@@ -370,6 +370,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.GiftBox:
 				effect = new YGiftBox(effectValue);
 				break;
+			case ECardEffectId.DartScroll:
+				effect = new YDartScroll();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

@@ -38,7 +38,8 @@ public enum ECardEffectId
     HealPlayer_OnDefense,
     AddKnifeToEnv_OnDefense,
     ApeWine,
-    GiftBox
+    GiftBox,
+    DartScroll
 }
 
 public enum EEffectType

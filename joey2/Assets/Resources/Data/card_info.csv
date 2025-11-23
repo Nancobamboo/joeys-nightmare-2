@@ -31,6 +31,7 @@
 3003,Art/Img/Item/img_card_HookLock,钩索,item        ,点击使用：从弃牌堆随机抽一张武器牌置入手牌,,,,,2,HookEquipWeaponFromDiscard_OnPlay
 3004,Art/Img/Item/img_card_Blood_bottle,猿酒,item   ,点击使用：下次攻击伤害翻倍,,,,,1,ApeWine
 3005,Art/Img/Monster/img_card_Barrel,礼物袋,item   ,在环境卡中随机召唤3张牌,,,,,1,GiftBox:3
+3006,Art/Img/Attack/img_card_Dart,手里剑卷轴,item   ,在环境中召唤3个锋利手里剑,,,,,2,DartScroll
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
