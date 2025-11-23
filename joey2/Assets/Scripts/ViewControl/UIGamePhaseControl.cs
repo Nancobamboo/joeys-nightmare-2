@@ -32,6 +32,7 @@ public partial class UIGamePhaseControl : YViewControl
 	public UICardSimpleControl CurrentEffectCard;
 	private CancellationTokenSource m_CurrentEffectCardCts;
 	private bool IsEnvDirty = false;
+	private int currentMonsterAttack = 0;
 
 	public static EResType GetResType()
 	{
@@ -66,6 +67,12 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
+		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
+		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
+		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
+		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
+		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
+
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
 		happySprite = Resources.Load<Sprite>("Art/Img/joey/joey_happy");
@@ -637,6 +644,41 @@ public partial class UIGamePhaseControl : YViewControl
 		AddEnvCardFromBag(cardControl);
 	}
 
+	void ThrowWeaponToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		ThrowWeaponToEnv(cardControl);
+	}
+	void AddCardToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		string cardId = (string)paraArray[1];
+		AddCardToEnv(cardControl, cardId);
+	}
+	void AddCardsToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		List<Card> cards = (List<Card>)paraArray[1];
+		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
+		AddEnvDropCard(cards, envIndex);
+	}
+	void DoubleLastWeaponAttack(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		DoubleLastWeaponAttack(cardControl);
+	}
+
+	void HealPlayerOnDefense(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		Debug.Log($"currentMonsterAttack: {currentMonsterAttack}");
+		if (currentMonsterAttack > 0)
+		{
+			ApplyPlayerHealthChange(currentMonsterAttack, true);
+		}
+		currentMonsterAttack = 0;
+	}
+
 	void RemoveCardData(int uniqueId)
 	{
 		if (m_CardDict.TryGetValue(uniqueId, out Card card))
@@ -812,6 +854,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex)
 	{
+		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 
@@ -852,6 +895,7 @@ public partial class UIGamePhaseControl : YViewControl
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 			}
 		}
+		currentMonsterAttack = 0;
 	}
 
 	void TakePlayerBoomDamage(object[] paraArray)

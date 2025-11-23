@@ -33,6 +33,13 @@ public enum ECardEffectId
     Ghost,
     GrimReaper,
     GrimReaperClone,
+    ExtraDamage_HalfHealth,
+    ThrowWeaponToStack_OnDefence,
+    HealPlayer_OnDefense,
+    AddKnifeToEnv_OnDefense,
+    ApeWine,
+    GiftBox,
+    DartScroll
     HookDefenceFromDiscard_OnRemoveCard
 }
 

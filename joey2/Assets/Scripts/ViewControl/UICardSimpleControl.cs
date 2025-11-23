@@ -352,6 +352,26 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.GrimReaperClone:
 				effect = new YGrimReaperClone();
 				break;
+			case ECardEffectId.ExtraDamage_HalfHealth:
+				effect = new YExtraDamage_HalfHealth(effectValue);
+				break;
+			case ECardEffectId.ThrowWeaponToStack_OnDefence:
+				effect = new YThrowWeaponToStack_OnDefence();
+				break;
+			case ECardEffectId.HealPlayer_OnDefense:
+				effect = new YHealPlayer_OnDefense();
+				break;
+			case ECardEffectId.AddKnifeToEnv_OnDefense:
+				effect = new YAddKnifeToEnv_OnDefense();
+				break;
+			case ECardEffectId.ApeWine:
+				effect = new YApeWine();
+				break;
+			case ECardEffectId.GiftBox:
+				effect = new YGiftBox(effectValue);
+				break;
+			case ECardEffectId.DartScroll:
+				effect = new YDartScroll();
 			case ECardEffectId.HookDefenceFromDiscard_OnRemoveCard:
 				effect = new HookDefenceFromDiscard_OnRemoveCard();
 				break;

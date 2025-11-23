@@ -26,6 +26,11 @@ public enum EActionId
 	AddEnvCardFromBag,
 	CreateGrimReaperClone,
 	GrimReaperCloneTakeDamage,
-	Upper,
-	HookDefenceFromDiscard_OnRemoveCard
+	ThrowWeaponToEnv,
+	HealPlayerOnDefense,
+	AddCardToEnv,
+	DoubleLastWeaponAttack,
+	AddCardsToEnv,
+  HookDefenceFromDiscard_OnRemoveCard,
+	Upper
 }
