@@ -12,9 +12,11 @@ public class UIShopCardControl : YViewControl
     public Transform CacheTrans;
     private Vector3 m_OriginalScale;
     private bool m_IsMoving;
+    private int m_ShopPrice; // Shop price (discounted)
 
     public ECardType CardType => cachedCardType;
     public Card CardData => cachedCard;
+    public System.Action<UIShopCardControl> ShopClickHandler; // Click event callback
 
     public static EResType GetResType()
     {
@@ -78,9 +80,10 @@ public class UIShopCardControl : YViewControl
 
     void OnBtnCardClick()
     {
+        ShopClickHandler?.Invoke(this);
     }
 
-    public void SetData(Card card)
+    public void SetData(Card card, int shopPrice)
     {
         RectTransform animRect = m_View.Anim.transform as RectTransform;
         if (animRect != null)
@@ -91,10 +94,12 @@ public class UIShopCardControl : YViewControl
         cachedCard = card;
         cachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
         m_IsMoving = false;
+        m_ShopPrice = shopPrice;
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
-        m_View.Description.text = card.description;
+        // Display price in description (append to original description)
+        m_View.Description.text = card.description + "\n<color=yellow>价格: " + shopPrice + " 金币</color>";
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
 
@@ -158,6 +163,12 @@ public class UIShopCardControl : YViewControl
     private Sprite LoadSprite(string path)
     {
         return Resources.Load<Sprite>(path);
+    }
+    
+    // Get shop price
+    public int GetShopPrice()
+    {
+        return m_ShopPrice;
     }
 }
 
