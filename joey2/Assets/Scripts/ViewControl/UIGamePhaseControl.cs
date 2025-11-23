@@ -66,7 +66,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
-
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
 		happySprite = Resources.Load<Sprite>("Art/Img/joey/joey_happy");
