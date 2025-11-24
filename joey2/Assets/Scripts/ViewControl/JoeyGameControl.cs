@@ -128,8 +128,16 @@ public class JoeyGameControl : YViewControl
 
 		int levelId = IsDebug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
+		if (!IsGuide && m_DataJoeyPlayer.SelfCardDict.Count == 0)
+		{
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			if (characterData != null)
+			{
+				DataSystem.Instance.InitRoguelikeCharacterData(characterData);
+			}
+		}
 
-		var playerData = GData.Instance.GetTutorialPlayerData(levelId);
+		(int health, int maxHealth)? playerData = GData.Instance.GetTutorialPlayerData(levelId);
 		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_DataJoeyPlayer.playerHealth = playerData.Value.health;
 		m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
@@ -202,8 +210,15 @@ public class JoeyGameControl : YViewControl
 
 	public async void LoadNextLevel()
 	{
-		m_DataJoeyPlayer.currentLevel++;
-		DataSystem.Instance.SaveDataJoeyPlayer();
+		if (!IsGuide)
+		{
+			DataSystem.Instance.LoadNextRoguelikeStage();
+		}
+		else
+		{
+			m_DataJoeyPlayer.currentLevel++;
+			DataSystem.Instance.SaveDataJoeyPlayer();
+		}
 		m_GamePhaseControl.ClearCardQueue();
 		await UniTask.WaitForSeconds(0.5f);
 

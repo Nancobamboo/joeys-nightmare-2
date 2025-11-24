@@ -12,12 +12,18 @@ public sealed class GData : PureSingleton<GData>
 	// 临时加入卡包的卡的id列表
 	public List<string> TempCardIdList { get; set; } = new List<string>();
 
+	// Roguelike数据
+	public List<RoguelikeCharacter> RoguelikeCharacterList { get; private set; } = new List<RoguelikeCharacter>();
+	public List<RoguelikeStage> RoguelikeStageList { get; private set; } = new List<RoguelikeStage>();
+
 	// 路径策略（简单直观）
 	private string CardCsvPath = "Data/card_info";   // 按你项目实际命名调整
 													 // private string LibraryCsvPath = "Data/library_data";
 	private string DeckCsvPath = "Data/deck_data";
 	private string TutorialEquipmentDeckCsvPath = "Data/tutorial_equipment_deck";
 	private string TutorialPlayerDataCsvPath = "Data/tutorial_player_data";
+	private string RoguelikeCharacterCsvPath = "Data/roguelike_character";
+	private string RoguelikeStageCsvPath = "Data/roguelike_stage";
 	private Dictionary<int, Dictionary<string, List<string>>> _tutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
 	private bool _tutorialEquipmentDeckLoaded = false;
 	private Dictionary<int, (int health, int maxHealth)> _tutorialPlayerDataCache = new Dictionary<int, (int, int)>();
@@ -25,6 +31,8 @@ public sealed class GData : PureSingleton<GData>
 	private bool _cardsLoaded = false;
 	// private bool _libraryLoaded = false;
 	private bool _deckLoaded = false;
+	private bool _roguelikeCharacterLoaded = false;
+	private bool _roguelikeStageLoaded = false;
 	private System.DateTime _cardsMTime = System.DateTime.MinValue;
 	// private System.DateTime _libraryMTime = System.DateTime.MinValue;
 	private System.DateTime _deckMTime = System.DateTime.MinValue;
@@ -36,6 +44,8 @@ public sealed class GData : PureSingleton<GData>
 		LoadDeck();
 		LoadTutorialEquipmentDeck();
 		LoadTutorialPlayerData();
+		LoadRoguelikeCharacter();
+		LoadRoguelikeStage();
 	}
 	public void SaveAll()
 	{
@@ -424,6 +434,204 @@ public sealed class GData : PureSingleton<GData>
 		{
 			return _tutorialPlayerDataCache[level];
 		}
+		return null;
+	}
+
+	// ---------------- Roguelike角色数据 ---------------- 
+	public void LoadRoguelikeCharacter(bool force = false)
+	{
+		if (!force && _roguelikeCharacterLoaded) return;
+
+		RoguelikeCharacterList.Clear();
+		var ta = Resources.Load<TextAsset>(RoguelikeCharacterCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Roguelike character CSV not found: {RoguelikeCharacterCsvPath}");
+			_roguelikeCharacterLoaded = true;
+			return;
+		}
+
+		var lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			_roguelikeCharacterLoaded = true;
+			return;
+		}
+
+		// Parse header
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int CharacterIdx = idx.ContainsKey("character") ? idx["character"] : -1;
+		int MaxHealthIdx = idx.ContainsKey("max_health") ? idx["max_health"] : -1;
+		int EquipmentAttackIdx = idx.ContainsKey("equipment_attack") ? idx["equipment_attack"] : -1;
+		int EquipmentDefenceIdx = idx.ContainsKey("equipment_defence") ? idx["equipment_defence"] : -1;
+		int EquipmentItemIdx = idx.ContainsKey("equipment_item") ? idx["equipment_item"] : -1;
+		int EquipmentSkillIdx = idx.ContainsKey("equipment_skill") ? idx["equipment_skill"] : -1;
+		int EquipmentRelicIdx = idx.ContainsKey("equipment_relic") ? idx["equipment_relic"] : -1;
+		int CoinsIdx = idx.ContainsKey("coins") ? idx["coins"] : -1;
+		int CardDeckIdx = idx.ContainsKey("card_deck") ? idx["card_deck"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			var values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
+
+			List<string> ParseList(int index)
+			{
+				List<string> result = new List<string>();
+				string value = Get(index);
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					string[] parts = value.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+					for (int i = 0; i < parts.Length; i++)
+					{
+						string id = parts[i].Trim();
+						if (!string.IsNullOrEmpty(id)) result.Add(id);
+					}
+				}
+				return result;
+			}
+
+			string character = Get(CharacterIdx);
+			if (string.IsNullOrEmpty(character)) continue;
+
+			var roguelikeCharacter = new RoguelikeCharacter();
+			roguelikeCharacter.character = character;
+			roguelikeCharacter.maxHealth = GetInt(MaxHealthIdx, 0);
+			roguelikeCharacter.equipmentAttack = ParseList(EquipmentAttackIdx);
+			roguelikeCharacter.equipmentDefence = ParseList(EquipmentDefenceIdx);
+			roguelikeCharacter.equipmentItem = ParseList(EquipmentItemIdx);
+			roguelikeCharacter.equipmentSkill = ParseList(EquipmentSkillIdx);
+			roguelikeCharacter.equipmentRelic = ParseList(EquipmentRelicIdx);
+			roguelikeCharacter.coins = GetInt(CoinsIdx, 0);
+			roguelikeCharacter.cardDeck = ParseList(CardDeckIdx);
+
+			RoguelikeCharacterList.Add(roguelikeCharacter);
+		}
+
+		_roguelikeCharacterLoaded = true;
+		Debug.Log($"Roguelike character loaded: {RoguelikeCharacterList.Count} characters");
+	}
+
+	// ---------------- Roguelike关卡数据 ---------------- 
+	public void LoadRoguelikeStage(bool force = false)
+	{
+		if (!force && _roguelikeStageLoaded) return;
+
+		RoguelikeStageList.Clear();
+		var ta = Resources.Load<TextAsset>(RoguelikeStageCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Roguelike stage CSV not found: {RoguelikeStageCsvPath}");
+			_roguelikeStageLoaded = true;
+			return;
+		}
+
+		var lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			_roguelikeStageLoaded = true;
+			return;
+		}
+
+		// Parse header
+		var header = lines[0].Split(',');
+		var idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			var key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int StagesIdx = idx.ContainsKey("stages") ? idx["stages"] : -1;
+		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			var line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			var values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			List<string> ParseList(int index)
+			{
+				List<string> result = new List<string>();
+				string value = Get(index);
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					string[] parts = value.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+					for (int i = 0; i < parts.Length; i++)
+					{
+						string id = parts[i].Trim();
+						if (!string.IsNullOrEmpty(id)) result.Add(id);
+					}
+				}
+				return result;
+			}
+
+			string stages = Get(StagesIdx);
+			if (string.IsNullOrEmpty(stages)) continue;
+
+			var roguelikeStage = new RoguelikeStage();
+			roguelikeStage.stages = stages;
+			roguelikeStage.level = ParseList(LevelIdx);
+
+			RoguelikeStageList.Add(roguelikeStage);
+		}
+
+		_roguelikeStageLoaded = true;
+		Debug.Log($"Roguelike stage loaded: {RoguelikeStageList.Count} stages");
+	}
+
+	public RoguelikeCharacter GetRoguelikeCharacter(int index = 0)
+	{
+		LoadRoguelikeCharacter();
+		if (index >= 0 && index < RoguelikeCharacterList.Count)
+		{
+			return RoguelikeCharacterList[index];
+		}
+		Debug.LogWarning($"Roguelike character index {index} out of range (count: {RoguelikeCharacterList.Count})");
+		return null;
+	}
+
+	public RoguelikeStage GetRoguelikeStage(int index = 0)
+	{
+		LoadRoguelikeStage();
+		if (index >= 0 && index < RoguelikeStageList.Count)
+		{
+			return RoguelikeStageList[index];
+		}
+		Debug.LogWarning($"Roguelike stage index {index} out of range (count: {RoguelikeStageList.Count})");
 		return null;
 	}
 
