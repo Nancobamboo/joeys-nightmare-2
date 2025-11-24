@@ -137,7 +137,7 @@ public class UICardSimpleControl : YViewControl
 			}
 			else if (cachedCardType == ECardType.other)
 			{
-				JoeyGameControl.Instance.LoadNextLevel();
+				JoeyGameControl.Instance.EndGamePhase();
 			}
 			else
 			{

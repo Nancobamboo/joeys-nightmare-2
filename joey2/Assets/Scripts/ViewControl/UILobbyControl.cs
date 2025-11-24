@@ -22,15 +22,19 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnBuildClick()
 	{
-		//Asset.OpenUI<UIBuildControl>(transform);
+		UIBuildControl buildControl = Asset.OpenUI<UIBuildControl>();
+		buildControl.SetData();
 	}
 
 	void OnBtnShopClick()
 	{
+		UIShopControl shopControl = Asset.OpenUI<UIShopControl>();
+		shopControl.SetData();
 	}
 
 	void OnBtnGameClick()
 	{
+		JoeyGameControl.Instance.LoadNextLevel();
 	}
 
 	void OnBtnMergeClick()
