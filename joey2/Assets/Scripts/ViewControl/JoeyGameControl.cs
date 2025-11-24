@@ -31,6 +31,7 @@ public class JoeyGameControl : YViewControl
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private UIPauseControl m_PauseControl;
 	private UIGameOverControl m_GameOverControl;
+	private UILobbyControl m_LobbyControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
@@ -245,6 +246,25 @@ public class JoeyGameControl : YViewControl
 	public void EnterBattleStart()
 	{
 		SetGamePhase(EGamePhase.BattleStart);
+	}
+
+	public void EndGamePhase()
+	{
+		if (GameMode == EGameMode.Battle)
+		{
+			if (m_LobbyControl == null)
+			{
+				m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+			}
+			else
+			{
+				m_LobbyControl.gameObject.SetActive(true);
+			}
+		}
+		else
+		{
+			LoadNextLevel();
+		}
 	}
 
 	public void ReturnToMainMenu()
