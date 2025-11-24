@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class UIBuildView : YBaseView
 {
 	public Button BtnClose;
@@ -17,12 +16,15 @@ public class UIBuildView : YBaseView
 	public Button BtnDefence;
 	public Button BtnItem;
 	public Button BtnSkill;
+	public RectTransform Item7;
+	public RectTransform Item8;
+	public RectTransform Item9;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
-		if (itemRef == null) return;
+		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
-		if (viewItemList == null || viewItemList.Count == 0) return;
+		if(viewItemList == null || viewItemList.Count == 0) return;
 		BtnClose = viewItemList[0].Target.GetComponent<Button>();
 		Content = viewItemList[1].Target.GetComponent<RectTransform>();
 		Item1 = viewItemList[2].Target.GetComponent<RectTransform>();
@@ -35,5 +37,8 @@ public class UIBuildView : YBaseView
 		BtnDefence = viewItemList[9].Target.GetComponent<Button>();
 		BtnItem = viewItemList[10].Target.GetComponent<Button>();
 		BtnSkill = viewItemList[11].Target.GetComponent<Button>();
+		Item7 = viewItemList[12].Target.GetComponent<RectTransform>();
+		Item8 = viewItemList[13].Target.GetComponent<RectTransform>();
+		Item9 = viewItemList[14].Target.GetComponent<RectTransform>();
 	}
 }
