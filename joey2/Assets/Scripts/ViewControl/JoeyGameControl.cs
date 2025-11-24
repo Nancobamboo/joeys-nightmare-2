@@ -13,6 +13,13 @@ public enum EGamePhase
 	PlayerStart,
 }
 
+public enum EGameMode
+{
+	Battle,
+	Guide,
+	Debug,
+}
+
 public class JoeyGameControl : YViewControl
 {
 	private JoeyGameView m_View;
@@ -28,8 +35,7 @@ public class JoeyGameControl : YViewControl
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 
-	public bool IsDebug = false;
-	public bool IsGuide = false;
+	public EGameMode GameMode = EGameMode.Battle;
 	public string[] DebugEnvCardIds = new string[0];
 	public string[] DebugBagCardIds = new string[0];
 	public int DebugLevelId = 1;
@@ -126,26 +132,36 @@ public class JoeyGameControl : YViewControl
 		GData.Instance.LoadAll();
 		StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/shuffle_cards", startTime: 0f));
 
-		int levelId = IsDebug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
+		int levelId = GameMode == EGameMode.Debug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
-		if (!IsGuide && m_DataJoeyPlayer.SelfCardDict.Count == 0)
+		if (GameMode == EGameMode.Battle && m_DataJoeyPlayer.SelfCardDict.Count == 0)
 		{
 			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
 			if (characterData != null)
 			{
 				DataSystem.Instance.InitRoguelikeCharacterData(characterData);
 			}
+			levelId = m_DataJoeyPlayer.currentLevel;
 		}
-
-		(int health, int maxHealth)? playerData = GData.Instance.GetTutorialPlayerData(levelId);
-		m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
-		m_DataJoeyPlayer.playerHealth = playerData.Value.health;
-		m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
+		if (GameMode != EGameMode.Battle)
+		{
+			(int health, int maxHealth)? playerData = GData.Instance.GetTutorialPlayerData(levelId);
+			if (playerData.HasValue)
+			{
+				m_DataJoeyPlayer.lastPlayerHealth = m_DataJoeyPlayer.playerHealth;
+				m_DataJoeyPlayer.playerHealth = playerData.Value.health;
+				m_DataJoeyPlayer.playerMaxHealth = playerData.Value.maxHealth;
+			}
+			else
+			{
+				Debug.LogError($"无法获取关卡 {levelId} 的玩家数据！");
+			}
+		}
 
 
 		m_GamePhaseControl.SetData();
 
-		if (!IsGuide)
+		if (GameMode == EGameMode.Battle)
 		{
 			m_GamePhaseControl.AddSelfCardList();
 		}
@@ -173,7 +189,7 @@ public class JoeyGameControl : YViewControl
 			m_GamePhaseControl.AddCardList(cardType: cardType, cardIds: cardIds);
 		}
 
-		if (IsDebug)
+		if (GameMode == EGameMode.Debug)
 		{
 			if (DebugEnvCardIds != null && DebugEnvCardIds.Length > 0)
 			{
@@ -210,7 +226,7 @@ public class JoeyGameControl : YViewControl
 
 	public async void LoadNextLevel()
 	{
-		if (!IsGuide)
+		if (GameMode != EGameMode.Guide)
 		{
 			DataSystem.Instance.LoadNextRoguelikeStage();
 		}

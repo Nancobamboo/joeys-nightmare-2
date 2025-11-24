@@ -730,8 +730,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
-      propertyPath: IsDebug
-      value: 1
+      propertyPath: GameMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugLevelId
