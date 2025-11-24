@@ -19,10 +19,11 @@ public class DataJoeyPlayer : IData
 	public List<int> EquipedDefenceList = new List<int>();
 	public List<int> EquipedItemList = new List<int>();
 	public List<int> EquipedSkillList = new List<int>();
-	public int MaxEquipedAttackNum = 3;
-	public int MaxEquipedDefenceNum = 3;
-	public int MaxEquipedItemNum = 3;
-	public int MaxEquipedSkillNum = 3;
+	public int MaxEquipedAttackNum;
+	public int MaxEquipedDefenceNum;
+	public int MaxEquipedItemNum;
+	public int MaxEquipedSkillNum;
+	public int StageId;
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -48,6 +49,7 @@ public class DataJoeyPlayer : IData
 		MaxEquipedDefenceNum = (int)jobject["MaxEquipedDefenceNum"];
 		MaxEquipedItemNum = (int)jobject["MaxEquipedItemNum"];
 		MaxEquipedSkillNum = (int)jobject["MaxEquipedSkillNum"];
+		StageId = (int)jobject["StageId"];
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -70,6 +72,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("MaxEquipedDefenceNum", MaxEquipedDefenceNum);
 		jobject.Add("MaxEquipedItemNum", MaxEquipedItemNum);
 		jobject.Add("MaxEquipedSkillNum", MaxEquipedSkillNum);
+		jobject.Add("StageId", StageId);
 	}
 	public void AddRelicListData(int data)
 	{

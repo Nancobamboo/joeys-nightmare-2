@@ -71,5 +71,100 @@ public partial class DataSystem
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
         return dataJoeyPlayer.RelicList.Contains((int)relicType);
     }
+
+    public void InitRoguelikeCharacterData(RoguelikeCharacter characterData)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        for (int i = 0; i < characterData.cardDeck.Count; i++)
+        {
+            string cardId = characterData.cardDeck[i];
+            if (string.IsNullOrEmpty(cardId)) continue;
+            Card card = CreateCard(cardId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+        }
+
+        for (int i = 0; i < characterData.equipmentAttack.Count; i++)
+        {
+            string cardId = characterData.equipmentAttack[i];
+            if (string.IsNullOrEmpty(cardId)) continue;
+            Card card = CreateCard(cardId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            dataJoeyPlayer.AddEquipedAttackListData(card.UniqueId);
+        }
+
+        for (int i = 0; i < characterData.equipmentDefence.Count; i++)
+        {
+            string cardId = characterData.equipmentDefence[i];
+            if (string.IsNullOrEmpty(cardId)) continue;
+            Card card = CreateCard(cardId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            dataJoeyPlayer.AddEquipedDefenceListData(card.UniqueId);
+        }
+
+        for (int i = 0; i < characterData.equipmentItem.Count; i++)
+        {
+            string cardId = characterData.equipmentItem[i];
+            if (string.IsNullOrEmpty(cardId)) continue;
+            Card card = CreateCard(cardId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            dataJoeyPlayer.AddEquipedItemListData(card.UniqueId);
+        }
+
+        for (int i = 0; i < characterData.equipmentSkill.Count; i++)
+        {
+            string cardId = characterData.equipmentSkill[i];
+            if (string.IsNullOrEmpty(cardId)) continue;
+            Card card = CreateCard(cardId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            dataJoeyPlayer.AddEquipedSkillListData(card.UniqueId);
+        }
+
+        dataJoeyPlayer.Coin = characterData.coins;
+
+        dataJoeyPlayer.MaxEquipedAttackNum = 3;
+        dataJoeyPlayer.MaxEquipedDefenceNum = 3;
+        dataJoeyPlayer.MaxEquipedItemNum = 3;
+        dataJoeyPlayer.MaxEquipedSkillNum = 3;
+
+        if (characterData.maxHealth > 0)
+        {
+            dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
+            dataJoeyPlayer.playerHealth = characterData.maxHealth;
+        }
+
+        RoguelikeStage firstStage = GData.Instance.GetRoguelikeStage(0);
+        if (firstStage != null && firstStage.level.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, firstStage.level.Count);
+            string levelIdStr = firstStage.level[randomIndex];
+            if (int.TryParse(levelIdStr, out int levelId))
+            {
+                dataJoeyPlayer.currentLevel = levelId;
+            }
+            dataJoeyPlayer.StageId = 0;
+        }
+
+        SaveDataJoeyPlayer();
+    }
+
+    public void LoadNextRoguelikeStage()
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.StageId++;
+
+        RoguelikeStage stage = GData.Instance.GetRoguelikeStage(dataJoeyPlayer.StageId);
+        if (stage != null && stage.level.Count > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, stage.level.Count);
+            string levelIdStr = stage.level[randomIndex];
+            if (int.TryParse(levelIdStr, out int levelId))
+            {
+                dataJoeyPlayer.currentLevel = levelId;
+            }
+        }
+
+        SaveDataJoeyPlayer();
+    }
 }
 

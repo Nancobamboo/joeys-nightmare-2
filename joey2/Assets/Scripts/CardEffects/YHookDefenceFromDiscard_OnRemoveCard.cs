@@ -6,7 +6,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Random = UnityEngine.Random;
 
-public class YHookDefenceFromDiscard_OnRemoveCard : YCardEffect
+public class YHookDefenceFromDiscard_OnRemoveCard : YDefaultEffect
 {
 	public YHookDefenceFromDiscard_OnRemoveCard()
 	{
