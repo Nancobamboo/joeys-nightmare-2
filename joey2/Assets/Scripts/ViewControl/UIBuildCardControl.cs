@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
 
 public class UIBuildCardControl : YViewControl
 {
@@ -12,12 +14,23 @@ public class UIBuildCardControl : YViewControl
     public Transform CacheTrans;
     private Vector3 m_OriginalScale = Vector3.zero;
     private bool m_IsMoving;
-    public bool m_IsDeckSlot;
     public bool m_IsEquipedSlot;
     public System.Action<UIBuildCardControl> BuildClickHandler;
 
     public ECardType CardType => cachedCardType;
     public Card CardData => cachedCard;
+
+    private Transform m_Transform = null;
+    private CanvasGroup m_CanvasGroup;
+    private Transform m_OriginalParent;
+    private int m_OriginalSiblingIndex;
+
+    public System.Action<UIBuildCardControl, PointerEventData> BeginDragHandler;
+    public System.Action<UIBuildCardControl, PointerEventData> DragHandler;
+    public System.Action<UIBuildCardControl, PointerEventData> EndDragHandler;
+
+
+
 
     public static EResType GetResType()
     {
@@ -27,7 +40,12 @@ public class UIBuildCardControl : YViewControl
     protected override void OnInit()
     {
         base.OnInit();
-        CacheTrans = transform;
+        if (m_Transform == null)
+        {
+            m_Transform = transform ;
+        }
+        
+        CacheTrans = m_Transform;
         if (m_OriginalScale == Vector3.zero)
         {
             m_OriginalScale = CacheTrans.localScale;
@@ -39,18 +57,21 @@ public class UIBuildCardControl : YViewControl
         {
             m_View.Trigger.onEnter = OnPointerEnter;
             m_View.Trigger.onExit = OnPointerExit;
+            m_View.Trigger.onBeginDrag = OnBeginDrag;
+            m_View.Trigger.onDrag = OnDrag;
+            m_View.Trigger.onEndDrag = OnEndDrag;
         }
 
         SetRaycastTargetFalse();
         CacheTrans.localScale = m_OriginalScale;
-        
+
 
     }
 
     private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
     {
         if (m_IsMoving) return;
-        CacheTrans.localScale = m_OriginalScale * 1.1f;
+        CacheTrans.localScale = m_OriginalScale * 1.05f;
     }
 
     private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
@@ -59,8 +80,37 @@ public class UIBuildCardControl : YViewControl
         CacheTrans.localScale = m_OriginalScale;
     }
 
+    private void OnBeginDrag(GameObject go, PointerEventData eventData)
+    {
+        if (!m_IsEquipedSlot) return;
+        m_IsMoving = true;
+        m_OriginalParent = CacheTrans.parent;
+        m_OriginalSiblingIndex = CacheTrans.GetSiblingIndex();
+        m_CanvasGroup.blocksRaycasts = false;
+        BeginDragHandler?.Invoke(this, eventData);
+    }
+    private void OnDrag(GameObject go, PointerEventData eventData)
+    {
+        if (!m_IsMoving) return;
+        DragHandler?.Invoke(this, eventData);
+    }
+
+    private void OnEndDrag(GameObject go, PointerEventData eventData)
+    {
+        if (!m_IsMoving) return;
+        m_IsMoving = false;
+        m_CanvasGroup.blocksRaycasts = true;
+        EndDragHandler?.Invoke(this, eventData);
+    }
     public void ResetScale()
     {
+        CacheTrans.localScale = m_OriginalScale;
+    }
+
+    public void RestoreDragState()
+    {
+        CacheTrans.SetParent(m_OriginalParent, false);
+        CacheTrans.SetSiblingIndex(m_OriginalSiblingIndex);
         CacheTrans.localScale = m_OriginalScale;
     }
 
@@ -92,7 +142,7 @@ public class UIBuildCardControl : YViewControl
 
     void OnBtnCardClick()
     {
-        if (m_IsDeckSlot || m_IsEquipedSlot)
+        if (m_IsEquipedSlot)
         {
             BuildClickHandler?.Invoke(this);
             return;
@@ -110,7 +160,6 @@ public class UIBuildCardControl : YViewControl
         cachedCard = card;
         cachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
         m_IsMoving = false;
-        m_IsDeckSlot = isDeckSlot;
         m_IsEquipedSlot = isEquipedSlot;
 
         m_View.CardName.text = card.cardName;
