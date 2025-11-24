@@ -22,8 +22,8 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnBuildClick()
 	{
-		UIBuildControl buildControl = Asset.OpenUI<UIBuildControl>();
-		buildControl.SetData();
+		// UIBuildControl buildControl = Asset.OpenUI<UIBuildControl>();
+		// buildControl.SetData();
 	}
 
 	void OnBtnShopClick()

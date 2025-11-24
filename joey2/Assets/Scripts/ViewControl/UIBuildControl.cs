@@ -247,6 +247,21 @@ public class UIBuildControl : YViewControl
 		OnBtnAttackClick();
 	}
 
+	public void SetShopData()
+	{
+		RectTransform[] itemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6, m_View.Item7, m_View.Item8, m_View.Item9 };
+
+		for (int i = 0; i < 9; i++)
+		{
+			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(null);
+			cardControl.CacheTrans.SetParent(itemArray[i]);
+			cardControl.CacheTrans.localScale = Vector3.one;
+			cardControl.CacheTrans.localPosition = Vector3.zero;
+			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
+			EquipedCardList.Add(cardControl);
+		}
+	}
+
 	protected override void OnReturn()
 	{
 		DeckCardList.Clear();

@@ -10,13 +10,14 @@ public class UIShopControl : YViewControl
 	private List<ShopCardData> m_CurrentShopCards = new List<ShopCardData>();
 	private DataJoeyPlayer m_PlayerData;
 	private int m_RefreshCost = 50;
+	private UIBuildControl m_BuildControl;
 
 	// Shop card data structure
 	private class ShopCardData
 	{
 		public Card card;
 		public int shopPrice; // Discounted price in shop
-		
+
 		public ShopCardData(Card card, int shopPrice)
 		{
 			this.card = card;
@@ -72,11 +73,11 @@ public class UIShopControl : YViewControl
 
 		// Deduct refresh cost
 		m_PlayerData.Coin -= m_RefreshCost;
-		
+
 		// Regenerate shop cards
 		GenerateShopCards();
 		RefreshShopDisplay();
-		
+
 		// Save data
 		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
@@ -85,45 +86,55 @@ public class UIShopControl : YViewControl
 	{
 		GenerateShopCards();
 		RefreshShopDisplay();
+
+		if (m_BuildControl == null)
+		{
+			m_BuildControl = Asset.OpenUI<UIBuildControl>();
+		}
+		else
+		{
+			m_BuildControl.gameObject.SetActive(true);
+		}
+		m_BuildControl.SetShopData();
 	}
 
 	// Generate shop cards with random discount (1折 to 10折, i.e., 10% to 100%)
 	void GenerateShopCards()
 	{
 		m_CurrentShopCards.Clear();
-		
+
 		// Ensure card data is loaded
 		GData.Instance.LoadCards();
-		
+
 		// Get all purchasable cards (filter out monster cards, only sell player-usable cards)
 		var allCards = GData.Instance.CardDict.Values.ToList();
-		var availableCards = allCards.Where(c => 
-			(c.type == "attack" || 
-			 c.type == "defence" || 
-			 c.type == "skill" || 
+		var availableCards = allCards.Where(c =>
+			(c.type == "attack" ||
+			 c.type == "defence" ||
+			 c.type == "skill" ||
 			 c.type == "item") &&
 			c.price > 0 // Must have price to sell
 		).ToList();
-		
+
 		// Randomly select 8 cards
 		int shopCardCount = 8;
 		var shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
-		
+
 		for (int i = 0; i < shopCardCount && i < shuffledCards.Count; i++)
 		{
 			Card card = shuffledCards[i];
-			
+
 			// Calculate discount price: 1折 to 10折 (10% to 100%)
 			// Random.Range(1, 11) generates integer from 1 to 10
 			int discount = Random.Range(1, 11); // 1-10折
 			int shopPrice = Mathf.RoundToInt(card.price * discount / 10f);
-			
+
 			// Ensure price is at least 1
 			if (shopPrice < 1)
 			{
 				shopPrice = 1;
 			}
-			
+
 			m_CurrentShopCards.Add(new ShopCardData(card, shopPrice));
 		}
 	}
@@ -141,7 +152,7 @@ public class UIShopControl : YViewControl
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 			m_ShopCardList.Add(cardControl);
 		}
-		
+
 		// Update card display
 		for (int i = 0; i < m_ShopCardList.Count; i++)
 		{
@@ -174,38 +185,38 @@ public class UIShopControl : YViewControl
 				break;
 			}
 		}
-		
+
 		if (shopCardData == null)
 		{
 			Debug.LogWarning("找不到对应的商店卡牌数据！");
 			return;
 		}
-		
+
 		int price = shopCardData.shopPrice;
-		
+
 		// Check if player has enough coins
 		if (m_PlayerData.Coin < price)
 		{
 			Debug.Log("金币不足！需要 " + price + " 金币，当前只有 " + m_PlayerData.Coin + " 金币");
 			return;
 		}
-		
+
 		// Deduct coins
 		m_PlayerData.Coin -= price;
-		
+
 		// Create card instance and add to player's card library
 		Card newCard = DataSystem.Instance.CreateCard(shopCardData.card.id);
 		m_PlayerData.AddSelfCardDictData(newCard);
-		
+
 		// Remove card from shop
 		m_CurrentShopCards.Remove(shopCardData);
-		
+
 		// Save data
 		DataSystem.Instance.SaveDataJoeyPlayer();
-		
+
 		// Refresh display
 		RefreshShopDisplay();
-		
+
 		Debug.Log("购买成功！花费 " + price + " 金币购买了 " + newCard.cardName);
 	}
 

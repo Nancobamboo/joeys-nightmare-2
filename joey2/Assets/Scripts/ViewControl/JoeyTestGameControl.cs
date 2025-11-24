@@ -18,7 +18,7 @@ public class JoeyTestGameControl : YViewControl
     void Start()
     {
         InitTestCards();
-        UIBuildControl buildControl = m_View.Asset.OpenUI<UIBuildControl>();
+        UILobbyControl buildControl = m_View.Asset.OpenUI<UILobbyControl>();
         buildControl.SetData();
     }
 
