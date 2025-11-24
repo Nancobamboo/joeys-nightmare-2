@@ -139,6 +139,7 @@ public class UIBuildControl : YViewControl
 				control.gameObject.SetActive(true);
 				control.SetData(card, true, false);
 				control.BuildClickHandler = OnBuildCardClick;
+				control.ResetScale();
 			}
 			else
 			{
@@ -159,6 +160,7 @@ public class UIBuildControl : YViewControl
 				control.gameObject.SetActive(true);
 				control.SetData(card, false, true);
 				control.BuildClickHandler = OnBuildCardClick;
+				control.ResetScale();
 			}
 			else
 			{

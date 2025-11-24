@@ -10,7 +10,7 @@ public class UIBuildCardControl : YViewControl
     private Card cachedCard;
     private ECardType cachedCardType;
     public Transform CacheTrans;
-    private Vector3 m_OriginalScale;
+    private Vector3 m_OriginalScale = Vector3.zero;
     private bool m_IsMoving;
     public bool m_IsDeckSlot;
     public bool m_IsEquipedSlot;
@@ -28,6 +28,10 @@ public class UIBuildCardControl : YViewControl
     {
         base.OnInit();
         CacheTrans = transform;
+        if (m_OriginalScale == Vector3.zero)
+        {
+            m_OriginalScale = CacheTrans.localScale;
+        }
         m_View = CreateView<UICardSimpleView>();
         m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
 
@@ -38,18 +42,25 @@ public class UIBuildCardControl : YViewControl
         }
 
         SetRaycastTargetFalse();
+        CacheTrans.localScale = m_OriginalScale;
+        
+
     }
 
     private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
     {
         if (m_IsMoving) return;
-        m_OriginalScale = CacheTrans.localScale;
         CacheTrans.localScale = m_OriginalScale * 1.1f;
     }
 
     private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
     {
         if (m_IsMoving) return;
+        CacheTrans.localScale = m_OriginalScale;
+    }
+
+    public void ResetScale()
+    {
         CacheTrans.localScale = m_OriginalScale;
     }
 
