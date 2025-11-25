@@ -166,5 +166,66 @@ public partial class DataSystem
 
         SaveDataJoeyPlayer();
     }
+
+    public void AddRelic(ERelicType relicType)
+    {
+        m_DataJoeyPlayer.AddRelicListData((int)relicType);
+    }
+
+    public bool AddCardToDataJoeyPlayer(Card card)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        ECardType cardType = card.GetCardType();
+
+        List<int> equipList = null;
+        List<int> tempList = null;
+        int maxLength = 0;
+
+        switch (cardType)
+        {
+            case ECardType.attack:
+                equipList = dataJoeyPlayer.EquipedAttackList;
+                tempList = dataJoeyPlayer.TempAttackList;
+                maxLength = dataJoeyPlayer.MaxEquipedAttackNum;
+                break;
+            case ECardType.defence:
+                equipList = dataJoeyPlayer.EquipedDefenceList;
+                tempList = dataJoeyPlayer.TempDefenceList;
+                maxLength = dataJoeyPlayer.MaxEquipedDefenceNum;
+                break;
+            case ECardType.item:
+                equipList = dataJoeyPlayer.EquipedItemList;
+                tempList = dataJoeyPlayer.TempItemList;
+                maxLength = dataJoeyPlayer.MaxEquipedItemNum;
+                break;
+            case ECardType.skill:
+                equipList = dataJoeyPlayer.EquipedSkillList;
+                tempList = dataJoeyPlayer.TempSkillList;
+                maxLength = dataJoeyPlayer.MaxEquipedSkillNum;
+                break;
+            default:
+                return false;
+        }
+
+        if (equipList.Count == maxLength)
+        {
+            if (tempList.Count == 3)
+            {
+                return false;
+            }
+            tempList.Add(card.UniqueId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            return true;
+        }
+
+        if (equipList.Count < maxLength)
+        {
+            equipList.Add(card.UniqueId);
+            dataJoeyPlayer.AddSelfCardDictData(card);
+            return true;
+        }
+
+        return false;
+    }
 }
 
