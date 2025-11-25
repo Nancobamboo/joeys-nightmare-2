@@ -52,7 +52,12 @@ public class UIBuildCardControl : YViewControl
         }
         m_View = CreateView<UICardSimpleView>();
         m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
-
+        // 添加这行：初始化 CanvasGroup
+        m_CanvasGroup = GetComponent<CanvasGroup>();
+        if (m_CanvasGroup == null)
+        {
+            m_CanvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
         if (m_View.Trigger != null)
         {
             m_View.Trigger.onEnter = OnPointerEnter;
@@ -121,10 +126,14 @@ public class UIBuildCardControl : YViewControl
 
     private void SetRaycastTargetFalse()
     {
+        // 获取 Trigger 所在的 GameObject，保持它能接收事件
+        GameObject triggerObj = m_View.Trigger != null ? m_View.Trigger.gameObject : null;
+        
         Image[] images = GetComponentsInChildren<Image>(true);
         for (int i = 0; i < images.Length; i++)
         {
-            if (images[i].gameObject != gameObject)
+            // 排除当前对象和 Trigger 所在对象
+            if (images[i].gameObject != gameObject && images[i].gameObject != triggerObj)
             {
                 images[i].raycastTarget = false;
             }
@@ -133,7 +142,7 @@ public class UIBuildCardControl : YViewControl
         Text[] texts = GetComponentsInChildren<Text>(true);
         for (int i = 0; i < texts.Length; i++)
         {
-            if (texts[i].gameObject != gameObject)
+            if (texts[i].gameObject != gameObject && texts[i].gameObject != triggerObj)
             {
                 texts[i].raycastTarget = false;
             }
@@ -149,7 +158,7 @@ public class UIBuildCardControl : YViewControl
         }
     }
 
-    public void SetData(Card card, bool isDeckSlot = false, bool isEquipedSlot = false)
+    public void SetData(Card card, bool isEquipedSlot = true)
     {
         RectTransform animRect = m_View.Anim.transform as RectTransform;
         if (animRect != null)

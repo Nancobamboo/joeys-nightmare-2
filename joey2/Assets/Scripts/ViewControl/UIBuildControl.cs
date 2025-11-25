@@ -144,10 +144,10 @@ public class UIBuildControl : YViewControl
 				m_PlayerData.SelfCardDict.TryGetValue(EquipedCardUniqueIdList[i], out var card))
 			{
 				control.gameObject.SetActive(true);
-				control.SetData(card, false, true);
-				control.BeginDragHandler = null;
-				control.DragHandler = null;
-				control.EndDragHandler = null;
+				control.SetData(card, true);
+				control.BeginDragHandler = OnCardBeginDrag;
+				control.DragHandler = OnCardDrag;
+				control.EndDragHandler = OnCardEndDrag;
 				control.ResetScale();
 			}
 			else
@@ -165,7 +165,7 @@ public class UIBuildControl : YViewControl
 				m_PlayerData.SelfCardDict.TryGetValue(TempCardUniqueIdList[i], out var card))
 			{
 				control.gameObject.SetActive(true);
-				control.SetData(card, false, true);
+				control.SetData(card, true);
 				control.BeginDragHandler = OnCardBeginDrag;
 				control.DragHandler = OnCardDrag;
 				control.EndDragHandler = OnCardEndDrag;
@@ -284,15 +284,18 @@ public class UIBuildControl : YViewControl
 
 	void UpdateDraggingPosition(PointerEventData eventData)
 	{
-		if (m_DraggingRect == null || m_RootCanvas == null) return;
-		if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
-			m_RootCanvas.transform as RectTransform,
-			eventData.position,
-			eventData.pressEventCamera,
-			out var worldPos))
+		if (m_DraggingRect == null || m_RootCanvas == null)
 		{
-			m_DraggingRect.position = worldPos;
+			Debug.Log("m_DraggingRect == null || m_RootCanvas == null");
 		}
+		if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
+				m_RootCanvas.transform as RectTransform,
+				eventData.position,
+				eventData.pressEventCamera,
+				out var worldPos))
+			{
+				m_DraggingRect.position = worldPos;
+			}
 	}
 
 	protected override void OnReturn()
