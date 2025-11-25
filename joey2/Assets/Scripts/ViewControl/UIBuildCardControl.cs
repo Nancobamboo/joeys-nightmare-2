@@ -58,6 +58,9 @@ public class UIBuildCardControl : YViewControl
         {
             m_CanvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
+        // ========== 调试：检查 Trigger 是否为空 ==========
+        Debug.Log($"[UIBuildCardControl] m_View.Trigger is null: {m_View.Trigger == null}");
+        
         if (m_View.Trigger != null)
         {
             m_View.Trigger.onEnter = OnPointerEnter;
@@ -66,7 +69,10 @@ public class UIBuildCardControl : YViewControl
             m_View.Trigger.onDrag = OnDrag;
             m_View.Trigger.onEndDrag = OnEndDrag;
         }
-
+        else
+        {
+            Debug.LogError("[UIBuildCardControl] Trigger is NULL! Drag will not work!");
+        }
         SetRaycastTargetFalse();
         CacheTrans.localScale = m_OriginalScale;
 
@@ -87,11 +93,20 @@ public class UIBuildCardControl : YViewControl
 
     private void OnBeginDrag(GameObject go, PointerEventData eventData)
     {
-        if (!m_IsEquipedSlot) return;
+        Debug.Log($"[UIBuildCardControl] OnBeginDrag called, m_IsEquipedSlot = {m_IsEquipedSlot}");
+        
+        if (!m_IsEquipedSlot) 
+        {
+            Debug.Log("[UIBuildCardControl] OnBeginDrag early return because m_IsEquipedSlot is false");
+            return;
+        }
+        
         m_IsMoving = true;
         m_OriginalParent = CacheTrans.parent;
         m_OriginalSiblingIndex = CacheTrans.GetSiblingIndex();
         m_CanvasGroup.blocksRaycasts = false;
+        
+        Debug.Log($"[UIBuildCardControl] BeginDragHandler is null: {BeginDragHandler == null}");
         BeginDragHandler?.Invoke(this, eventData);
     }
     private void OnDrag(GameObject go, PointerEventData eventData)
