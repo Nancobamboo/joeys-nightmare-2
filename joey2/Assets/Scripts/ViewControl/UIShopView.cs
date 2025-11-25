@@ -5,11 +5,9 @@ using UnityEngine.UI;
 public class UIShopView : YBaseView
 {
 	public Button Control;
-	public Button BtnClose;
 	public RectTransform Content;
-	public Button BtnBuy;
-	public Button BtnSale;
 	public Button BtnRefresh;
+	public Button BtnClose;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -17,10 +15,8 @@ public class UIShopView : YBaseView
 		var viewItemList = itemRef.ViewItemList;
 		if(viewItemList == null || viewItemList.Count == 0) return;
 		Control = viewItemList[0].Target.GetComponent<Button>();
-		BtnClose = viewItemList[1].Target.GetComponent<Button>();
-		Content = viewItemList[2].Target.GetComponent<RectTransform>();
-		BtnBuy = viewItemList[3].Target.GetComponent<Button>();
-		BtnSale = viewItemList[4].Target.GetComponent<Button>();
-		BtnRefresh = viewItemList[5].Target.GetComponent<Button>();
+		Content = viewItemList[1].Target.GetComponent<RectTransform>();
+		BtnRefresh = viewItemList[2].Target.GetComponent<Button>();
+		BtnClose = viewItemList[3].Target.GetComponent<Button>();
 	}
 }

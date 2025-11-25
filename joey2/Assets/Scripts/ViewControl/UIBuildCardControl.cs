@@ -45,8 +45,6 @@ public class UIBuildCardControl : YViewControl
 
     private void OnBeginDrag(GameObject go, PointerEventData eventData)
     {
-        Debug.Log($"[UIBuildCardControl] OnBeginDrag: EquipIndex={EquipIndex}");
-        Debug.Log($"[UIBuildCardControl] OnBeginDrag: start dragging");
     }
 
     private void OnDrag(GameObject go, PointerEventData eventData)
@@ -64,15 +62,12 @@ public class UIBuildCardControl : YViewControl
                 out Vector2 localPos))
             {
                 rectTransform.localPosition = localPos;
-                Debug.Log($"[UIBuildCardControl] OnDrag: localPos={localPos}");
             }
         }
     }
 
     private void OnEndDrag(GameObject go, PointerEventData eventData)
     {
-        Debug.Log($"[UIBuildCardControl] OnEndDrag");
-
         if (OnDragEndHandler != null)
         {
             OnDragEndHandler(this, eventData);
