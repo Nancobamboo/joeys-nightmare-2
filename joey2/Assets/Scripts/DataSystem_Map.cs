@@ -27,6 +27,7 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_disappear] = 0f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Dunsui] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_glow] = 0f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Fanjia] = 1f;
 
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_diaoluo_anim] = 0.5833333f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_dunpai] = 0.41666666f;
