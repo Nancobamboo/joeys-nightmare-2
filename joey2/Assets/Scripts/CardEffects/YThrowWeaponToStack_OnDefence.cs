@@ -41,7 +41,8 @@ public partial class UIGamePhaseControl
 		if (weaponCard != null)
 		{
 			AddEnvCardFromBag(weaponCard);
+			weaponCard.Return();
 		}
-		weaponCard.Return();
+		
 	}
 }

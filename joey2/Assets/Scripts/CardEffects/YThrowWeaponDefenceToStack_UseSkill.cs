@@ -16,16 +16,25 @@ public class YThrowWeaponDefenceToStack_UseSkill : YCardEffect
 
     public override float OnRemoveCard()
     {
-        YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv, CardControl);
-        YActionSystem.Instance.DispatchAction(EActionId.ThrowDefenceToEnv, CardControl);
+        YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponDefenceToEnv, CardControl);
         return 0f;
     }
 }
 
 public partial class UIGamePhaseControl
 {
-    public void ThrowDefenceToEnv(UICardSimpleControl cardControl)
+    public void ThrowWeaponDefenceToEnv(UICardSimpleControl cardControl)
     {
+
+		UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
+        // TODO judge whether the weapon card is fist
+        if (weaponCard != null)
+        {
+            AddEnvCardFromBag(weaponCard);
+            weaponCard.Return();
+		}
+		
+
         UICardSimpleControl defenceCard = GetLastBagCard(ECardType.defence);
         // TODO judge whether the weapon card is fist
         if (defenceCard != null)

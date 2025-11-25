@@ -68,6 +68,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
+		RegistAction(EActionId.ThrowWeaponDefenceToEnv, ThrowWeaponDefenceToEnv);
+		
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
@@ -649,6 +651,14 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		ThrowWeaponToEnv(cardControl);
 	}
+	void ThrowWeaponDefenceToEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		ThrowWeaponDefenceToEnv(cardControl);
+	}
+
+
+
 	void AddCardToEnv(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
