@@ -43,8 +43,8 @@
 4004,Art/Img/img_card_attrack_01,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,100,1,
 4005,Art/Img/img_card_attrack_01,肉盾冲击,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,100,1,
 4006,Art/Img/Skill/img_card_Lightning,连环闪电    ,skill     ,点击使用：对全场敌人造成3点伤害,0,0,0,300,3,Electric:3
-,,,,,,,,,,
-,,,,,,,,,,
+4007,Art/Img/Skill/img_card_Lightning,匕首飞来,skill     ,在环境中召唤两个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill
+4008,Art/Img/Skill/img_card_Lightning,丢盔弃甲,skill     ,将装备中的攻击防御卡丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,

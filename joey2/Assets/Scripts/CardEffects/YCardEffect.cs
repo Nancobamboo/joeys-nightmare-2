@@ -40,7 +40,9 @@ public enum ECardEffectId
     ApeWine,
     GiftBox,
     DartScroll,
-    HookDefenceFromDiscard_OnRemoveCard
+    HookDefenceFromDiscard_OnRemoveCard,
+    AddKnifeToEnv_UseSkill,
+    ThrowWeaponDefenceToStack_UseSkill
 }
 
 public enum EEffectType
@@ -145,11 +147,23 @@ public class YCardEffect
 
     public virtual float UseSkill()
     {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            var vfxNames = new List<EVFXName> { };
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+            return 0.3f;
+        }
         return 0f;
     }
 
     public virtual float UseItem()
     {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            var vfxNames = new List<EVFXName> { };
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+            return 0.3f;
+        }
         return 0f;
     }
 
