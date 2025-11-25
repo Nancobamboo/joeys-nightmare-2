@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 [{"lastPlayerHealth":0,"playerHealth":0,"playerMaxHealth":0,"playerAttack":0,"playerDefence":0,"currentLevel":0,"Coin":0,"RelicList":[],"SelfCardList":[],"UniqueIdGen":0,"EquipedAttackList":[],"EquipedDefenceList":[],"EquipedItemList":[],"EquipedSkillList":[],"TempAttackList":[],"TempDefenceList":[],"TempItemList":[],"TempSkillList":[],"MaxEquipedAttackNum":0,"MaxEquipedDefenceNum":0,"MaxEquipedItemNum":0,"MaxEquipedSkillNum":0,"StageId":0}]
+=======
+[{"lastPlayerHealth":3,"playerHealth":3,"playerMaxHealth":99,"playerAttack":0,"playerDefence":0,"currentLevel":100,"Coin":0,"RelicList":[],"SelfCardList":[],"UniqueIdGen":76,"EquipedAttackList":[],"EquipedDefenceList":[],"EquipedItemList":[],"EquipedSkillList":[],"MaxEquipedAttackNum":0,"MaxEquipedDefenceNum":0,"MaxEquipedItemNum":0,"MaxEquipedSkillNum":0,"StageId":1}]
+>>>>>>> ba5f18ba (cw)
