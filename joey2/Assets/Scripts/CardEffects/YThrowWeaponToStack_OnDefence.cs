@@ -25,7 +25,7 @@ public class YThrowWeaponToStack_OnDefence : YCardEffect
 		return base.UseDefence(isOverflow);
 	}
 
-    public override float OnRemoveCard()
+	public override float OnRemoveCard()
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv, CardControl);
 		return 0f;
@@ -40,7 +40,8 @@ public partial class UIGamePhaseControl
 		// TODO judge whether the weapon card is fist
 		if (weaponCard != null)
 		{
-			YActionSystem.Instance.DispatchAction(EActionId.AddEnvCardFromBag, weaponCard);
+			AddEnvCardFromBag(weaponCard);
 		}
+		weaponCard.Return();
 	}
 }

@@ -8,18 +8,18 @@ using Random = UnityEngine.Random;
 
 public class YThrowWeaponDefenceToStack_UseSkill : YCardEffect
 {
-	public YThrowWeaponDefenceToStack_UseSkill()
-	{
-		Id = ECardEffectId.ThrowWeaponDefenceToStack_UseSkill;
-	}
+    public YThrowWeaponDefenceToStack_UseSkill()
+    {
+        Id = ECardEffectId.ThrowWeaponDefenceToStack_UseSkill;
+    }
 
 
     public override float OnRemoveCard()
-	{
+    {
         YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv, CardControl);
         YActionSystem.Instance.DispatchAction(EActionId.ThrowDefenceToEnv, CardControl);
-		return 0f;
-	}
+        return 0f;
+    }
 }
 
 public partial class UIGamePhaseControl
@@ -30,7 +30,8 @@ public partial class UIGamePhaseControl
         // TODO judge whether the weapon card is fist
         if (defenceCard != null)
         {
-            YActionSystem.Instance.DispatchAction(EActionId.AddEnvCardFromBag, defenceCard);
+            AddEnvCardFromBag(defenceCard);
+            defenceCard.Return();
         }
-	}
+    }
 }
