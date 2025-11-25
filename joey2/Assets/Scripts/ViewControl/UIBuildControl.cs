@@ -9,8 +9,10 @@ public class UIBuildControl : YViewControl
 {
 	private UIBuildView m_View;
 	private List<UIBuildCardControl> EquipedCardList = new List<UIBuildCardControl>();
-	private RectTransform[] m_ItemArray;
+	private RectTransform[] m_EquipedItemArray;
+	private RectTransform[] m_TempItemArray;
 	private DataJoeyPlayer m_PlayerData;
+	public ECardType m_CurrentCardType;
 
 
 	public static EResType GetResType()
@@ -28,8 +30,10 @@ public class UIBuildControl : YViewControl
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
-		m_ItemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6, m_View.Item7, m_View.Item8, m_View.Item9 };
+		m_EquipedItemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6 };
+		m_TempItemArray = new RectTransform[] { m_View.Item7, m_View.Item8, m_View.Item9 };
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
+		m_CurrentCardType = ECardType.other;
 	}
 
 
@@ -61,33 +65,64 @@ public class UIBuildControl : YViewControl
 
 	private void RefreshEquipedCardsByType(ECardType cardType)
 	{
+		SaveBuild(m_CurrentCardType);
+		m_CurrentCardType = cardType;
 		List<int> equipList = null;
+		List<int> tempList = null;
 		switch (cardType)
 		{
 			case ECardType.attack:
 				equipList = m_PlayerData.EquipedAttackList;
+				tempList = m_PlayerData.TempAttackList;
 				break;
 			case ECardType.defence:
 				equipList = m_PlayerData.EquipedDefenceList;
+				tempList = m_PlayerData.TempDefenceList;
 				break;
 			case ECardType.item:
 				equipList = m_PlayerData.EquipedItemList;
+				tempList = m_PlayerData.TempItemList;
 				break;
 			case ECardType.skill:
 				equipList = m_PlayerData.EquipedSkillList;
+				tempList = m_PlayerData.TempSkillList;
 				break;
 			default:
 				return;
 		}
 
-		for (int i = 0; i < EquipedCardList.Count; i++)
+		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
 			UIBuildCardControl cardControl = EquipedCardList[i];
 			if (i < equipList.Count)
 			{
 				int cardUniqueId = equipList[i];
 				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
-				if (card != null)
+				if (card != null && card.GetCardType() == cardType)
+				{
+					cardControl.gameObject.SetActive(true);
+					cardControl.SetData(card);
+				}
+				else
+				{
+					cardControl.gameObject.SetActive(false);
+				}
+			}
+			else
+			{
+				cardControl.gameObject.SetActive(false);
+			}
+		}
+
+		for (int i = 0; i < m_TempItemArray.Length; i++)
+		{
+			int equipIndex = m_EquipedItemArray.Length + i;
+			UIBuildCardControl cardControl = EquipedCardList[equipIndex];
+			if (i < tempList.Count)
+			{
+				int cardUniqueId = tempList[i];
+				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
+				if (card != null && card.GetCardType() == cardType)
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
@@ -106,10 +141,10 @@ public class UIBuildControl : YViewControl
 
 	public void SetShopData()
 	{
-		for (int i = 0; i < m_ItemArray.Length; i++)
+		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
 			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(m_View.Content);
-			RectTransform itemRect = m_ItemArray[i];
+			RectTransform itemRect = m_EquipedItemArray[i];
 			cardControl.CacheTrans.localPosition = itemRect.localPosition;
 			cardControl.CacheTrans.localScale = Vector3.one * 0.6f;
 			cardControl.EquipIndex = i;
@@ -117,16 +152,73 @@ public class UIBuildControl : YViewControl
 			EquipedCardList.Add(cardControl);
 		}
 
+		for (int i = 0; i < m_TempItemArray.Length; i++)
+		{
+			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(m_View.Content);
+			RectTransform itemRect = m_TempItemArray[i];
+			cardControl.CacheTrans.localPosition = itemRect.localPosition;
+			cardControl.CacheTrans.localScale = Vector3.one * 0.6f;
+			cardControl.EquipIndex = m_EquipedItemArray.Length + i;
+			cardControl.OnDragEndHandler = OnCardDragEnd;
+			EquipedCardList.Add(cardControl);
+		}
+
 		RefreshEquipedCardsByType(ECardType.attack);
+	}
+
+	public void SaveBuild(ECardType cardType)
+	{
+		List<int> equipList = null;
+		List<int> tempList = null;
+		switch (cardType)
+		{
+			case ECardType.attack:
+				equipList = m_PlayerData.EquipedAttackList;
+				tempList = m_PlayerData.TempAttackList;
+				break;
+			case ECardType.defence:
+				equipList = m_PlayerData.EquipedDefenceList;
+				tempList = m_PlayerData.TempDefenceList;
+				break;
+			case ECardType.item:
+				equipList = m_PlayerData.EquipedItemList;
+				tempList = m_PlayerData.TempItemList;
+				break;
+			case ECardType.skill:
+				equipList = m_PlayerData.EquipedSkillList;
+				tempList = m_PlayerData.TempSkillList;
+				break;
+			default:
+				return;
+		}
+
+		equipList.Clear();
+		tempList.Clear();
+
+		for (int i = 0; i < EquipedCardList.Count; i++)
+		{
+			UIBuildCardControl cardControl = EquipedCardList[i];
+			if (cardControl.gameObject.activeSelf && cardControl.CardData != null)
+			{
+				if (cardControl.EquipIndex < 6)
+				{
+					equipList.Add(cardControl.CardData.UniqueId);
+				}
+				else
+				{
+					tempList.Add(cardControl.CardData.UniqueId);
+				}
+			}
+		}
 	}
 
 	private void OnCardDragEnd(UIBuildCardControl draggedCard, PointerEventData eventData)
 	{
-		for (int i = 0; i < m_ItemArray.Length; i++)
+		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
-			if (m_ItemArray[i] != null)
+			if (m_EquipedItemArray[i] != null)
 			{
-				RectTransform itemRect = m_ItemArray[i];
+				RectTransform itemRect = m_EquipedItemArray[i];
 				if (RectTransformUtility.RectangleContainsScreenPoint(
 					itemRect,
 					eventData.position,
@@ -138,46 +230,97 @@ public class UIBuildControl : YViewControl
 			}
 		}
 
+		for (int i = 0; i < m_TempItemArray.Length; i++)
+		{
+			if (m_TempItemArray[i] != null)
+			{
+				RectTransform itemRect = m_TempItemArray[i];
+				if (RectTransformUtility.RectangleContainsScreenPoint(
+					itemRect,
+					eventData.position,
+					eventData.pressEventCamera))
+				{
+					OnCardDragEndSwap(draggedCard, m_EquipedItemArray.Length + i);
+					return;
+				}
+			}
+		}
+
 		RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
 		if (rectTransform != null)
 		{
-			rectTransform.localPosition = m_ItemArray[draggedCard.EquipIndex].localPosition;
+			if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
+			{
+				rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = draggedCard.EquipIndex - m_EquipedItemArray.Length;
+				rectTransform.localPosition = m_TempItemArray[tempIndex].localPosition;
+			}
 		}
 	}
 
 	private void OnCardDragEndSwap(UIBuildCardControl draggedCard, int targetItemIndex)
 	{
 		UIBuildCardControl targetCard = null;
+		int draggedIndex = -1;
+		int targetIndex = -1;
+
 		for (int i = 0; i < EquipedCardList.Count; i++)
 		{
-			UIBuildCardControl card = EquipedCardList[i];
-			if (card != null && card.EquipIndex == targetItemIndex && card != draggedCard)
+			if (EquipedCardList[i] == draggedCard)
 			{
-				targetCard = card;
-				break;
+				draggedIndex = i;
+			}
+			if (EquipedCardList[i].EquipIndex == targetItemIndex && EquipedCardList[i] != draggedCard)
+			{
+				targetCard = EquipedCardList[i];
+				targetIndex = i;
 			}
 		}
 
 		if (targetCard != null)
 		{
-			Vector3 draggedPos = m_ItemArray[draggedCard.EquipIndex].localPosition;
-			Vector3 targetPos = m_ItemArray[targetCard.EquipIndex].localPosition;
+			UIBuildCardControl tempCard = EquipedCardList[draggedIndex];
+			EquipedCardList[draggedIndex] = EquipedCardList[targetIndex];
+			EquipedCardList[targetIndex] = tempCard;
 
-			draggedCard.CacheTrans.localPosition = targetPos;
-			targetCard.CacheTrans.localPosition = draggedPos;
-
-			int tempIndex = draggedCard.EquipIndex;
+			int tempEquipIndex = draggedCard.EquipIndex;
 			draggedCard.EquipIndex = targetCard.EquipIndex;
-			targetCard.EquipIndex = tempIndex;
+			targetCard.EquipIndex = tempEquipIndex;
 
-			Debug.Log($"[UIBuildControl] Swapped cards: Card1 EquipIndex={draggedCard.EquipIndex}, Card2 EquipIndex={targetCard.EquipIndex}");
+			if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
+			{
+				draggedCard.CacheTrans.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = draggedCard.EquipIndex - m_EquipedItemArray.Length;
+				draggedCard.CacheTrans.localPosition = m_TempItemArray[tempIndex].localPosition;
+			}
+
+			if (targetCard.EquipIndex < m_EquipedItemArray.Length)
+			{
+				targetCard.CacheTrans.localPosition = m_EquipedItemArray[targetCard.EquipIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = targetCard.EquipIndex - m_EquipedItemArray.Length;
+				targetCard.CacheTrans.localPosition = m_TempItemArray[tempIndex].localPosition;
+			}
 		}
 		else
 		{
-			if (targetItemIndex >= 0 && targetItemIndex < m_ItemArray.Length)
+			draggedCard.EquipIndex = targetItemIndex;
+			if (targetItemIndex < m_EquipedItemArray.Length)
 			{
-				draggedCard.CacheTrans.localPosition = m_ItemArray[targetItemIndex].localPosition;
-				draggedCard.EquipIndex = targetItemIndex;
+				draggedCard.CacheTrans.localPosition = m_EquipedItemArray[targetItemIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = targetItemIndex - m_EquipedItemArray.Length;
+				draggedCard.CacheTrans.localPosition = m_TempItemArray[tempIndex].localPosition;
 			}
 		}
 	}
