@@ -1,5 +1,6 @@
 # joeys-nightmare-2
 iron song
+<img width="1063" height="807" alt="image" src="https://github.com/user-attachments/assets/7c8b3422-6643-4bfc-8ecd-66508c1461c1" />
 
 <img width="663" height="278" alt="image" src="https://github.com/user-attachments/assets/a1b00faf-4853-4405-a3fc-1f43c5ca1613" />
 
