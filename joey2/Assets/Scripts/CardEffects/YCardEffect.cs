@@ -70,7 +70,8 @@ public enum EVFXName
     VFX_Dunsui,
     VFX_glow,
     VFX_LeiDan,
-    VFX_Shouji
+    VFX_Shouji,
+    VFX_Fanjia, //仞甲
 }
 
 public enum ECardAnimName
