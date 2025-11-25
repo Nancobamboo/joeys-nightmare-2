@@ -376,6 +376,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.HookDefenceFromDiscard_OnRemoveCard:
 				effect = new YHookDefenceFromDiscard_OnRemoveCard();
 				break;
+			case ECardEffectId.AddKnifeToEnv_UseSkill:
+				effect = new YAddKnifeToEnv_UseSkill();
+				break;
+			case ECardEffectId.ThrowWeaponDefenceToStack_UseSkill:
+				effect = new YThrowWeaponDefenceToStack_UseSkill();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

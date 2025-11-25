@@ -43,7 +43,7 @@ public partial class UIGamePhaseControl
         }
         int randomIndex = Random.Range(0, m_EnvPanels.Count);
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
-        Card newCard = cardControl.CardData.Clone();
+        Card newCard = cardControl.CardData;
         m_CardDict[newCard.UniqueId] = newCard;
         UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);
         newCardControl.SetData(newCard, isEnv: true, envIndex: randomIndex);
