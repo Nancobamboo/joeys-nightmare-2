@@ -19,6 +19,14 @@ public class DataJoeyPlayer : IData
 	public List<int> EquipedDefenceList = new List<int>();
 	public List<int> EquipedItemList = new List<int>();
 	public List<int> EquipedSkillList = new List<int>();
+
+	public List<int> TempAttackList = new List<int>();
+	public List<int> TempDefenceList = new List<int>();
+	public List<int> TempItemList = new List<int>();
+	public List<int> TempSkillList = new List<int>();
+
+
+
 	public int MaxEquipedAttackNum;
 	public int MaxEquipedDefenceNum;
 	public int MaxEquipedItemNum;
@@ -49,6 +57,10 @@ public class DataJoeyPlayer : IData
 		MaxEquipedDefenceNum = (int)jobject["MaxEquipedDefenceNum"];
 		MaxEquipedItemNum = (int)jobject["MaxEquipedItemNum"];
 		MaxEquipedSkillNum = (int)jobject["MaxEquipedSkillNum"];
+		JsonUtil.ToList(jobject, "TempAttackList", ref TempAttackList);
+		JsonUtil.ToList(jobject, "TempDefenceList", ref TempDefenceList);
+		JsonUtil.ToList(jobject, "TempItemList", ref TempItemList);
+		JsonUtil.ToList(jobject, "TempSkillList", ref TempSkillList);
 		StageId = (int)jobject["StageId"];
 	}
 	public void SaveToJson(JObject jobject)
@@ -72,6 +84,10 @@ public class DataJoeyPlayer : IData
 		jobject.Add("MaxEquipedDefenceNum", MaxEquipedDefenceNum);
 		jobject.Add("MaxEquipedItemNum", MaxEquipedItemNum);
 		jobject.Add("MaxEquipedSkillNum", MaxEquipedSkillNum);
+		jobject.Add("TempAttackList", JsonUtil.ToJArray(TempAttackList));
+		jobject.Add("TempDefenceList", JsonUtil.ToJArray(TempDefenceList));
+		jobject.Add("TempItemList", JsonUtil.ToJArray(TempItemList));
+		jobject.Add("TempSkillList", JsonUtil.ToJArray(TempSkillList));
 		jobject.Add("StageId", StageId);
 	}
 	public void AddRelicListData(int data)

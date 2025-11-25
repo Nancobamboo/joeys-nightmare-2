@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using UnityEngine.EventSystems;
 
 
 public class UIBuildControl : YViewControl
 {
 	private UIBuildView m_View;
-	private List<UIBuildCardControl> DeckCardList = new List<UIBuildCardControl>();
+	private List<UIBuildCardControl> TempCardList = new List<UIBuildCardControl>();
 	private List<UIBuildCardControl> EquipedCardList = new List<UIBuildCardControl>();
 	DataJoeyPlayer m_PlayerData;
 
-	private List<int> DeckCardUniqueIdList = new List<int>();
+	private List<int> TempCardUniqueIdList = new List<int>();
 	private List<int> EquipedCardUniqueIdList = new List<int>();
 	private ECardType m_CurrentCardType = ECardType.attack;
+
+	private Canvas m_RootCanvas;
+	private UIBuildCardControl m_CurrentDraggingCard;
+	private RectTransform m_DraggingRect;
+	private RectTransform[] m_EquipedSlots;
+	private RectTransform[] m_TempSlots;
 
 
 	public static EResType GetResType()
@@ -33,6 +39,9 @@ public class UIBuildControl : YViewControl
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
+		m_RootCanvas = GetComponentInParent<Canvas>();
+		m_EquipedSlots = new[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6 };
+		m_TempSlots = new[] { m_View.Item7, m_View.Item8, m_View.Item9 };
 	}
 
 
@@ -44,26 +53,26 @@ public class UIBuildControl : YViewControl
 
 	void OnBtnAttackClick()
 	{
-		SetDeckAndEquipedCardId(ECardType.attack);
+		SetTempAndEquipedCardId(ECardType.attack);
 	}
 	void OnBtnDefenceClick()
 	{
-		SetDeckAndEquipedCardId(ECardType.defence);
+		SetTempAndEquipedCardId(ECardType.defence);
 	}
 	void OnBtnItemClick()
 	{
-		SetDeckAndEquipedCardId(ECardType.item);
+		SetTempAndEquipedCardId(ECardType.item);
 	}
 	void OnBtnSkillClick()
 	{
-		SetDeckAndEquipedCardId(ECardType.skill);
+		SetTempAndEquipedCardId(ECardType.skill);
 	}
 
 
-	void SetDeckAndEquipedCardId(ECardType cardType = ECardType.attack)
+	void SetTempAndEquipedCardId(ECardType cardType = ECardType.attack)
 	{
 		m_CurrentCardType = cardType;
-		DeckCardUniqueIdList.Clear();
+		TempCardUniqueIdList.Clear();
 		EquipedCardUniqueIdList.Clear();
 		foreach (var kvp in m_PlayerData.SelfCardDict)
 		{
@@ -81,9 +90,9 @@ public class UIBuildControl : YViewControl
 				{
 					EquipedCardUniqueIdList.Add(cardUniqueId);
 				}
-				else
+				if (m_PlayerData.TempAttackList.Contains(cardUniqueId))
 				{
-					DeckCardUniqueIdList.Add(cardUniqueId);
+					TempCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
 			else if (cardType == ECardType.defence)
@@ -92,9 +101,9 @@ public class UIBuildControl : YViewControl
 				{
 					EquipedCardUniqueIdList.Add(cardUniqueId);
 				}
-				else
+				if (m_PlayerData.TempDefenceList.Contains(cardUniqueId))
 				{
-					DeckCardUniqueIdList.Add(cardUniqueId);
+					TempCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
 			else if (cardType == ECardType.item)
@@ -103,9 +112,9 @@ public class UIBuildControl : YViewControl
 				{
 					EquipedCardUniqueIdList.Add(cardUniqueId);
 				}
-				else
+				if (m_PlayerData.TempItemList.Contains(cardUniqueId))
 				{
-					DeckCardUniqueIdList.Add(cardUniqueId);
+					TempCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
 			else if (cardType == ECardType.skill)
@@ -114,40 +123,17 @@ public class UIBuildControl : YViewControl
 				{
 					EquipedCardUniqueIdList.Add(cardUniqueId);
 				}
-				else
+				if (m_PlayerData.TempSkillList.Contains(cardUniqueId))
 				{
-					DeckCardUniqueIdList.Add(cardUniqueId);
+					TempCardUniqueIdList.Add(cardUniqueId);
 				}
 			}
 		}
-		RefreshDeckCards();
 		RefreshEquipedCards();
-		Debug.Log("count of DeckCardUniqueIdList: " + DeckCardUniqueIdList.Count);
+		Debug.Log("count of TempCardUniqueIdList: " + TempCardUniqueIdList.Count);
 		Debug.Log("count of EquipedCardUniqueIdList: " + EquipedCardUniqueIdList.Count);
 	}
 
-
-
-	void RefreshDeckCards()
-	{
-		for (int i = 0; i < DeckCardList.Count; i++)
-		{
-			var control = DeckCardList[i];
-			if (i < DeckCardUniqueIdList.Count &&
-				m_PlayerData.SelfCardDict.TryGetValue(DeckCardUniqueIdList[i], out var card))
-			{
-				control.gameObject.SetActive(true);
-				control.SetData(card, true, false);
-				control.BuildClickHandler = OnBuildCardClick;
-				control.ResetScale();
-			}
-			else
-			{
-				control.gameObject.SetActive(false);
-				control.BuildClickHandler = null;
-			}
-		}
-	}
 
 	void RefreshEquipedCards()
 	{
@@ -158,8 +144,10 @@ public class UIBuildControl : YViewControl
 				m_PlayerData.SelfCardDict.TryGetValue(EquipedCardUniqueIdList[i], out var card))
 			{
 				control.gameObject.SetActive(true);
-				control.SetData(card, false, true);
-				control.BuildClickHandler = OnBuildCardClick;
+				control.SetData(card, true);
+				control.BeginDragHandler = OnCardBeginDrag;
+				control.DragHandler = OnCardDrag;
+				control.EndDragHandler = OnCardEndDrag;
 				control.ResetScale();
 			}
 			else
@@ -168,45 +156,46 @@ public class UIBuildControl : YViewControl
 				control.BuildClickHandler = null;
 			}
 		}
-	}
 
 
-	void OnBuildCardClick(UIBuildCardControl control)
-	{
-		int uniqueId = control.CardData.UniqueId;
-		bool changed = control.m_IsDeckSlot
-			? TryMoveFromDeckToEquiped(uniqueId)
-			: TryMoveFromEquipedToDeck(uniqueId);
-
-		if (changed)
+		for (int i = 0; i < TempCardList.Count; i++)
 		{
-			RefreshDeckCards();
-			RefreshEquipedCards();
-			DataSystem.Instance.SaveDataJoeyPlayer();
+			var control = TempCardList[i];
+			if (i < TempCardUniqueIdList.Count &&
+				m_PlayerData.SelfCardDict.TryGetValue(TempCardUniqueIdList[i], out var card))
+			{
+				control.gameObject.SetActive(true);
+				control.SetData(card, true);
+				control.BeginDragHandler = OnCardBeginDrag;
+				control.DragHandler = OnCardDrag;
+				control.EndDragHandler = OnCardEndDrag;
+				control.ResetScale();
+			}
+			else
+			{
+				control.gameObject.SetActive(false);
+				control.BeginDragHandler = null;
+				control.DragHandler = null;
+				control.EndDragHandler = null;
+			}
 		}
 	}
 
 
-	bool TryMoveFromDeckToEquiped(int uniqueId)
-	{
-		var equipedList = GetEquipedListByType(m_CurrentCardType, out int maxNum);
-		if (equipedList.Count >= maxNum) return false;
+	// void OnBuildCardClick(UIBuildCardControl control)
+	// {
+	// 	int uniqueId = control.CardData.UniqueId;
+	// 	bool changed = control.m_IsDeckSlot
+	// 		? TryMoveFromDeckToEquiped(uniqueId)
+	// 		: TryMoveFromEquipedToDeck(uniqueId);
 
-		DeckCardUniqueIdList.Remove(uniqueId);
-		EquipedCardUniqueIdList.Add(uniqueId);
-		equipedList.Add(uniqueId);
-		return true;
-	}
-
-	bool TryMoveFromEquipedToDeck(int uniqueId)
-	{
-		var equipedList = GetEquipedListByType(m_CurrentCardType, out _);
-		if (!equipedList.Remove(uniqueId)) return false;
-
-		EquipedCardUniqueIdList.Remove(uniqueId);
-		DeckCardUniqueIdList.Add(uniqueId);
-		return true;
-	}
+	// 	if (changed)
+	// 	{
+	// 		RefreshDeckCards();
+	// 		RefreshEquipedCards();
+	// 		DataSystem.Instance.SaveDataJoeyPlayer();
+	// 	}
+	// }
 
 	List<int> GetEquipedListByType(ECardType cardType, out int maxNum)
 	{
@@ -216,32 +205,34 @@ public class UIBuildControl : YViewControl
 			case ECardType.defence: maxNum = m_PlayerData.MaxEquipedDefenceNum; return m_PlayerData.EquipedDefenceList;
 			case ECardType.item: maxNum = m_PlayerData.MaxEquipedItemNum; return m_PlayerData.EquipedItemList;
 			case ECardType.skill: maxNum = m_PlayerData.MaxEquipedSkillNum; return m_PlayerData.EquipedSkillList;
-			default: maxNum = 0; return DeckCardUniqueIdList;
+			default: maxNum = 0; return new List<int>();
 		}
 	}
 
 	public void SetData()
 	{
-		RectTransform[] itemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6 };
+		RectTransform[] itemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6 ,m_View.Item7, m_View.Item8, m_View.Item9};
 
-		for (int i = 0; i < 18; i++)
-		{
-			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(null);
-			cardControl.CacheTrans.SetParent(m_View.Content);
-			cardControl.CacheTrans.localScale = Vector3.one;
-			cardControl.CacheTrans.localPosition = Vector3.zero;
-			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
-			DeckCardList.Add(cardControl);
-		}
-
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 9; i++)
 		{
 			UIBuildCardControl cardControl = Asset.OpenUI<UIBuildCardControl>(null);
 			cardControl.CacheTrans.SetParent(itemArray[i]);
 			cardControl.CacheTrans.localScale = Vector3.one;
 			cardControl.CacheTrans.localPosition = Vector3.zero;
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
-			EquipedCardList.Add(cardControl);
+			cardControl.BeginDragHandler = OnCardBeginDrag;
+			cardControl.DragHandler = OnCardDrag;
+			cardControl.EndDragHandler = OnCardEndDrag;
+			if (i < 6)
+			{
+				EquipedCardList.Add(cardControl);
+			}
+			else
+			{
+				TempCardList.Add(cardControl);
+			}
+			
+
 		}
 
 		OnBtnAttackClick();
@@ -261,10 +252,55 @@ public class UIBuildControl : YViewControl
 			EquipedCardList.Add(cardControl);
 		}
 	}
+	void OnCardBeginDrag(UIBuildCardControl control, PointerEventData eventData)
+	{
+		m_CurrentDraggingCard = control;
+		m_DraggingRect = control.CacheTrans as RectTransform;
+		control.CacheTrans.SetParent(m_RootCanvas.transform, true);
+		UpdateDraggingPosition(eventData);
+	}
+
+	void OnCardDrag(UIBuildCardControl control, PointerEventData eventData)
+	{
+		if (control != m_CurrentDraggingCard) return;
+		UpdateDraggingPosition(eventData);
+	}
+
+	void OnCardEndDrag(UIBuildCardControl control, PointerEventData eventData)
+	{
+		if (control != m_CurrentDraggingCard) return;
+
+		bool moved = false;
+		control.RestoreDragState();
+		m_CurrentDraggingCard = null;
+		m_DraggingRect = null;
+
+		if (moved)
+		{
+			RefreshEquipedCards();
+			DataSystem.Instance.SaveDataJoeyPlayer();
+		}
+	}
+
+	void UpdateDraggingPosition(PointerEventData eventData)
+	{
+		if (m_DraggingRect == null || m_RootCanvas == null)
+		{
+			Debug.Log("m_DraggingRect == null || m_RootCanvas == null");
+		}
+		if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
+				m_RootCanvas.transform as RectTransform,
+				eventData.position,
+				eventData.pressEventCamera,
+				out var worldPos))
+			{
+				m_DraggingRect.position = worldPos;
+			}
+	}
 
 	protected override void OnReturn()
 	{
-		DeckCardList.Clear();
+		TempCardList.Clear();
 		EquipedCardList.Clear();
 
 		base.OnReturn();

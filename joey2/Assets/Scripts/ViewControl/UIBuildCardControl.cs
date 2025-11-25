@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
 
 public class UIBuildCardControl : YViewControl
 {
@@ -12,12 +14,23 @@ public class UIBuildCardControl : YViewControl
     public Transform CacheTrans;
     private Vector3 m_OriginalScale = Vector3.zero;
     private bool m_IsMoving;
-    public bool m_IsDeckSlot;
     public bool m_IsEquipedSlot;
     public System.Action<UIBuildCardControl> BuildClickHandler;
 
     public ECardType CardType => cachedCardType;
     public Card CardData => cachedCard;
+
+    private Transform m_Transform = null;
+    private CanvasGroup m_CanvasGroup;
+    private Transform m_OriginalParent;
+    private int m_OriginalSiblingIndex;
+
+    public System.Action<UIBuildCardControl, PointerEventData> BeginDragHandler;
+    public System.Action<UIBuildCardControl, PointerEventData> DragHandler;
+    public System.Action<UIBuildCardControl, PointerEventData> EndDragHandler;
+
+
+
 
     public static EResType GetResType()
     {
@@ -27,30 +40,49 @@ public class UIBuildCardControl : YViewControl
     protected override void OnInit()
     {
         base.OnInit();
-        CacheTrans = transform;
+        if (m_Transform == null)
+        {
+            m_Transform = transform ;
+        }
+        
+        CacheTrans = m_Transform;
         if (m_OriginalScale == Vector3.zero)
         {
             m_OriginalScale = CacheTrans.localScale;
         }
         m_View = CreateView<UICardSimpleView>();
         m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
-
+        // 添加这行：初始化 CanvasGroup
+        m_CanvasGroup = GetComponent<CanvasGroup>();
+        if (m_CanvasGroup == null)
+        {
+            m_CanvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        // ========== 调试：检查 Trigger 是否为空 ==========
+        Debug.Log($"[UIBuildCardControl] m_View.Trigger is null: {m_View.Trigger == null}");
+        
         if (m_View.Trigger != null)
         {
             m_View.Trigger.onEnter = OnPointerEnter;
             m_View.Trigger.onExit = OnPointerExit;
+            m_View.Trigger.onBeginDrag = OnBeginDrag;
+            m_View.Trigger.onDrag = OnDrag;
+            m_View.Trigger.onEndDrag = OnEndDrag;
         }
-
+        else
+        {
+            Debug.LogError("[UIBuildCardControl] Trigger is NULL! Drag will not work!");
+        }
         SetRaycastTargetFalse();
         CacheTrans.localScale = m_OriginalScale;
-        
+
 
     }
 
     private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
     {
         if (m_IsMoving) return;
-        CacheTrans.localScale = m_OriginalScale * 1.1f;
+        CacheTrans.localScale = m_OriginalScale * 1.05f;
     }
 
     private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
@@ -59,8 +91,46 @@ public class UIBuildCardControl : YViewControl
         CacheTrans.localScale = m_OriginalScale;
     }
 
+    private void OnBeginDrag(GameObject go, PointerEventData eventData)
+    {
+        Debug.Log($"[UIBuildCardControl] OnBeginDrag called, m_IsEquipedSlot = {m_IsEquipedSlot}");
+        
+        if (!m_IsEquipedSlot) 
+        {
+            Debug.Log("[UIBuildCardControl] OnBeginDrag early return because m_IsEquipedSlot is false");
+            return;
+        }
+        
+        m_IsMoving = true;
+        m_OriginalParent = CacheTrans.parent;
+        m_OriginalSiblingIndex = CacheTrans.GetSiblingIndex();
+        m_CanvasGroup.blocksRaycasts = false;
+        
+        Debug.Log($"[UIBuildCardControl] BeginDragHandler is null: {BeginDragHandler == null}");
+        BeginDragHandler?.Invoke(this, eventData);
+    }
+    private void OnDrag(GameObject go, PointerEventData eventData)
+    {
+        if (!m_IsMoving) return;
+        DragHandler?.Invoke(this, eventData);
+    }
+
+    private void OnEndDrag(GameObject go, PointerEventData eventData)
+    {
+        if (!m_IsMoving) return;
+        m_IsMoving = false;
+        m_CanvasGroup.blocksRaycasts = true;
+        EndDragHandler?.Invoke(this, eventData);
+    }
     public void ResetScale()
     {
+        CacheTrans.localScale = m_OriginalScale;
+    }
+
+    public void RestoreDragState()
+    {
+        CacheTrans.SetParent(m_OriginalParent, false);
+        CacheTrans.SetSiblingIndex(m_OriginalSiblingIndex);
         CacheTrans.localScale = m_OriginalScale;
     }
 
@@ -71,10 +141,14 @@ public class UIBuildCardControl : YViewControl
 
     private void SetRaycastTargetFalse()
     {
+        // 获取 Trigger 所在的 GameObject，保持它能接收事件
+        GameObject triggerObj = m_View.Trigger != null ? m_View.Trigger.gameObject : null;
+        
         Image[] images = GetComponentsInChildren<Image>(true);
         for (int i = 0; i < images.Length; i++)
         {
-            if (images[i].gameObject != gameObject)
+            // 排除当前对象和 Trigger 所在对象
+            if (images[i].gameObject != gameObject && images[i].gameObject != triggerObj)
             {
                 images[i].raycastTarget = false;
             }
@@ -83,7 +157,7 @@ public class UIBuildCardControl : YViewControl
         Text[] texts = GetComponentsInChildren<Text>(true);
         for (int i = 0; i < texts.Length; i++)
         {
-            if (texts[i].gameObject != gameObject)
+            if (texts[i].gameObject != gameObject && texts[i].gameObject != triggerObj)
             {
                 texts[i].raycastTarget = false;
             }
@@ -92,14 +166,14 @@ public class UIBuildCardControl : YViewControl
 
     void OnBtnCardClick()
     {
-        if (m_IsDeckSlot || m_IsEquipedSlot)
+        if (m_IsEquipedSlot)
         {
             BuildClickHandler?.Invoke(this);
             return;
         }
     }
 
-    public void SetData(Card card, bool isDeckSlot = false, bool isEquipedSlot = false)
+    public void SetData(Card card, bool isEquipedSlot = true)
     {
         RectTransform animRect = m_View.Anim.transform as RectTransform;
         if (animRect != null)
@@ -110,7 +184,6 @@ public class UIBuildCardControl : YViewControl
         cachedCard = card;
         cachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
         m_IsMoving = false;
-        m_IsDeckSlot = isDeckSlot;
         m_IsEquipedSlot = isEquipedSlot;
 
         m_View.CardName.text = card.cardName;
