@@ -51,6 +51,10 @@ public class JoeyTestGameControl : YViewControl
         m_PlayerData.EquipedItemList.Add(card6.UniqueId);
         m_PlayerData.EquipedSkillList.Add(card7.UniqueId);
 
+        m_PlayerData.TempAttackList.Add(card2.UniqueId);
+        m_PlayerData.TempAttackList.Add(card3.UniqueId);
+        m_PlayerData.TempDefenceList.Add(card5.UniqueId);
+
         //m_PlayerData.UniqueIdGen = 5000;
         Debug.Log("InitTestCards");
     }

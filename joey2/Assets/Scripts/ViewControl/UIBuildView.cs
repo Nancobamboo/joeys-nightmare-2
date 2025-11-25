@@ -4,41 +4,41 @@ using UnityEngine.UI;
 
 public class UIBuildView : YBaseView
 {
-	public Button BtnClose;
-	public RectTransform Content;
 	public RectTransform Item1;
 	public RectTransform Item2;
 	public RectTransform Item3;
 	public RectTransform Item4;
 	public RectTransform Item5;
 	public RectTransform Item6;
+	public RectTransform Item7;
+	public RectTransform Item8;
+	public RectTransform Item9;
 	public Button BtnAttack;
 	public Button BtnDefence;
 	public Button BtnItem;
 	public Button BtnSkill;
-	public RectTransform Item7;
-	public RectTransform Item8;
-	public RectTransform Item9;
+	public Button BtnClose;
+	public RectTransform Content;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
 		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
 		if(viewItemList == null || viewItemList.Count == 0) return;
-		BtnClose = viewItemList[0].Target.GetComponent<Button>();
-		Content = viewItemList[1].Target.GetComponent<RectTransform>();
-		Item1 = viewItemList[2].Target.GetComponent<RectTransform>();
-		Item2 = viewItemList[3].Target.GetComponent<RectTransform>();
-		Item3 = viewItemList[4].Target.GetComponent<RectTransform>();
-		Item4 = viewItemList[5].Target.GetComponent<RectTransform>();
-		Item5 = viewItemList[6].Target.GetComponent<RectTransform>();
-		Item6 = viewItemList[7].Target.GetComponent<RectTransform>();
-		BtnAttack = viewItemList[8].Target.GetComponent<Button>();
-		BtnDefence = viewItemList[9].Target.GetComponent<Button>();
-		BtnItem = viewItemList[10].Target.GetComponent<Button>();
-		BtnSkill = viewItemList[11].Target.GetComponent<Button>();
-		Item7 = viewItemList[12].Target.GetComponent<RectTransform>();
-		Item8 = viewItemList[13].Target.GetComponent<RectTransform>();
-		Item9 = viewItemList[14].Target.GetComponent<RectTransform>();
+		Item1 = viewItemList[0].Target.GetComponent<RectTransform>();
+		Item2 = viewItemList[1].Target.GetComponent<RectTransform>();
+		Item3 = viewItemList[2].Target.GetComponent<RectTransform>();
+		Item4 = viewItemList[3].Target.GetComponent<RectTransform>();
+		Item5 = viewItemList[4].Target.GetComponent<RectTransform>();
+		Item6 = viewItemList[5].Target.GetComponent<RectTransform>();
+		Item7 = viewItemList[6].Target.GetComponent<RectTransform>();
+		Item8 = viewItemList[7].Target.GetComponent<RectTransform>();
+		Item9 = viewItemList[8].Target.GetComponent<RectTransform>();
+		BtnAttack = viewItemList[9].Target.GetComponent<Button>();
+		BtnDefence = viewItemList[10].Target.GetComponent<Button>();
+		BtnItem = viewItemList[11].Target.GetComponent<Button>();
+		BtnSkill = viewItemList[12].Target.GetComponent<Button>();
+		BtnClose = viewItemList[13].Target.GetComponent<Button>();
+		Content = viewItemList[14].Target.GetComponent<RectTransform>();
 	}
 }
