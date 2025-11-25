@@ -13,7 +13,17 @@ public class YAddKnifeToEnv_UseSkill : YCardEffect
 	{
 		Id = ECardEffectId.AddKnifeToEnv_UseSkill;
 	}
+	public override float UseSkill()
+	{
 
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            var vfxNames = new List<EVFXName> { };
+            float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+            return 0.3f;
+        }
+		return base.UseSkill();
+	}
 
 	public override float OnRemoveCard()
 	{
