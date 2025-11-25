@@ -397,17 +397,6 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
-	public void AddRelic(ERelicType relicType)
-	{
-		m_DataJoeyPlayer.AddRelicListData((int)relicType);
-	}
-
-	public void AddSelfCard(string cardId)
-	{
-		Card card = DataSystem.Instance.CreateCard(cardId);
-		m_DataJoeyPlayer.AddSelfCardDictData(card);
-		DataSystem.Instance.SaveDataJoeyPlayer();
-	}
 
 	protected override void OnReturn()
 	{
