@@ -50,6 +50,11 @@ public class UIShopControl : YViewControl
 		Close();
 	}
 
+	public new void Close()
+	{
+		gameObject.SetActive(false);
+	}
+
 	void OnBtnBuyClick()
 	{
 	}

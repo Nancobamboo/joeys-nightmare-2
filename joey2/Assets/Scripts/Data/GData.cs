@@ -568,6 +568,7 @@ public sealed class GData : PureSingleton<GData>
 
 		int StagesIdx = idx.ContainsKey("stages") ? idx["stages"] : -1;
 		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -605,6 +606,15 @@ public sealed class GData : PureSingleton<GData>
 			var roguelikeStage = new RoguelikeStage();
 			roguelikeStage.stages = stages;
 			roguelikeStage.level = ParseList(LevelIdx);
+			string typeStr = Get(TypeIdx);
+			if (!string.IsNullOrEmpty(typeStr) && System.Enum.TryParse<EStageType>(typeStr, out EStageType stageType))
+			{
+				roguelikeStage.type = stageType;
+			}
+			else
+			{
+				roguelikeStage.type = EStageType.normal;
+			}
 
 			RoguelikeStageList.Add(roguelikeStage);
 		}
