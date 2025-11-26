@@ -63,7 +63,7 @@ public class UIBuildControl : YViewControl
 
 
 
-	private void RefreshEquipedCardsByType(ECardType cardType)
+	public void RefreshEquipedCardsByType(ECardType cardType)
 	{
 		SaveBuild(m_CurrentCardType);
 		m_CurrentCardType = cardType;

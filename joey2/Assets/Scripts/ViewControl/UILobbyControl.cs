@@ -1,4 +1,5 @@
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class UILobbyControl : YViewControl
 {
@@ -45,7 +46,7 @@ public class UILobbyControl : YViewControl
 			m_ShopControl.Close();
 		}
 		Close();
-		JoeyGameControl.Instance.LoadNextLevel();
+		JoeyGameControl.Instance.LoadNextLevel(true);
 	}
 
 	void OnBtnMergeClick()

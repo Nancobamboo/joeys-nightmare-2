@@ -185,6 +185,29 @@ public partial class UIGamePhaseControl : YViewControl
 		ClearAllCard();
 	}
 
+	public void SetDataWithoutBagClear()
+	{
+		RefreshView();
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			if (m_EnvCardDict.TryGetValue(i, out List<UICardSimpleControl> envCardList))
+			{
+				for (int j = 0; j < envCardList.Count; j++)
+				{
+					UICardSimpleControl cardControl = envCardList[j];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						m_CardDict.Remove(cardControl.CardData.UniqueId);
+						cardControl.Return();
+					}
+				}
+			}
+		}
+		m_EnvCardDict.Clear();
+		UsedCardList.Clear();
+		ClearGrimReaperData();
+	}
+
 	private void RefreshView()
 	{
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();

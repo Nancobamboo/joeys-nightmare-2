@@ -207,6 +207,9 @@ public class UIShopControl : YViewControl
 
 		RefreshShopDisplay();
 
+		ECardType cardType = newCard.GetCardType();
+		m_BuildControl.RefreshEquipedCardsByType(cardType);
+
 		Debug.Log("购买成功！花费 " + price + " 金币购买了 " + newCard.cardName);
 	}
 
