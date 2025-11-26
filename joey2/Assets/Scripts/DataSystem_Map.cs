@@ -152,7 +152,6 @@ public partial class DataSystem
     public void LoadNextRoguelikeStage()
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-        dataJoeyPlayer.StageId++;
 
         RoguelikeStage stage = GData.Instance.GetRoguelikeStage(dataJoeyPlayer.StageId);
         if (stage != null && stage.level.Count > 0)
