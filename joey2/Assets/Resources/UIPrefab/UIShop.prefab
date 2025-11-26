@@ -420,7 +420,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -114, y: -37}
+  m_AnchoredPosition: {x: -746, y: -162}
   m_SizeDelta: {x: 156.20728, y: 41.231873}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4153729313273753123
@@ -1226,7 +1226,6 @@ GameObject:
   - component: {fileID: 7935931131451886926}
   - component: {fileID: 4227557755645005689}
   - component: {fileID: 3048094868999927576}
-  - component: {fileID: 2652332869356284310}
   m_Layer: 5
   m_Name: Scroll View
   m_TagString: Untagged
@@ -1292,36 +1291,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2652332869356284310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7593333145633889126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Content: {fileID: 412456209867987176}
-  m_Horizontal: 0
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
-  m_Viewport: {fileID: 1055439030000593455}
-  m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
-  m_HorizontalScrollbarVisibility: 2
-  m_VerticalScrollbarVisibility: 2
-  m_HorizontalScrollbarSpacing: -3
-  m_VerticalScrollbarSpacing: -3
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &7641661494575091274
 GameObject:
   m_ObjectHideFlags: 0
@@ -1333,7 +1302,6 @@ GameObject:
   - component: {fileID: 1055439030000593455}
   - component: {fileID: 4490694803511456063}
   - component: {fileID: 3321942078117132934}
-  - component: {fileID: 1575267952953378198}
   m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
@@ -1399,19 +1367,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1575267952953378198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7641661494575091274}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 0
 --- !u!1 &7667685522556147361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1635,6 +1590,10 @@ MonoBehaviour:
   - Target: {fileID: 6084941017472865168}
     Components:
     - {fileID: 990129994900685469}
+    VarNameArray: []
+  - Target: {fileID: 2331112970438528475}
+    Components:
+    - {fileID: 9200376399490703917}
     VarNameArray: []
 --- !u!1 &8752950206555499822
 GameObject:
