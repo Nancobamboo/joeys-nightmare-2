@@ -31,7 +31,6 @@ public class JoeyGameControl : YViewControl
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private UIPauseControl m_PauseControl;
 	private UIGameOverControl m_GameOverControl;
-	private UILobbyControl m_LobbyControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
@@ -252,13 +251,14 @@ public class JoeyGameControl : YViewControl
 	{
 		if (GameMode == EGameMode.Battle)
 		{
-			if (m_LobbyControl == null)
+			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
-				m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+				Asset.OpenUI<UILobbyControl>();
 			}
 			else
 			{
-				m_LobbyControl.gameObject.SetActive(true);
+				LoadNextLevel();
 			}
 		}
 		else
