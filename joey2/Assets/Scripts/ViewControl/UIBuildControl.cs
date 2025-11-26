@@ -25,7 +25,7 @@ public class UIBuildControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIBuildView>();
-		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
+		//m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnAttack.onClick.AddListener(OnBtnAttackClick);
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
