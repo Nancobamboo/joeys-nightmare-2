@@ -25,7 +25,7 @@ public class UIBuildControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIBuildView>();
-		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
+		//m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnAttack.onClick.AddListener(OnBtnAttackClick);
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
@@ -342,6 +342,20 @@ public class UIBuildControl : YViewControl
 		DataSystem.Instance.AddCoin(halfPrice);
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
+
+		RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
+		if (rectTransform != null)
+		{
+			if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
+			{
+				rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = draggedCard.EquipIndex - m_EquipedItemArray.Length;
+				rectTransform.localPosition = m_TempItemArray[tempIndex].localPosition;
+			}
+		}
 
 		draggedCard.gameObject.SetActive(false);
 
