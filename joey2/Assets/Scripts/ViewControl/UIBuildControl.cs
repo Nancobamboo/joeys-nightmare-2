@@ -343,6 +343,20 @@ public class UIBuildControl : YViewControl
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
 
+		RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
+		if (rectTransform != null)
+		{
+			if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
+			{
+				rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+			}
+			else
+			{
+				int tempIndex = draggedCard.EquipIndex - m_EquipedItemArray.Length;
+				rectTransform.localPosition = m_TempItemArray[tempIndex].localPosition;
+			}
+		}
+
 		draggedCard.gameObject.SetActive(false);
 
 		RefreshEquipedCardsByType(m_CurrentCardType);
