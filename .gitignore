@@ -64,3 +64,6 @@ Temp/
 *.opendb
 *.VC.db
 /build
+
+
+/joey2/Assets/Datas
