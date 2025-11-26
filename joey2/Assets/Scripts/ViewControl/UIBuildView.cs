@@ -19,6 +19,7 @@ public class UIBuildView : YBaseView
 	public Button BtnSkill;
 	public Button BtnClose;
 	public RectTransform Content;
+	public Image BtnDelete;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -40,5 +41,6 @@ public class UIBuildView : YBaseView
 		BtnSkill = viewItemList[12].Target.GetComponent<Button>();
 		BtnClose = viewItemList[13].Target.GetComponent<Button>();
 		Content = viewItemList[14].Target.GetComponent<RectTransform>();
+		BtnDelete = viewItemList[15].Target.GetComponent<Image>();
 	}
 }

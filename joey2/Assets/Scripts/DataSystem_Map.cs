@@ -173,6 +173,13 @@ public partial class DataSystem
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
     }
 
+    public void AddCoin(int delta)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.Coin += delta;
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin);
+    }
+
     public bool AddCardToDataJoeyPlayer(Card card)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
