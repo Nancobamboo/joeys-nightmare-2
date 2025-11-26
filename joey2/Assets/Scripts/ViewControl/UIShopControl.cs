@@ -115,12 +115,25 @@ public class UIShopControl : YViewControl
 		int shopCardCount = 8;
 		List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
 
+		// Randomly select one card for 50% discount
+		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, shuffledCards.Count));
+
 		for (int i = 0; i < shopCardCount && i < shuffledCards.Count; i++)
 		{
 			Card card = shuffledCards[i];
+			int shopPrice;
 
-			int discount = Random.Range(1, 11);
-			int shopPrice = Mathf.RoundToInt(card.price * discount / 10f);
+			if (i == halfPriceIndex)
+			{
+				// First selected card: 50% discount
+				shopPrice = Mathf.RoundToInt(card.price * 0.5f);
+			}
+			else
+			{
+				// Other cards: 90%-100% smooth random
+				float discountRate = Random.Range(0.9f, 1.0f);
+				shopPrice = Mathf.RoundToInt(card.price * discountRate);
+			}
 
 			if (shopPrice < 1)
 			{
