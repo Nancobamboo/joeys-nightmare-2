@@ -132,8 +132,8 @@ public class UIShopControl : YViewControl
 			}
 			else
 			{
-				// Other cards: 90%-100% smooth random
-				float discountRate = Random.Range(0.9f, 1.0f);
+				// Other cards: 80%-100% smooth random
+				float discountRate = Random.Range(0.8f, 1.0f);
 				shopPrice = Mathf.RoundToInt(card.price * discountRate);
 			}
 
