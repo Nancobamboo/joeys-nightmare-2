@@ -14,6 +14,8 @@ public enum EResType
 	UILobby,
 	UIBuild,
 	UIShop,
+	UIBuildNew,
+	UIBuildCardNew,
     UIUpper,
     LevelEnemy,
     SoundEffect,

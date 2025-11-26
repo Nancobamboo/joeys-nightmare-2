@@ -560,6 +560,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5906766161424068510}
   - component: {fileID: 8011272062151629978}
+  - component: {fileID: 3283869173266613164}
   m_Layer: 5
   m_Name: UIBuildCardNew
   m_TagString: Untagged
@@ -596,6 +597,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5589210245250907581}
   m_CullTransparentMesh: 1
+--- !u!114 &3283869173266613164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5589210245250907581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637109d37df5caa4a8b283cb20fd9cb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ViewItemList:
+  - Target: {fileID: 7018982129338923665}
+    Components:
+    - {fileID: 373338509786233674}
+    VarNameArray:
+    - 
+  - Target: {fileID: 5776715129832544333}
+    Components:
+    - {fileID: 3024420791680996740}
+    VarNameArray: []
+  - Target: {fileID: 8857638705088453949}
+    Components:
+    - {fileID: 3487563813416069540}
+    VarNameArray:
+    - 
+  - Target: {fileID: 519016526856115187}
+    Components:
+    - {fileID: 853914411376258120}
+    VarNameArray:
+    - 
+  - Target: {fileID: 1656309324318488524}
+    Components:
+    - {fileID: 6569895191472949631}
+    VarNameArray:
+    - 
+  - Target: {fileID: 4450999798161577742}
+    Components:
+    - {fileID: 1151067257231403437}
+    VarNameArray: []
+  - Target: {fileID: 775831684060439963}
+    Components:
+    - {fileID: 6099726753713525283}
+    VarNameArray: []
+  - Target: {fileID: 1693442220568060039}
+    Components: []
+    VarNameArray: []
 --- !u!1 &6099726753713525283
 GameObject:
   m_ObjectHideFlags: 0
