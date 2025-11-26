@@ -34,6 +34,7 @@ public class JoeyGameControl : YViewControl
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
+	private bool m_IsLobbyEnter = false;
 
 	public EGameMode GameMode = EGameMode.Battle;
 	public string[] DebugEnvCardIds = new string[0];
@@ -61,7 +62,8 @@ public class JoeyGameControl : YViewControl
 		{
 			m_DataJoeyPlayer.currentLevel = 1;
 		}
-		SetGamePhase(EGamePhase.BattleStart);
+		Asset.OpenUI<UILobbyControl>();
+		SetGamePhase(EGamePhase.Default);
 	}
 
 	void Update()
@@ -136,6 +138,7 @@ public class JoeyGameControl : YViewControl
 
 		if (GameMode == EGameMode.Battle && m_DataJoeyPlayer.SelfCardDict.Count == 0)
 		{
+			m_DataJoeyPlayer.StageId = 0;
 			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
 			if (characterData != null)
 			{
@@ -159,11 +162,27 @@ public class JoeyGameControl : YViewControl
 		}
 
 
-		m_GamePhaseControl.SetData();
-
 		if (GameMode == EGameMode.Battle)
 		{
+			if (m_IsLobbyEnter == false)
+			{
+				m_GamePhaseControl.SetDataWithoutBagClear();
+
+			}
+			else
+			{
+				m_GamePhaseControl.SetData();
+			}
+		}
+		else
+		{
+			m_GamePhaseControl.SetData();
+		}
+
+		if (m_IsLobbyEnter)
+		{
 			m_GamePhaseControl.AddSelfCardList();
+			m_IsLobbyEnter = false;
 		}
 
 		List<List<string>> cardIdListEnv = CardDraw.Instance.DrawCardEnv(levelId);
@@ -173,20 +192,23 @@ public class JoeyGameControl : YViewControl
 			m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 		}
 
-		Dictionary<string, List<string>> equipmentDeck;
-
-		equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(levelId);
-
-
-		foreach (var kv in equipmentDeck)
+		if (GameMode != EGameMode.Battle)
 		{
-			string cardTypeStr = kv.Key;
-			List<string> cardIds = kv.Value;
+			Dictionary<string, List<string>> equipmentDeck;
 
-			ECardType cardType = (ECardType)System.Enum.Parse(typeof(ECardType), cardTypeStr);
-			Debug.Log("cardType: " + cardTypeStr + " " + cardType.ToString());
+			equipmentDeck = GData.Instance.GetTutorialEquipmentDeck(levelId);
 
-			m_GamePhaseControl.AddCardList(cardType: cardType, cardIds: cardIds);
+
+			foreach (var kv in equipmentDeck)
+			{
+				string cardTypeStr = kv.Key;
+				List<string> cardIds = kv.Value;
+
+				ECardType cardType = (ECardType)System.Enum.Parse(typeof(ECardType), cardTypeStr);
+				Debug.Log("cardType: " + cardTypeStr + " " + cardType.ToString());
+
+				m_GamePhaseControl.AddCardList(cardType: cardType, cardIds: cardIds);
+			}
 		}
 
 		if (GameMode == EGameMode.Debug)
@@ -224,8 +246,9 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
-	public async void LoadNextLevel()
+	public async void LoadNextLevel(bool IsLobbyEnter = false)
 	{
+		m_IsLobbyEnter = IsLobbyEnter;
 		if (GameMode != EGameMode.Guide)
 		{
 			DataSystem.Instance.LoadNextRoguelikeStage();
@@ -251,6 +274,7 @@ public class JoeyGameControl : YViewControl
 	{
 		if (GameMode == EGameMode.Battle)
 		{
+			m_DataJoeyPlayer.StageId++;
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 			if (currentStage != null && currentStage.type == EStageType.boss)
 			{

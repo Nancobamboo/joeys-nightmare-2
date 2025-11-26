@@ -69,11 +69,12 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.GrimReaperCloneTakeDamage, GrimReaperCloneTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
 		RegistAction(EActionId.ThrowWeaponDefenceToEnv, ThrowWeaponDefenceToEnv);
-		
+
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
+		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -182,6 +183,29 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		RefreshView();
 		ClearAllCard();
+	}
+
+	public void SetDataWithoutBagClear()
+	{
+		RefreshView();
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			if (m_EnvCardDict.TryGetValue(i, out List<UICardSimpleControl> envCardList))
+			{
+				for (int j = 0; j < envCardList.Count; j++)
+				{
+					UICardSimpleControl cardControl = envCardList[j];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						m_CardDict.Remove(cardControl.CardData.UniqueId);
+						cardControl.Return();
+					}
+				}
+			}
+		}
+		m_EnvCardDict.Clear();
+		UsedCardList.Clear();
+		ClearGrimReaperData();
 	}
 
 	private void RefreshView()
@@ -307,9 +331,20 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public void AddSelfCardList()
 	{
-		foreach (KeyValuePair<int, Card> kvp in m_DataJoeyPlayer.SelfCardDict)
+		AddCardsFromEquipList(m_DataJoeyPlayer.EquipedAttackList);
+		AddCardsFromEquipList(m_DataJoeyPlayer.EquipedDefenceList);
+		AddCardsFromEquipList(m_DataJoeyPlayer.EquipedItemList);
+		AddCardsFromEquipList(m_DataJoeyPlayer.EquipedSkillList);
+	}
+
+	private void AddCardsFromEquipList(List<int> equipList)
+	{
+		for (int i = 0; i < equipList.Count; i++)
 		{
-			Card card = kvp.Value;
+			int uniqueId = equipList[i];
+			Card card = m_DataJoeyPlayer.GetSelfCardDictData(uniqueId);
+			if (card == null) continue;
+
 			ECardType cardType = card.GetCardType();
 			Transform parent = null;
 			switch (cardType)
@@ -502,6 +537,12 @@ public partial class UIGamePhaseControl : YViewControl
 
 			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+
+			Card configCard = GData.Instance.GetCardConfigById(monsterId);
+			if (configCard != null && configCard.price > 0)
+			{
+				DataSystem.Instance.AddCoin(configCard.price);
+			}
 
 			RemoveEnvCard(envIndex, cardControl);
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
@@ -1114,6 +1155,12 @@ public partial class UIGamePhaseControl : YViewControl
 			m_DataJoeyPlayer.Coin += stolenAmount;
 			OnCoinChanged(m_DataJoeyPlayer.Coin);
 		}
+	}
+
+	void OnCoinChange(object[] paraArray)
+	{
+		int coin = (int)paraArray[0];
+		OnCoinChanged(coin);
 	}
 
 	void EscapeMonkey(object[] paraArray)

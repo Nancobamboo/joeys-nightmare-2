@@ -152,7 +152,6 @@ public partial class DataSystem
     public void LoadNextRoguelikeStage()
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-        dataJoeyPlayer.StageId++;
 
         RoguelikeStage stage = GData.Instance.GetRoguelikeStage(dataJoeyPlayer.StageId);
         if (stage != null && stage.level.Count > 0)
@@ -171,6 +170,13 @@ public partial class DataSystem
     public void AddRelic(ERelicType relicType)
     {
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
+    }
+
+    public void AddCoin(int delta)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.Coin += delta;
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin);
     }
 
     public bool AddCardToDataJoeyPlayer(Card card)

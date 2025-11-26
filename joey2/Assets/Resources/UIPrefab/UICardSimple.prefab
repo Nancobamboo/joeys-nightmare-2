@@ -691,6 +691,14 @@ MonoBehaviour:
     VarNameArray:
     - BtnCard
     - Trigger
+  - Target: {fileID: 2866611008872040225}
+    Components:
+    - {fileID: 8807206356941641773}
+    VarNameArray: []
+  - Target: {fileID: 5324092168634429454}
+    Components:
+    - {fileID: 3193137900196140213}
+    VarNameArray: []
 --- !u!114 &287875919152844429
 MonoBehaviour:
   m_ObjectHideFlags: 0

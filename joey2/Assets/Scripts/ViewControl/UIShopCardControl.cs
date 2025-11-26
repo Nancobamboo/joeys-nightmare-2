@@ -98,10 +98,11 @@ public class UIShopCardControl : YViewControl
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
-        // Display price in description (append to original description)
-        m_View.Description.text = card.description + "\n<color=yellow>价格: " + shopPrice + " 金币</color>";
+        m_View.Description.text = card.description;
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
+        m_View.Text.text = shopPrice.ToString();
+        m_View.Price.SetActive(true);
 
         SetTypeUI(card);
         SetStars(card.stars);
