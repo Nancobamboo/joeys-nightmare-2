@@ -35,5 +35,6 @@ public enum EActionId
   	HookDefenceFromDiscard_OnRemoveCard,
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
+	OnCoinChange,
 	Upper
 }
