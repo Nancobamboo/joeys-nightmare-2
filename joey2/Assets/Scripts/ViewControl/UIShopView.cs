@@ -7,8 +7,8 @@ public class UIShopView : YBaseView
 	public Button Control;
 	public RectTransform Content;
 	public Button BtnRefresh;
-	public Button BtnClose;
 	public Text TxtCoin;
+	public Button BtnClose;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -18,7 +18,7 @@ public class UIShopView : YBaseView
 		Control = viewItemList[0].Target.GetComponent<Button>();
 		Content = viewItemList[1].Target.GetComponent<RectTransform>();
 		BtnRefresh = viewItemList[2].Target.GetComponent<Button>();
-		BtnClose = viewItemList[3].Target.GetComponent<Button>();
-		TxtCoin = viewItemList[4].Target.GetComponent<Text>();
+		TxtCoin = viewItemList[3].Target.GetComponent<Text>();
+		BtnClose = viewItemList[4].Target.GetComponent<Button>();
 	}
 }
