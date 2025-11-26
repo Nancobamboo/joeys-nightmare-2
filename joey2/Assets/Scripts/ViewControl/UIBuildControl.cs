@@ -214,6 +214,12 @@ public class UIBuildControl : YViewControl
 
 	private void OnCardDragEnd(UIBuildCardControl draggedCard, PointerEventData eventData)
 	{
+		if (CheckCardInDeleteArea(draggedCard, eventData))
+		{
+			DeleteCard(draggedCard);
+			return;
+		}
+
 		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
 			if (m_EquipedItemArray[i] != null)
@@ -259,6 +265,87 @@ public class UIBuildControl : YViewControl
 				rectTransform.localPosition = m_TempItemArray[tempIndex].localPosition;
 			}
 		}
+	}
+
+	private bool CheckCardInDeleteArea(UIBuildCardControl draggedCard, PointerEventData eventData)
+	{
+		if (m_View.BtnDelete == null || draggedCard.CardData == null)
+		{
+			return false;
+		}
+
+		RectTransform deleteRect = m_View.BtnDelete.rectTransform;
+		RectTransform cardRect = draggedCard.CacheTrans as RectTransform;
+
+		if (deleteRect == null || cardRect == null)
+		{
+			return false;
+		}
+
+		Vector3[] deleteCorners = new Vector3[4];
+		Vector3[] cardCorners = new Vector3[4];
+		deleteRect.GetWorldCorners(deleteCorners);
+		cardRect.GetWorldCorners(cardCorners);
+
+		Rect deleteRectWorld = new Rect(deleteCorners[0].x, deleteCorners[0].y,
+			deleteCorners[2].x - deleteCorners[0].x,
+			deleteCorners[2].y - deleteCorners[0].y);
+
+		Rect cardRectWorld = new Rect(cardCorners[0].x, cardCorners[0].y,
+			cardCorners[2].x - cardCorners[0].x,
+			cardCorners[2].y - cardCorners[0].y);
+
+		return deleteRectWorld.Overlaps(cardRectWorld);
+	}
+
+	private void DeleteCard(UIBuildCardControl draggedCard)
+	{
+		if (draggedCard.CardData == null)
+		{
+			return;
+		}
+
+		Card card = draggedCard.CardData;
+		ECardType cardType = card.GetCardType();
+		int uniqueId = card.UniqueId;
+
+		List<int> equipList = null;
+		List<int> tempList = null;
+
+		switch (cardType)
+		{
+			case ECardType.attack:
+				equipList = m_PlayerData.EquipedAttackList;
+				tempList = m_PlayerData.TempAttackList;
+				break;
+			case ECardType.defence:
+				equipList = m_PlayerData.EquipedDefenceList;
+				tempList = m_PlayerData.TempDefenceList;
+				break;
+			case ECardType.item:
+				equipList = m_PlayerData.EquipedItemList;
+				tempList = m_PlayerData.TempItemList;
+				break;
+			case ECardType.skill:
+				equipList = m_PlayerData.EquipedSkillList;
+				tempList = m_PlayerData.TempSkillList;
+				break;
+			default:
+				return;
+		}
+
+		equipList.Remove(uniqueId);
+		tempList.Remove(uniqueId);
+		m_PlayerData.RemoveSelfCardDictData(uniqueId);
+
+		int halfPrice = Mathf.RoundToInt(card.price / 2f);
+		DataSystem.Instance.AddCoin(halfPrice);
+
+		DataSystem.Instance.SaveDataJoeyPlayer();
+
+		draggedCard.gameObject.SetActive(false);
+
+		RefreshEquipedCardsByType(m_CurrentCardType);
 	}
 
 	private void OnCardDragEndSwap(UIBuildCardControl draggedCard, int targetItemIndex)

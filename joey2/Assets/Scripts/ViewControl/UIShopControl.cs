@@ -36,6 +36,7 @@ public class UIShopControl : YViewControl
 		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnRefresh.onClick.AddListener(OnBtnRefreshClick);
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
+		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 	}
 
 	void OnControlClick()
@@ -71,7 +72,7 @@ public class UIShopControl : YViewControl
 			return;
 		}
 
-		m_PlayerData.Coin -= m_RefreshCost;
+		DataSystem.Instance.AddCoin(-m_RefreshCost);
 
 		GenerateShopCards();
 		RefreshShopDisplay();
@@ -83,6 +84,7 @@ public class UIShopControl : YViewControl
 	{
 		GenerateShopCards();
 		RefreshShopDisplay();
+		m_View.TxtCoin.text = m_PlayerData.Coin.ToString();
 
 		if (m_BuildControl == null)
 		{
@@ -201,10 +203,16 @@ public class UIShopControl : YViewControl
 			return;
 		}
 
-		m_PlayerData.Coin -= price;
-
 		Card newCard = DataSystem.Instance.CreateCard(shopCardData.card.id);
-		m_PlayerData.AddSelfCardDictData(newCard);
+		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
+
+		if (!success)
+		{
+			Debug.Log("装备栏和临时栏都已满，无法购买！");
+			return;
+		}
+
+		DataSystem.Instance.AddCoin(-price);
 
 		m_CurrentShopCards.Remove(shopCardData);
 
@@ -213,6 +221,12 @@ public class UIShopControl : YViewControl
 		RefreshShopDisplay();
 
 		Debug.Log("购买成功！花费 " + price + " 金币购买了 " + newCard.cardName);
+	}
+
+	void OnCoinChange(object[] paraArray)
+	{
+		int coin = (int)paraArray[0];
+		m_View.TxtCoin.text = coin.ToString();
 	}
 
 	protected override void OnReturn()
