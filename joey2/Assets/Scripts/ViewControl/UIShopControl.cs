@@ -9,7 +9,7 @@ public class UIShopControl : YViewControl
 	private List<ShopCardData> m_CurrentShopCards = new List<ShopCardData>();
 	private DataJoeyPlayer m_PlayerData;
 	private int m_RefreshCost = 50;
-	private UIBuildControl m_BuildControl;
+	private UIBuildNewControl m_BuildControl;
 
 	private class ShopCardData
 	{
@@ -88,7 +88,7 @@ public class UIShopControl : YViewControl
 
 		if (m_BuildControl == null)
 		{
-			m_BuildControl = Asset.OpenUI<UIBuildControl>(transform);
+			m_BuildControl = Asset.OpenUI<UIBuildNewControl>(transform);
 		}
 		else
 		{

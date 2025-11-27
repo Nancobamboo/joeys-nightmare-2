@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 809661537875560255}
   - component: {fileID: 7055663095574013251}
   m_Layer: 5
-  m_Name: item1 (3)
+  m_Name: item4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -917,7 +917,7 @@ GameObject:
   - component: {fileID: 6600640829640788153}
   - component: {fileID: 2974965877064226264}
   m_Layer: 5
-  m_Name: item1 (2)
+  m_Name: item3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1235,7 +1235,7 @@ GameObject:
   - component: {fileID: 1884200659980651904}
   - component: {fileID: 6370538612317530862}
   m_Layer: 5
-  m_Name: item1 (4)
+  m_Name: item5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1535,7 +1535,7 @@ GameObject:
   - component: {fileID: 6514136301278327922}
   - component: {fileID: 1647048999652554773}
   m_Layer: 5
-  m_Name: item1 (1)
+  m_Name: item2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1748,11 +1748,39 @@ MonoBehaviour:
     VarNameArray: []
   - Target: {fileID: 385145136484615815}
     Components:
-    - {fileID: 8638104750015545416}
+    - {fileID: 4060403853346786552}
     VarNameArray: []
   - Target: {fileID: 7412137408819368946}
     Components:
     - {fileID: 7412137408819368946}
+    VarNameArray: []
+  - Target: {fileID: 1703494149370740393}
+    Components:
+    - {fileID: 1703494149370740393}
+    VarNameArray: []
+  - Target: {fileID: 6143396766753699362}
+    Components:
+    - {fileID: 6143396766753699362}
+    VarNameArray: []
+  - Target: {fileID: 7769075206119457256}
+    Components:
+    - {fileID: 7769075206119457256}
+    VarNameArray: []
+  - Target: {fileID: 58662744969580540}
+    Components:
+    - {fileID: 58662744969580540}
+    VarNameArray: []
+  - Target: {fileID: 3180062917171172079}
+    Components:
+    - {fileID: 3180062917171172079}
+    VarNameArray: []
+  - Target: {fileID: 4865894290993810884}
+    Components:
+    - {fileID: 4865894290993810884}
+    VarNameArray: []
+  - Target: {fileID: 8620832045288082200}
+    Components:
+    - {fileID: 8620832045288082200}
     VarNameArray: []
 --- !u!1 &5338226167949943272
 GameObject:
@@ -1766,7 +1794,7 @@ GameObject:
   - component: {fileID: 3287784614054551190}
   - component: {fileID: 9176903955632317273}
   m_Layer: 5
-  m_Name: item1 (5)
+  m_Name: item6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1841,7 +1869,7 @@ GameObject:
   - component: {fileID: 1489380492866283591}
   - component: {fileID: 7245797633896596717}
   m_Layer: 5
-  m_Name: item1 (6)
+  m_Name: item7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1917,7 +1945,7 @@ GameObject:
   - component: {fileID: 4060403853346786552}
   - component: {fileID: 8638104750015545416}
   m_Layer: 5
-  m_Name: BtnSell
+  m_Name: BtnDelete
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
