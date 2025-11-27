@@ -4,6 +4,7 @@ using UnityEngine;
 public class JoeyTestGameControl : YViewControl
 {
     private JoeyGameView m_View;
+    public bool isNew = false;
     public static JoeyTestGameControl Instance { get; private set; }
     private DataJoeyPlayer m_PlayerData;
 
@@ -18,6 +19,7 @@ public class JoeyTestGameControl : YViewControl
     void Start()
     {
         InitTestCards();
+
         UILobbyControl buildControl = m_View.Asset.OpenUI<UILobbyControl>();
         buildControl.SetData();
     }

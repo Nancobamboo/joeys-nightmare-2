@@ -618,8 +618,9 @@ public sealed class GData : PureSingleton<GData>
 			if (!idx.ContainsKey(key)) idx[key] = i;
 		}
 
-		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int IndexIdx = idx.ContainsKey("index") ? idx["index"] : -1;
+		int CostIdx = idx.ContainsKey("cost") ? idx["cost"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -635,23 +636,37 @@ public sealed class GData : PureSingleton<GData>
 				return values[index].Trim();
 			}
 
-			string id = Get(IdIdx);
-			string typeStr = Get(TypeIdx);
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
 
-			if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(typeStr)) continue;
+			string typeStr = Get(TypeIdx);
+			int index = GetInt(IndexIdx, -1);
+			int cost = GetInt(CostIdx, 0);
+
+			if (string.IsNullOrEmpty(typeStr) || index < 0) continue;
 
 			if (System.Enum.TryParse<ECardType>(typeStr, true, out ECardType cardType))
 			{
 				EquipmentUnlock equipmentUnlock = new EquipmentUnlock();
-				equipmentUnlock.id = id;
+				equipmentUnlock.id = "";
 				equipmentUnlock.type = cardType;
+				equipmentUnlock.cost = cost;
 
 				int cardTypeInt = (int)cardType;
 				if (!EquipmentUnlockDict.ContainsKey(cardTypeInt))
 				{
 					EquipmentUnlockDict[cardTypeInt] = new List<EquipmentUnlock>();
 				}
-				EquipmentUnlockDict[cardTypeInt].Add(equipmentUnlock);
+				while (EquipmentUnlockDict[cardTypeInt].Count <= index)
+				{
+					EquipmentUnlockDict[cardTypeInt].Add(null);
+				}
+				EquipmentUnlockDict[cardTypeInt][index] = equipmentUnlock;
 			}
 		}
 

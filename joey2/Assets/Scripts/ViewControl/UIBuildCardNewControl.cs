@@ -5,24 +5,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-
-public class UIBuildCardControl : YViewControl
+public class UIBuildCardNewControl : YViewControl
 {
-    private UICardSimpleView m_View;
+	private UIBuildCardNewView m_View;
+
     private Card m_CachedCard;
     private ECardType m_CachedCardType;
     public Transform CacheTrans;
     private Vector3 m_OriginalScale = Vector3.zero;
     public int EquipIndex;
-    public System.Action<UIBuildCardControl> BuildClickHandler;
-    public System.Action<UIBuildCardControl, PointerEventData> OnDragEndHandler;
+    public System.Action<UIBuildCardNewControl> BuildClickHandler;
+    public System.Action<UIBuildCardNewControl, PointerEventData> OnDragEndHandler;
 
     public ECardType CardType => m_CachedCardType;
     public Card CardData => m_CachedCard;
 
     public static EResType GetResType()
     {
-        return EResType.UICardSimple;
+        return EResType.UIBuildCardNew;
     }
 
     protected override void OnInit()
@@ -33,7 +33,7 @@ public class UIBuildCardControl : YViewControl
         {
             m_OriginalScale = CacheTrans.localScale;
         }
-        m_View = CreateView<UICardSimpleView>();
+        m_View = CreateView<UIBuildCardNewView>();
         m_View.BtnCard.onClick.AddListener(OnBtnCardClick);
 
         m_View.Trigger.onBeginDrag = OnBeginDrag;
@@ -107,22 +107,13 @@ public class UIBuildCardControl : YViewControl
         BuildClickHandler?.Invoke(this);
     }
 
-    public void SetData(Card card)
+    public void SetData(Card card, bool isEquipedSlot = true)
     {
-        RectTransform animRect = m_View.Anim.transform as RectTransform;
-        if (animRect != null)
-        {
-            animRect.anchoredPosition = Vector2.zero;
-        }
-        m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
         m_CachedCard = card;
         m_CachedCardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
-        m_View.Description.text = card.description;
-        m_View.IconType.sprite = LoadSprite(card.iconType);
-        m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
 
         SetTypeUI(card);
         SetStars(card.stars);
@@ -132,7 +123,6 @@ public class UIBuildCardControl : YViewControl
     {
         m_View.Attack.SetActive(false);
         m_View.Defence.SetActive(false);
-        m_View.Moster.SetActive(false);
 
         switch (m_CachedCardType)
         {
@@ -144,23 +134,6 @@ public class UIBuildCardControl : YViewControl
             case ECardType.defence:
                 m_View.Defence.SetActive(true);
                 m_View.TxtDefence.text = card.defence.ToString();
-                break;
-
-            case ECardType.monster:
-                m_View.Attack.SetActive(true);
-                m_View.TxtAttack.text = card.attack.ToString();
-                m_View.Moster.SetActive(true);
-                m_View.TextHeart.text = card.currentHealth.ToString();
-                break;
-
-            case ECardType.skill:
-                break;
-
-            case ECardType.item:
-                break;
-
-            case ECardType.other:
-                m_View.IconType.gameObject.SetActive(false);
                 break;
 
             default:
