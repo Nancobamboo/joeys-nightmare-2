@@ -8,8 +8,15 @@ public class UIBuildNewView : YBaseView
 	public Button BtnDefence;
 	public Button BtnItem;
 	public Button BtnSkill;
-	public Button BtnSell;
+	public Image BtnDelete;
 	public RectTransform Content;
+	public RectTransform item1;
+	public RectTransform item2;
+	public RectTransform item3;
+	public RectTransform item4;
+	public RectTransform item5;
+	public RectTransform item6;
+	public RectTransform item7;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -20,7 +27,14 @@ public class UIBuildNewView : YBaseView
 		BtnDefence = viewItemList[1].Target.GetComponent<Button>();
 		BtnItem = viewItemList[2].Target.GetComponent<Button>();
 		BtnSkill = viewItemList[3].Target.GetComponent<Button>();
-		BtnSell = viewItemList[4].Target.GetComponent<Button>();
+		BtnDelete = viewItemList[4].Target.GetComponent<Image>();
 		Content = viewItemList[5].Target.GetComponent<RectTransform>();
+		item1 = viewItemList[6].Target.GetComponent<RectTransform>();
+		item2 = viewItemList[7].Target.GetComponent<RectTransform>();
+		item3 = viewItemList[8].Target.GetComponent<RectTransform>();
+		item4 = viewItemList[9].Target.GetComponent<RectTransform>();
+		item5 = viewItemList[10].Target.GetComponent<RectTransform>();
+		item6 = viewItemList[11].Target.GetComponent<RectTransform>();
+		item7 = viewItemList[12].Target.GetComponent<RectTransform>();
 	}
 }
