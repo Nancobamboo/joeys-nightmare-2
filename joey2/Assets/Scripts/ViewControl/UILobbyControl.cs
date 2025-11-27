@@ -5,7 +5,6 @@ public class UILobbyControl : YViewControl
 {
 	private UILobbyView m_View;
 	private UIShopControl m_ShopControl;
-
 	public static EResType GetResType()
 	{
 		return EResType.UILobby;
@@ -27,11 +26,16 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnShopClick()
 	{
+		bool isNew = false;
+		if (JoeyTestGameControl.Instance != null)
+		{
+			isNew = JoeyTestGameControl.Instance.isNew;
+		}
+
 		if (m_ShopControl == null)
 		{
 			m_ShopControl = Asset.OpenUI<UIShopControl>();
-			m_ShopControl.SetData();
-
+			m_ShopControl.SetData(isNew);
 		}
 		else
 		{
@@ -55,7 +59,6 @@ public class UILobbyControl : YViewControl
 
 	public void SetData()
 	{
-		;
 	}
 
 	protected override void OnReturn()

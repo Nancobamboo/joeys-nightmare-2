@@ -4,7 +4,8 @@ using UnityEngine;
 public class JoeyTestGameControl : YViewControl
 {
     private JoeyGameView m_View;
-    public int TestNew = 0; 
+    public int TestNew = 0;
+    public bool isNew = false;
     public static JoeyTestGameControl Instance { get; private set; }
     private DataJoeyPlayer m_PlayerData;
 
