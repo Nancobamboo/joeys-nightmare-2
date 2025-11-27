@@ -11,6 +11,8 @@ public class UIBuildCardNewView : YBaseView
 	public GameObject Defence;
 	public Text TxtDefence;
 	public GameObject StarLayout;
+	public Button BtnCard;
+	public EventTriggerListener Trigger;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -24,5 +26,7 @@ public class UIBuildCardNewView : YBaseView
 		Defence = viewItemList[4].Target.gameObject;
 		TxtDefence = viewItemList[5].Target.GetComponent<Text>();
 		StarLayout = viewItemList[6].Target.gameObject;
+		BtnCard = viewItemList[8].Target.GetComponent<Button>();
+		Trigger = viewItemList[8].Target.GetComponent<EventTriggerListener>();
 	}
 }
