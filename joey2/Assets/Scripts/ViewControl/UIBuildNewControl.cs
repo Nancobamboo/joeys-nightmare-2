@@ -24,7 +24,7 @@ public class UIBuildNewControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIBuildNewView>();
-		//m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
+		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnAttack.onClick.AddListener(OnBtnAttackClick);
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
@@ -116,7 +116,7 @@ public class UIBuildNewControl : YViewControl
 			UIBuildCardNewControl cardControl = Asset.OpenUI<UIBuildCardNewControl>(m_View.Content);
 			RectTransform itemRect = m_EquipedItemArray[i];
 			cardControl.CacheTrans.localPosition = itemRect.localPosition;
-			cardControl.CacheTrans.localScale = Vector3.one * 0.6f;
+			cardControl.CacheTrans.localScale = Vector3.one;
 			cardControl.EquipIndex = i;
 			cardControl.OnDragEndHandler = OnCardDragEnd;
 			EquipedCardList.Add(cardControl);
