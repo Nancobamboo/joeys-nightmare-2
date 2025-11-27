@@ -107,7 +107,7 @@ public class UIBuildCardControl : YViewControl
         BuildClickHandler?.Invoke(this);
     }
 
-    public void SetData(Card card, bool isEquipedSlot = true)
+    public void SetData(Card card)
     {
         RectTransform animRect = m_View.Anim.transform as RectTransform;
         if (animRect != null)

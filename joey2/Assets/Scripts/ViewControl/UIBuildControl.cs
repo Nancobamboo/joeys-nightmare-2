@@ -79,9 +79,12 @@ public class UIBuildControl : YViewControl
 
 
 
-	public void RefreshEquipedCardsByType(ECardType cardType)
+	public void RefreshEquipedCardsByType(ECardType cardType, bool isSaveBuild = true)
 	{
-		SaveBuild(m_CurrentCardType);
+		if (isSaveBuild && m_CurrentCardType != ECardType.other)
+		{
+			SaveBuild(m_CurrentCardType);
+		}
 		m_CurrentCardType = cardType;
 
 		m_View.SelectAttack.SetActive(false);
@@ -154,7 +157,7 @@ public class UIBuildControl : YViewControl
 			{
 				int cardUniqueId = equipList[i];
 				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
-				if (card != null && card.GetCardType() == cardType)
+				if (card != null)
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
@@ -178,7 +181,7 @@ public class UIBuildControl : YViewControl
 			{
 				int cardUniqueId = tempList[i];
 				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
-				if (card != null && card.GetCardType() == cardType)
+				if (card != null)
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
@@ -308,13 +311,17 @@ public class UIBuildControl : YViewControl
 			UIBuildCardControl cardControl = EquipedCardList[i];
 			if (cardControl.gameObject.activeSelf && cardControl.CardData != null)
 			{
-				if (cardControl.EquipIndex < 6)
+				ECardType cardControlType = cardControl.CardData.GetCardType();
+				if (cardControlType == cardType)
 				{
-					equipList.Add(cardControl.CardData.UniqueId);
-				}
-				else
-				{
-					tempList.Add(cardControl.CardData.UniqueId);
+					if (cardControl.EquipIndex < 6)
+					{
+						equipList.Add(cardControl.CardData.UniqueId);
+					}
+					else
+					{
+						tempList.Add(cardControl.CardData.UniqueId);
+					}
 				}
 			}
 		}
@@ -467,7 +474,8 @@ public class UIBuildControl : YViewControl
 
 		draggedCard.gameObject.SetActive(false);
 
-		RefreshEquipedCardsByType(m_CurrentCardType);
+		//SaveBuild(cardType);
+		//RefreshEquipedCardsByType(m_CurrentCardType);
 	}
 
 	private void OnCardDragEndSwap(UIBuildCardControl draggedCard, int targetItemIndex)
@@ -532,6 +540,8 @@ public class UIBuildControl : YViewControl
 				draggedCard.CacheTrans.localPosition = m_TempItemArray[tempIndex].localPosition;
 			}
 		}
+
+		SaveBuild(m_CurrentCardType);
 	}
 
 	protected override void OnReturn()
