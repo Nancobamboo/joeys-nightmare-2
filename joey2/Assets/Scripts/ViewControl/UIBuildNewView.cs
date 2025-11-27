@@ -18,6 +18,10 @@ public class UIBuildNewView : YBaseView
 	public RectTransform item6;
 	public RectTransform item7;
 	public Button BtnClose;
+	public GameObject SelectAttack;
+	public GameObject SelectDefence;
+	public GameObject SelectItem;
+	public GameObject SelectSkill;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -38,5 +42,9 @@ public class UIBuildNewView : YBaseView
 		item6 = viewItemList[11].Target.GetComponent<RectTransform>();
 		item7 = viewItemList[12].Target.GetComponent<RectTransform>();
 		BtnClose = viewItemList[13].Target.GetComponent<Button>();
+		SelectAttack = viewItemList[14].Target.gameObject;
+		SelectDefence = viewItemList[15].Target.gameObject;
+		SelectItem = viewItemList[16].Target.gameObject;
+		SelectSkill = viewItemList[17].Target.gameObject;
 	}
 }
