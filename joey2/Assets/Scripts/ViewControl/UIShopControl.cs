@@ -107,7 +107,7 @@ public class UIShopControl : YViewControl
 		{
 			if (m_BuildNewControl == null)
 			{
-				m_BuildNewControl = Asset.OpenUI<UIBuildNewControl>(transform);
+				m_BuildNewControl = Asset.OpenUI<UIBuildNewControl>(m_View.BuildRoot);
 			}
 			else
 			{
@@ -119,7 +119,7 @@ public class UIShopControl : YViewControl
 		{
 			if (m_BuildControl == null)
 			{
-				m_BuildControl = Asset.OpenUI<UIBuildControl>(transform);
+				m_BuildControl = Asset.OpenUI<UIBuildControl>(m_View.BuildRoot);
 			}
 			else
 			{

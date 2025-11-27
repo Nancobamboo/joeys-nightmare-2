@@ -69,19 +69,28 @@ public class UIBuildNewControl : YViewControl
 		}
 		m_CurrentCardType = cardType;
 		List<int> equipList = null;
+		m_View.SelectAttack.SetActive(false);
+		m_View.SelectDefence.SetActive(false);
+		m_View.SelectItem.SetActive(false);
+		m_View.SelectSkill.SetActive(false);
+
 		switch (cardType)
 		{
 			case ECardType.attack:
 				equipList = m_PlayerData.EquipedAttackList;
+				m_View.SelectAttack.SetActive(true);
 				break;
 			case ECardType.defence:
 				equipList = m_PlayerData.EquipedDefenceList;
+				m_View.SelectDefence.SetActive(true);
 				break;
 			case ECardType.item:
 				equipList = m_PlayerData.EquipedItemList;
+				m_View.SelectItem.SetActive(true);
 				break;
 			case ECardType.skill:
 				equipList = m_PlayerData.EquipedSkillList;
+				m_View.SelectSkill.SetActive(true);
 				break;
 			default:
 				return;
@@ -156,7 +165,7 @@ public class UIBuildNewControl : YViewControl
 			UIBuildCardNewControl cardControl = EquipedCardList[i];
 			if (cardControl.gameObject.activeSelf && cardControl.CardData != null)
 			{
-				if (cardControl.EquipIndex < 6)
+				if (cardControl.EquipIndex < 7)
 				{
 					equipList.Add(cardControl.CardData.UniqueId);
 				}

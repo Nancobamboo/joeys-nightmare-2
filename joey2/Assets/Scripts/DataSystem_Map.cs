@@ -10,6 +10,7 @@ public partial class DataSystem
     public Dictionary<int, float> VFXDelayTimeDict = new Dictionary<int, float>();
     public Dictionary<int, float> AnimDelayTimeDict = new Dictionary<int, float>();
 
+    public const bool isNew = true;
     public void LoadGameData()
     {
         Debug.Log("LoadGameData called");
@@ -123,10 +124,20 @@ public partial class DataSystem
 
         dataJoeyPlayer.Coin = characterData.coins;
 
-        dataJoeyPlayer.MaxEquipedAttackNum = 3;
-        dataJoeyPlayer.MaxEquipedDefenceNum = 3;
-        dataJoeyPlayer.MaxEquipedItemNum = 3;
-        dataJoeyPlayer.MaxEquipedSkillNum = 3;
+        if (isNew)
+        {
+            dataJoeyPlayer.MaxEquipedAttackNum = 7;
+            dataJoeyPlayer.MaxEquipedDefenceNum = 7;
+            dataJoeyPlayer.MaxEquipedItemNum = 7;
+            dataJoeyPlayer.MaxEquipedSkillNum = 7;
+        }
+        else
+        {
+            dataJoeyPlayer.MaxEquipedAttackNum = 3;
+            dataJoeyPlayer.MaxEquipedDefenceNum = 3;
+            dataJoeyPlayer.MaxEquipedItemNum = 3;
+            dataJoeyPlayer.MaxEquipedSkillNum = 3;
+        }
 
         if (characterData.maxHealth > 0)
         {
