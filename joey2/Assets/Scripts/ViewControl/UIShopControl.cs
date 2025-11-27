@@ -63,6 +63,7 @@ public class UIShopControl : YViewControl
 			}
 		}
 
+		DataSystem.Instance.SaveDataJoeyPlayer();
 		Close();
 	}
 
@@ -256,14 +257,14 @@ public class UIShopControl : YViewControl
 		{
 			if (m_BuildNewControl != null)
 			{
-				m_BuildNewControl.RefreshEquipedCardsByType(cardType);
+				m_BuildNewControl.RefreshEquipedCardsByType(cardType, false);
 			}
 		}
 		else
 		{
 			if (m_BuildControl != null)
 			{
-				m_BuildControl.RefreshEquipedCardsByType(cardType);
+				m_BuildControl.RefreshEquipedCardsByType(cardType, false);
 			}
 		}
 

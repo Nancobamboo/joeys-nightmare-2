@@ -61,9 +61,12 @@ public class UIBuildNewControl : YViewControl
 
 
 
-	public void RefreshEquipedCardsByType(ECardType cardType)
+	public void RefreshEquipedCardsByType(ECardType cardType, bool isSaveBuild = true)
 	{
-		SaveBuild(m_CurrentCardType);
+		if (isSaveBuild && m_CurrentCardType != ECardType.other)
+		{
+			SaveBuild(m_CurrentCardType);
+		}
 		m_CurrentCardType = cardType;
 		List<int> equipList = null;
 		switch (cardType)
