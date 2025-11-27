@@ -17,6 +17,7 @@ public class UIBuildNewView : YBaseView
 	public RectTransform item5;
 	public RectTransform item6;
 	public RectTransform item7;
+	public Button BtnClose;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -36,5 +37,6 @@ public class UIBuildNewView : YBaseView
 		item5 = viewItemList[10].Target.GetComponent<RectTransform>();
 		item6 = viewItemList[11].Target.GetComponent<RectTransform>();
 		item7 = viewItemList[12].Target.GetComponent<RectTransform>();
+		BtnClose = viewItemList[13].Target.GetComponent<Button>();
 	}
 }

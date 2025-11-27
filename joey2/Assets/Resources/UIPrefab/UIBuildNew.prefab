@@ -1388,6 +1388,10 @@ MonoBehaviour:
     Components:
     - {fileID: 8620832045288082200}
     VarNameArray: []
+  - Target: {fileID: 1390403063470070127}
+    Components:
+    - {fileID: 4012456923605360786}
+    VarNameArray: []
 --- !u!1 &5338226167949943272
 GameObject:
   m_ObjectHideFlags: 0
