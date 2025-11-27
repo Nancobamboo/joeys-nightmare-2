@@ -9,7 +9,9 @@ public class UIShopControl : YViewControl
 	private List<ShopCardData> m_CurrentShopCards = new List<ShopCardData>();
 	private DataJoeyPlayer m_PlayerData;
 	private int m_RefreshCost = 50;
-	private UIBuildNewControl m_BuildControl;
+	private UIBuildControl m_BuildControl;
+	private UIBuildNewControl m_BuildNewControl;
+	private bool m_IsNew;
 
 	private class ShopCardData
 	{
@@ -46,7 +48,20 @@ public class UIShopControl : YViewControl
 
 	void OnBtnCloseClick()
 	{
-		m_BuildControl.SaveBuild(m_BuildControl.m_CurrentCardType);
+		if (m_IsNew)
+		{
+			if (m_BuildNewControl != null)
+			{
+				m_BuildNewControl.SaveBuild(m_BuildNewControl.m_CurrentCardType);
+			}
+		}
+		else
+		{
+			if (m_BuildControl != null)
+			{
+				m_BuildControl.SaveBuild(m_BuildControl.m_CurrentCardType);
+			}
+		}
 
 		Close();
 	}
@@ -80,21 +95,37 @@ public class UIShopControl : YViewControl
 		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 
-	public void SetData()
+	public void SetData(bool isNew = false)
 	{
+		m_IsNew = isNew;
 		GenerateShopCards();
 		RefreshShopDisplay();
 		m_View.TxtCoin.text = m_PlayerData.Coin.ToString();
 
-		if (m_BuildControl == null)
+		if (isNew)
 		{
-			m_BuildControl = Asset.OpenUI<UIBuildNewControl>(transform);
+			if (m_BuildNewControl == null)
+			{
+				m_BuildNewControl = Asset.OpenUI<UIBuildNewControl>(transform);
+			}
+			else
+			{
+				m_BuildNewControl.gameObject.SetActive(true);
+			}
+			m_BuildNewControl.SetShopData();
 		}
 		else
 		{
-			m_BuildControl.gameObject.SetActive(true);
+			if (m_BuildControl == null)
+			{
+				m_BuildControl = Asset.OpenUI<UIBuildControl>(transform);
+			}
+			else
+			{
+				m_BuildControl.gameObject.SetActive(true);
+			}
+			m_BuildControl.SetShopData();
 		}
-		m_BuildControl.SetShopData();
 	}
 
 	void GenerateShopCards()
@@ -221,7 +252,20 @@ public class UIShopControl : YViewControl
 		RefreshShopDisplay();
 
 		ECardType cardType = newCard.GetCardType();
-		m_BuildControl.RefreshEquipedCardsByType(cardType);
+		if (m_IsNew)
+		{
+			if (m_BuildNewControl != null)
+			{
+				m_BuildNewControl.RefreshEquipedCardsByType(cardType);
+			}
+		}
+		else
+		{
+			if (m_BuildControl != null)
+			{
+				m_BuildControl.RefreshEquipedCardsByType(cardType);
+			}
+		}
 
 		Debug.Log("购买成功！花费 " + price + " 金币购买了 " + newCard.cardName);
 	}
