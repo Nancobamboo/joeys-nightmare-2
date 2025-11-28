@@ -53,9 +53,11 @@ public class JoeyGameControl : YViewControl
 		m_View = CreateView<JoeyGameView>();
 		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
 		DataSystem.Instance.SaveDataJoeyPlayer();
-	}
+        GData.Instance.LoadAll();
 
-	void Start()
+    }
+
+    void Start()
 	{
 		m_GamePhaseControl = Asset.OpenUI<UIGamePhaseControl>();
 		if (m_DataJoeyPlayer.currentLevel <= 0)
@@ -131,7 +133,6 @@ public class JoeyGameControl : YViewControl
 
 	public void SetLevelData()
 	{
-		GData.Instance.LoadAll();
 		StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/shuffle_cards", startTime: 0f));
 
 		int levelId = GameMode == EGameMode.Debug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;

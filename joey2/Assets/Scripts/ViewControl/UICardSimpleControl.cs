@@ -30,6 +30,8 @@ public enum ERelicType
 	LifeSteal,
 	EnvAttack,
 	EnvDefence,
+	GetSpecialCardByAttack,
+	HealOnKill,
 }
 
 public class UICardSimpleControl : YViewControl
@@ -52,6 +54,7 @@ public class UICardSimpleControl : YViewControl
 	public YCardEffect CardEffect;
 
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
+	private UIDescExtControl m_DescExtControl;
 
 	public static EResType GetResType()
 	{
@@ -79,12 +82,33 @@ public class UICardSimpleControl : YViewControl
 		if (m_IsMoving) return;
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
+
+		if (cachedCard != null)
+		{
+			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+			if (keywordDescriptions != null && keywordDescriptions.Count > 0)
+			{
+				m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
+				m_DescExtControl.SetData(keywordDescriptions);
+				RectTransform cardRect = CacheTrans as RectTransform;
+				if (cardRect != null)
+				{
+					m_DescExtControl.SetPositionRelativeTo(cardRect);
+				}
+			}
+		}
 	}
 
 	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
 		if (m_IsMoving) return;
 		CacheTrans.localScale = m_OriginalScale;
+
+		if (m_DescExtControl != null)
+		{
+			m_DescExtControl.Close();
+			m_DescExtControl = null;
+		}
 	}
 
 	public void SetMoving(bool isMoving)
