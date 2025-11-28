@@ -271,31 +271,49 @@ public partial class UIGamePhaseControl : YViewControl
 		return card;
 	}
 
+	private Transform GetParentByCardType(ECardType cardType)
+	{
+		switch (cardType)
+		{
+			case ECardType.attack:
+				return m_View.AttackPanel.transform;
+			case ECardType.defence:
+				return m_View.DefencePanel.transform;
+			case ECardType.skill:
+				return m_View.SkillPanel.transform;
+			case ECardType.item:
+				return m_View.ItemPanel.transform;
+			case ECardType.monster:
+			case ECardType.other:
+				return m_View.EnvPanels.transform;
+			default:
+				return null;
+		}
+	}
+
+	private void AddCardToBag(string cardId)
+	{
+		Card card = CreateCard(cardId);
+		ECardType cardType = card.GetCardType();
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
+		{
+			return;
+		}
+		UICardSimpleControl cardControl = GetCardSimple(parent, false);
+		cardControl.SetData(card);
+		AddBagCard(cardType, cardControl);
+		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+	}
+
 	public void AddCardList(ECardType cardType, List<string> cardIds)
 	{
 		Debug.Log("AddCardList: " + cardType + " " + cardIds.Count);
 
-		Transform parent = null;
-		switch (cardType)
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
 		{
-			case ECardType.attack:
-				parent = m_View.AttackPanel.transform;
-				break;
-			case ECardType.defence:
-				parent = m_View.DefencePanel.transform;
-				break;
-			case ECardType.skill:
-				parent = m_View.SkillPanel.transform;
-				break;
-			case ECardType.item:
-				parent = m_View.ItemPanel.transform;
-				break;
-			case ECardType.monster:
-			case ECardType.other:
-				parent = m_View.EnvPanels.transform;
-				break;
-			default:
-				return;
+			return;
 		}
 
 		for (int i = cardIds.Count - 1; i >= 0; i--)
@@ -346,27 +364,10 @@ public partial class UIGamePhaseControl : YViewControl
 			if (card == null) continue;
 
 			ECardType cardType = card.GetCardType();
-			Transform parent = null;
-			switch (cardType)
+			Transform parent = GetParentByCardType(cardType);
+			if (parent == null)
 			{
-				case ECardType.attack:
-					parent = m_View.AttackPanel.transform;
-					break;
-				case ECardType.defence:
-					parent = m_View.DefencePanel.transform;
-					break;
-				case ECardType.skill:
-					parent = m_View.SkillPanel.transform;
-					break;
-				case ECardType.item:
-					parent = m_View.ItemPanel.transform;
-					break;
-				case ECardType.monster:
-				case ECardType.other:
-					parent = m_View.EnvPanels.transform;
-					break;
-				default:
-					continue;
+				continue;
 			}
 			m_CardDict[card.UniqueId] = card;
 			UICardSimpleControl cardControl = GetCardSimple(parent, false);
@@ -451,25 +452,11 @@ public partial class UIGamePhaseControl : YViewControl
 	private UICardSimpleControl GetSpecialCardSimpleById(string cardId)
 	{
 		Card card = CreateCard(cardId);
-		ECardType cardType = (ECardType)System.Enum.Parse(typeof(ECardType), card.type);
-
-		Transform parent = null;
-		switch (cardType)
+		ECardType cardType = card.GetCardType();
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
 		{
-			case ECardType.attack:
-				parent = m_View.AttackPanel.transform;
-				break;
-			case ECardType.defence:
-				parent = m_View.DefencePanel.transform;
-				break;
-			case ECardType.skill:
-				parent = m_View.SkillPanel.transform;
-				break;
-			case ECardType.item:
-				parent = m_View.ItemPanel.transform;
-				break;
-			default:
-				return null;
+			return null;
 		}
 
 		UICardSimpleControl cardControl = GetCardSimple(parent, false);
@@ -863,6 +850,11 @@ public partial class UIGamePhaseControl : YViewControl
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 
+		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
+		{
+			AddCardToBag("4001");
+		}
+
 		for (int i = 0; i < attackCount; i++)
 		{
 			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
@@ -872,6 +864,12 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				delayTime = attackCardControl.CardEffect?.OnKill() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+
+				if (DataSystem.Instance.HasRelic(ERelicType.HealOnKill))
+				{
+					AppHp(3);
+				}
+
 				break;
 			}
 			else
