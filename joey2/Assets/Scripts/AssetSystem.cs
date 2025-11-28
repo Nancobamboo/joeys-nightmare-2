@@ -353,7 +353,7 @@ public partial class AssetSystem : MonoBehaviour
 		return resType;
 	}
 
-	
+
 
 	Dictionary<string, UIGuideTipControl> m_GuideDict = new Dictionary<string, UIGuideTipControl>();
 

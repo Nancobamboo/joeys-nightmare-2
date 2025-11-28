@@ -14,6 +14,7 @@ public sealed class GData : PureSingleton<GData>
 	public List<RoguelikeStage> RoguelikeStageList { get; private set; } = new List<RoguelikeStage>();
 
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
+	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
@@ -22,6 +23,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_RoguelikeCharacterCsvPath = "Data/roguelike_character";
 	private string m_RoguelikeStageCsvPath = "Data/roguelike_stage";
 	private string m_EquipmentUnlockCsvPath = "Data/equipment_unlock";
+	private string m_KeywordCsvPath = "Data/keyword";
 	private Dictionary<int, Dictionary<string, List<string>>> m_TutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
 	private Dictionary<int, (int health, int maxHealth)> m_TutorialPlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool m_CardsLoaded = false;
@@ -38,6 +40,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadRoguelikeCharacter();
 		LoadRoguelikeStage();
 		LoadEquipmentUnlock();
+		LoadKeyword();
 	}
 
 	public void SaveAll()
@@ -684,6 +687,97 @@ public sealed class GData : PureSingleton<GData>
 			}
 		}
 		return null;
+	}
+
+	public void LoadKeyword(bool force = false)
+	{
+		if (!force && KeywordDict.Count > 0) return;
+
+		KeywordDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_KeywordCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Keyword CSV not found: {m_KeywordCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int KeywordIdx = idx.ContainsKey("keyword") ? idx["keyword"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			string keyword = Get(KeywordIdx);
+			string description = Get(DescriptionIdx);
+
+			if (string.IsNullOrEmpty(keyword)) continue;
+
+			keyword = keyword.Trim();
+			description = description.Trim();
+			KeywordDict[keyword] = description;
+		}
+
+		Debug.Log($"Keyword loaded: {KeywordDict.Count} keywords");
+	}
+
+	public string GetKeyword(string keyword)
+	{
+		LoadKeyword();
+		if (KeywordDict.TryGetValue(keyword, out string description))
+		{
+			return description;
+		}
+		return null;
+	}
+
+	public List<string> CheckKeywordInDescription(string description)
+	{
+		Debug.Log("CheckKeywordInDescription: " + description);
+		List<string> result = new List<string>();
+		if (string.IsNullOrEmpty(description))
+		{
+			return result;
+		}
+
+		foreach (KeyValuePair<string, string> kvp in KeywordDict)
+		{
+			string keyword = kvp.Key;
+			if (description.Contains(keyword))
+			{
+				result.Add(kvp.Value);
+			}
+		}
+
+		foreach (string r in result)
+		{
+			Debug.Log("CheckKeywordInDescription result: " + r);
+		}
+		return result;
 	}
 
 }

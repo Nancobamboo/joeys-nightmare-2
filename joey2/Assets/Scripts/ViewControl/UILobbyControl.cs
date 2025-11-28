@@ -26,7 +26,7 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnShopClick()
 	{
-		bool isNew = false;
+		bool isNew = DataSystem.isNew;
 		if (JoeyTestGameControl.Instance != null)
 		{
 			isNew = JoeyTestGameControl.Instance.isNew;
