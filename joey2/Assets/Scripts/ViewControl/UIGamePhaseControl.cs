@@ -852,7 +852,10 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			AddCardToBag("4001");
+			if (ControlUtils.RandomPercent(10))
+			{
+				AddCardToBag("4001");
+			}
 		}
 
 		for (int i = 0; i < attackCount; i++)
@@ -915,6 +918,13 @@ public partial class UIGamePhaseControl : YViewControl
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
+			{
+				if (ControlUtils.RandomPercent(10))
+				{
+					AddCardToBag("4001");
+				}
+			}
 		}
 		int damage = 0;
 		if (defenceValue < enemyAttack)
