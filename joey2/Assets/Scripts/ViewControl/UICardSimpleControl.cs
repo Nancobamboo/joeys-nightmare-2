@@ -83,7 +83,7 @@ public class UICardSimpleControl : YViewControl
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
 
-		if (cachedCard != null)
+		if (cachedCard != null && !IsEnv)
 		{
 			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
 			if (keywordDescriptions != null && keywordDescriptions.Count > 0)

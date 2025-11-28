@@ -855,13 +855,17 @@ public partial class UIGamePhaseControl : YViewControl
 			AddCardToBag("4001");
 		}
 
+		bool enemyKilled = false;
 		for (int i = 0; i < attackCount; i++)
 		{
 			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 
-			if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex);
+			if (isKilled)
 			{
+				enemyKilled = true;
+
 				delayTime = attackCardControl.CardEffect?.OnKill() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 
@@ -872,17 +876,18 @@ public partial class UIGamePhaseControl : YViewControl
 
 				break;
 			}
-			else
-			{
-				int enemyAttack = enemyCardControl.CardData.currentAttack;
-				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
-			}
 		}
 
 		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+		}
+
+		if (!enemyKilled && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+		{
+			int enemyAttack = enemyCardControl.CardData.currentAttack;
+			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
 		}
 		await RemoveBagCard(ECardType.attack, attackCardControl);
 		float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;

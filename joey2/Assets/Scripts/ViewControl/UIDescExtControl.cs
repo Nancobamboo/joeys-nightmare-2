@@ -68,7 +68,7 @@ public class UIDescExtControl : YViewControl
 		float y = targetRectLocal.yMax - descRect.yMax;
 
 		m_RectTransform.localPosition = new Vector2(x, y);
-		this.transform.SetParent(targetRect.parent.parent);
+		this.transform.SetParent(Asset.UIRoot);
 
 	}
 
