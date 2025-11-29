@@ -245,6 +245,11 @@ public class UICardSimpleControl : YViewControl
 		m_BuffValueArray[(int)buffType] += value;
 	}
 
+	public int GetBuffValue(EBuffType buffType)
+	{
+		return m_BuffValueArray[(int)buffType];
+	}
+
 	public void AddRelicList(List<int> relicList)
 	{
 		if (cachedCard == null)
@@ -373,9 +378,6 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.GrimReaper:
 				effect = new YGrimReaper();
-				break;
-			case ECardEffectId.GrimReaperClone:
-				effect = new YGrimReaperClone();
 				break;
 			case ECardEffectId.ExtraDamage_HalfHealth:
 				effect = new YExtraDamage_HalfHealth(effectValue);
