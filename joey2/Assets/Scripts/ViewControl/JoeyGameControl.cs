@@ -278,7 +278,9 @@ public class JoeyGameControl : YViewControl
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
-				Asset.OpenUI<UILobbyControl>();
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetRelicData();
+				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();
 			}
 			else
 			{
@@ -286,8 +288,8 @@ public class JoeyGameControl : YViewControl
 				selectControl.SetData();
 				selectControl.OnSelectComplete = () => LoadNextLevel();
 			}
-			m_DataJoeyPlayer.StageId++;
 
+			m_DataJoeyPlayer.StageId++;
 		}
 		else
 		{

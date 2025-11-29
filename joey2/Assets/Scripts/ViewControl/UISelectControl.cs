@@ -8,6 +8,8 @@ public class UISelectControl : YViewControl
 	private UISelectView m_View;
 	private List<UISelectCardControl> m_CardList = new List<UISelectCardControl>();
 	private List<Card> m_CurrentSelectCards = new List<Card>();
+	private List<UIRelicControl> m_RelicList = new List<UIRelicControl>();
+	private List<RelicInfo> m_CurrentSelectRelics = new List<RelicInfo>();
 	private DataJoeyPlayer m_PlayerData;
 	private const int SELECT_CARD_COUNT = 3;
 	public System.Action OnSelectComplete;
@@ -121,6 +123,82 @@ public class UISelectControl : YViewControl
 		}
 	}
 
+	public void SetRelicData()
+	{
+		GenerateSelectRelics();
+		RefreshRelicDisplay();
+	}
+
+	void GenerateSelectRelics()
+	{
+		m_CurrentSelectRelics.Clear();
+
+		List<RelicInfo> allRelics = GData.Instance.RelicInfoDict.Values.ToList();
+		List<RelicInfo> shuffledRelics = allRelics.OrderBy(x => Random.value).ToList();
+
+		for (int i = 0; i < SELECT_CARD_COUNT && i < shuffledRelics.Count; i++)
+		{
+			RelicInfo relic = shuffledRelics[i];
+			m_CurrentSelectRelics.Add(relic);
+		}
+	}
+
+	void RefreshRelicDisplay()
+	{
+		while (m_RelicList.Count < SELECT_CARD_COUNT)
+		{
+			UIRelicControl relicControl = Asset.OpenUI<UIRelicControl>(null);
+			relicControl.CacheTrans.SetParent(m_View.Content);
+			relicControl.CacheTrans.localScale = Vector3.one;
+			relicControl.CacheTrans.localPosition = Vector3.zero;
+			relicControl.CacheTrans.localEulerAngles = Vector3.zero;
+			m_RelicList.Add(relicControl);
+		}
+
+		float relicSpacing = 300f;
+		float startX = -(SELECT_CARD_COUNT - 1) * relicSpacing * 0.5f;
+
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			UIRelicControl control = m_RelicList[i];
+			if (i < m_CurrentSelectRelics.Count)
+			{
+				RelicInfo relic = m_CurrentSelectRelics[i];
+				control.gameObject.SetActive(true);
+				control.SetData(relic);
+				control.SelectClickHandler = OnSelectRelicClick;
+
+				RectTransform rectTransform = control.CacheTrans as RectTransform;
+				if (rectTransform != null)
+				{
+					rectTransform.localPosition = new Vector3(startX + i * relicSpacing, 0, 0);
+				}
+			}
+			else
+			{
+				control.gameObject.SetActive(false);
+				control.SelectClickHandler = null;
+			}
+		}
+	}
+
+	void OnSelectRelicClick(UIRelicControl relicControl)
+	{
+		if (relicControl.RelicData == null)
+		{
+			return;
+		}
+
+		ERelicType relicType = (ERelicType)relicControl.RelicData.id;
+		DataSystem.Instance.AddRelic(relicType);
+		DataSystem.Instance.SaveDataJoeyPlayer();
+		Close();
+		if (OnSelectComplete != null)
+		{
+			OnSelectComplete();
+		}
+	}
+
 	protected override void OnReturn()
 	{
 		for (int i = 0; i < m_CardList.Count; i++)
@@ -132,6 +210,16 @@ public class UISelectControl : YViewControl
 		}
 		m_CardList.Clear();
 		m_CurrentSelectCards.Clear();
+
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			if (m_RelicList[i] != null)
+			{
+				m_RelicList[i].SelectClickHandler = null;
+			}
+		}
+		m_RelicList.Clear();
+		m_CurrentSelectRelics.Clear();
 		OnSelectComplete = null;
 		base.OnReturn();
 	}
