@@ -220,6 +220,15 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
 		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
+		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+		{
+			m_View.TxtStage.text = currentStage.stages;
+		}
+		else
+		{
+			m_View.TxtStage.text = string.Empty;
+		}
 	}
 
 	private void OnCoinChanged(int coin)
