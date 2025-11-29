@@ -59,6 +59,8 @@
 5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,monster,亡语：对两侧敌人各造成10点伤害,,,1,100,3,Boom_OnDead:10
 5008,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,Vampire Monkey,monster      ,点击攻击,5,,8,100,1,
 5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,monster,可能藏着好东西？,,,1,100,1,
+5010,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,SiLing Donkey,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,100,1,NecDonkey
+5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,Skeleton Donkey,monster      ,点击攻击,5,,15,100,1,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,

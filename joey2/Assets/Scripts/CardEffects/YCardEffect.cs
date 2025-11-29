@@ -43,7 +43,8 @@ public enum ECardEffectId
     HookDefenceFromDiscard_OnRemoveCard,
     AddKnifeToEnv_UseSkill,
     ThrowWeaponDefenceToStack_UseSkill,
-    VampireMonkey
+    VampireMonkey,
+    NecDonkey
 }
 
 public enum EEffectType

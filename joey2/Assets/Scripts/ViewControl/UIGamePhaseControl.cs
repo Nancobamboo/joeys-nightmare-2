@@ -72,6 +72,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
+		RegistAction(EActionId.AddCardToSpecifiedEnv, AddCardToSpecifiedEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
@@ -686,7 +687,13 @@ public partial class UIGamePhaseControl : YViewControl
 		ThrowWeaponDefenceToEnv(cardControl);
 	}
 
-
+	void AddCardToSpecifiedEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		string cardId = (string)paraArray[1];
+		int envIndex = (int)paraArray[2];
+		AddCardToEnv(cardControl, cardId, envIndex);
+	}
 
 	void AddCardToEnv(object[] paraArray)
 	{

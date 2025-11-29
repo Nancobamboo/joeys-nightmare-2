@@ -409,6 +409,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.VampireMonkey:
 				effect = new YVampireMonkey();
 				break;
+			case ECardEffectId.NecDonkey:
+				effect = new YNecDonkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

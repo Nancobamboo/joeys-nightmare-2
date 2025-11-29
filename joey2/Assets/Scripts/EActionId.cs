@@ -30,6 +30,7 @@ public enum EActionId
 	ThrowWeaponDefenceToEnv,
 	HealPlayerOnDefense,
 	AddCardToEnv,
+	AddCardToSpecifiedEnv,
 	DoubleLastWeaponAttack,
 	AddCardsToEnv,
   	HookDefenceFromDiscard_OnRemoveCard,
