@@ -21,6 +21,7 @@ public class UICardSimpleView : YBaseView
 	public EventTriggerListener Trigger;
 	public Text Text;
 	public GameObject Price;
+	public Image CardBackground;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -44,5 +45,6 @@ public class UICardSimpleView : YBaseView
 		Trigger = viewItemList[13].Target.GetComponent<EventTriggerListener>();
 		Text = viewItemList[14].Target.GetComponent<Text>();
 		Price = viewItemList[15].Target.gameObject;
+		CardBackground = viewItemList[16].Target.GetComponent<Image>();
 	}
 }
