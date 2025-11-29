@@ -852,7 +852,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			if (ControlUtils.RandomPercent(10))
+			if (ControlUtil.IsRandomSucceed(10))
 			{
 				AddCardToBag("4001");
 			}
@@ -920,7 +920,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
 			{
-				if (ControlUtils.RandomPercent(10))
+				if (ControlUtil.IsRandomSucceed(10))
 				{
 					AddCardToBag("4001");
 				}
