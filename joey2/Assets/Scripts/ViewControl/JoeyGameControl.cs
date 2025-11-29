@@ -275,10 +275,10 @@ public class JoeyGameControl : YViewControl
 	{
 		if (GameMode == EGameMode.Battle)
 		{
-			m_DataJoeyPlayer.StageId++;
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
+				m_DataJoeyPlayer.StageId++;
 				Asset.OpenUI<UILobbyControl>();
 			}
 			else
