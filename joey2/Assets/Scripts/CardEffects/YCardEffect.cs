@@ -32,7 +32,6 @@ public enum ECardEffectId
     MoveWeaponToEnv,
     Ghost,
     GrimReaper,
-    GrimReaperClone,
     ExtraDamage_HalfHealth,
     ThrowWeaponToStack_OnDefence,
     HealPlayer_OnDefense,
@@ -200,7 +199,7 @@ public class YCardEffect
     {
         return value;
     }
-    
+
 
 }
 
