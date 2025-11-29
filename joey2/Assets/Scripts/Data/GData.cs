@@ -15,6 +15,7 @@ public sealed class GData : PureSingleton<GData>
 
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
 	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
+	public Dictionary<int, RelicInfo> RelicInfoDict { get; private set; } = new Dictionary<int, RelicInfo>();
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
@@ -24,6 +25,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_RoguelikeStageCsvPath = "Data/roguelike_stage";
 	private string m_EquipmentUnlockCsvPath = "Data/equipment_unlock";
 	private string m_KeywordCsvPath = "Data/keyword";
+	private string m_RelicInfoCsvPath = "Data/relic_info";
 	private Dictionary<int, Dictionary<string, List<string>>> m_TutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
 	private Dictionary<int, (int health, int maxHealth)> m_TutorialPlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool m_CardsLoaded = false;
@@ -41,6 +43,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadRoguelikeStage();
 		LoadEquipmentUnlock();
 		LoadKeyword();
+		LoadRelicInfo();
 	}
 
 	public void SaveAll()
@@ -743,6 +746,84 @@ public sealed class GData : PureSingleton<GData>
 		}
 
 		Debug.Log($"Keyword loaded: {KeywordDict.Count} keywords");
+	}
+
+	public void LoadRelicInfo(bool force = false)
+	{
+		if (!force && RelicInfoDict.Count > 0) return;
+
+		RelicInfoDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_RelicInfoCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Relic info CSV not found: {m_RelicInfoCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
+		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int NameIdx = idx.ContainsKey("name") ? idx["name"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
+
+			int id = GetInt(IdIdx, 0);
+			if (id == 0) continue;
+
+			string cardImage = Get(CardImageIdx);
+			string name = Get(NameIdx);
+			string description = Get(DescriptionIdx);
+
+			RelicInfo relicInfo = new RelicInfo(id, cardImage, name, description);
+			RelicInfoDict[id] = relicInfo;
+		}
+
+		Debug.Log($"Relic info loaded: {RelicInfoDict.Count} relics");
+	}
+
+	public RelicInfo GetRelicInfo(ERelicType relicType)
+	{
+		LoadRelicInfo();
+		int id = (int)relicType;
+		if (RelicInfoDict.TryGetValue(id, out RelicInfo relicInfo))
+		{
+			return relicInfo;
+		}
+		return null;
 	}
 
 	public string GetKeyword(string keyword)

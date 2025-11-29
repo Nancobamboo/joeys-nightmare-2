@@ -10,9 +10,12 @@ public class YDoubleAttack_OnDealDamage : YCardEffect
 		Id = ECardEffectId.DoubleAttack_OnDealDamage;
 	}
 
-	public override float OnDealDamage()
+	public override void SetData(UICardSimpleControl cardControl)
 	{
-		return base.OnDealDamage();
+		base.SetData(cardControl);
+		AddEffectValue(EEffectType.ExtraAttackCnt, 1);
 	}
+
+
 }
 
