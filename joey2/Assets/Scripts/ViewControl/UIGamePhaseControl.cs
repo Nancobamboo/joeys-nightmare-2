@@ -972,7 +972,7 @@ public partial class UIGamePhaseControl : YViewControl
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
 			{
 				if (ControlUtil.IsRandomSucceed(10))
