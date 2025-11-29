@@ -53,11 +53,11 @@ public class JoeyGameControl : YViewControl
 		m_View = CreateView<JoeyGameView>();
 		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
 		DataSystem.Instance.SaveDataJoeyPlayer();
-        GData.Instance.LoadAll();
+		GData.Instance.LoadAll();
 
-    }
+	}
 
-    void Start()
+	void Start()
 	{
 		m_GamePhaseControl = Asset.OpenUI<UIGamePhaseControl>();
 		if (m_DataJoeyPlayer.currentLevel <= 0)
@@ -278,7 +278,6 @@ public class JoeyGameControl : YViewControl
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
-				m_DataJoeyPlayer.StageId++;
 				Asset.OpenUI<UILobbyControl>();
 			}
 			else
@@ -287,6 +286,8 @@ public class JoeyGameControl : YViewControl
 				selectControl.SetData();
 				selectControl.OnSelectComplete = () => LoadNextLevel();
 			}
+			m_DataJoeyPlayer.StageId++;
+
 		}
 		else
 		{
