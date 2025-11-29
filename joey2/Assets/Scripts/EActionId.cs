@@ -31,12 +31,14 @@ public enum EActionId
 	ThrowWeaponDefenceToEnv,
 	HealPlayerOnDefense,
 	AddCardToEnv,
+	AddCardToSpecifiedEnv,
 	DoubleLastWeaponAttack,
 	AddCardsToEnv,
   	HookDefenceFromDiscard_OnRemoveCard,
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
 	OnCoinChange,
+	MonsterHealOnDealDamage,
 	AddCardToBagFromSelect,
 	Upper
 }

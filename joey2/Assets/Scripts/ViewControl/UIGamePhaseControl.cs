@@ -74,9 +74,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		RegistAction(EActionId.HealPlayerOnDefense, HealPlayerOnDefense);
 		RegistAction(EActionId.AddCardToEnv, AddCardToEnv);
+		RegistAction(EActionId.AddCardToSpecifiedEnv, AddCardToSpecifiedEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
+		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
@@ -700,7 +702,13 @@ public partial class UIGamePhaseControl : YViewControl
 		ThrowWeaponDefenceToEnv(cardControl);
 	}
 
-
+	void AddCardToSpecifiedEnv(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		string cardId = (string)paraArray[1];
+		int envIndex = (int)paraArray[2];
+		AddCardToEnv(cardControl, cardId, envIndex);
+	}
 
 	void AddCardToEnv(object[] paraArray)
 	{
@@ -714,6 +722,16 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void MonsterHealOnDealDamage(object[] paraArray)
+	{
+		UICardSimpleControl monsterCardControl = (UICardSimpleControl)paraArray[0];
+		if (monsterCardControl != null && monsterCardControl.CardType == ECardType.monster)
+		{
+			VampireMonkeyDealDamage(monsterCardControl);
+			// monsterCardControl.CallCardTakeDamage(3, EEffectType.Heal);
+		}
 	}
 	void DoubleLastWeaponAttack(object[] paraArray)
 	{
