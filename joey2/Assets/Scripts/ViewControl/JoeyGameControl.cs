@@ -53,11 +53,11 @@ public class JoeyGameControl : YViewControl
 		m_View = CreateView<JoeyGameView>();
 		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
 		DataSystem.Instance.SaveDataJoeyPlayer();
-		GData.Instance.LoadAll();
+        GData.Instance.LoadAll();
 
-	}
+    }
 
-	void Start()
+    void Start()
 	{
 		m_GamePhaseControl = Asset.OpenUI<UIGamePhaseControl>();
 		if (m_DataJoeyPlayer.currentLevel <= 0)
@@ -283,7 +283,9 @@ public class JoeyGameControl : YViewControl
 			}
 			else
 			{
-				LoadNextLevel();
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetData();
+				selectControl.OnSelectComplete = () => LoadNextLevel();
 			}
 		}
 		else
@@ -314,7 +316,6 @@ public class JoeyGameControl : YViewControl
 			{
 				GameObject instance = Instantiate(prefab, parent);
 				instance.gameObject.name = vfxName.ToString();
-				instance.transform.localScale = Vector3.one;
 
 				return instance.transform;
 			});
@@ -324,7 +325,6 @@ public class JoeyGameControl : YViewControl
 		Transform vfxTransform = pool.Get();
 		vfxTransform.SetParent(parent);
 		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
 
 		var cts = new CancellationTokenSource();
 		CancelTokenDict[vfxTransform] = cts;
@@ -345,7 +345,6 @@ public class JoeyGameControl : YViewControl
 				GameObject instance = Instantiate(prefab, parent);
 				instance.gameObject.name = vfxName.ToString();
 				instance.transform.localPosition = Vector3.zero;
-				instance.transform.localScale = Vector3.one;
 
 				return instance.transform;
 			});
@@ -355,7 +354,6 @@ public class JoeyGameControl : YViewControl
 		Transform vfxTransform = pool.Get();
 		vfxTransform.SetParent(parent);
 		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
 		vfxTransform.gameObject.SetActive(true);
 
 		return vfxTransform;
@@ -379,7 +377,6 @@ public class JoeyGameControl : YViewControl
 		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
 		vfxTransform.SetParent(effectRoot);
 		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
 	}
 
 	private async UniTaskVoid DelayHideVFX(Transform vfxTransform, float delayTime, CancellationTokenSource cts, int key)

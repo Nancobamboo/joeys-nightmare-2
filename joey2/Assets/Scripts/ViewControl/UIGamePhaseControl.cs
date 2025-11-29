@@ -77,6 +77,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
+		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -296,12 +297,22 @@ public partial class UIGamePhaseControl : YViewControl
 	private void AddCardToBag(string cardId)
 	{
 		Card card = CreateCard(cardId);
+		AddCardToBag(card);
+	}
+
+	private void AddCardToBag(Card card)
+	{
+		if (card == null)
+		{
+			return;
+		}
 		ECardType cardType = card.GetCardType();
 		Transform parent = GetParentByCardType(cardType);
 		if (parent == null)
 		{
 			return;
 		}
+		m_CardDict[card.UniqueId] = card;
 		UICardSimpleControl cardControl = GetCardSimple(parent, false);
 		cardControl.SetData(card);
 		AddBagCard(cardType, cardControl);
@@ -1068,6 +1079,15 @@ public partial class UIGamePhaseControl : YViewControl
 		else
 		{
 			AddCardFromDiscardByType(specialCardType);
+		}
+	}
+
+	void AddCardToBagFromSelect(object[] paraArray)
+	{
+		if (paraArray.Length > 0 && paraArray[0] is Card)
+		{
+			Card card = (Card)paraArray[0];
+			AddCardToBag(card);
 		}
 	}
 

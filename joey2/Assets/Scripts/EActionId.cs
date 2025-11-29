@@ -37,5 +37,6 @@ public enum EActionId
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
 	OnCoinChange,
+	AddCardToBagFromSelect,
 	Upper
 }

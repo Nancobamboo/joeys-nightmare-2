@@ -111,13 +111,7 @@ public class UISelectControl : YViewControl
 
 		Card selectedCard = cardControl.CardData;
 		Card newCard = DataSystem.Instance.CreateCard(selectedCard.id);
-		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
-
-		if (!success)
-		{
-			Debug.Log("装备栏和临时栏都已满，无法添加卡牌！");
-			return;
-		}
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
 		Close();
