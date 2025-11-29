@@ -1045,7 +1045,7 @@ public partial class UIGamePhaseControl : YViewControl
 			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
 			if (reflectDamage > 0)
 			{
-				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex);
+				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
 			}
 			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished() ?? 0f;
 			if (finishDelayTime > 0f)
@@ -1143,14 +1143,14 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex)
+	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex, CancellationToken? cancellationToken = null)
 	{
 		if (enemyCardControl == null)
 		{
 			return;
 		}
 
-		await DealDamageToEnvCard(enemyCardControl, damage, envIndex);
+		await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, cancellationToken);
 	}
 
 	async void TakeAllEnemyDamage(object[] paraArray)
