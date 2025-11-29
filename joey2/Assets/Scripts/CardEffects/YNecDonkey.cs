@@ -16,7 +16,7 @@ public class YNecDonkey : YDefaultEffect
         if (CardControl != null && CardControl.CardData != null)
         {
             Card cardData = CardControl.CardData;
-            if (cardData.currentHealth <= cardData.health / 2 && !m_IsCalled)
+            if (cardData.currentHealth > 0 && cardData.currentHealth <= cardData.health / 2 && !m_IsCalled)
             {                
                 // TODO due to the env index is fixed, set env size = 5
                 int envIndex = CardControl.EnvIndex;
