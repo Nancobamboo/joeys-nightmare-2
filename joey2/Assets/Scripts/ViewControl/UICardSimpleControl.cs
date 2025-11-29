@@ -406,6 +406,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ThrowWeaponDefenceToStack_UseSkill:
 				effect = new YThrowWeaponDefenceToStack_UseSkill();
 				break;
+			case ECardEffectId.VampireMonkey:
+				effect = new YVampireMonkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

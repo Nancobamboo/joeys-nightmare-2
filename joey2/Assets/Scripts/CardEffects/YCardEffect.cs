@@ -42,7 +42,8 @@ public enum ECardEffectId
     DartScroll,
     HookDefenceFromDiscard_OnRemoveCard,
     AddKnifeToEnv_UseSkill,
-    ThrowWeaponDefenceToStack_UseSkill
+    ThrowWeaponDefenceToStack_UseSkill,
+    VampireMonkey
 }
 
 public enum EEffectType

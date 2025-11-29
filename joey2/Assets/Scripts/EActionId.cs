@@ -36,5 +36,6 @@ public enum EActionId
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
 	OnCoinChange,
+	MonsterHealOnDealDamage,
 	Upper
 }

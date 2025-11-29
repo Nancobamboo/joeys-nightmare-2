@@ -75,6 +75,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
+		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -699,6 +700,16 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void MonsterHealOnDealDamage(object[] paraArray)
+	{
+		UICardSimpleControl monsterCardControl = (UICardSimpleControl)paraArray[0];
+		if (monsterCardControl != null && monsterCardControl.CardType == ECardType.monster)
+		{
+			VampireMonkeyDealDamage(monsterCardControl);
+			// monsterCardControl.CallCardTakeDamage(3, EEffectType.Heal);
+		}
 	}
 	void DoubleLastWeaponAttack(object[] paraArray)
 	{
