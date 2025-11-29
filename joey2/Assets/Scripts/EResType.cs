@@ -17,6 +17,7 @@ public enum EResType
 	UIBuildNew,
 	UIBuildCardNew,
 	UIDescExt,
+	UISelect,
     UIUpper,
     LevelEnemy,
     SoundEffect,

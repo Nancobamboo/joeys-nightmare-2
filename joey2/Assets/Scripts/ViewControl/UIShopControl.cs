@@ -133,8 +133,6 @@ public class UIShopControl : YViewControl
 	{
 		m_CurrentShopCards.Clear();
 
-		GData.Instance.LoadCards();
-
 		List<Card> allCards = GData.Instance.CardDict.Values.ToList();
 		List<Card> availableCards = allCards.Where(c =>
 		{

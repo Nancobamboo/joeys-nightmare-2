@@ -26,6 +26,7 @@ public enum EActionId
 	AddEnvCardFromBag,
 	CreateGrimReaperClone,
 	GrimReaperCloneTakeDamage,
+	GrimReaperTakeDamage,
 	ThrowWeaponToEnv,
 	ThrowWeaponDefenceToEnv,
 	HealPlayerOnDefense,
@@ -38,5 +39,6 @@ public enum EActionId
 	ThrowDefenceToEnv,
 	OnCoinChange,
 	MonsterHealOnDealDamage,
+	AddCardToBagFromSelect,
 	Upper
 }
