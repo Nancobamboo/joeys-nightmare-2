@@ -31,6 +31,7 @@ public enum ERelicType
 	EnvAttack,
 	EnvDefence,
 	GetSpecialCardByAttack,
+	GetSpecialCardByDefence,
 	HealOnKill,
 }
 

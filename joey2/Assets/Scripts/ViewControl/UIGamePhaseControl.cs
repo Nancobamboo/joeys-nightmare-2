@@ -901,7 +901,10 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			AddCardToBag("4001");
+			if (ControlUtil.IsRandomSucceed(10))
+			{
+				AddCardToBag("4001");
+			}
 		}
 
 		bool enemyKilled = false;
@@ -969,7 +972,14 @@ public partial class UIGamePhaseControl : YViewControl
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+			await UniTask.WaitForSeconds(delayTime, cancellationToken: m_CurrentEffectCardCts.Token);
+			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
+			{
+				if (ControlUtil.IsRandomSucceed(10))
+				{
+					AddCardToBag("4001");
+				}
+			}
 		}
 		int damage = 0;
 		if (defenceValue < enemyAttack)
