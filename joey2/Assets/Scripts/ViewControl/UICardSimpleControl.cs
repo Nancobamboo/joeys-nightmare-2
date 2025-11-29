@@ -51,6 +51,7 @@ public class UICardSimpleControl : YViewControl
 	private List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 	private Vector3 m_OriginalScale;
 	private bool m_IsMoving;
+	private bool m_IsHovering;
 
 	public YCardEffect CardEffect;
 
@@ -81,6 +82,7 @@ public class UICardSimpleControl : YViewControl
 	private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
 		if (m_IsMoving) return;
+		m_IsHovering = true;
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
 
@@ -103,6 +105,7 @@ public class UICardSimpleControl : YViewControl
 	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
 		if (m_IsMoving) return;
+		m_IsHovering = false;
 		CacheTrans.localScale = m_OriginalScale;
 
 		if (m_DescExtControl != null)
@@ -114,6 +117,19 @@ public class UICardSimpleControl : YViewControl
 
 	public void SetMoving(bool isMoving)
 	{
+		if (isMoving && !m_IsMoving)
+		{
+			if (m_IsHovering)
+			{
+				CacheTrans.localScale = m_OriginalScale;
+				if (m_DescExtControl != null)
+				{
+					m_DescExtControl.Close();
+					m_DescExtControl = null;
+				}
+				m_IsHovering = false;
+			}
+		}
 		m_IsMoving = isMoving;
 	}
 
@@ -443,6 +459,7 @@ public class UICardSimpleControl : YViewControl
 		IsEnv = isEnv;
 		EnvIndex = envIndex;
 		m_IsMoving = false;
+		m_IsHovering = false;
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
@@ -626,6 +643,7 @@ public class UICardSimpleControl : YViewControl
 			animRect.anchoredPosition = Vector2.zero;
 		}
 		m_IsMoving = false;
+		m_IsHovering = false;
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
 		{
 			m_BuffValueArray[i] = 0;
