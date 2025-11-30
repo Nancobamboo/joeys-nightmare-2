@@ -80,6 +80,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
+		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -731,6 +732,12 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void SwapTopTwoEnvCards(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		SwapTopTwoEnvCards(cardControl);
 	}
 
 	void MonsterHealOnDealDamage(object[] paraArray)

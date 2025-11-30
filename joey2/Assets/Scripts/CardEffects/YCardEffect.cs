@@ -43,7 +43,8 @@ public enum ECardEffectId
     AddKnifeToEnv_UseSkill,
     ThrowWeaponDefenceToStack_UseSkill,
     VampireMonkey,
-    NecDonkey
+    NecDonkey,
+    TimidTurkey
 }
 
 public enum EEffectType

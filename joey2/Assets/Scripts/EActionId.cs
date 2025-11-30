@@ -40,5 +40,6 @@ public enum EActionId
 	OnCoinChange,
 	MonsterHealOnDealDamage,
 	AddCardToBagFromSelect,
+	SwapTopTwoEnvCards,
 	Upper
 }
