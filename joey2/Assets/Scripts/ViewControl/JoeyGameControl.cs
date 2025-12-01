@@ -281,7 +281,8 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-			if (currentStage != null && currentStage.type == EStageType.boss)
+			// Elite and Boss stages both go to shop
+			if (currentStage != null && (currentStage.type == EStageType.elite || currentStage.type == EStageType.boss))
 			{
 				if (m_GamePhaseControl != null)
 				{
