@@ -437,6 +437,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.NecDonkey:
 				effect = new YNecDonkey();
 				break;
+			case ECardEffectId.TimidTurkey:
+				effect = new YTimidTurkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -469,6 +472,7 @@ public class UICardSimpleControl : YViewControl
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
+		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 		m_View.Description.text = card.description;
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);

@@ -80,6 +80,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
+		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -220,6 +221,15 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
 		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
+		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+		{
+			m_View.TxtStage.text = currentStage.stages;
+		}
+		else
+		{
+			m_View.TxtStage.text = string.Empty;
+		}
 	}
 
 	private void OnCoinChanged(int coin)
@@ -722,6 +732,12 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void SwapTopTwoEnvCards(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		SwapTopTwoEnvCards(cardControl);
 	}
 
 	void MonsterHealOnDealDamage(object[] paraArray)

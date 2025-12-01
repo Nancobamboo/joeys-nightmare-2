@@ -67,6 +67,7 @@ public sealed class GData : PureSingleton<GData>
 		}
 		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int CardBackgroundIdx = idx.ContainsKey("cardBackground") ? idx["cardBackground"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
 		int CardNameIdx = idx.ContainsKey("cardName") ? idx["cardName"] : -1;
 		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
@@ -102,6 +103,7 @@ public sealed class GData : PureSingleton<GData>
 
 			string id = Get(IdIdx);
 			string cardImage = Get(CardImageIdx);
+			string cardBackground = Get(CardBackgroundIdx);
 			string type = Get(TypeIdx);
 			string cardName = Get(CardNameIdx);
 			string description = Get(DescriptionIdx);
@@ -124,7 +126,7 @@ public sealed class GData : PureSingleton<GData>
 				}
 			}
 
-			Card card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectId);
+			Card card = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
 
 			CardDict[id] = card;
 		}
