@@ -59,6 +59,16 @@ public class JoeyGameControl : YViewControl
 
 	void Start()
 	{
+		if (GameMode == EGameMode.Battle && m_DataJoeyPlayer.SelfCardDict.Count == 0)
+		{
+			m_DataJoeyPlayer.StageId = 0;
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			if (characterData != null)
+			{
+				DataSystem.Instance.InitRoguelikeCharacterData(characterData);
+			}
+		}
+
 		m_GamePhaseControl = Asset.OpenUI<UIGamePhaseControl>();
 		if (m_DataJoeyPlayer.currentLevel <= 0)
 		{
@@ -137,16 +147,6 @@ public class JoeyGameControl : YViewControl
 
 		int levelId = GameMode == EGameMode.Debug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
-		if (GameMode == EGameMode.Battle && m_DataJoeyPlayer.SelfCardDict.Count == 0)
-		{
-			m_DataJoeyPlayer.StageId = 0;
-			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
-			if (characterData != null)
-			{
-				DataSystem.Instance.InitRoguelikeCharacterData(characterData);
-			}
-			levelId = m_DataJoeyPlayer.currentLevel;
-		}
 		if (GameMode != EGameMode.Battle)
 		{
 			(int health, int maxHealth)? playerData = GData.Instance.GetTutorialPlayerData(levelId);
@@ -273,11 +273,21 @@ public class JoeyGameControl : YViewControl
 
 	public void EndGamePhase()
 	{
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.ClearEnvCardList();
+		}
+
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-			if (currentStage != null && currentStage.type == EStageType.boss)
+			// Elite and Boss stages both go to shop
+			if (currentStage != null && (currentStage.type == EStageType.elite || currentStage.type == EStageType.boss))
 			{
+				if (m_GamePhaseControl != null)
+				{
+					m_GamePhaseControl.ClearBagCardList();
+				}
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetRelicData();
 				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();

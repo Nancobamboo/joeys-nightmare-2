@@ -23,6 +23,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private MonoBehaviourPool<UICardSimpleControl> m_CardSimplePool;
 	private MonoBehaviourPool<UIDamageTextControl> m_DamageTextPool;
 	private Dictionary<int, Card> m_CardDict = new Dictionary<int, Card>();
+	private List<UIRelicControl> m_RelicList = new List<UIRelicControl>();
 	private Dictionary<int, List<UICardSimpleControl>> m_EnvCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private DataJoeyPlayer m_DataJoeyPlayer;
@@ -80,6 +81,9 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
+		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
+		RegistAction(EActionId.UpdateRelic, UpdateRelic);
+		RegistAction(EActionId.OnCardPointerEnter, OnCardPointerEnter);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -190,9 +194,8 @@ public partial class UIGamePhaseControl : YViewControl
 		ClearAllCard();
 	}
 
-	public void SetDataWithoutBagClear()
+	public void ClearEnvCardList()
 	{
-		RefreshView();
 		for (int i = 0; i < m_EnvPanels.Count; i++)
 		{
 			if (m_EnvCardDict.TryGetValue(i, out List<UICardSimpleControl> envCardList))
@@ -210,6 +213,34 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 		m_EnvCardDict.Clear();
+	}
+
+	public void ClearBagCardList()
+	{
+		foreach (var kvp in m_BagCardDict)
+		{
+			List<UICardSimpleControl> bagCardList = kvp.Value;
+			if (bagCardList != null)
+			{
+				for (int i = 0; i < bagCardList.Count; i++)
+				{
+					UICardSimpleControl cardControl = bagCardList[i];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						m_CardDict.Remove(cardControl.CardData.UniqueId);
+						RemoveCardCts(cardControl);
+						cardControl.Return();
+					}
+				}
+			}
+		}
+		m_BagCardDict.Clear();
+	}
+
+	public void SetDataWithoutBagClear()
+	{
+		RefreshView();
+		ClearEnvCardList();
 		UsedCardList.Clear();
 		ClearGrimReaperData();
 	}
@@ -220,6 +251,16 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
 		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
+		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+		{
+			m_View.TxtStage.text = currentStage.stages;
+		}
+		else
+		{
+			m_View.TxtStage.text = string.Empty;
+		}
+		RefreshRelicDisplay();
 	}
 
 	private void OnCoinChanged(int coin)
@@ -722,6 +763,12 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void SwapTopTwoEnvCards(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		SwapTopTwoEnvCards(cardControl);
 	}
 
 	void MonsterHealOnDealDamage(object[] paraArray)
@@ -1304,6 +1351,79 @@ public partial class UIGamePhaseControl : YViewControl
 	void JulietMonkeyDead(object[] paraArray)
 	{
 		this.OnJulietMonkeyDead();
+	}
+
+	void UpdateRelic(object[] paraArray)
+	{
+		RefreshRelicDisplay();
+	}
+
+	void OnCardPointerEnter(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		if (cardControl == null)
+		{
+			return;
+		}
+
+		bool shouldShow = false;
+		if (cardControl.IsEnv)
+		{
+			UICardSimpleControl lastEnvCard = GetLastEnvCard(cardControl.EnvIndex);
+			if (lastEnvCard == cardControl)
+			{
+				shouldShow = true;
+			}
+		}
+		else
+		{
+			shouldShow = true;
+		}
+
+		if (shouldShow)
+		{
+			cardControl.ShowCardHoverEffect();
+		}
+	}
+
+	private void RefreshRelicDisplay()
+	{
+		int needCount = 0;
+		if (m_DataJoeyPlayer != null && m_DataJoeyPlayer.RelicList != null)
+		{
+			needCount = m_DataJoeyPlayer.RelicList.Count;
+		}
+
+		while (m_RelicList.Count < needCount)
+		{
+			UIRelicControl relicControl = Asset.OpenUI<UIRelicControl>(m_View.RelicContent);
+			relicControl.CacheTrans.localScale = Vector3.one;
+			relicControl.CacheTrans.localPosition = Vector3.zero;
+			relicControl.CacheTrans.localEulerAngles = Vector3.zero;
+			m_RelicList.Add(relicControl);
+		}
+
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			if (i < needCount)
+			{
+				int relicId = m_DataJoeyPlayer.RelicList[i];
+				RelicInfo relicInfo = GData.Instance.GetRelicInfo((ERelicType)relicId);
+				if (relicInfo != null)
+				{
+					m_RelicList[i].gameObject.SetActive(true);
+					m_RelicList[i].SetGameData(relicInfo);
+				}
+				else
+				{
+					m_RelicList[i].gameObject.SetActive(false);
+				}
+			}
+			else
+			{
+				m_RelicList[i].gameObject.SetActive(false);
+			}
+		}
 	}
 
 	protected override void OnReturn()
