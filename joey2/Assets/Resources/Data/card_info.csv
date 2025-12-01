@@ -41,7 +41,7 @@
 4003,Art/Img/img_card_attrack_01,Art/Img/Skill/img_bg_Skill,双持武器       ,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,100,1,
 4004,Art/Img/img_card_attrack_01,Art/Img/Skill/img_bg_Skill,堡垒       ,skill     ,下次格挡时，可以使用两个防具,0,0,0,100,1,
 4005,Art/Img/img_card_attrack_01,Art/Img/Skill/img_bg_Skill,肉盾冲击,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,100,1,
-4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,skill     ,对全场敌人造成3点伤害,0,0,0,300,3,Electric:3
+4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,skill     ,群伤:5,0,0,0,100,1,Electric:5
 4007,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,匕首飞来,skill     ,在环境中召唤两个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill
 4008,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,丢盔弃甲,skill     ,将装备中的攻击防御卡丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
 ,,,,,,,,,,,
