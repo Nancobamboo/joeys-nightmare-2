@@ -9,7 +9,7 @@
 1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,回旋镖       ,attack,攻击时，向周围敌人弹射2次,4,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2
 1008,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,染血长矛       ,attack,生命值低于50%时，攻击+10,9,0,0,200,2,ExtraDamage_HalfHealth:10
 1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,手刀,attack,亡语:从弃牌堆抽取一张防御卡,8,0,0,200,2,HookDefenceFromDiscard_OnRemoveCard
-1011,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,赤手空拳,attack,永不消耗,3,0,0,0,1,
+1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,attack,永不消耗,3,0,0,0,1,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
