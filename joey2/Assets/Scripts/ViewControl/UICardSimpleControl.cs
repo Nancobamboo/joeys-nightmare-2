@@ -436,6 +436,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.NecDonkey:
 				effect = new YNecDonkey();
 				break;
+			case ECardEffectId.BareHands:
+				effect = new YBareHands();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

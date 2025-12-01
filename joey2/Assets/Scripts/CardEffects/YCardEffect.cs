@@ -44,7 +44,8 @@ public enum ECardEffectId
     ThrowWeaponDefenceToStack_UseSkill,
     VampireMonkey,
     NecDonkey,
-    TimidTurkey
+    TimidTurkey,
+    BareHands
 }
 
 public enum EEffectType
