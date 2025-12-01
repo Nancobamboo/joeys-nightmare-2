@@ -77,6 +77,17 @@ public class UIRelicControl : YViewControl
 		}
 	}
 
+	public void SetGameData(RelicInfo relicInfo)
+	{
+		m_RelicInfo = relicInfo;
+		if (m_RelicInfo != null)
+		{
+			m_View.ImgRelic.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.CardItem.SetActive(false);
+			m_View.TxtName.gameObject.SetActive(false);
+		}
+	}
+
 	private Sprite LoadSprite(string path)
 	{
 		return Resources.Load<Sprite>(path);

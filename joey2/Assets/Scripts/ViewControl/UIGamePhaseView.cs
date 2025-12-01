@@ -20,6 +20,7 @@ public class UIGamePhaseView : YBaseView
 	public RectTransform EffectRoot3;
 	public RectTransform EffectRoot4;
 	public Text TxtStage;
+	public RectTransform RelicContent;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -42,5 +43,6 @@ public class UIGamePhaseView : YBaseView
 		EffectRoot3 = viewItemList[13].Target.GetComponent<RectTransform>();
 		EffectRoot4 = viewItemList[14].Target.GetComponent<RectTransform>();
 		TxtStage = viewItemList[15].Target.GetComponent<Text>();
+		RelicContent = viewItemList[16].Target.GetComponent<RectTransform>();
 	}
 }

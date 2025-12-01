@@ -23,6 +23,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private MonoBehaviourPool<UICardSimpleControl> m_CardSimplePool;
 	private MonoBehaviourPool<UIDamageTextControl> m_DamageTextPool;
 	private Dictionary<int, Card> m_CardDict = new Dictionary<int, Card>();
+	private List<UIRelicControl> m_RelicList = new List<UIRelicControl>();
 	private Dictionary<int, List<UICardSimpleControl>> m_EnvCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private Dictionary<int, List<UICardSimpleControl>> m_BagCardDict = new Dictionary<int, List<UICardSimpleControl>>();
 	private DataJoeyPlayer m_DataJoeyPlayer;
@@ -81,6 +82,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
 		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
+		RegistAction(EActionId.UpdateRelic, UpdateRelic);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -230,6 +232,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			m_View.TxtStage.text = string.Empty;
 		}
+		RefreshRelicDisplay();
 	}
 
 	private void OnCoinChanged(int coin)
@@ -1320,6 +1323,51 @@ public partial class UIGamePhaseControl : YViewControl
 	void JulietMonkeyDead(object[] paraArray)
 	{
 		this.OnJulietMonkeyDead();
+	}
+
+	void UpdateRelic(object[] paraArray)
+	{
+		RefreshRelicDisplay();
+	}
+
+	private void RefreshRelicDisplay()
+	{
+		int needCount = 0;
+		if (m_DataJoeyPlayer != null && m_DataJoeyPlayer.RelicList != null)
+		{
+			needCount = m_DataJoeyPlayer.RelicList.Count;
+		}
+
+		while (m_RelicList.Count < needCount)
+		{
+			UIRelicControl relicControl = Asset.OpenUI<UIRelicControl>(m_View.RelicContent);
+			relicControl.CacheTrans.localScale = Vector3.one;
+			relicControl.CacheTrans.localPosition = Vector3.zero;
+			relicControl.CacheTrans.localEulerAngles = Vector3.zero;
+			m_RelicList.Add(relicControl);
+		}
+
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			if (i < needCount)
+			{
+				int relicId = m_DataJoeyPlayer.RelicList[i];
+				RelicInfo relicInfo = GData.Instance.GetRelicInfo((ERelicType)relicId);
+				if (relicInfo != null)
+				{
+					m_RelicList[i].gameObject.SetActive(true);
+					m_RelicList[i].SetGameData(relicInfo);
+				}
+				else
+				{
+					m_RelicList[i].gameObject.SetActive(false);
+				}
+			}
+			else
+			{
+				m_RelicList[i].gameObject.SetActive(false);
+			}
+		}
 	}
 
 	protected override void OnReturn()
