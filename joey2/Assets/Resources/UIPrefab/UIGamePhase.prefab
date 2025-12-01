@@ -2323,7 +2323,7 @@ GameObject:
   - component: {fileID: 4478135976560113529}
   - component: {fileID: 4785283868305527068}
   m_Layer: 5
-  m_Name: Number
+  m_Name: UsedCradsNumber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2465,7 +2465,7 @@ GameObject:
   - component: {fileID: 3592865325208837967}
   - component: {fileID: 8104719561184559557}
   m_Layer: 5
-  m_Name: BtnCard
+  m_Name: UsedRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3141,6 +3141,14 @@ MonoBehaviour:
   - Target: {fileID: 9205612298605694259}
     Components:
     - {fileID: 9205612298605694259}
+    VarNameArray: []
+  - Target: {fileID: 2822244115184171471}
+    Components:
+    - {fileID: 2822244115184171471}
+    VarNameArray: []
+  - Target: {fileID: 7349236608634568786}
+    Components:
+    - {fileID: 4785283868305527068}
     VarNameArray: []
 --- !u!1 &5650933788740573034
 GameObject:

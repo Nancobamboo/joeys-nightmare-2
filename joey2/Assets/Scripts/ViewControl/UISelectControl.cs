@@ -50,10 +50,12 @@ public class UISelectControl : YViewControl
 		List<Card> availableCards = allCards.Where(c =>
 		{
 			ECardType cardType = c.GetCardType();
-			return cardType == ECardType.attack ||
+			return(cardType == ECardType.attack ||
 				cardType == ECardType.defence ||
 				cardType == ECardType.skill ||
-				cardType == ECardType.item;
+				cardType == ECardType.item) &&
+			c.price > 0;
+
 		}).ToList();
 
 		List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
