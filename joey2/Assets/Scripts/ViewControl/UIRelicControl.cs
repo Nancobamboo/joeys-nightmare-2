@@ -93,6 +93,15 @@ public class UIRelicControl : YViewControl
 		return Resources.Load<Sprite>(path);
 	}
 
+	public void CleanupDescExt()
+	{
+		if (m_DescExtControl != null)
+		{
+			m_DescExtControl.Close();
+			m_DescExtControl = null;
+		}
+	}
+
 	protected override void OnReturn()
 	{
 		if (m_DescExtControl != null)

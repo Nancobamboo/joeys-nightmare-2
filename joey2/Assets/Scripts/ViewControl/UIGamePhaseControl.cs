@@ -83,6 +83,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
 		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
 		RegistAction(EActionId.UpdateRelic, UpdateRelic);
+		RegistAction(EActionId.OnCardPointerEnter, OnCardPointerEnter);
 
 		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
 		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
@@ -193,9 +194,8 @@ public partial class UIGamePhaseControl : YViewControl
 		ClearAllCard();
 	}
 
-	public void SetDataWithoutBagClear()
+	public void ClearEnvCardList()
 	{
-		RefreshView();
 		for (int i = 0; i < m_EnvPanels.Count; i++)
 		{
 			if (m_EnvCardDict.TryGetValue(i, out List<UICardSimpleControl> envCardList))
@@ -213,6 +213,34 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 		m_EnvCardDict.Clear();
+	}
+
+	public void ClearBagCardList()
+	{
+		foreach (var kvp in m_BagCardDict)
+		{
+			List<UICardSimpleControl> bagCardList = kvp.Value;
+			if (bagCardList != null)
+			{
+				for (int i = 0; i < bagCardList.Count; i++)
+				{
+					UICardSimpleControl cardControl = bagCardList[i];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						m_CardDict.Remove(cardControl.CardData.UniqueId);
+						RemoveCardCts(cardControl);
+						cardControl.Return();
+					}
+				}
+			}
+		}
+		m_BagCardDict.Clear();
+	}
+
+	public void SetDataWithoutBagClear()
+	{
+		RefreshView();
+		ClearEnvCardList();
 		UsedCardList.Clear();
 		ClearGrimReaperData();
 	}
@@ -1328,6 +1356,34 @@ public partial class UIGamePhaseControl : YViewControl
 	void UpdateRelic(object[] paraArray)
 	{
 		RefreshRelicDisplay();
+	}
+
+	void OnCardPointerEnter(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		if (cardControl == null)
+		{
+			return;
+		}
+
+		bool shouldShow = false;
+		if (cardControl.IsEnv)
+		{
+			UICardSimpleControl lastEnvCard = GetLastEnvCard(cardControl.EnvIndex);
+			if (lastEnvCard == cardControl)
+			{
+				shouldShow = true;
+			}
+		}
+		else
+		{
+			shouldShow = true;
+		}
+
+		if (shouldShow)
+		{
+			cardControl.ShowCardHoverEffect();
+		}
 	}
 
 	private void RefreshRelicDisplay()

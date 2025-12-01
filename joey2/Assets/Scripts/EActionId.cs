@@ -34,7 +34,7 @@ public enum EActionId
 	AddCardToSpecifiedEnv,
 	DoubleLastWeaponAttack,
 	AddCardsToEnv,
-  	HookDefenceFromDiscard_OnRemoveCard,
+	HookDefenceFromDiscard_OnRemoveCard,
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
 	OnCoinChange,
@@ -42,5 +42,6 @@ public enum EActionId
 	AddCardToBagFromSelect,
 	SwapTopTwoEnvCards,
 	UpdateRelic,
+	OnCardPointerEnter,
 	Upper
 }
