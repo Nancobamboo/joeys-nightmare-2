@@ -524,7 +524,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private UICardSimpleControl GetFistCard()
 	{
-		UICardSimpleControl cardControl = GetSpecialCardSimpleById("1003");
+		UICardSimpleControl cardControl = GetSpecialCardSimpleById("1011");
 
 		return cardControl;
 	}
