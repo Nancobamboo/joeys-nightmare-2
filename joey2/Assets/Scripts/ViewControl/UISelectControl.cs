@@ -69,11 +69,8 @@ public class UISelectControl : YViewControl
 	{
 		while (m_CardList.Count < SELECT_CARD_COUNT)
 		{
-			UISelectCardControl cardControl = Asset.OpenUI<UISelectCardControl>(null);
-			cardControl.CacheTrans.SetParent(m_View.Content);
-			cardControl.CacheTrans.localScale = Vector3.one;
-			cardControl.CacheTrans.localPosition = Vector3.zero;
-			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
+			UISelectCardControl cardControl = Asset.OpenUI<UISelectCardControl>(m_View.Content);
+
 			m_CardList.Add(cardControl);
 		}
 
@@ -147,11 +144,8 @@ public class UISelectControl : YViewControl
 	{
 		while (m_RelicList.Count < SELECT_CARD_COUNT)
 		{
-			UIRelicControl relicControl = Asset.OpenUI<UIRelicControl>(null);
-			relicControl.CacheTrans.SetParent(m_View.Content);
-			relicControl.CacheTrans.localScale = Vector3.one;
-			relicControl.CacheTrans.localPosition = Vector3.zero;
-			relicControl.CacheTrans.localEulerAngles = Vector3.zero;
+			UIRelicControl relicControl = Asset.OpenUI<UIRelicControl>(m_View.ContentRelic);
+
 			m_RelicList.Add(relicControl);
 		}
 
@@ -192,6 +186,7 @@ public class UISelectControl : YViewControl
 		ERelicType relicType = (ERelicType)relicControl.RelicData.id;
 		DataSystem.Instance.AddRelic(relicType);
 		DataSystem.Instance.SaveDataJoeyPlayer();
+		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic);
 		Close();
 		if (OnSelectComplete != null)
 		{
@@ -199,13 +194,14 @@ public class UISelectControl : YViewControl
 		}
 	}
 
-	protected override void OnReturn()
+	protected override void OnClose()
 	{
 		for (int i = 0; i < m_CardList.Count; i++)
 		{
 			if (m_CardList[i] != null)
 			{
 				m_CardList[i].SelectClickHandler = null;
+				m_CardList[i].CleanupDescExt();
 			}
 		}
 		m_CardList.Clear();
@@ -216,11 +212,11 @@ public class UISelectControl : YViewControl
 			if (m_RelicList[i] != null)
 			{
 				m_RelicList[i].SelectClickHandler = null;
+				m_RelicList[i].CleanupDescExt();
 			}
 		}
 		m_RelicList.Clear();
 		m_CurrentSelectRelics.Clear();
-		OnSelectComplete = null;
-		base.OnReturn();
+		base.OnClose();
 	}
 }

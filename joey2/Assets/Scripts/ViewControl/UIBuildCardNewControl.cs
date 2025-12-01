@@ -114,6 +114,7 @@ public class UIBuildCardNewControl : YViewControl
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
+        m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 
         SetTypeUI(card);
         SetStars(card.stars);

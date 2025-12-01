@@ -82,6 +82,11 @@ public class UICardSimpleControl : YViewControl
 	private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
 		if (m_IsMoving) return;
+		YActionSystem.Instance.DispatchAction(EActionId.OnCardPointerEnter, this);
+	}
+
+	public void ShowCardHoverEffect()
+	{
 		m_IsHovering = true;
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
@@ -463,7 +468,6 @@ public class UICardSimpleControl : YViewControl
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
-		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 		m_View.Description.text = card.description;
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
@@ -628,6 +632,16 @@ public class UICardSimpleControl : YViewControl
 	protected override void OnReturn()
 	{
 		StopAllEffects();
+
+		if (m_IsHovering)
+		{
+			CacheTrans.localScale = m_OriginalScale;
+			if (m_DescExtControl != null)
+			{
+				m_DescExtControl.Close();
+				m_DescExtControl = null;
+			}
+		}
 
 		for (int i = 0; i < EffectEntityList.Count; i++)
 		{

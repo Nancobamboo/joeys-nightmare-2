@@ -6,6 +6,7 @@ public class UISelectView : YBaseView
 {
 	public Button BtnSkip;
 	public RectTransform Content;
+	public RectTransform ContentRelic;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -14,5 +15,6 @@ public class UISelectView : YBaseView
 		if(viewItemList == null || viewItemList.Count == 0) return;
 		BtnSkip = viewItemList[0].Target.GetComponent<Button>();
 		Content = viewItemList[1].Target.GetComponent<RectTransform>();
+		ContentRelic = viewItemList[2].Target.GetComponent<RectTransform>();
 	}
 }
