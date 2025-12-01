@@ -31,16 +31,16 @@ level,slotIndex,cardIds,comment
 999,4,2005;2005
 100,0,,【新手教学】基础战斗 - Theme: Basic Combat | HP: 10 | Gold: 20
 100,1,,Strategy: Use shield to block 1 attack, sword to kill 2 monkeys (5dmg x2)
-100,2,1000;2000;5001;5001;6001,Starting Sword(5) + Shield(3) + 2x Bad Monkeys(3atk 5hp) + Exit
+100,2,1002;2001;5001;5001;6001,Starting Sword(5) + Shield(3) + 2x Bad Monkeys(3atk 5hp) + Exit
 100,3,,
 100,4,,
 101,0,,【木桶惊喜】探索奖励 - Theme: Exploration Rewards | HP: 21 | Gold: 35
 101,1,1002;5009;5001,Strategy: Break barrel for loot, use resources to clear monkeys, potion for skeleton
 101,2,2001,Broken Sword(5) + Barrel(1hp->loot) + Bad Monkey(5hp) | Shield(3)
-101,3,5003;3000;6001,Skeleton(5atk 15hp) + Health Potion(+10hp) + Exit
+101,3,5003;3001;6001,Skeleton(5atk 15hp) + Health Potion(+10hp) + Exit
 101,4,,
 102,0,,【猿酒爆发】增益技巧 - Theme: Burst Damage | HP: 21 | Gold: 48
-102,1,5009;1001;3004,Strategy: Ape Wine + Claymore = 16dmg burst on skeleton, finish monkey with other weapons
+102,1,5009;1004;3004,Strategy: Ape Wine + Iron Sword = 16dmg burst on skeleton, finish monkey with other weapons
 102,2,5003;2002,Barrel + Claymore(8) + Ape Wine(dmg x2) | Skeleton(15hp) + Shield(8)
 102,3,5001;6001,Bad Monkey(5hp) + Exit
 102,4,,
@@ -74,41 +74,41 @@ level,slotIndex,cardIds,comment
 108,2,5008;5003;2006,Barrel + Blood Lance(9,half HP +10) | Vampire(8hp) + Skeleton(15hp) + Blood Shield(12def,heal)
 108,3,3004;6001,Ape Wine + Exit
 108,4,,
-109,0,,【精英挑战】高血量单位 - Theme: High HP Unit | HP: 53 | Gold: 65
-109,1,1006;2002,Strategy: Dart Scroll + Hammer = 24dmg on Big Monkey, collect drops to finish others
-109,2,5004;5003;5009,Hammer(15) + Shield(8) | Big Monkey(8atk 30hp,drops loot) + Skeleton(15hp) + Barrel
-109,3,5008;3006;3001;6001,Vampire(8hp) + Dart Scroll(3x3) + Potion + Exit
+109,0,,【神秘商人】奇遇挑战 - Theme: Rare Encounter | HP: 53 | Gold: 85
+109,1,5013;2002,Strategy: Timid Turkey swaps cards when hit, use Hook Lock to cycle weapons wisely
+109,2,5005;5003;5009,Shield(8) | Timid Turkey(9atk 25hp,swap 2 cards on hit) + Vampire Lord(5atk 20hp,lifesteal 3) | Skeleton(15hp) + Barrel
+109,3,5008;3003;3001;6001,Vampire(8hp) + Hook Lock(draw weapon) + Potion + Exit
 109,4,,
-110,0,,【礼物惊喜】随机乐趣 - Theme: Random Rewards | HP: 24 | Gold: 53
-110,1,5009;1005,Strategy: Gift Bag summons 3 random cards, Lightning AOE clears, Double Swords bursts
-110,2,5008;5003;3005,Barrel + Double Swords(8,no armor +5) | Vampire(8hp) + Skeleton(15hp) + Gift Bag(summon 3 cards)
-110,3,4006;6001,Lightning(5 AOE) + Exit
+110,0,,【匕首风暴】连锁反应 - Theme: Dagger Chain | HP: 54 | Gold: 68
+110,1,5009;1005,Strategy: Dagger Shield spawns dagger on break, use Flying Daggers for weapon flood
+110,2,5008;5003;2007,Barrel + Double Swords(8,no armor +5) | Vampire(8hp) + Skeleton(15hp) + Dagger Shield(8def,spawn dagger)
+110,3,4007;3005;6001,Flying Daggers(spawn 2 daggers) + Gift Bag(summon 3 cards) + Exit
 110,4,,
-111,0,5009;1004,【第三次BOSS】双重威胁 - Theme: Multi-Boss | HP: 68 | Gold: 75 | SHOP
-111,1,1006;5004,Strategy: Bomb AOE chips, Flying Daggers adds weapons, Hammer bursts, Hand Guard cycles
-111,2,5004;5008;2004,Barrel + Iron Sword(8) | Hammer(15) + Big Monkey(30hp) | Big Monkey(30hp) + Vampire(8hp) + Hand Guard
+111,0,5009;1004,【第三次BOSS】爆炸陷阱 - Theme: Explosive Trap | HP: 68 | Gold: 75 | SHOP
+111,1,1006;5004,Strategy: Exploding Barrel AOE on death, position carefully, Hammer for burst damage
+111,2,5004;5007;2004,Barrel + Iron Sword(8) | Hammer(15) + Big Monkey(30hp) | Exploding Barrel(1hp,death AOE 10dmg) + Vampire(8hp) + Hand Guard
 111,3,3001;3002;4007;6001,Health Potion + Bomb(10 AOE) + Flying Daggers + Exit
 111,4,1003,Dart(3)
-112,0,1002,【持久战】资源管理 - Theme: Sustain | HP: 24 | Gold: 53
-112,1,5009;1006,Strategy: Blood Shield heals while blocking, Hand Blade cycles defenses, Hammer finishes
-112,2,5008;5003;1010,Barrel + Hammer(15) | Vampire(8hp) + Skeleton(15hp) + Hand Blade(8,draw defense)
-112,3,2006;3001;6001,Blood Shield(12def,heal) + Potion + Exit
-112,4,,
-113,0,3001,【精英围攻】多目标压制 - Theme: Multi-Target | HP: 54 | Gold: 70
-113,1,5004;1008,Strategy: Bomb + Lightning for AOE clear small enemies, Blood Lance half HP burst + Thorn reflect for Big Monkey
-113,2,5003;5009;2003,Health Potion | Big Monkey(30hp) + Blood Lance(9/19) | Skeleton(15hp) + Barrel + Thorn Armor(reflect 5)
-113,3,5008;3002;4006;6001,Vampire(8hp) + Bomb(10) + Lightning(5 AOE) + Exit
-113,4,,
-114,0,1002,【终局前夕】全能考验 - Theme: Comprehensive Test | HP: 39 | Gold: 68
-114,1,5009;1006,Strategy: Ape Wine + Hammer = 30dmg instant kill Big Monkey, Double Swords + Blood Shield for Vampire
-114,2,5004;5008;2006,Broken Sword | Barrel + Hammer(15) | Big Monkey(30hp) + Vampire(8hp) + Blood Shield(12,heal)
-114,3,3004;1005;3001;6001,Ape Wine(x2) + Double Swords(8+5) + Potion + Exit
-114,4,,
-115,0,1003;1002,【最终BOSS】终极考验 - Theme: Ultimate Challenge | HP: 76 | Gold: 90 | VICTORY
-115,1,5004;1006;2004,Strategy: Bomb AOE pre-damage, Double Strike + Hammer = 30x2 to instant kill one Big Monkey
-115,2,5004;5008;3001,Dart(3) + Broken Sword | Big Monkey(30hp) + Hammer(15) + Hand Guard(5,draw weapon) | Big Monkey(30hp) + Vampire(8hp) + Potion(+10)
-115,3,5008;1008;3002;4001,Vampire(8hp) + Blood Lance(9/19) + Bomb(10 AOE) + Double Strike
-115,4,2003;6001,Thorn Armor(reflect 5) + Exit
+112,0,1002,【武器抛弃流】环境控制 - Theme: Weapon Discard | HP: 64 | Gold: 73
+112,1,5009;1006,Strategy: Slip Shield throws weapon to env, Discard Armor throws all equipment, control the board
+112,2,5008;5003;1010,Broken Sword + Barrel + Hammer(15) | Vampire(8hp) + Skeleton(15hp) + Hand Blade(8,draw defense)
+112,3,5004;2005;3001,Big Monkey(30hp) + Slip Shield(12def,throw weapon on death) + Potion
+112,4,4008;6001,Discard Armor(throw all equipment) + Exit
+113,0,3001,【精英围攻】奇遇之战 - Theme: Elite Encounter | HP: 64 | Gold: 100
+113,1,5013;1008,Strategy: Timid Turkey swaps 2 cards when hit - control env carefully, massive gold reward if killed
+113,2,5010;5009;2003,Health Potion | Timid Turkey(9atk 25hp,swap 2 cards on hit) + Blood Lance(9/19) | SiLing Donkey(3atk 20hp,half HP summon skeletons) + Barrel + Thorn Armor(reflect 5)
+113,3,5011;3002;4006,Skeleton Donkey(15hp) + Bomb(10 AOE) + Lightning(5 AOE)
+113,4,5008;3001;6001,Vampire(8hp) + Potion + Exit
+114,0,1002,【双持狂战】极限输出 - Theme: Dual Wield Berserker | HP: 74 | Gold: 88
+114,1,5009;1006,Strategy: Dual Wield doubles damage but can't use shield, high risk high reward, use potions to sustain
+114,2,5004;5005;2006,Broken Sword + Barrel + Hammer(15) | Big Monkey(30hp) + Vampire Lord(20hp,lifesteal 3) + Blood Shield(12,heal)
+114,3,3004;1005;3001,Ape Wine(x2) + Double Swords(8+5) + Potion
+114,4,4003;3003;6001,Dual Wield(x2 dmg,no shield) + Hook Lock + Exit
+115,0,1003;1002,【最终BOSS：死神降临】终极考验 - Theme: Grim Reaper | HP: 86 | Gold: 100 | VICTORY
+115,1,5012;1006;2004,Strategy: Grim Reaper boss fight, use all mechanics learned, Double Strike + Hammer for burst
+115,2,5004;5010;3001,Dart(3) + Broken Sword | Grim Reaper(5atk 15hp,BOSS) + Hammer(15) + Hand Guard(5,draw weapon) | Big Monkey(30hp) + SiLing Donkey(20hp) + Potion(+10)
+115,3,5005;1008;3002;4001,Vampire Lord(20hp) + Blood Lance(9/19) + Bomb(10 AOE) + Double Strike
+115,4,2003;3004;6001,Thorn Armor(reflect 5) + Ape Wine + Exit
 ,,,
 ,,,
 ,,,

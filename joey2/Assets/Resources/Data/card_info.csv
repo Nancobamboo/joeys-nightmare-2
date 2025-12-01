@@ -1,27 +1,27 @@
 ﻿id   ,cardImage ,cardBackground,cardName            ,type,description,attack ,defence ,health ,price ,stars,effectIds
 1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,武器牌1,attack,,5,0,0,0,1,
 1001,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,武器牌2,attack,堆叠到手牌,8,0,0,0,1,
-1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑   ,attack,,5,0,0,100,1,
-1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,attack,装备：迅击,3,0,0,200,2,DealRandomEnemyEqualToAttack_OnTop
+1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑   ,attack,,5,0,0,50,1,
+1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,attack,装备：迅击,3,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop
 1004,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,铁剑        ,attack,,8,0,0,100,1,
-1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,attack,没有防具时，额外伤害：5 ,8,0,0,200,2,ExtraDamage_NoDefence:5
-1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,重锤        ,attack,,15,0,0,100,1,
+1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,attack,没有防具时，额外伤害：5 ,8,0,0,100,2,ExtraDamage_NoDefence:5
+1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,重锤        ,attack,,15,0,0,300,3,
 1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,回旋镖       ,attack,攻击时，向周围敌人弹射2次,4,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2
-1008,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,染血长矛       ,attack,生命值低于50%时，攻击+10,9,0,0,200,2,ExtraDamage_HalfHealth:10
-1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,手刀,attack,亡语:从弃牌堆抽取一张防御卡,8,0,0,200,2,HookDefenceFromDiscard_OnRemoveCard
-1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,attack,永不消耗,3,0,0,0,1,
+1008,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,染血长矛       ,attack,生命值低于50%时，攻击+10,9,0,0,100,2,ExtraDamage_HalfHealth:10
+1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,手刀,attack,亡语:从弃牌堆抽取一张防御卡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
+1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,attack,永不消耗,3,0,0,0,1,BareHands
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,防御牌,defence,,0,3,0,0,1,
-2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,破盾       ,defence,,0,3,0,100,1,
+2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,破盾       ,defence,,0,3,0,50,1,
 2002,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,铁盾       ,defence,,0,8,0,100,1,
-2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,刃甲,defence,受击时：反弹5点伤害,5,5,,300,3,DealDamage_UseDefence:5
-2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,护手,defence,受击时：从弃牌堆随机抽一张武器牌置入手牌,0,5,,300,3,HookEquipWeaponFromDiscard_OnDefence
-2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,手滑盾,defence,亡语:丢弃当前攻击手牌到环境中,0,12,,100,1,ThrowWeaponToStack_OnDefence
-2006,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,血魔盾,defence,回复和抵挡伤害相同数值的生命,0,12,,100,1,HealPlayer_OnDefense
-2007,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,匕首护盾,defence,亡语:在环境中召唤一把匕首,0,8,,200,2,AddKnifeToEnv_OnDefense
+2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,刃甲,defence,受击时：反弹5点伤害,5,5,,200,2,DealDamage_UseDefence:5
+2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,护手,defence,受击时：从弃牌堆随机抽一张武器牌置入手牌,0,5,,200,2,HookEquipWeaponFromDiscard_OnDefence
+2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,手滑盾,defence,亡语:丢弃当前攻击手牌到环境中,0,12,,300,3,ThrowWeaponToStack_OnDefence
+2006,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,血魔盾,defence,回复和抵挡伤害相同数值的生命,0,12,,300,3,HealPlayer_OnDefense
+2007,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,匕首护盾,defence,亡语:在环境中召唤一把匕首,0,8,,300,3,AddKnifeToEnv_OnDefense
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
@@ -29,8 +29,8 @@
 3001,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,小血瓶  ,item   ,恢复10点生命值,0,0,0,200,2,HealPlayer_OnPlay:10
 3002,Art/Img/Item/img_card_Boom,Art/Img/Item/img_bg_Item,炸弹,item   ,对随机敌人及两侧目标造成10点伤害,,,,300,3,Boom_OnPlay:10
 3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,钩索,item        ,从弃牌堆随机抽一张武器牌置入手牌,,,,200,2,HookEquipWeaponFromDiscard_OnPlay
-3004,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,猿酒,item   ,下次攻击伤害翻倍,,,,100,1,ApeWine
-3005,Art/Img/Monster/img_card_Barrel,Art/Img/Item/img_bg_Item,礼物袋,item   ,在环境卡中随机召唤3张牌,,,,100,1,GiftBox:3
+3004,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,猿酒,item   ,下次攻击伤害翻倍,,,,200,2,ApeWine
+3005,Art/Img/Monster/img_card_Barrel,Art/Img/Item/img_bg_Item,礼物袋,item   ,在环境卡中随机召唤3张牌,,,,300,3,GiftBox:3
 3006,Art/Img/Attack/img_card_Dart,Art/Img/Item/img_bg_Item,手里剑卷轴,item   ,在环境中召唤3个锋利手里剑,,,,200,2,DartScroll
 ,,,,,,,,,,,
 ,,,,,,,,,,,
@@ -57,10 +57,10 @@
 5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,Vampire Monkey,monster      ,每次攻击时回复3点血量,5,,20,20,1,VampireMonkey
 5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,monster,可能藏着好东西？,,,1,5,1,
 5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,monster,亡语：对两侧敌人各造成10点伤害,,,1,15,3,Boom_OnDead:10
-5008,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,Vampire Monkey,monster      ,,5,,8,15,1,
+5008,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,Captain Monkey,monster      ,,5,,8,15,1,
 5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,monster,可能藏着好东西？,,,1,5,1,
-5010,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,SiLing Donkey,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,100,1,NecDonkey
-5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,Skeleton Donkey,monster      ,,5,,15,100,1,
+5010,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,SiLing Donkey,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,30,1,NecDonkey
+5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,Skeleton Donkey,monster      ,,5,,15,15,1,
 5012,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,死神,monster      ,死神,5,,15,100,1,GrimReaper
 5013,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,胆小Turkey,monster      ,受击时：交换环境中的两张牌,9,,25,100,2,TimidTurkey
 ,,,,,,,,,,,

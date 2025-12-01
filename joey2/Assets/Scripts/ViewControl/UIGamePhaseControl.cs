@@ -363,6 +363,32 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 	}
 
+	private void AddBarehandedCardToBottom()
+	{
+		Card card = CreateCard("1011");
+		if (card == null)
+		{
+			return;
+		}
+		ECardType cardType = card.GetCardType();
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
+		{
+			return;
+		}
+		m_CardDict[card.UniqueId] = card;
+		UICardSimpleControl cardControl = GetCardSimple(parent, false);
+		cardControl.SetData(card);
+		
+		// Insert at the beginning (bottom) of the list instead of the end
+		AddBagCardToBottom(cardType, cardControl);
+		
+		// Set as first sibling to display at the bottom in UI
+		cardControl.CacheTrans.SetSiblingIndex(0);
+		
+		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+	}
+
 	public void AddCardList(ECardType cardType, List<string> cardIds)
 	{
 		Debug.Log("AddCardList: " + cardType + " " + cardIds.Count);
@@ -450,8 +476,33 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	private void AddBagCardToBottom(ECardType cardType, UICardSimpleControl cardControl, bool isMoveCard = false)
+	{
+		int cardTypeInt = (int)cardType;
+		if (!m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
+		{
+			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
+		}
+		// Insert at index 0 (bottom of the stack)
+		m_BagCardDict[cardTypeInt].Insert(0, cardControl);
+		cardControl.IsEnv = false;
+		cardControl.EnvIndex = -1;
+		if (!isMoveCard)
+		{
+			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+		}
+	}
+
 	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
 	{
+		// Check if this is the Barehanded card (永不消耗)
+		if (cardControl.CardData.id == "1011")
+		{
+			Debug.Log("Barehanded card should not be removed (永不消耗)");
+			// Don't remove it, just return
+			return;
+		}
+		
 		int cardTypeInt = (int)cardType;
 		if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
 		{
@@ -504,6 +555,25 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		List<UICardSimpleControl> cardList = GetBagCardList(cardType);
 		return cardList != null && cardList.Count > 0;
+	}
+
+	public bool HasBarehandedCard()
+	{
+		List<UICardSimpleControl> cardList = GetBagCardList(ECardType.attack);
+		if (cardList == null || cardList.Count == 0) return false;
+		
+		// Check if the bottom card (index 0) is Barehanded
+		return cardList.Count > 0 && cardList[0].CardData.id == "1011";
+	}
+
+	public void EnsureBarehandedCardAtBottom()
+	{
+		// Only add if it doesn't exist yet
+		if (!HasBarehandedCard())
+		{
+			Debug.Log("Adding Barehanded card (1011) to the bottom of weapon stack");
+			AddBarehandedCardToBottom();
+		}
 	}
 
 	private UICardSimpleControl GetSpecialCardSimpleById(string cardId)

@@ -239,13 +239,16 @@ public class JoeyGameControl : YViewControl
 					bagCardDict[cardType].Add(cardId);
 				}
 
-				foreach (var kv in bagCardDict)
-				{
-					m_GamePhaseControl.AddCardList(cardType: kv.Key, cardIds: kv.Value);
-				}
+			foreach (var kv in bagCardDict)
+			{
+				m_GamePhaseControl.AddCardList(cardType: kv.Key, cardIds: kv.Value);
 			}
 		}
 	}
+	
+	// Ensure Barehanded card is at the bottom of weapon stack
+	m_GamePhaseControl.EnsureBarehandedCardAtBottom();
+}
 
 	public async void LoadNextLevel(bool IsLobbyEnter = false)
 	{
