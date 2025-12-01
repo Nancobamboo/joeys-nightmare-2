@@ -156,6 +156,12 @@ public class UICardSimpleControl : YViewControl
 
 	void OnBtnCardClick()
 	{
+		if (m_DescExtControl != null)
+		{
+			m_DescExtControl.Close();
+			m_DescExtControl = null;
+		}
+		
 		if (!IsEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
 		{
 			return;
