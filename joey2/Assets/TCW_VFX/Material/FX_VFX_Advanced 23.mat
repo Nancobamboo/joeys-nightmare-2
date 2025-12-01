@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FX_VFX_Advanced 22
+  m_Name: FX_VFX_Advanced 23
   m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -50,7 +50,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 44de31e389505a349aa812a301aa43d9, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9df2bcff30e963e4c9e9fbab4ba7cc11, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
