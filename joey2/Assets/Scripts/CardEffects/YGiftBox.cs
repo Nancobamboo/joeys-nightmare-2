@@ -20,7 +20,8 @@ public class YGiftBox : YCardEffect
         {
             Card card = GData.Instance.RandomCard();
             Debug.Log("GiftBox card: " + card.GetCardType());
-            if (card.GetCardType() == ECardType.monster)
+            // Filter out monster cards and cards with price = 0
+            if (card.GetCardType() == ECardType.monster || card.price == 0)
             {
                 continue;
             }
