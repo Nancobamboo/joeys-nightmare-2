@@ -194,13 +194,14 @@ public class UISelectControl : YViewControl
 		}
 	}
 
-	protected override void OnReturn()
+	protected override void OnClose()
 	{
 		for (int i = 0; i < m_CardList.Count; i++)
 		{
 			if (m_CardList[i] != null)
 			{
 				m_CardList[i].SelectClickHandler = null;
+				m_CardList[i].CleanupDescExt();
 			}
 		}
 		m_CardList.Clear();
@@ -211,11 +212,11 @@ public class UISelectControl : YViewControl
 			if (m_RelicList[i] != null)
 			{
 				m_RelicList[i].SelectClickHandler = null;
+				m_RelicList[i].CleanupDescExt();
 			}
 		}
 		m_RelicList.Clear();
 		m_CurrentSelectRelics.Clear();
-		OnSelectComplete = null;
-		base.OnReturn();
+		base.OnClose();
 	}
 }

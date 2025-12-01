@@ -273,11 +273,20 @@ public class JoeyGameControl : YViewControl
 
 	public void EndGamePhase()
 	{
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.ClearEnvCardList();
+		}
+
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
+				if (m_GamePhaseControl != null)
+				{
+					m_GamePhaseControl.ClearBagCardList();
+				}
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetRelicData();
 				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();
