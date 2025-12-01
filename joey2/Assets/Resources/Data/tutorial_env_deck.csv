@@ -103,7 +103,7 @@ level,slotIndex,cardIds,comment
 114,1,5009;1006,Strategy: Dual Wield doubles damage but can't use shield, high risk high reward, use potions to sustain
 114,2,5004;5005;2006,Broken Sword + Barrel + Hammer(15) | Big Monkey(30hp) + Vampire Lord(20hp,lifesteal 3) + Blood Shield(12,heal)
 114,3,3004;1005;3001,Ape Wine(x2) + Double Swords(8+5) + Potion
-114,4,4003;3003;6001,Dual Wield(x2 dmg,no shield) + Hook Lock + Exit
+114,4,3003;6001,Dual Wield(x2 dmg,no shield) + Hook Lock + Exit
 115,0,1003;1002,【最终BOSS：死神降临】终极考验 - Theme: Grim Reaper | HP: 86 | Gold: 100 | VICTORY
 115,1,5012;1006;2004,Strategy: Grim Reaper boss fight, use all mechanics learned, Double Strike + Hammer for burst
 115,2,5004;5010;3001,Dart(3) + Broken Sword | Grim Reaper(5atk 15hp,BOSS) + Hammer(15) + Hand Guard(5,draw weapon) | Big Monkey(30hp) + SiLing Donkey(20hp) + Potion(+10)
