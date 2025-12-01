@@ -8,6 +8,7 @@ public class UIRelicView : YBaseView
 	public Text TxtName;
 	public Button BtnRelic;
 	public EventTriggerListener Trigger;
+	public GameObject CardItem;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -18,5 +19,6 @@ public class UIRelicView : YBaseView
 		TxtName = viewItemList[1].Target.GetComponent<Text>();
 		BtnRelic = viewItemList[2].Target.GetComponent<Button>();
 		Trigger = viewItemList[2].Target.GetComponent<EventTriggerListener>();
+		CardItem = viewItemList[3].Target.gameObject;
 	}
 }

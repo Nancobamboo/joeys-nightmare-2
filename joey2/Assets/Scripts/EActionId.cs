@@ -41,5 +41,6 @@ public enum EActionId
 	MonsterHealOnDealDamage,
 	AddCardToBagFromSelect,
 	SwapTopTwoEnvCards,
+	UpdateRelic,
 	Upper
 }

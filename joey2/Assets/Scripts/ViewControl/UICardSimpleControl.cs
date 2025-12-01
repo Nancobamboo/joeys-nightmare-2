@@ -156,12 +156,6 @@ public class UICardSimpleControl : YViewControl
 
 	void OnBtnCardClick()
 	{
-		if (m_DescExtControl != null)
-		{
-			m_DescExtControl.Close();
-			m_DescExtControl = null;
-		}
-		
 		if (!IsEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
 		{
 			return;
@@ -437,9 +431,6 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.NecDonkey:
 				effect = new YNecDonkey();
 				break;
-			case ECardEffectId.TimidTurkey:
-				effect = new YTimidTurkey();
-				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -472,7 +463,6 @@ public class UICardSimpleControl : YViewControl
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
-		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 		m_View.Description.text = card.description;
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
