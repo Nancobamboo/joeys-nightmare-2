@@ -88,7 +88,10 @@ public class DataJoeyPlayer : IData
 	}
 	public void AddRelicListData(int data)
 	{
-		RelicList.Add(data);
+		if (!RelicList.Contains(data))
+		{
+			RelicList.Add(data);
+		}
 	}
 	public void RemoveRelicListData(int data)
 	{

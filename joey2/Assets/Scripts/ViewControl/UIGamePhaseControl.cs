@@ -36,6 +36,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private int currentMonsterAttack = 0;
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
+	private UICardSimpleControl m_FistCardCache;
 
 	public static EResType GetResType()
 	{
@@ -192,6 +193,22 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		RefreshView();
 		ClearAllCard();
+		CreateFistCardCache();
+	}
+
+	private void CreateFistCardCache()
+	{
+		Card card = DataSystem.Instance.CreateCard("1011");
+		Transform attackPanelTransform = m_View.AttackPanel.transform;
+		UICardSimpleControl cardControl = m_CardSimplePool.Get();
+		cardControl.CacheTrans.SetParent(m_View.EmptyAttack);
+		cardControl.CacheTrans.position = attackPanelTransform.position;
+		cardControl.CacheTrans.localScale = Vector3.one * .8f;
+		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
+		cardControl.IsEnv = false;
+		cardControl.AddRelicList(m_DataJoeyPlayer.RelicList);
+		cardControl.SetData(card);
+		m_FistCardCache = cardControl;
 	}
 
 	public void ClearEnvCardList()
@@ -363,31 +380,6 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 	}
 
-	private void AddBarehandedCardToBottom()
-	{
-		Card card = CreateCard("1011");
-		if (card == null)
-		{
-			return;
-		}
-		ECardType cardType = card.GetCardType();
-		Transform parent = GetParentByCardType(cardType);
-		if (parent == null)
-		{
-			return;
-		}
-		m_CardDict[card.UniqueId] = card;
-		UICardSimpleControl cardControl = GetCardSimple(parent, false);
-		cardControl.SetData(card);
-		
-		// Insert at the beginning (bottom) of the list instead of the end
-		AddBagCardToBottom(cardType, cardControl);
-		
-		// Set as first sibling to display at the bottom in UI
-		cardControl.CacheTrans.SetSiblingIndex(0);
-		
-		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-	}
 
 	public void AddCardList(ECardType cardType, List<string> cardIds)
 	{
@@ -476,33 +468,9 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private void AddBagCardToBottom(ECardType cardType, UICardSimpleControl cardControl, bool isMoveCard = false)
-	{
-		int cardTypeInt = (int)cardType;
-		if (!m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
-		{
-			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
-		}
-		// Insert at index 0 (bottom of the stack)
-		m_BagCardDict[cardTypeInt].Insert(0, cardControl);
-		cardControl.IsEnv = false;
-		cardControl.EnvIndex = -1;
-		if (!isMoveCard)
-		{
-			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-		}
-	}
 
 	private async UniTask RemoveBagCard(ECardType cardType, UICardSimpleControl cardControl)
 	{
-		// Check if this is the Barehanded card (永不消耗)
-		if (cardControl.CardData.id == "1011")
-		{
-			Debug.Log("Barehanded card should not be removed (永不消耗)");
-			// Don't remove it, just return
-			return;
-		}
-		
 		int cardTypeInt = (int)cardType;
 		if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
 		{
@@ -536,6 +504,10 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return cardList[cardList.Count - 1];
 		}
+		if (cardType == ECardType.attack && m_FistCardCache != null)
+		{
+			return m_FistCardCache;
+		}
 		return null;
 	}
 
@@ -557,46 +529,10 @@ public partial class UIGamePhaseControl : YViewControl
 		return cardList != null && cardList.Count > 0;
 	}
 
-	public bool HasBarehandedCard()
-	{
-		List<UICardSimpleControl> cardList = GetBagCardList(ECardType.attack);
-		if (cardList == null || cardList.Count == 0) return false;
-		
-		// Check if the bottom card (index 0) is Barehanded
-		return cardList.Count > 0 && cardList[0].CardData.id == "1011";
-	}
-
-	public void EnsureBarehandedCardAtBottom()
-	{
-		// Only add if it doesn't exist yet
-		if (!HasBarehandedCard())
-		{
-			Debug.Log("Adding Barehanded card (1011) to the bottom of weapon stack");
-			AddBarehandedCardToBottom();
-		}
-	}
-
-	private UICardSimpleControl GetSpecialCardSimpleById(string cardId)
-	{
-		Card card = CreateCard(cardId);
-		ECardType cardType = card.GetCardType();
-		Transform parent = GetParentByCardType(cardType);
-		if (parent == null)
-		{
-			return null;
-		}
-
-		UICardSimpleControl cardControl = GetCardSimple(parent, false);
-		cardControl.SetData(card);
-		AddBagCard(cardType, cardControl);
-		return cardControl;
-	}
 
 	private UICardSimpleControl GetFistCard()
 	{
-		UICardSimpleControl cardControl = GetSpecialCardSimpleById("1011");
-
-		return cardControl;
+		return m_FistCardCache;
 	}
 
 	private void AddEnvCard(int index, UICardSimpleControl cardControl)
@@ -880,7 +816,7 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_CardSimplePool.ForEach(cardControl =>
 		{
-			if (cardControl != null && cardControl.gameObject.activeSelf)
+			if (cardControl != null && cardControl.gameObject.activeSelf && cardControl != m_FistCardCache)
 			{
 				cardControl.Return();
 			}
@@ -1046,12 +982,7 @@ public partial class UIGamePhaseControl : YViewControl
 		int attackCount = (int)paraArray[1];
 		int envIndex = (int)paraArray[2];
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
-		bool useFistCard = false;
-		if (attackCardControl == null)
-		{
-			attackCardControl = GetFistCard();
-			useFistCard = true;
-		}
+		bool useFistCard = attackCardControl == m_FistCardCache;
 		if (useFistCard)
 		{
 			await UniTask.WaitForSeconds(1f, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1107,13 +1038,18 @@ public partial class UIGamePhaseControl : YViewControl
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
 		}
-		await RemoveBagCard(ECardType.attack, attackCardControl);
-		float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-		if (removeDelayTime > 0f)
+
+		if (!useFistCard)
 		{
-			await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+			await RemoveBagCard(ECardType.attack, attackCardControl);
+			float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+			if (removeDelayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+			}
 		}
 		RemoveCardCts(attackCardControl);
+
 		enemyCardControl.IsEffecting = false;
 		RemoveCardCts(enemyCardControl);
 	}
@@ -1426,6 +1362,23 @@ public partial class UIGamePhaseControl : YViewControl
 	void UpdateRelic(object[] paraArray)
 	{
 		RefreshRelicDisplay();
+		int relicId = (int)paraArray[0];
+		UpdateAllCardsRelic(relicId);
+	}
+
+	private void UpdateAllCardsRelic(int relicId)
+	{
+		foreach (var kvp in m_BagCardDict)
+		{
+			List<UICardSimpleControl> bagCardList = kvp.Value;
+			for (int i = 0; i < bagCardList.Count; i++)
+			{
+				UICardSimpleControl cardControl = bagCardList[i];
+				cardControl.AddRelic(relicId);
+			}
+		}
+
+		m_FistCardCache.AddRelic(relicId);
 	}
 
 	void OnCardPointerEnter(object[] paraArray)

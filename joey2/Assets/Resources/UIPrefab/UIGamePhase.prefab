@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 7461035459641491750}
   - component: {fileID: 7873463979281695195}
   m_Layer: 5
-  m_Name: Empty
+  m_Name: EmptyAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3149,6 +3149,10 @@ MonoBehaviour:
   - Target: {fileID: 7349236608634568786}
     Components:
     - {fileID: 4785283868305527068}
+    VarNameArray: []
+  - Target: {fileID: 572475433590363030}
+    Components:
+    - {fileID: 572475433590363030}
     VarNameArray: []
 --- !u!1 &5650933788740573034
 GameObject:

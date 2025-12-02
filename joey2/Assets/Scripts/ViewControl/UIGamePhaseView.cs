@@ -23,6 +23,7 @@ public class UIGamePhaseView : YBaseView
 	public RectTransform RelicContent;
 	public RectTransform UsedRoot;
 	public Text UsedCradsNumber;
+	public RectTransform EmptyAttack;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -48,5 +49,6 @@ public class UIGamePhaseView : YBaseView
 		RelicContent = viewItemList[16].Target.GetComponent<RectTransform>();
 		UsedRoot = viewItemList[17].Target.GetComponent<RectTransform>();
 		UsedCradsNumber = viewItemList[18].Target.GetComponent<Text>();
+		EmptyAttack = viewItemList[19].Target.GetComponent<RectTransform>();
 	}
 }
