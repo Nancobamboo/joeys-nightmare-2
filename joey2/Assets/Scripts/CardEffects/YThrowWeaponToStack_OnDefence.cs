@@ -52,7 +52,7 @@ public partial class UIGamePhaseControl
 			// 等待所有伤害结算完成，确保动画在正确的时机播放
 			await UniTask.Yield();
 			await AddEnvCardFromBagAsync(weaponCard);
-			weaponCard.Return();
+			// weaponCard.Return();
 		}
 		envCardCount = 0;
 		foreach (var kvp in m_EnvCardDict)
@@ -102,23 +102,5 @@ public partial class UIGamePhaseControl
 		newCardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		parent.enabled = true;
 		newCardControl.SetMoving(false);
-	}
-
-	private async UniTask MoveCardToEnvAnimationAsync(UICardSimpleControl cardControl, Vector3 startPos, Vector3 endPos, Vector3 startScale, Vector3 endScale, float duration, VerticalLayoutGroup layout)
-	{
-		layout.enabled = false;
-		cardControl.CacheTrans.SetParent(Asset.UIRoot);
-
-		float elapsed = 0f;
-		while (elapsed < duration)
-		{
-			elapsed += Time.deltaTime;
-			float t = elapsed / duration;
-
-			cardControl.CacheTrans.position = Vector3.Lerp(startPos, endPos, t);
-			cardControl.CacheTrans.localScale = Vector3.Lerp(startScale, endScale, t);
-
-			await UniTask.Yield();
-		}
 	}
 }
