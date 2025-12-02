@@ -1,6 +1,7 @@
 // Scripts/CardEffects/Effects/YBoom_OnKill.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using System;
 using Cysharp.Threading.Tasks;
@@ -75,7 +76,9 @@ public partial class UIGamePhaseControl
 				if (cardList != null && cardList.Count > 0)
 				{
 					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
-					await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom);
+					CancellationToken token = GetOrCreateCardToken(lastCard);
+					await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom, token);
+					RemoveCardCts(lastCard);
 				}
 			}
 		}
