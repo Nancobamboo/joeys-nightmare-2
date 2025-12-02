@@ -50,7 +50,7 @@ public class UISelectControl : YViewControl
 		List<Card> availableCards = allCards.Where(c =>
 		{
 			ECardType cardType = c.GetCardType();
-			return(cardType == ECardType.attack ||
+			return (cardType == ECardType.attack ||
 				cardType == ECardType.defence ||
 				cardType == ECardType.skill ||
 				cardType == ECardType.item) &&
@@ -112,7 +112,11 @@ public class UISelectControl : YViewControl
 
 		Card selectedCard = cardControl.CardData;
 		Card newCard = DataSystem.Instance.CreateCard(selectedCard.id);
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
+		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
+		if (success)
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
+		}
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
 		Close();

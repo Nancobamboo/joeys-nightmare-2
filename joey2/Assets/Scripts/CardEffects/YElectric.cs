@@ -1,6 +1,7 @@
 // Scripts/CardEffects/Effects/YElectric.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -69,7 +70,9 @@ public partial class UIGamePhaseControl
 			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
 			if (enemyCardControl != null)
 			{
-				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric);
+				CancellationToken token = GetOrCreateCardToken(enemyCardControl);
+				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric, token);
+				RemoveCardCts(enemyCardControl);
 			}
 		}
 	}

@@ -34,7 +34,7 @@ public class UIShopControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIShopView>();
-		m_View.Control.onClick.AddListener(OnControlClick);
+		//m_View.Control.onClick.AddListener(OnControlClick);
 		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnRefresh.onClick.AddListener(OnBtnRefreshClick);
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
@@ -43,7 +43,14 @@ public class UIShopControl : YViewControl
 
 	void OnControlClick()
 	{
-		Close();
+		for (int i = 0; i < m_ShopCardList.Count; i++)
+		{
+			if (m_ShopCardList[i] != null)
+			{
+				m_ShopCardList[i].CleanupDescExt();
+			}
+		}
+		gameObject.SetActive(false);
 	}
 
 	void OnBtnCloseClick()
@@ -64,11 +71,13 @@ public class UIShopControl : YViewControl
 		}
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
-		Close();
-	}
-
-	public new void Close()
-	{
+		for (int i = 0; i < m_ShopCardList.Count; i++)
+		{
+			if (m_ShopCardList[i] != null)
+			{
+				m_ShopCardList[i].CleanupDescExt();
+			}
+		}
 		gameObject.SetActive(false);
 	}
 
