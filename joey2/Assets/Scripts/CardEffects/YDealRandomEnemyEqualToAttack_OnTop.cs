@@ -48,46 +48,40 @@ public partial class UIGamePhaseControl
 {
 	public async UniTask AttackRandomEnemy(int damage, int attackTime)
 	{
-		try
+
+		if (damage <= 0)
 		{
-			if (damage <= 0)
-			{
-				return;
-			}
-
-			int envIndex = FindRandomEnemy();
-			if (envIndex == -1)
-			{
-				return;
-			}
-
-			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
-			if (enemyCardControl == null)
-			{
-				return;
-			}
-
-			Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
-			for (int i = 0; i < attackTime; i++)
-			{
-				CancellationToken token = GetOrCreateCardToken(enemyCardControl);
-				if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token))
-				{
-					RemoveCardCts(enemyCardControl);
-					break;
-				}
-				RemoveCardCts(enemyCardControl);
-				Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
-				enemyCardControl = GetLastEnvCard(envIndex);
-				if (enemyCardControl == null)
-				{
-					break;
-				}
-			}
+			return;
 		}
-		catch (System.OperationCanceledException)
+
+		int envIndex = FindRandomEnemy();
+		if (envIndex == -1)
 		{
+			return;
 		}
+
+		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+		if (enemyCardControl == null)
+		{
+			return;
+		}
+
+		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
+		for (int i = 0; i < attackTime; i++)
+		{
+			CancellationToken token = GetOrCreateCardToken(enemyCardControl);
+			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token);
+
+
+			RemoveCardCts(enemyCardControl);
+
+			if (isKilled)
+			{
+				break;
+			}
+
+		}
+
 	}
 }
 

@@ -999,7 +999,8 @@ public partial class UIGamePhaseControl : YViewControl
 		if (!enemyKilled && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
-			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
+			CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
+			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken);
 		}
 
 		if (!useFistCard)
@@ -1014,7 +1015,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RemoveCardCts(attackCardControl);
 
 		enemyCardControl.IsEffecting = false;
-		RemoveCardCts(enemyCardControl);
 	}
 
 	async void TakePlayerDamage(object[] paraArray)
@@ -1022,14 +1022,15 @@ public partial class UIGamePhaseControl : YViewControl
 		int enemyAttack = (int)paraArray[0];
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[1];
 		int envIndex = (int)paraArray[2];
-		await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex);
+		CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+		await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken);
 	}
 
-	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex)
+	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex, CancellationToken cancellationToken = default)
 	{
 		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
-		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(CurrentEffectCard));
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: cancellationToken);
 
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
@@ -1076,6 +1077,8 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			RemoveCardCts(defenceCardControl);
 		}
+
+		RemoveCardCts(enemyCardControl);
 		currentMonsterAttack = 0;
 	}
 
