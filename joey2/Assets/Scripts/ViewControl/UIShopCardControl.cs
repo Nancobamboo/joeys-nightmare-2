@@ -189,10 +189,18 @@ public class UIShopCardControl : YViewControl
         return Resources.Load<Sprite>(path);
     }
 
-    // Get shop price
     public int GetShopPrice()
     {
         return m_ShopPrice;
+    }
+
+    public void CleanupDescExt()
+    {
+        if (m_DescExtControl != null)
+        {
+            m_DescExtControl.Close();
+            m_DescExtControl = null;
+        }
     }
 }
 
