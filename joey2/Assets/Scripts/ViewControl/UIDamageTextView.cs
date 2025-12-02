@@ -6,6 +6,7 @@ public class UIDamageTextView : YBaseView
 {
 	public Text Damage;
 	public Text Add;
+	public Animator Anim;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -14,5 +15,6 @@ public class UIDamageTextView : YBaseView
 		if(viewItemList == null || viewItemList.Count == 0) return;
 		Damage = viewItemList[0].Target.GetComponent<Text>();
 		Add = viewItemList[1].Target.GetComponent<Text>();
+		Anim = viewItemList[2].Target.GetComponent<Animator>();
 	}
 }

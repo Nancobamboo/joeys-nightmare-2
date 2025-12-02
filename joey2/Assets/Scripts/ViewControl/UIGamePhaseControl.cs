@@ -15,10 +15,6 @@ public partial class UIGamePhaseControl : YViewControl
 	private UIGamePhaseView m_View;
 	private SingleDelayAction m_MoveCardDelayAction = new SingleDelayAction();
 
-	private Sprite sadSprite;
-	private Sprite sleepSprite;
-	private Sprite happySprite;
-	private Sprite deathSprite;
 	private List<VerticalLayoutGroup> m_EnvPanels = new List<VerticalLayoutGroup>();
 	private MonoBehaviourPool<UICardSimpleControl> m_CardSimplePool;
 	private MonoBehaviourPool<UIDamageTextControl> m_DamageTextPool;
@@ -86,11 +82,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.UpdateRelic, UpdateRelic);
 		RegistAction(EActionId.OnCardPointerEnter, OnCardPointerEnter);
 
-		sadSprite = Resources.Load<Sprite>("Art/Img/joey/joey_sad");
-		sleepSprite = Resources.Load<Sprite>("Art/Img/joey/img_sleep");
-		happySprite = Resources.Load<Sprite>("Art/Img/joey/joey_happy");
-		deathSprite = Resources.Load<Sprite>("Art/Img/joey/joey_weekup");
-
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
 			Transform child = m_View.EnvPanels.GetChild(i);
@@ -124,17 +115,14 @@ public partial class UIGamePhaseControl : YViewControl
 	void OnHPChanged(int hp)
 	{
 		m_View.TextHeart.text = hp.ToString();
-		ChangeJoeyImage();
 	}
 
 	void OnAttackChanged(int attack)
 	{
-		m_View.AttackNum.text = attack.ToString();
 	}
 
 	void OnDefenceChanged(int defence)
 	{
-		m_View.DefenceNum.text = defence.ToString();
 	}
 
 	private void ApplyPlayerHealthChange(int delta, bool isHeal = false)
@@ -152,9 +140,9 @@ public partial class UIGamePhaseControl : YViewControl
 		if (delta != 0)
 		{
 			int actualChange = isHeal ? (m_DataJoeyPlayer.playerHealth - m_DataJoeyPlayer.lastPlayerHealth) : Mathf.Abs(delta);
-			if (actualChange > 0)
+			//if (actualChange > 0)
 			{
-				ShowDamageText(actualChange, m_View.JoeyImage.transform, new Vector3(100f, 190f, 0), !isHeal);
+				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
 			}
 		}
 		OnHPChanged(m_DataJoeyPlayer.playerHealth);
@@ -265,8 +253,6 @@ public partial class UIGamePhaseControl : YViewControl
 	private void RefreshView()
 	{
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
-		m_View.AttackNum.text = m_DataJoeyPlayer.playerAttack.ToString();
-		m_View.DefenceNum.text = m_DataJoeyPlayer.playerDefence.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
 		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
@@ -284,29 +270,6 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_DataJoeyPlayer.Coin = coin;
 		m_View.TxtCoin.text = coin.ToString();
-	}
-
-	public void ChangeJoeyImage()
-	{
-		StartCoroutine(ChangeJoeyImageCoroutine());
-	}
-
-	IEnumerator ChangeJoeyImageCoroutine()
-	{
-		if (m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.lastPlayerHealth)
-		{
-			m_View.JoeyImage.sprite = sadSprite;
-		}
-		else if (m_DataJoeyPlayer.playerHealth > m_DataJoeyPlayer.lastPlayerHealth)
-		{
-			m_View.JoeyImage.sprite = happySprite;
-		}
-		else if (m_DataJoeyPlayer.playerHealth <= 0)
-		{
-			m_View.JoeyImage.sprite = deathSprite;
-		}
-		yield return new WaitForSeconds(0.5f);
-		m_View.JoeyImage.sprite = sleepSprite;
 	}
 
 	private UICardSimpleControl GetCardSimple(Transform parent, bool IsEnv)
@@ -1121,7 +1084,7 @@ public partial class UIGamePhaseControl : YViewControl
 		int damage = (int)paraArray[0];
 		if (damage > 0)
 		{
-			JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_boom, m_View.JoeyImage.transform, 0f);
+			JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_boom, m_View.Joey, 0f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
 		ApplyPlayerHealthChange(-damage);
