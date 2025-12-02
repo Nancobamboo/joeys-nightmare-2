@@ -62,7 +62,7 @@
 5010,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,SiLing Donkey,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,30,1,NecDonkey
 5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,Skeleton Donkey,monster      ,,5,,15,15,1,
 5012,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,死神,monster      ,死神,5,,15,100,1,GrimReaper
-5013,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,胆小Turkey,monster      ,受击时：交换环境中的两张牌,9,,25,100,2,TimidTurkey
+5013,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,胆小Turkey,monster      ,亡语:获得20金币  受击:躲到下一张牌后,9,,25,100,2,TimidTurkey
 ,,,,,,,,,,,
 ,,,,,,,,,,,
 ,,,,,,,,,,,
