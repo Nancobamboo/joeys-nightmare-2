@@ -1,6 +1,7 @@
 // Scripts/CardEffects/Effects/YDealRandomEnemyEqualToAttack_OnTop.cs
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -69,10 +70,13 @@ public partial class UIGamePhaseControl
 			Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
 			for (int i = 0; i < attackTime; i++)
 			{
-				if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex))
+				CancellationToken token = GetOrCreateCardToken(enemyCardControl);
+				if (await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token))
 				{
+					RemoveCardCts(enemyCardControl);
 					break;
 				}
+				RemoveCardCts(enemyCardControl);
 				Debug.Log("AttackRandomEnemy: enemyCardControl = " + enemyCardControl.CardData.currentHealth);
 				enemyCardControl = GetLastEnvCard(envIndex);
 				if (enemyCardControl == null)
