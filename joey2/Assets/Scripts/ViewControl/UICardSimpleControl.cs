@@ -109,7 +109,7 @@ public class UICardSimpleControl : YViewControl
 
 	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
-		if (m_IsMoving) return;
+		if (m_IsMoving || !m_IsHovering) return;
 		m_IsHovering = false;
 		CacheTrans.localScale = m_OriginalScale;
 
@@ -271,6 +271,38 @@ public class UICardSimpleControl : YViewControl
 		return m_BuffValueArray[(int)buffType];
 	}
 
+	public void AddRelic(int relicId)
+	{
+		if (cachedCard == null)
+		{
+			return;
+		}
+		ERelicType relicType = (ERelicType)relicId;
+		switch (relicType)
+		{
+			case ERelicType.EnvAttack:
+				if (IsEnv)
+				{
+					cachedCard.attack += 1;
+					cachedCard.currentAttack += 1;
+					m_View.TxtAttack.color = Color.green;
+				}
+				break;
+			case ERelicType.EnvDefence:
+				if (IsEnv)
+				{
+					cachedCard.defence += 1;
+					cachedCard.currentDefence += 1;
+					m_View.TxtDefence.color = Color.green;
+				}
+				break;
+		}
+		if (IsEnv)
+		{
+			RefreshCard();
+		}
+	}
+
 	public void AddRelicList(List<int> relicList)
 	{
 		if (cachedCard == null)
@@ -279,28 +311,7 @@ public class UICardSimpleControl : YViewControl
 		}
 		for (int i = 0; i < relicList.Count; i++)
 		{
-			ERelicType relicType = (ERelicType)relicList[i];
-			switch (relicType)
-			{
-				case ERelicType.EnvAttack:
-					if (IsEnv)
-					{
-						cachedCard.attack += 1;
-						cachedCard.currentAttack += 1;
-					}
-					break;
-				case ERelicType.EnvDefence:
-					if (IsEnv)
-					{
-						cachedCard.defence += 1;
-						cachedCard.currentDefence += 1;
-					}
-					break;
-			}
-		}
-		if (IsEnv)
-		{
-			RefreshCard();
+			AddRelic(relicList[i]);
 		}
 	}
 

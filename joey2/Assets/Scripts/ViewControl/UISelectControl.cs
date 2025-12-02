@@ -188,7 +188,7 @@ public class UISelectControl : YViewControl
 		ERelicType relicType = (ERelicType)relicControl.RelicData.id;
 		DataSystem.Instance.AddRelic(relicType);
 		DataSystem.Instance.SaveDataJoeyPlayer();
-		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic);
+		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic, (int)relicType);
 		Close();
 		if (OnSelectComplete != null)
 		{
