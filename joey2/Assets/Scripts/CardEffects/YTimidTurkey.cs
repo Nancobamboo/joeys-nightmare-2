@@ -5,6 +5,8 @@ using Cysharp.Threading.Tasks;
 
 public class YTimidTurkey : YDefaultEffect
 {
+    private bool _swapScheduled = false; // 标志位，用于防止重复触发交换
+
     public YTimidTurkey()
     {
         Id = ECardEffectId.TimidTurkey;
@@ -19,6 +21,7 @@ public class YTimidTurkey : YDefaultEffect
     {
         if (CardControl == null || CardControl.CardData == null)
         {
+            _swapScheduled = false; // 重置标志
             return;
         }
 
@@ -44,22 +47,42 @@ public class YTimidTurkey : YDefaultEffect
             // 如果卡片已经被销毁，退出
             if (CardControl == null || CardControl.CardData == null || !CardControl.gameObject.activeSelf)
             {
+                _swapScheduled = false; // 重置标志
                 return;
             }
         }
+        
+        // 再次检查卡片是否仍然有效
+        if (CardControl == null || CardControl.CardData == null || !CardControl.gameObject.activeSelf)
+        {
+            _swapScheduled = false; // 重置标志
+            return;
+        }
+        
+        float maxDelayTime = CardControl.PlayVFX(new List<EVFXName> { EVFXName.VFX_disappear }, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
+        await UniTask.WaitForSeconds(maxDelayTime);
         
         // 执行交换
         if (CardControl != null && CardControl.CardData != null && CardControl.gameObject.activeSelf)
         {
             YActionSystem.Instance.DispatchAction(EActionId.SwapTopTwoEnvCards, CardControl);
         }
+        
+        // 交换完成后重置标志，以便下次战斗可以再次触发
+        _swapScheduled = false;
     }
 
     public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
     {
         if (CardControl != null && CardControl.CardData != null)
         {
-            SwapTopTwoEnvCardsDelayed().Forget();
+            // 只有在还没有安排交换时才启动新的交换任务
+            // 这样可以确保即使有多次伤害结算，也只会执行一次交换
+            if (!_swapScheduled)
+            {
+                _swapScheduled = true;
+                SwapTopTwoEnvCardsDelayed().Forget();
+            }
         }
         return base.OnTakeDamage(effectType);
     }

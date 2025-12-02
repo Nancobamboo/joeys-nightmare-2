@@ -30,6 +30,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private Dictionary<UICardSimpleControl, CancellationTokenSource> m_CardCtsDict = new Dictionary<UICardSimpleControl, CancellationTokenSource>();
 	private bool IsEnvDirty = false;
 	private int currentMonsterAttack = 0;
+	private bool m_NextAttackDouble = false;
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
@@ -752,7 +753,12 @@ public partial class UIGamePhaseControl : YViewControl
 	void DoubleLastWeaponAttack(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		DoubleLastWeaponAttack(cardControl);
+		if (cardControl == null)
+		{
+			return;
+		}
+		// 设置标记，表示下一次攻击翻倍
+		m_NextAttackDouble = true;
 	}
 
 	void HealPlayerOnDefense(object[] paraArray)
@@ -954,7 +960,11 @@ public partial class UIGamePhaseControl : YViewControl
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
-
+		if (m_NextAttackDouble)
+		{
+			damage *= 2;
+			m_NextAttackDouble = false;
+		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
