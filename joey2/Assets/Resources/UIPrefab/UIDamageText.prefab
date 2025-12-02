@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 8764777834207010856}
   - component: {fileID: 6537526265823408889}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Anim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -385,4 +385,8 @@ MonoBehaviour:
   - Target: {fileID: 565217259254730732}
     Components:
     - {fileID: 3053010030820979194}
+    VarNameArray: []
+  - Target: {fileID: 2489622078283147073}
+    Components:
+    - {fileID: 6537526265823408889}
     VarNameArray: []

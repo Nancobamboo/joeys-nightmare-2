@@ -6,14 +6,11 @@ public class UIGamePhaseView : YBaseView
 {
 	public RectTransform EnvPanels;
 	public Text TextHeart;
-	public Text AttackNum;
-	public Text DefenceNum;
 	public Text TxtCoin;
 	public VerticalLayoutGroup SkillPanel;
 	public VerticalLayoutGroup ItemPanel;
 	public VerticalLayoutGroup DefencePanel;
 	public VerticalLayoutGroup AttackPanel;
-	public Image JoeyImage;
 	public RectTransform EffectRoot0;
 	public RectTransform EffectRoot1;
 	public RectTransform EffectRoot2;
@@ -24,31 +21,30 @@ public class UIGamePhaseView : YBaseView
 	public RectTransform UsedRoot;
 	public Text UsedCradsNumber;
 	public RectTransform EmptyAttack;
+	public RectTransform Joey;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
-		if(itemRef == null) return;
+		if (itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
-		if(viewItemList == null || viewItemList.Count == 0) return;
+		if (viewItemList == null || viewItemList.Count == 0) return;
 		EnvPanels = viewItemList[0].Target.GetComponent<RectTransform>();
 		TextHeart = viewItemList[1].Target.GetComponent<Text>();
-		AttackNum = viewItemList[2].Target.GetComponent<Text>();
-		DefenceNum = viewItemList[3].Target.GetComponent<Text>();
-		TxtCoin = viewItemList[4].Target.GetComponent<Text>();
-		SkillPanel = viewItemList[5].Target.GetComponent<VerticalLayoutGroup>();
-		ItemPanel = viewItemList[6].Target.GetComponent<VerticalLayoutGroup>();
-		DefencePanel = viewItemList[7].Target.GetComponent<VerticalLayoutGroup>();
-		AttackPanel = viewItemList[8].Target.GetComponent<VerticalLayoutGroup>();
-		JoeyImage = viewItemList[9].Target.GetComponent<Image>();
-		EffectRoot0 = viewItemList[10].Target.GetComponent<RectTransform>();
-		EffectRoot1 = viewItemList[11].Target.GetComponent<RectTransform>();
-		EffectRoot2 = viewItemList[12].Target.GetComponent<RectTransform>();
-		EffectRoot3 = viewItemList[13].Target.GetComponent<RectTransform>();
-		EffectRoot4 = viewItemList[14].Target.GetComponent<RectTransform>();
-		TxtStage = viewItemList[15].Target.GetComponent<Text>();
-		RelicContent = viewItemList[16].Target.GetComponent<RectTransform>();
-		UsedRoot = viewItemList[17].Target.GetComponent<RectTransform>();
-		UsedCradsNumber = viewItemList[18].Target.GetComponent<Text>();
-		EmptyAttack = viewItemList[19].Target.GetComponent<RectTransform>();
+		TxtCoin = viewItemList[2].Target.GetComponent<Text>();
+		SkillPanel = viewItemList[3].Target.GetComponent<VerticalLayoutGroup>();
+		ItemPanel = viewItemList[4].Target.GetComponent<VerticalLayoutGroup>();
+		DefencePanel = viewItemList[5].Target.GetComponent<VerticalLayoutGroup>();
+		AttackPanel = viewItemList[6].Target.GetComponent<VerticalLayoutGroup>();
+		EffectRoot0 = viewItemList[7].Target.GetComponent<RectTransform>();
+		EffectRoot1 = viewItemList[8].Target.GetComponent<RectTransform>();
+		EffectRoot2 = viewItemList[9].Target.GetComponent<RectTransform>();
+		EffectRoot3 = viewItemList[10].Target.GetComponent<RectTransform>();
+		EffectRoot4 = viewItemList[11].Target.GetComponent<RectTransform>();
+		TxtStage = viewItemList[12].Target.GetComponent<Text>();
+		RelicContent = viewItemList[13].Target.GetComponent<RectTransform>();
+		UsedRoot = viewItemList[14].Target.GetComponent<RectTransform>();
+		UsedCradsNumber = viewItemList[15].Target.GetComponent<Text>();
+		EmptyAttack = viewItemList[16].Target.GetComponent<RectTransform>();
+		Joey = viewItemList[17].Target.GetComponent<RectTransform>();
 	}
 }

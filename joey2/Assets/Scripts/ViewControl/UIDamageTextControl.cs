@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 public class UIDamageTextControl : YViewControl
 {
 	private UIDamageTextView m_View;
-	private Animator m_Animator;
 	public Transform CacheTrans;
 
 	public static EResType GetResType()
@@ -18,7 +17,6 @@ public class UIDamageTextControl : YViewControl
 		base.OnInit();
 		CacheTrans = transform;
 		m_View = CreateView<UIDamageTextView>();
-		m_Animator = GetComponent<Animator>();
 	}
 
 	public void SetData(int value, Transform parent, Vector3 localPositionShift, bool isDamage = true)
@@ -30,20 +28,16 @@ public class UIDamageTextControl : YViewControl
 		if (isDamage)
 		{
 			m_View.Damage.text = "-" + value.ToString();
-			m_View.Damage.gameObject.SetActive(true);
-			m_View.Add.gameObject.SetActive(false);
 		}
 		else
 		{
 			m_View.Add.text = "+" + value.ToString();
-			m_View.Add.gameObject.SetActive(true);
-			m_View.Damage.gameObject.SetActive(false);
 		}
 
-		if (m_Animator != null)
+		if (m_View.Anim != null)
 		{
 			string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
-			m_Animator.Play(animName);
+			m_View.Anim.Play(animName);
 		}
 
 		DelayReturn().Forget();
