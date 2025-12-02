@@ -29,7 +29,7 @@ public class UIBuildNewControl : YViewControl
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
-		m_EquipedItemArray = new RectTransform[] { m_View.item1, m_View.item2, m_View.item3, m_View.item4, m_View.item5, m_View.item6 ,m_View.item7};
+		m_EquipedItemArray = new RectTransform[] { m_View.item1, m_View.item2, m_View.item3, m_View.item4, m_View.item5, m_View.item6, m_View.item7};
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
 		m_CurrentCardType = ECardType.other;
 	}
