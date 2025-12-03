@@ -18,6 +18,7 @@ public enum EGameMode
 	Battle,
 	Guide,
 	Debug,
+	Env,
 }
 
 public class JoeyGameControl : YViewControl
@@ -66,6 +67,19 @@ public class JoeyGameControl : YViewControl
 			if (characterData != null)
 			{
 				DataSystem.Instance.InitRoguelikeCharacterData(characterData);
+			}
+		}
+
+		// Initialize Env mode character data
+		if (GameMode == EGameMode.Env && m_DataJoeyPlayer.EnvCardPool.Count == 0)
+		{
+			m_DataJoeyPlayer.StageId = 0;
+			// Force reload env stage data to ensure fresh data
+			CardDraw.Instance.ReloadEnvStage();
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			if (characterData != null)
+			{
+				DataSystem.Instance.InitEnvModeCharacterData(characterData);
 			}
 		}
 
@@ -147,7 +161,7 @@ public class JoeyGameControl : YViewControl
 
 		int levelId = GameMode == EGameMode.Debug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
-		if (GameMode != EGameMode.Battle)
+		if (GameMode != EGameMode.Battle && GameMode != EGameMode.Env)
 		{
 			(int health, int maxHealth)? playerData = GData.Instance.GetTutorialPlayerData(levelId);
 			if (playerData.HasValue)
@@ -162,6 +176,25 @@ public class JoeyGameControl : YViewControl
 			}
 		}
 
+		// Env mode: distribute cards randomly to environment
+		if (GameMode == EGameMode.Env)
+		{
+			m_GamePhaseControl.SetData();
+
+			// Env mode uses StageId + 1 as level number (1-8)
+			int envLevelId = m_DataJoeyPlayer.StageId + 1;
+			Debug.Log($"Env mode: Loading level {envLevelId}, StageId={m_DataJoeyPlayer.StageId}");
+
+			// Get player's accumulated card pool and distribute randomly with monsters
+			List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
+			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool);
+			for (int i = 0; i < envModeCardList.Count; i++)
+			{
+				List<string> cardIdList = envModeCardList[i];
+				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
+			}
+			return;
+		}
 
 		if (GameMode == EGameMode.Battle)
 		{
@@ -250,11 +283,16 @@ public class JoeyGameControl : YViewControl
 	public async void LoadNextLevel(bool IsLobbyEnter = false)
 	{
 		m_IsLobbyEnter = IsLobbyEnter;
-		if (GameMode != EGameMode.Guide)
+		if (GameMode == EGameMode.Battle)
 		{
 			DataSystem.Instance.LoadNextRoguelikeStage();
 		}
-		else
+		else if (GameMode == EGameMode.Env)
+		{
+			// Env mode uses StageId directly, just save player data
+			DataSystem.Instance.SaveDataJoeyPlayer();
+		}
+		else if (GameMode == EGameMode.Guide)
 		{
 			m_DataJoeyPlayer.currentLevel++;
 			DataSystem.Instance.SaveDataJoeyPlayer();
@@ -307,6 +345,35 @@ public class JoeyGameControl : YViewControl
 			else
 			{
 				// Normal stage: card selection only
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetData();
+				selectControl.OnSelectComplete = () => LoadNextLevel();
+			}
+
+			m_DataJoeyPlayer.StageId++;
+		}
+		else if (GameMode == EGameMode.Env)
+		{
+			// Env mode: same stage progression as Battle mode
+			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+
+			if (currentStage != null && currentStage.type == EStageType.boss)
+			{
+				// Boss stage: relic selection + enter shop
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetRelicData();
+				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();
+			}
+			else if (currentStage != null && currentStage.type == EStageType.elite)
+			{
+				// Elite stage: relic selection only, no shop
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetRelicData();
+				selectControl.OnSelectComplete = () => LoadNextLevel();
+			}
+			else
+			{
+				// Normal stage: card selection (cards go to EnvCardPool, not equipped)
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetData();
 				selectControl.OnSelectComplete = () => LoadNextLevel();

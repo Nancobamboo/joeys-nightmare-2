@@ -178,6 +178,82 @@ public partial class DataSystem
         SaveDataJoeyPlayer();
     }
 
+    /// <summary>
+    /// Initialize character data for Env mode.
+    /// Instead of equipping cards, all equipment cards are added to EnvCardPool.
+    /// </summary>
+    public void InitEnvModeCharacterData(RoguelikeCharacter characterData)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        // Clear existing EnvCardPool
+        dataJoeyPlayer.ClearEnvCardPool();
+
+        // Add all equipment cards to EnvCardPool (card IDs, not Card objects)
+        for (int i = 0; i < characterData.equipmentAttack.Count; i++)
+        {
+            string cardId = characterData.equipmentAttack[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentDefence.Count; i++)
+        {
+            string cardId = characterData.equipmentDefence[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentItem.Count; i++)
+        {
+            string cardId = characterData.equipmentItem[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentSkill.Count; i++)
+        {
+            string cardId = characterData.equipmentSkill[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        // Add card deck to EnvCardPool
+        for (int i = 0; i < characterData.cardDeck.Count; i++)
+        {
+            string cardId = characterData.cardDeck[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        // Set coins
+        dataJoeyPlayer.Coin = characterData.coins;
+
+        // Set health
+        if (characterData.maxHealth > 0)
+        {
+            dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
+            dataJoeyPlayer.playerHealth = characterData.maxHealth;
+        }
+
+        // Set first stage level (use level 1 for Env mode)
+        dataJoeyPlayer.currentLevel = 1;
+        dataJoeyPlayer.StageId = 0;
+
+        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool");
+        SaveDataJoeyPlayer();
+    }
+
     public void AddRelic(ERelicType relicType)
     {
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
