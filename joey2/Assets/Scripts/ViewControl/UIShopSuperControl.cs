@@ -222,7 +222,7 @@ public class UIShopSuperControl : YViewControl
         ECardType cardType = shopCardData.card.GetCardType();
         if (m_BuildControl != null)
         {
-            m_BuildControl.RefreshCardsByType(cardType, false);
+            m_BuildControl.RefreshEquipedCardsByType(cardType, false);
         }
 
         Debug.Log("购买成功！花费 " + price + " 金币，卡牌 " + shopCardData.card.cardName + " 已加入卡牌池");

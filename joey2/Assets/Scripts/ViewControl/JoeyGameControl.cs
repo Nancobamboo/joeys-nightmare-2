@@ -352,7 +352,7 @@ public class JoeyGameControl : YViewControl
 					var ctrl = Asset.OpenUI<UIShopSuperControl>();
 					ctrl.SetData();
 
-                };
+				};
 			}
 			else if (stageType == EStageType.elite)
 			{
