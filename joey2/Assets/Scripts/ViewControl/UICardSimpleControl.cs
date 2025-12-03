@@ -58,6 +58,8 @@ public class UICardSimpleControl : YViewControl
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 	private UIDescExtControl m_DescExtControl;
 
+	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
+
 	public static EResType GetResType()
 	{
 		return EResType.UICardSimple;
@@ -281,19 +283,19 @@ public class UICardSimpleControl : YViewControl
 		switch (relicType)
 		{
 			case ERelicType.EnvAttack:
-				if (IsEnv)
+				if (IsEnv && cachedCardType == ECardType.attack)
 				{
 					cachedCard.attack += 1;
 					cachedCard.currentAttack += 1;
-					m_View.TxtAttack.color = Color.green;
+					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
 			case ERelicType.EnvDefence:
-				if (IsEnv)
+				if (IsEnv && cachedCardType == ECardType.defence)
 				{
 					cachedCard.defence += 1;
 					cachedCard.currentDefence += 1;
-					m_View.TxtDefence.color = Color.green;
+					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
 		}
