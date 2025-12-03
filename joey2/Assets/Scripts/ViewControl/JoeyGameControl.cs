@@ -347,7 +347,12 @@ public class JoeyGameControl : YViewControl
 			{
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetRelicData();
-				selectControl.OnSelectComplete = () => Asset.OpenUI<UIShopSuperControl>();
+				selectControl.OnSelectComplete = () =>
+				{
+					var ctrl = Asset.OpenUI<UIShopSuperControl>();
+					ctrl.SetData();
+
+                };
 			}
 			else if (stageType == EStageType.elite)
 			{
