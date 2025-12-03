@@ -690,6 +690,10 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_BuffValueArray[i] = 0;
 		}
+
+		m_View.TxtAttack.color = Color.white;
+		m_View.TxtDefence.color = Color.white;
+
 		gameObject.SetActive(false);
 		EffectEntityList.Clear();
 		base.OnReturn();

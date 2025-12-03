@@ -9,10 +9,6 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     private bool _tutorialEnvDeckLoaded = false;
     private string TutorialEnvDeckCsvPath = "Data/tutorial_env_deck";
 
-    // Env mode stage data
-    private Dictionary<int, List<string>> _envStageCache = new Dictionary<int, List<string>>();
-    private bool _envStageLoaded = false;
-    private string EnvStageCsvPath = "Data/env_stage";
     private const int ENV_SLOT_COUNT = 5;
     private const int MIN_NON_MONSTER_TOP_CARDS = 3;
     private const string EXIT_CARD_ID = "6001";
@@ -125,103 +121,13 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         };
     }
 
-    // ===================== Env Mode Methods =====================
-
-    /// <summary>
-    /// Force reload env stage data (useful for development)
-    /// </summary>
-    public void ReloadEnvStage()
-    {
-        _envStageLoaded = false;
-        _envStageCache.Clear();
-        LoadEnvStage();
-    }
-
-    /// <summary>
-    /// Load env stage configuration from CSV
-    /// </summary>
-    private void LoadEnvStage()
-    {
-        if (_envStageLoaded) return;
-
-        _envStageCache.Clear();
-        var ta = Resources.Load<TextAsset>(EnvStageCsvPath);
-        if (ta == null)
-        {
-            Debug.LogWarning($"Env stage CSV not found: {EnvStageCsvPath}");
-            _envStageLoaded = true;
-            return;
-        }
-
-        var lines = ta.text.Split('\n');
-        if (lines.Length <= 1)
-        {
-            _envStageLoaded = true;
-            return;
-        }
-
-        // Parse header
-        var header = lines[0].Split(',');
-        var idx = new Dictionary<string, int>();
-        for (int i = 0; i < header.Length; i++)
-        {
-            var key = header[i].Trim();
-            if (!idx.ContainsKey(key)) idx[key] = i;
-        }
-
-        int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
-        int MonsterIdsIdx = idx.ContainsKey("monster_ids") ? idx["monster_ids"] : -1;
-
-        for (int i = 1; i < lines.Length; i++)
-        {
-            var line = lines[i];
-            if (string.IsNullOrWhiteSpace(line)) continue;
-
-            var values = line.Split(',');
-            if (values.Length < 2) continue;
-
-            string Get(int index)
-            {
-                if (index < 0 || index >= values.Length) return string.Empty;
-                return values[index].Trim();
-            }
-
-            if (!int.TryParse(Get(LevelIdx), out int level)) continue;
-            string monsterIdsStr = Get(MonsterIdsIdx);
-
-            List<string> monsterIds = new List<string>();
-            if (!string.IsNullOrWhiteSpace(monsterIdsStr))
-            {
-                var parts = monsterIdsStr.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
-                foreach (var part in parts)
-                {
-                    var id = part.Trim();
-                    if (!string.IsNullOrEmpty(id)) monsterIds.Add(id);
-                }
-            }
-
-            _envStageCache[level] = monsterIds;
-        }
-
-        _envStageLoaded = true;
-        Debug.Log($"Env stage loaded: {_envStageCache.Count} levels");
-    }
-
-    /// <summary>
-    /// Get monster list for a specific env mode level
-    /// </summary>
     public List<string> GetEnvStageMonsters(int level)
     {
-        LoadEnvStage();
-        Debug.Log($"GetEnvStageMonsters: level={level}, cache count={_envStageCache.Count}, keys=[{string.Join(",", _envStageCache.Keys)}]");
-
-        if (_envStageCache.ContainsKey(level))
+        EnvStage envStage = GData.Instance.GetEnvStage(level);
+        if (envStage != null)
         {
-            var monsters = new List<string>(_envStageCache[level]);
-            Debug.Log($"Found monsters for level {level}: [{string.Join(";", monsters)}]");
-            return monsters;
+            return new List<string>(envStage.monsterIds);
         }
-
         Debug.LogWarning($"Env stage for level {level} not found, using default monsters");
         return new List<string> { "5001", "5001", "5003" };
     }
@@ -236,9 +142,6 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     /// <returns>List of 5 columns, each containing card IDs (first=top, last=bottom due to reverse iteration in AddEnvCardList)</returns>
     public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool)
     {
-        LoadEnvStage();
-
-        // Collect all cards (excluding exit card - it will be added at the end/bottom)
         List<string> monsters = GetEnvStageMonsters(level);
         List<string> nonMonsterCards = new List<string>(playerCardPool);
 

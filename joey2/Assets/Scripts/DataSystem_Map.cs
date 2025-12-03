@@ -154,7 +154,6 @@ public partial class DataSystem
             {
                 dataJoeyPlayer.currentLevel = levelId;
             }
-            dataJoeyPlayer.StageId = 0;
         }
 
         SaveDataJoeyPlayer();
@@ -178,18 +177,12 @@ public partial class DataSystem
         SaveDataJoeyPlayer();
     }
 
-    /// <summary>
-    /// Initialize character data for Env mode.
-    /// Instead of equipping cards, all equipment cards are added to EnvCardPool.
-    /// </summary>
     public void InitEnvModeCharacterData(RoguelikeCharacter characterData)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
 
-        // Clear existing EnvCardPool
-        dataJoeyPlayer.ClearEnvCardPool();
+        //dataJoeyPlayer.ClearEnvCardPool();
 
-        // Add all equipment cards to EnvCardPool (card IDs, not Card objects)
         for (int i = 0; i < characterData.equipmentAttack.Count; i++)
         {
             string cardId = characterData.equipmentAttack[i];
@@ -226,7 +219,6 @@ public partial class DataSystem
             }
         }
 
-        // Add card deck to EnvCardPool
         for (int i = 0; i < characterData.cardDeck.Count; i++)
         {
             string cardId = characterData.cardDeck[i];
@@ -236,19 +228,15 @@ public partial class DataSystem
             }
         }
 
-        // Set coins
         dataJoeyPlayer.Coin = characterData.coins;
 
-        // Set health
         if (characterData.maxHealth > 0)
         {
             dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
             dataJoeyPlayer.playerHealth = characterData.maxHealth;
         }
 
-        // Set first stage level (use level 1 for Env mode)
         dataJoeyPlayer.currentLevel = 1;
-        dataJoeyPlayer.StageId = 0;
 
         Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool");
         SaveDataJoeyPlayer();

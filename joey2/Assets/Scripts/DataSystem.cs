@@ -62,7 +62,7 @@ public partial class DataSystem : YSingletonModule<DataSystem>
         {
             jarray = (JArray)JsonConvert.DeserializeObject(result);
         }
-       
+
 #else
         JArray jarray = JsonUtil.LoadFile(this.SavePath + "/" + filename + ".json");
 #endif

@@ -91,10 +91,7 @@ public class DataJoeyPlayer : IData
 	}
 	public void AddRelicListData(int data)
 	{
-		if (!RelicList.Contains(data))
-		{
-			RelicList.Add(data);
-		}
+		RelicList.Add(data);
 	}
 	public void RemoveRelicListData(int data)
 	{
@@ -214,17 +211,17 @@ public class DataJoeyPlayer : IData
 	{
 		return TempSkillList[dataIndex];
 	}
-	public void AddEnvCardPoolData(string cardId)
+	public void AddEnvCardPoolData(string data)
 	{
-		EnvCardPool.Add(cardId);
+		EnvCardPool.Add(data);
 	}
-	public void RemoveEnvCardPoolData(string cardId)
+	public void RemoveEnvCardPoolData(string data)
 	{
-		EnvCardPool.Remove(cardId);
+		EnvCardPool.Remove(data);
 	}
-	public void ClearEnvCardPool()
+	public string GetEnvCardPoolData(int dataIndex)
 	{
-		EnvCardPool.Clear();
+		return EnvCardPool[dataIndex];
 	}
 }
 public partial class DataSystem

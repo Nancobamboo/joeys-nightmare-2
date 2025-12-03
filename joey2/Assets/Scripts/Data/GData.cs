@@ -12,6 +12,7 @@ public sealed class GData : PureSingleton<GData>
 
 	public List<RoguelikeCharacter> RoguelikeCharacterList { get; private set; } = new List<RoguelikeCharacter>();
 	public List<RoguelikeStage> RoguelikeStageList { get; private set; } = new List<RoguelikeStage>();
+	public List<EnvStage> EnvStageList { get; private set; } = new List<EnvStage>();
 
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
 	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
@@ -26,6 +27,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_EquipmentUnlockCsvPath = "Data/equipment_unlock";
 	private string m_KeywordCsvPath = "Data/keyword";
 	private string m_RelicInfoCsvPath = "Data/relic_info";
+	private string m_EnvStageCsvPath = "Data/env_stage";
 	private Dictionary<int, Dictionary<string, List<string>>> m_TutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
 	private Dictionary<int, (int health, int maxHealth)> m_TutorialPlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool m_CardsLoaded = false;
@@ -44,6 +46,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadEquipmentUnlock();
 		LoadKeyword();
 		LoadRelicInfo();
+		LoadEnvStage();
 	}
 
 	public void SaveAll()
@@ -598,6 +601,111 @@ public sealed class GData : PureSingleton<GData>
 		}
 		Debug.LogWarning($"Roguelike stage index {index} out of range (count: {RoguelikeStageList.Count})");
 		return null;
+	}
+
+	public void LoadEnvStage(bool force = false)
+	{
+		if (!force && EnvStageList.Count > 0) return;
+
+		EnvStageList.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_EnvStageCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Env stage CSV not found: {m_EnvStageCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+		int MonsterIdsIdx = idx.ContainsKey("monster_ids") ? idx["monster_ids"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			List<string> ParseList(int index)
+			{
+				List<string> result = new List<string>();
+				string value = Get(index);
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					string[] parts = value.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+					for (int j = 0; j < parts.Length; j++)
+					{
+						string id = parts[j].Trim();
+						if (!string.IsNullOrEmpty(id)) result.Add(id);
+					}
+				}
+				return result;
+			}
+
+			if (!int.TryParse(Get(LevelIdx), out int level)) continue;
+
+			EnvStage envStage = new EnvStage();
+			envStage.level = level;
+			envStage.monsterIds = ParseList(MonsterIdsIdx);
+			string typeStr = Get(TypeIdx);
+			if (!string.IsNullOrEmpty(typeStr) && System.Enum.TryParse<EStageType>(typeStr, true, out EStageType stageType))
+			{
+				envStage.type = stageType;
+			}
+			else
+			{
+				envStage.type = EStageType.normal;
+			}
+
+			EnvStageList.Add(envStage);
+		}
+
+		Debug.Log($"Env stage loaded: {EnvStageList.Count} stages");
+	}
+
+	public EnvStage GetEnvStage(int level)
+	{
+		LoadEnvStage();
+		for (int i = 0; i < EnvStageList.Count; i++)
+		{
+			if (EnvStageList[i].level == level)
+			{
+				return EnvStageList[i];
+			}
+		}
+		Debug.LogWarning($"Env stage for level {level} not found");
+		return null;
+	}
+
+	public EStageType GetEnvStageType(int level)
+	{
+		EnvStage envStage = GetEnvStage(level);
+		if (envStage != null)
+		{
+			return envStage.type;
+		}
+		return EStageType.normal;
 	}
 
 	public void LoadEquipmentUnlock(bool force = false)

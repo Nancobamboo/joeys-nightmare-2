@@ -242,7 +242,6 @@ public class UIShopControl : YViewControl
 			return;
 		}
 
-		// In Env mode, add card to EnvCardPool instead of equipping
 		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
 			m_PlayerData.AddEnvCardPoolData(shopCardData.card.id);
