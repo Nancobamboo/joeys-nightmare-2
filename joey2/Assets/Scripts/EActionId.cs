@@ -43,5 +43,7 @@ public enum EActionId
 	SwapTopTwoEnvCards,
 	UpdateRelic,
 	OnCardPointerEnter,
+	PermanentBoostAttack,
+	PermanentBoostDefence,
 	Upper
 }
