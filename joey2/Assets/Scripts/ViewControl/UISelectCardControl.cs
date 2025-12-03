@@ -121,6 +121,7 @@ public class UISelectCardControl : YViewControl
         m_View.Description.text = card.description;
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
+        m_View.CardBackground.sprite = LoadSprite(card.CardBackground);
         m_View.Price.SetActive(false); // 三选一界面不需要显示价格
 
         SetTypeUI(card);
