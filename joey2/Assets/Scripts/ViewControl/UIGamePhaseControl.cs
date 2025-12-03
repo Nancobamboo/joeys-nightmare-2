@@ -193,6 +193,10 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private void CreateFistCardCache()
 	{
+		if (m_FistCardCache != null && m_FistCardCache.gameObject.activeSelf)
+		{
+			return;
+		}
 		Card card = DataSystem.Instance.CreateCard("1011");
 		Transform attackPanelTransform = m_View.AttackPanel.transform;
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
@@ -492,10 +496,6 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return cardList[cardList.Count - 1];
 		}
-		if (cardType == ECardType.attack && m_FistCardCache != null)
-		{
-			return m_FistCardCache;
-		}
 		return null;
 	}
 
@@ -560,6 +560,10 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
+			//if (effectType == EEffectType.Damage)
+			{
+				ShakeScreen(0.2f, 20f).Forget();
+			}
 			if (delayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
@@ -1084,11 +1088,11 @@ public partial class UIGamePhaseControl : YViewControl
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-			
+
 			// 检查防御牌是否有ThrowWeaponToStack_OnDefence效果，如果有，武器牌会被移动到环境卡，不应该播放掉落动画
-			weaponWillMoveToEnv = defenceCardControl.CardEffect != null && 
+			weaponWillMoveToEnv = defenceCardControl.CardEffect != null &&
 				defenceCardControl.CardEffect.Id == ECardEffectId.ThrowWeaponToStack_OnDefence;
-			
+
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
 			{
 				if (ControlUtil.IsRandomSucceed(10))
@@ -1129,7 +1133,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		RemoveCardCts(enemyCardControl);
 		currentMonsterAttack = 0;
-		
+
 		// 返回是否应该播放武器牌的掉落动画（如果武器牌会被移动到环境卡，则返回false）
 		return !weaponWillMoveToEnv;
 	}
