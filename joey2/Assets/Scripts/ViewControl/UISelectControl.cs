@@ -112,7 +112,6 @@ public class UISelectControl : YViewControl
 
 		Card selectedCard = cardControl.CardData;
 
-		// In Env mode, add card to EnvCardPool instead of equipping
 		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
 			m_PlayerData.AddEnvCardPoolData(selectedCard.id);

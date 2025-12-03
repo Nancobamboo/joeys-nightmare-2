@@ -979,6 +979,10 @@ public partial class UIGamePhaseControl : YViewControl
 		int attackCount = (int)paraArray[1];
 		int envIndex = (int)paraArray[2];
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
+		if (attackCardControl == null)
+		{
+			attackCardControl = GetFistCard();
+		}
 		bool useFistCard = attackCardControl == m_FistCardCache;
 		if (useFistCard)
 		{
