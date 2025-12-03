@@ -281,9 +281,10 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-			// Elite and Boss stages both go to shop
-			if (currentStage != null && (currentStage.type == EStageType.elite || currentStage.type == EStageType.boss))
+
+			if (currentStage != null && currentStage.type == EStageType.boss)
 			{
+				// Boss stage: relic selection + enter shop
 				if (m_GamePhaseControl != null)
 				{
 					m_GamePhaseControl.ClearBagCardList();
@@ -292,8 +293,20 @@ public class JoeyGameControl : YViewControl
 				selectControl.SetRelicData();
 				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();
 			}
+			else if (currentStage != null && currentStage.type == EStageType.elite)
+			{
+				// Elite stage: relic selection only, no shop
+				if (m_GamePhaseControl != null)
+				{
+					m_GamePhaseControl.ClearBagCardList();
+				}
+				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+				selectControl.SetRelicData();
+				selectControl.OnSelectComplete = () => LoadNextLevel();
+			}
 			else
 			{
+				// Normal stage: card selection only
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetData();
 				selectControl.OnSelectComplete = () => LoadNextLevel();
