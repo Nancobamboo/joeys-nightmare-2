@@ -30,6 +30,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private Dictionary<UICardSimpleControl, CancellationTokenSource> m_CardCtsDict = new Dictionary<UICardSimpleControl, CancellationTokenSource>();
 	private bool IsEnvDirty = false;
 	private int currentMonsterAttack = 0;
+	private bool m_NextAttackDouble = false;
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
@@ -776,7 +777,12 @@ public partial class UIGamePhaseControl : YViewControl
 	void DoubleLastWeaponAttack(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		DoubleLastWeaponAttack(cardControl);
+		if (cardControl == null)
+		{
+			return;
+		}
+		// 设置标记，表示下一次攻击翻倍
+		m_NextAttackDouble = true;
 	}
 
 	void HealPlayerOnDefense(object[] paraArray)
@@ -978,7 +984,11 @@ public partial class UIGamePhaseControl : YViewControl
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
-
+		if (m_NextAttackDouble)
+		{
+			damage *= 2;
+			m_NextAttackDouble = false;
+		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1014,17 +1024,25 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
-		if (finishDelayTime > 0f)
-		{
-			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-		}
+		// 延迟播放武器牌的掉落动画，直到防御牌使用后判断是否需要播放
+		bool shouldPlayWeaponDropAnimation = true;
 
 		if (!enemyKilled && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
-			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken);
+			// 传递武器牌引用，以便在防御牌使用后判断是否需要播放掉落动画
+			shouldPlayWeaponDropAnimation = await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
+		}
+
+		// 只有当武器牌不会被移动到环境卡时，才播放掉落动画
+		if (shouldPlayWeaponDropAnimation)
+		{
+			float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
+			if (finishDelayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+			}
 		}
 
 		if (!useFistCard)
@@ -1047,10 +1065,11 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[1];
 		int envIndex = (int)paraArray[2];
 		CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-		await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken);
+		// 这个调用不需要返回武器牌掉落动画的播放标志，因为不是从TakeEnemyDamage调用的
+		await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, null);
 	}
 
-	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex, CancellationToken cancellationToken = default)
+	async UniTask<bool> TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex, CancellationToken cancellationToken = default, UICardSimpleControl attackCardControl = null)
 	{
 		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
@@ -1058,12 +1077,18 @@ public partial class UIGamePhaseControl : YViewControl
 
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
+		bool weaponWillMoveToEnv = false;
 		if (defenceCardControl != null)
 		{
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+			
+			// 检查防御牌是否有ThrowWeaponToStack_OnDefence效果，如果有，武器牌会被移动到环境卡，不应该播放掉落动画
+			weaponWillMoveToEnv = defenceCardControl.CardEffect != null && 
+				defenceCardControl.CardEffect.Id == ECardEffectId.ThrowWeaponToStack_OnDefence;
+			
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
 			{
 				if (ControlUtil.IsRandomSucceed(10))
@@ -1104,6 +1129,9 @@ public partial class UIGamePhaseControl : YViewControl
 
 		RemoveCardCts(enemyCardControl);
 		currentMonsterAttack = 0;
+		
+		// 返回是否应该播放武器牌的掉落动画（如果武器牌会被移动到环境卡，则返回false）
+		return !weaponWillMoveToEnv;
 	}
 
 	void TakePlayerBoomDamage(object[] paraArray)

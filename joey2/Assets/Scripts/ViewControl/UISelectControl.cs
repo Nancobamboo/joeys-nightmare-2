@@ -111,14 +111,25 @@ public class UISelectControl : YViewControl
 		}
 
 		Card selectedCard = cardControl.CardData;
-		Card newCard = DataSystem.Instance.CreateCard(selectedCard.id);
-		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
-		if (success)
+
+		// In Env mode, add card to EnvCardPool instead of equipping
+		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
-			YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
+			m_PlayerData.AddEnvCardPoolData(selectedCard.id);
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"Env mode: Added card {selectedCard.id} to EnvCardPool");
+		}
+		else
+		{
+			Card newCard = DataSystem.Instance.CreateCard(selectedCard.id);
+			bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
+			if (success)
+			{
+				YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
+			}
+			DataSystem.Instance.SaveDataJoeyPlayer();
 		}
 
-		DataSystem.Instance.SaveDataJoeyPlayer();
 		Close();
 		if (OnSelectComplete != null)
 		{

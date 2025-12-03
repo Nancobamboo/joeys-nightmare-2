@@ -242,6 +242,18 @@ public class UIShopControl : YViewControl
 			return;
 		}
 
+		// In Env mode, add card to EnvCardPool instead of equipping
+		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		{
+			m_PlayerData.AddEnvCardPoolData(shopCardData.card.id);
+			DataSystem.Instance.AddCoin(-price);
+			m_CurrentShopCards.Remove(shopCardData);
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			RefreshShopDisplay();
+			Debug.Log("Env mode: 购买成功！花费 " + price + " 金币，卡牌 " + shopCardData.card.cardName + " 已加入卡牌池");
+			return;
+		}
+
 		Card newCard = DataSystem.Instance.CreateCard(shopCardData.card.id);
 		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
 
