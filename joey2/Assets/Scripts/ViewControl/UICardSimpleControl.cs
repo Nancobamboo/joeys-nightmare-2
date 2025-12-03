@@ -494,6 +494,15 @@ public class UICardSimpleControl : YViewControl
 		SetStars(card.stars);
 		CardEffect = GetCardEffect();
 		IsEffecting = false;
+
+		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
+		{
+			DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+			if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
+			{
+				AddRelicList(dataJoeyPlayer.RelicList);
+			}
+		}
 	}
 
 	private void SetTypeUI(Card card)

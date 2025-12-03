@@ -338,6 +338,7 @@ public class JoeyGameControl : YViewControl
 		Transform vfxTransform = pool.Get();
 		vfxTransform.SetParent(parent);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.localScale = Vector3.one;
 
 		var cts = new CancellationTokenSource();
 		CancelTokenDict[vfxTransform] = cts;
@@ -367,6 +368,7 @@ public class JoeyGameControl : YViewControl
 		Transform vfxTransform = pool.Get();
 		vfxTransform.SetParent(parent);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.localScale = Vector3.one;
 		vfxTransform.gameObject.SetActive(true);
 
 		return vfxTransform;
@@ -390,6 +392,7 @@ public class JoeyGameControl : YViewControl
 		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
 		vfxTransform.SetParent(effectRoot);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.localScale = Vector3.one;
 	}
 
 	private async UniTaskVoid DelayHideVFX(Transform vfxTransform, float delayTime, CancellationTokenSource cts, int key)

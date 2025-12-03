@@ -195,7 +195,6 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.CacheTrans.localScale = Vector3.one * .8f;
 		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		cardControl.IsEnv = false;
-		cardControl.AddRelicList(m_DataJoeyPlayer.RelicList);
 		cardControl.SetData(card);
 		m_FistCardCache = cardControl;
 	}
@@ -282,7 +281,6 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		cardControl.CacheTrans.SetAsLastSibling();
 		cardControl.IsEnv = IsEnv;
-		cardControl.AddRelicList(m_DataJoeyPlayer.RelicList);
 		return cardControl;
 	}
 
@@ -1373,6 +1371,19 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		m_FistCardCache.AddRelic(relicId);
+
+		foreach (var kvp in m_EnvCardDict)
+		{
+			List<UICardSimpleControl> envCardList = kvp.Value;
+			for (int i = 0; i < envCardList.Count; i++)
+			{
+				UICardSimpleControl cardControl = envCardList[i];
+				if (cardControl.CardType != ECardType.monster && cardControl.CardType != ECardType.other)
+				{
+					cardControl.AddRelic(relicId);
+				}
+			}
+		}
 	}
 
 	void OnCardPointerEnter(object[] paraArray)
