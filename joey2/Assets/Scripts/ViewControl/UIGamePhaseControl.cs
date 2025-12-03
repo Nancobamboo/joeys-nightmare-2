@@ -82,6 +82,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.SwapTopTwoEnvCards, SwapTopTwoEnvCards);
 		RegistAction(EActionId.UpdateRelic, UpdateRelic);
 		RegistAction(EActionId.OnCardPointerEnter, OnCardPointerEnter);
+		RegistAction(EActionId.PermanentBoostAttack, PermanentBoostAttack);
+		RegistAction(EActionId.PermanentBoostDefence, PermanentBoostDefence);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -145,6 +147,10 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
 			}
+		}
+		if (delta < 0 && !isHeal)
+		{
+			ShakeScreen(0.2f, 20f).Forget();
 		}
 		OnHPChanged(m_DataJoeyPlayer.playerHealth);
 		CheckGameOver();
@@ -288,6 +294,26 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
 		damageTextControl.SetData(damage, parent, localPositionShift, isDamage);
+	}
+
+	private async UniTask ShakeScreen(float duration = 0.2f, float intensity = 10f)
+	{
+		RectTransform rectTransform = transform as RectTransform;
+		Vector2 originalPosition = rectTransform.anchoredPosition;
+		float elapsed = 0f;
+
+		while (elapsed < duration)
+		{
+			float progress = elapsed / duration;
+			float currentIntensity = intensity * (1f - progress);
+			Vector2 randomOffset = Random.insideUnitCircle * currentIntensity;
+			rectTransform.anchoredPosition = originalPosition + randomOffset;
+
+			elapsed += Time.deltaTime;
+			await UniTask.Yield();
+		}
+
+		rectTransform.anchoredPosition = originalPosition;
 	}
 
 	public Card CreateCard(string cardId)
@@ -1411,6 +1437,30 @@ public partial class UIGamePhaseControl : YViewControl
 		if (shouldShow)
 		{
 			cardControl.ShowCardHoverEffect();
+		}
+	}
+
+	void PermanentBoostAttack(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = GetLastBagCard(ECardType.attack);
+		if (cardControl != null && cardControl.CardData != null)
+		{
+			Card cardData = cardControl.CardData;
+			cardData.attack += 1;
+			cardData.currentAttack += 1;
+			cardControl.RefreshCard();
+		}
+	}
+
+	void PermanentBoostDefence(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = GetLastBagCard(ECardType.defence);
+		if (cardControl != null && cardControl.CardData != null)
+		{
+			Card cardData = cardControl.CardData;
+			cardData.defence += 1;
+			cardData.currentDefence += 1;
+			cardControl.RefreshCard();
 		}
 	}
 

@@ -45,7 +45,10 @@ public enum ECardEffectId
     VampireMonkey,
     NecDonkey,
     TimidTurkey,
-    BareHands
+    BareHands,
+    TurkeyFeather,
+    DonkeyMeatFireBun,
+    MonkeyBanana
 }
 
 public enum EEffectType
