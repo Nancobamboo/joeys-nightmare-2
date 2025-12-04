@@ -9,7 +9,7 @@ public class YMonkeyBanana : YCardEffect
 		Id = ECardEffectId.MonkeyBanana;
 	}
 
-	public override float UseSkill()
+	public override float UseItem()
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{

@@ -45,5 +45,6 @@ public enum EActionId
 	OnCardPointerEnter,
 	PermanentBoostAttack,
 	PermanentBoostDefence,
+	Bone,
 	Upper
 }
