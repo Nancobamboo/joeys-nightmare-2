@@ -145,6 +145,14 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
 			}
+			if (isHeal)
+			{
+				m_View.JoeyAnim.Play("happy");
+			}
+			else
+			{
+				m_View.JoeyAnim.Play("fear");
+			}
 		}
 		if (delta < 0 && !isHeal)
 		{
@@ -187,6 +195,20 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
+	}
+
+	public void SetBackgroundByStageId(int stageId)
+	{
+		if (stageId <= 8)
+		{
+			m_View.MonkeyBg.SetActive(true);
+			m_View.TurkeyBg.SetActive(false);
+		}
+		else
+		{
+			m_View.MonkeyBg.SetActive(false);
+			m_View.TurkeyBg.SetActive(true);
+		}
 	}
 
 	private void CreateFistCardCache()
@@ -262,14 +284,21 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
-		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
-			m_View.TxtStage.text = currentStage.stages;
+			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
+			if (envStage != null)
+			{
+				m_View.TxtStage.text = envStage.level.ToString();
+			}
 		}
 		else
 		{
-			m_View.TxtStage.text = string.Empty;
+			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+			if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+			{
+				m_View.TxtStage.text = currentStage.stages;
+			}
 		}
 		RefreshRelicDisplay();
 	}

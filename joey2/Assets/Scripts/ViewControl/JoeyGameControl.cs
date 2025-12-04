@@ -158,6 +158,9 @@ public class JoeyGameControl : YViewControl
 	{
 		StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/shuffle_cards", startTime: 0f));
 
+		int stageId = m_DataJoeyPlayer.StageId;
+		m_GamePhaseControl.SetBackgroundByStageId(stageId);
+
 		int levelId = GameMode == EGameMode.Debug ? DebugLevelId : m_DataJoeyPlayer.currentLevel;
 
 		if (GameMode != EGameMode.Battle && GameMode != EGameMode.Env)
