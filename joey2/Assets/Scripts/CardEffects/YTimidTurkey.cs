@@ -30,12 +30,12 @@ public class YTimidTurkey : YDefaultEffect
         float waitTime = 0f;
         float maxWaitTime = 10f;
         float checkInterval = 0.1f;
-        
+
         while (waitTime < maxWaitTime)
         {
             await UniTask.WaitForSeconds(checkInterval);
             waitTime += checkInterval;
-            
+
             // 检查攻击流程是否完成
             if (CardControl != null && !CardControl.IsEffecting)
             {
@@ -43,7 +43,7 @@ public class YTimidTurkey : YDefaultEffect
                 await UniTask.WaitForSeconds(0.3f);
                 break;
             }
-            
+
             // 如果卡片已经被销毁，退出
             if (CardControl == null || CardControl.CardData == null || !CardControl.gameObject.activeSelf)
             {
@@ -51,28 +51,28 @@ public class YTimidTurkey : YDefaultEffect
                 return;
             }
         }
-        
+
         // 再次检查卡片是否仍然有效
         if (CardControl == null || CardControl.CardData == null || !CardControl.gameObject.activeSelf)
         {
             _swapScheduled = false; // 重置标志
             return;
         }
-        
+
         float maxDelayTime = CardControl.PlayVFX(new List<EVFXName> { EVFXName.VFX_disappear }, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
         await UniTask.WaitForSeconds(maxDelayTime);
-        
+
         // 执行交换
         if (CardControl != null && CardControl.CardData != null && CardControl.gameObject.activeSelf)
         {
             YActionSystem.Instance.DispatchAction(EActionId.SwapTopTwoEnvCards, CardControl);
         }
-        
+
         // 交换完成后重置标志，以便下次战斗可以再次触发
         _swapScheduled = false;
     }
 
-    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         if (CardControl != null && CardControl.CardData != null)
         {

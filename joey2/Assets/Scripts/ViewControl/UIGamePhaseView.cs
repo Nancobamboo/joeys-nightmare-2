@@ -22,12 +22,15 @@ public class UIGamePhaseView : YBaseView
 	public Text UsedCradsNumber;
 	public RectTransform EmptyAttack;
 	public RectTransform Joey;
+	public Animator JoeyAnim;
+	public GameObject MonkeyBg;
+	public GameObject TurkeyBg;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
-		if (itemRef == null) return;
+		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
-		if (viewItemList == null || viewItemList.Count == 0) return;
+		if(viewItemList == null || viewItemList.Count == 0) return;
 		EnvPanels = viewItemList[0].Target.GetComponent<RectTransform>();
 		TextHeart = viewItemList[1].Target.GetComponent<Text>();
 		TxtCoin = viewItemList[2].Target.GetComponent<Text>();
@@ -46,5 +49,8 @@ public class UIGamePhaseView : YBaseView
 		UsedCradsNumber = viewItemList[15].Target.GetComponent<Text>();
 		EmptyAttack = viewItemList[16].Target.GetComponent<RectTransform>();
 		Joey = viewItemList[17].Target.GetComponent<RectTransform>();
+		JoeyAnim = viewItemList[17].Target.GetComponent<Animator>();
+		MonkeyBg = viewItemList[18].Target.gameObject;
+		TurkeyBg = viewItemList[19].Target.gameObject;
 	}
 }

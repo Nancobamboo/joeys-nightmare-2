@@ -22,7 +22,7 @@ public class YBareHands : YCardEffect
         return base.OnDealDamage();
     }
 
-    public override float OnUseFinished()
+    public override float OnUseFinished(bool isSkip)
     {
         // Barehanded card should not be removed (永不消耗)
         // Don't play the drop animation

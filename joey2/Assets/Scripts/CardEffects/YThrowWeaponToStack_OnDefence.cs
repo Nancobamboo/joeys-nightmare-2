@@ -35,6 +35,16 @@ public class YThrowWeaponToStack_OnDefence : YCardEffect
 
 public partial class UIGamePhaseControl
 {
+	bool IsUseAttackFinishAnim()
+	{
+		UICardSimpleControl lastDefenceCard = GetLastBagCard(ECardType.defence);
+		if (lastDefenceCard != null && lastDefenceCard.CardEffect != null)
+		{
+			return lastDefenceCard.CardEffect.Id == ECardEffectId.ThrowWeaponToStack_OnDefence;
+		}
+		return false;
+	}
+
 	async void ThrowWeaponToEnv(UICardSimpleControl cardControl)
 	{
 		// check env card count number

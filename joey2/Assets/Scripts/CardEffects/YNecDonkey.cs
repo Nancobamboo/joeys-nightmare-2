@@ -11,13 +11,13 @@ public class YNecDonkey : YDefaultEffect
         Id = ECardEffectId.NecDonkey;
     }
 
-    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         if (CardControl != null && CardControl.CardData != null)
         {
             Card cardData = CardControl.CardData;
             if (cardData.currentHealth > 0 && cardData.currentHealth <= cardData.health / 2 && !m_IsCalled)
-            {                
+            {
                 // TODO due to the env index is fixed, set env size = 5
                 int envIndex = CardControl.EnvIndex;
                 int leftEnvIndex = Mathf.Clamp(envIndex - 1, 0, 4);

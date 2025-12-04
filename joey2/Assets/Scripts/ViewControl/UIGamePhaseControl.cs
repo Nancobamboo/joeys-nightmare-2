@@ -30,7 +30,6 @@ public partial class UIGamePhaseControl : YViewControl
 	private Dictionary<UICardSimpleControl, CancellationTokenSource> m_CardCtsDict = new Dictionary<UICardSimpleControl, CancellationTokenSource>();
 	private bool IsEnvDirty = false;
 	private int currentMonsterAttack = 0;
-	private bool m_NextAttackDouble = false;
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
@@ -143,9 +142,16 @@ public partial class UIGamePhaseControl : YViewControl
 		if (delta != 0)
 		{
 			int actualChange = isHeal ? (m_DataJoeyPlayer.playerHealth - m_DataJoeyPlayer.lastPlayerHealth) : Mathf.Abs(delta);
-			//if (actualChange > 0)
 			{
 				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
+			}
+			if (isHeal)
+			{
+				m_View.JoeyAnim.Play("happy");
+			}
+			else
+			{
+				m_View.JoeyAnim.Play("fear");
 			}
 		}
 		if (delta < 0 && !isHeal)
@@ -189,6 +195,20 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
+	}
+
+	public void SetBackgroundByStageId(int stageId)
+	{
+		if (stageId <= 8)
+		{
+			m_View.MonkeyBg.SetActive(true);
+			m_View.TurkeyBg.SetActive(false);
+		}
+		else
+		{
+			m_View.MonkeyBg.SetActive(false);
+			m_View.TurkeyBg.SetActive(true);
+		}
 	}
 
 	private void CreateFistCardCache()
@@ -264,14 +284,21 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
-		RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-		if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
-			m_View.TxtStage.text = currentStage.stages;
+			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
+			if (envStage != null)
+			{
+				m_View.TxtStage.text = envStage.level.ToString();
+			}
 		}
 		else
 		{
-			m_View.TxtStage.text = string.Empty;
+			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+			if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+			{
+				m_View.TxtStage.text = currentStage.stages;
+			}
 		}
 		RefreshRelicDisplay();
 	}
@@ -560,7 +587,6 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
-			//if (effectType == EEffectType.Damage)
 			{
 				ShakeScreen(0.2f, 20f).Forget();
 			}
@@ -775,7 +801,6 @@ public partial class UIGamePhaseControl : YViewControl
 		if (monsterCardControl != null && monsterCardControl.CardType == ECardType.monster)
 		{
 			VampireMonkeyDealDamage(monsterCardControl);
-			// monsterCardControl.CallCardTakeDamage(3, EEffectType.Heal);
 		}
 	}
 	void DoubleLastWeaponAttack(object[] paraArray)
@@ -785,8 +810,12 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return;
 		}
-		// 设置标记，表示下一次攻击翻倍
-		m_NextAttackDouble = true;
+		UICardSimpleControl lastAttackCard = GetLastBagCard(ECardType.attack);
+		if (lastAttackCard != null && lastAttackCard.CardEffect != null)
+		{
+			int attackValue = lastAttackCard.CardData.currentAttack;
+			lastAttackCard.CardEffect.AddEffectValue(EEffectType.Damage, attackValue);
+		}
 	}
 
 	void HealPlayerOnDefense(object[] paraArray)
@@ -904,7 +933,6 @@ public partial class UIGamePhaseControl : YViewControl
 
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
 			AddBagCard(cardType, cardControl, true);
-			//await UniTask.WaitForSeconds(delayTime);
 
 			VerticalLayoutGroup layout = null;
 			switch (cardType)
@@ -956,7 +984,6 @@ public partial class UIGamePhaseControl : YViewControl
 		layout.enabled = false;
 		cardControl.CacheTrans.SetParent(layout.transform);
 
-		//Debug.Log("MoveCardAnimation: startPos = " + startPos + ", endPos = " + endPos + ", startScale = " + startScale + ", endScale = " + endScale + ", duration = " + duration);
 		float elapsed = 0f;
 		while (elapsed < duration)
 		{
@@ -992,11 +1019,6 @@ public partial class UIGamePhaseControl : YViewControl
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
-		if (m_NextAttackDouble)
-		{
-			damage *= 2;
-			m_NextAttackDouble = false;
-		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1032,25 +1054,18 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		// 延迟播放武器牌的掉落动画，直到防御牌使用后判断是否需要播放
-		bool shouldPlayWeaponDropAnimation = true;
+		bool isSkip = IsUseAttackFinishAnim();
+		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished(isSkip) ?? 0f;
+		if (finishDelayTime > 0f)
+		{
+			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+		}
 
 		if (!enemyKilled && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
-			// 传递武器牌引用，以便在防御牌使用后判断是否需要播放掉落动画
-			shouldPlayWeaponDropAnimation = await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
-		}
-
-		// 只有当武器牌不会被移动到环境卡时，才播放掉落动画
-		if (shouldPlayWeaponDropAnimation)
-		{
-			float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished() ?? 0f;
-			if (finishDelayTime > 0f)
-			{
-				await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-			}
+			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
 		}
 
 		if (!useFistCard)
@@ -1064,6 +1079,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		RemoveCardCts(attackCardControl);
 
+
 		enemyCardControl.IsEffecting = false;
 	}
 
@@ -1073,29 +1089,27 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[1];
 		int envIndex = (int)paraArray[2];
 		CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-		// 这个调用不需要返回武器牌掉落动画的播放标志，因为不是从TakeEnemyDamage调用的
 		await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, null);
 	}
 
-	async UniTask<bool> TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex, CancellationToken cancellationToken = default, UICardSimpleControl attackCardControl = null)
+	async UniTask TakePlayerDamageAsync(int enemyAttack, UICardSimpleControl enemyCardControl, int envIndex, CancellationToken cancellationToken = default, UICardSimpleControl attackCardControl = null)
 	{
+		if (!m_CardCtsDict.TryGetValue(enemyCardControl, out CancellationTokenSource _))
+		{
+			return;
+		}
 		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: cancellationToken);
 
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
-		bool weaponWillMoveToEnv = false;
 		if (defenceCardControl != null)
 		{
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-
-			// 检查防御牌是否有ThrowWeaponToStack_OnDefence效果，如果有，武器牌会被移动到环境卡，不应该播放掉落动画
-			weaponWillMoveToEnv = defenceCardControl.CardEffect != null &&
-				defenceCardControl.CardEffect.Id == ECardEffectId.ThrowWeaponToStack_OnDefence;
 
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByDefence))
 			{
@@ -1121,7 +1135,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
 			}
-			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished() ?? 0f;
+			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished(false) ?? 0f;
 			if (finishDelayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
@@ -1137,9 +1151,6 @@ public partial class UIGamePhaseControl : YViewControl
 
 		RemoveCardCts(enemyCardControl);
 		currentMonsterAttack = 0;
-
-		// 返回是否应该播放武器牌的掉落动画（如果武器牌会被移动到环境卡，则返回false）
-		return !weaponWillMoveToEnv;
 	}
 
 	void TakePlayerBoomDamage(object[] paraArray)
@@ -1183,7 +1194,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-		float finishDelayTime = cardControl.CardEffect?.OnUseFinished() ?? 0f;
+		float finishDelayTime = cardControl.CardEffect?.OnUseFinished(false) ?? 0f;
 		if (finishDelayTime > 0f)
 		{
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
@@ -1225,15 +1236,9 @@ public partial class UIGamePhaseControl : YViewControl
 
 	async void AttackRandomEnemy(object[] paraArray)
 	{
-		try
-		{
-			int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
-			int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
-			await AttackRandomEnemy(damage, attackTime);
-		}
-		catch (OperationCanceledException)
-		{
-		}
+		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
+		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
+		await AttackRandomEnemy(damage, attackTime).SuppressCancellationThrow();
 	}
 
 	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex, CancellationToken? cancellationToken = null)
@@ -1243,7 +1248,7 @@ public partial class UIGamePhaseControl : YViewControl
 			return;
 		}
 
-		await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, cancellationToken);
+		await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.ReflectDamage, cancellationToken);
 	}
 
 	async void TakeAllEnemyDamage(object[] paraArray)
@@ -1333,8 +1338,9 @@ public partial class UIGamePhaseControl : YViewControl
 	void GrimReaperTakeDamage(object[] paraArray)
 	{
 		UICardSimpleControl grimReaperCard = (UICardSimpleControl)paraArray[0];
-		bool isSuccess = paraArray.Length > 1 && paraArray[1] is bool ? (bool)paraArray[1] : false;
-		GrimReaperTakeDamage(grimReaperCard, isSuccess);
+		bool isSuccess = (bool)paraArray[1];
+		int damage = (int)paraArray[2];
+		GrimReaperTakeDamage(grimReaperCard, isSuccess, damage);
 	}
 
 	private void ClearGrimReaperData()

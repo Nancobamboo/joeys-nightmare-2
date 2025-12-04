@@ -2711,6 +2711,17 @@ MonoBehaviour:
   - Target: {fileID: 5610116369803024799}
     Components:
     - {fileID: 5610116369803024799}
+    - {fileID: 1528724033285744817}
+    VarNameArray:
+    - 
+    - JoeyAnim
+  - Target: {fileID: 2967418900662898645}
+    Components:
+    - {fileID: 6659798432838363633}
+    VarNameArray: []
+  - Target: {fileID: 1733643846281848440}
+    Components:
+    - {fileID: 6545231819341785019}
     VarNameArray: []
 --- !u!1 &5811095425636920943
 GameObject:
