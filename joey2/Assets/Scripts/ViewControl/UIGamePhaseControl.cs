@@ -981,8 +981,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private async UniTask MoveCardAnimation(UICardSimpleControl cardControl, Vector3 startPos, Vector3 endPos, Vector3 startScale, Vector3 endScale, float duration, VerticalLayoutGroup layout, CancellationToken cancellationToken)
 	{
-		layout.enabled = false;
-		cardControl.CacheTrans.SetParent(layout.transform);
+		if (layout != null)
+		{
+			layout.enabled = false;
+			cardControl.CacheTrans.SetParent(layout.transform);
+		}
 
 		float elapsed = 0f;
 		while (elapsed < duration)
@@ -996,7 +999,65 @@ public partial class UIGamePhaseControl : YViewControl
 
 			//Debug.Log($"MoveCard Animation - Position: {cardControl.CacheTrans.position}, Scale: {cardControl.CacheTrans.localScale}, t: {t}");
 
-			await UniTask.Yield(GetOrCreateCardToken(cardControl));
+			await UniTask.Yield(cancellationToken);
+		}
+	}
+
+	public void MoveBagCardsToCoinAndShowReward()
+	{
+		MoveBagCardsToCoinAndShowRewardAsync().Forget();
+	}
+
+	private async UniTaskVoid MoveBagCardsToCoinAndShowRewardAsync()
+	{
+		List<UICardSimpleControl> bagCards = new List<UICardSimpleControl>();
+		foreach (var kvp in m_BagCardDict)
+		{
+			List<UICardSimpleControl> cardList = kvp.Value;
+			for (int i = 0; i < cardList.Count; i++)
+			{
+				UICardSimpleControl cardControl = cardList[i];
+				if (cardControl != m_FistCardCache)
+				{
+					bagCards.Add(cardControl);
+				}
+			}
+		}
+
+		Vector3 targetPos = m_View.TxtCoin.transform.position;
+		float duration = 0.5f;
+
+		List<UniTask> animationTasks = new List<UniTask>();
+		for (int i = 0; i < bagCards.Count; i++)
+		{
+			UICardSimpleControl cardControl = bagCards[i];
+			cardControl.transform.SetParent(Asset.UIRoot);
+			Vector3 startPos = cardControl.CacheTrans.position;
+			Vector3 startScale = cardControl.CacheTrans.localScale;
+			Vector3 endScale = Vector3.zero;
+
+			animationTasks.Add(MoveCardAnimation(cardControl, startPos, targetPos, startScale, endScale, duration, null, CancellationToken.None));
+		}
+
+		await UniTask.WhenAll(animationTasks);
+
+		for (int i = 0; i < bagCards.Count; i++)
+		{
+			UICardSimpleControl cardControl = bagCards[i];
+			RemoveCardData(cardControl.CardData.UniqueId);
+			RemoveCardCts(cardControl);
+			cardControl.Return();
+		}
+
+
+		int coinReward = bagCards.Count * 5;
+		if (coinReward > 0)
+		{
+			DataSystem.Instance.AddCoin(coinReward);
+			OnCoinChanged(m_DataJoeyPlayer.Coin);
+			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
+			damageTextControl.SetCoinData(coinReward, Asset.UIRoot, Vector3.zero);
+			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
 		}
 	}
 
