@@ -147,7 +147,12 @@ public class UISelectControl : YViewControl
 		m_CurrentSelectRelics.Clear();
 
 		List<RelicInfo> allRelics = GData.Instance.RelicInfoDict.Values.ToList();
-		List<RelicInfo> shuffledRelics = allRelics.OrderBy(x => Random.value).ToList();
+		List<RelicInfo> availableRelics = allRelics.Where(r =>
+		{
+			return m_PlayerData != null && m_PlayerData.RelicList != null && !m_PlayerData.RelicList.Contains(r.id);
+		}).ToList();
+
+		List<RelicInfo> shuffledRelics = availableRelics.OrderBy(x => Random.value).ToList();
 
 		for (int i = 0; i < SELECT_CARD_COUNT && i < shuffledRelics.Count; i++)
 		{

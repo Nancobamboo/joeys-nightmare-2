@@ -460,6 +460,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.Bone:
 				effect = new YBone();
 				break;
+			case ECardEffectId.PermanentAttackBoostWithRandomDamage:
+				effect = new YPermanentAttackBoostWithRandomDamage(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}

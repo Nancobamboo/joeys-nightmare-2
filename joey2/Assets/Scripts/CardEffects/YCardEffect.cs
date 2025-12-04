@@ -49,7 +49,8 @@ public enum ECardEffectId
     TurkeyFeather,
     DonkeyMeatFireBun,
     MonkeyBanana,
-    Bone
+    Bone,
+    PermanentAttackBoostWithRandomDamage
 }
 
 public enum EEffectType
