@@ -48,7 +48,8 @@ public enum ECardEffectId
     BareHands,
     TurkeyFeather,
     DonkeyMeatFireBun,
-    MonkeyBanana
+    MonkeyBanana,
+    Bone
 }
 
 public enum EEffectType

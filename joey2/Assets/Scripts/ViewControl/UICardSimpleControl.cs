@@ -457,6 +457,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.TimidTurkey:
 				effect = new YTimidTurkey();
 				break;
+			case ECardEffectId.Bone:
+				effect = new YBone();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
