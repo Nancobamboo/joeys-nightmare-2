@@ -1005,7 +1005,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			if (ControlUtil.IsRandomSucceed(10))
 			{
-				AddCardToBag("4001");
+				AddCardToBag("3009");
 			}
 		}
 
@@ -1101,7 +1101,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				if (ControlUtil.IsRandomSucceed(10))
 				{
-					AddCardToBag("4001");
+					AddCardToBag("3010");
 				}
 			}
 		}
@@ -1162,10 +1162,24 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardType == ECardType.skill)
 		{
 			delayTime = cardControl.CardEffect?.UseSkill() ?? 0.5f;
+			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardBySkill))
+			{
+				if (ControlUtil.IsRandomSucceed(10))
+				{
+					AddCardToBag("3008");
+				}
+			}
 		}
 		else if (cardType == ECardType.item)
 		{
 			delayTime = cardControl.CardEffect?.UseItem() ?? 0.5f;
+			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByItem))
+			{
+				if (ControlUtil.IsRandomSucceed(10))
+				{
+					AddCardToBag("3007");
+				}
+			}
 		}
 
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(cardControl));

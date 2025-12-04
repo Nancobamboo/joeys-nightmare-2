@@ -27,12 +27,14 @@ public enum EBuffType
 
 public enum ERelicType
 {
-	LifeSteal = 9001,
-	EnvAttack = 9002,
-	EnvDefence = 9003,
-	GetSpecialCardByAttack = 9004,
-	GetSpecialCardByDefence = 9005,
-	HealOnKill = 9006,
+	EnvAttack = 9001,
+	EnvDefence = 9002,
+	GetSpecialCardByAttack = 9003,
+	GetSpecialCardByItem = 9004,
+	GetSpecialCardBySkill = 9005,
+	GetSpecialCardByDefence = 9006,
+	LifeSteal = 9007,
+	HealOnKill = 9008,
 }
 
 public class UICardSimpleControl : YViewControl

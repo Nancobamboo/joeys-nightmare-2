@@ -1,6 +1,9 @@
 ﻿id   ,cardImage ,name,description
-9001,Art\Img\Relic\relic1,蝙蝠牙齿,主动攻击造成吸血:1
-9002,Art\Img\Relic\relic2,蝙蝠祝福,击杀:回复3点生命
-9003,Art\Img\Relic\relic3,monkey祝福,使用攻击卡时有小概率获得一个猴子香蕉
-9004,Art\Img\Relic\relic1,环境攻击,环境卡中的攻击卡攻击+1
-9005,Art\Img\Relic\relic1,环境防御,环境卡中的防御卡防御+1
+9001,Art\Img\Relic\relic1,环境攻击,环境卡中的攻击卡攻击+1
+9002,Art\Img\Relic\relic1,环境防御,环境卡中的防御卡防御+1
+9003,Art\Img\Relic\relic3,monkey祝福,使用武器时,有小概率获得一个猴子香蕉
+9004,Art\Img\Relic\relic1,火鸡祝福,使用道具时,有小概率获得一个火鸡羽毛
+9005,Art\Img\Relic\relic1,驴之祝福,使用技能时,有小概率获得一个驴肉火烧
+9006,Art\Img\Relic\relic1,骷髅祝福,使用防具时,有小概率获得一个骷髅骸骨
+9007,Art\Img\Relic\relic1,蝙蝠牙齿,主动攻击造成吸血:1
+9008,Art\Img\Relic\relic2,蝙蝠祝福,击杀:回复3点生命
