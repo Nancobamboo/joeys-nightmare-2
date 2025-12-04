@@ -21,6 +21,7 @@ public class UIDamageTextControl : YViewControl
 
 	public void SetData(int value, Transform parent, Vector3 localPositionShift, bool isDamage = true)
 	{
+		m_View.Coin.gameObject.SetActive(false);
 		CacheTrans.SetParent(parent);
 		CacheTrans.localPosition = localPositionShift;
 		CacheTrans.localScale = Vector3.one;
