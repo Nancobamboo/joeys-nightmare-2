@@ -52,7 +52,7 @@ public class YDefaultEffect : YCardEffect
         return base.OnDealDamage();
     }
 
-    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         if (CardControl != null && CardControl.gameObject != null)
         {

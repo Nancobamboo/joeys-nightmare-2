@@ -211,7 +211,7 @@ public class UICardSimpleControl : YViewControl
 	{
 		Debug.Log(CardData.cardName);
 		cachedCard.TakeDamage(damage);
-		float delayTime = CardEffect?.OnTakeDamage(effectType) ?? 0f;
+		float delayTime = CardEffect?.OnTakeDamage(effectType, damage) ?? 0f;
 		RefreshCard();
 		return delayTime;
 	}
@@ -262,6 +262,17 @@ public class UICardSimpleControl : YViewControl
 				int newValue = CardEffect?.OnBuffValueChange(buffType, m_BuffValueArray[i]) ?? m_BuffValueArray[i];
 				m_BuffValueArray[i] = newValue;
 			}
+		}
+
+		int counter = GetBuffValue(EBuffType.Counter);
+		if (counter > 0)
+		{
+			m_View.Counter.SetActive(true);
+			m_View.TxtCnt.text = counter.ToString();
+		}
+		else
+		{
+			m_View.Counter.SetActive(false);
 		}
 	}
 

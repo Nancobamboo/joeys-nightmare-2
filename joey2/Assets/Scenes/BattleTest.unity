@@ -741,8 +741,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
+      propertyPath: DebugEnvCardIds.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[0]
-      value: 4006
+      value: 2006
+      objectReference: {fileID: 0}
+    - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
+      propertyPath: DebugEnvCardIds.Array.data[0]
+      value: 5012
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
