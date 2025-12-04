@@ -9,7 +9,7 @@ public class YTurkeyFeather : YCardEffect
 		Id = ECardEffectId.TurkeyFeather;
 	}
 
-	public override float UseSkill()
+	public override float UseItem()
 	{
 		if (CardControl != null && CardControl.gameObject != null)
 		{

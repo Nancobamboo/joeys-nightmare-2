@@ -9,7 +9,7 @@ public class YDonkeyMeatFireBun : YCardEffect
         Id = ECardEffectId.DonkeyMeatFireBun;
     }
 
-    public override float UseSkill()
+    public override float UseItem()
     {
         if (CardControl != null && CardControl.gameObject != null)
         {
