@@ -365,9 +365,13 @@ public class JoeyGameControl : YViewControl
 			}
 			else
 			{
+
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetData();
 				selectControl.OnSelectComplete = () => LoadNextLevel();
+
+				m_GamePhaseControl.MoveBagCardsToCoinAndShowReward();
+
 			}
 
 			m_DataJoeyPlayer.StageId++;

@@ -34,11 +34,20 @@ public class UIDamageTextControl : YViewControl
 			m_View.Add.text = "+" + value.ToString();
 		}
 
-		if (m_View.Anim != null)
-		{
-			string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
-			m_View.Anim.Play(animName);
-		}
+		string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
+		m_View.Anim.Play(animName);
+
+		DelayReturn().Forget();
+	}
+
+	public void SetCoinData(int value, Transform parent, Vector3 localPositionShift)
+	{
+		CacheTrans.SetParent(parent);
+		CacheTrans.localPosition = localPositionShift;
+		CacheTrans.localScale = Vector3.one;
+
+		m_View.Coin.text = "+" + value.ToString();
+		m_View.Anim.Play("UIDamage_Coin");
 
 		DelayReturn().Forget();
 	}

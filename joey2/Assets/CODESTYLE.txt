@@ -21,6 +21,7 @@ Project Code Style
 - Do not use foreach for value type arrays; use for loop instead
 - Do not use foreach for collections containing value types (e.g., List<string>, string[]); use for loop instead
 - Do not check null for m_View.xxx (m_View is always initialized)
+- m_View相关的代码都不判空
 
 5) JSON
 - Use float/double as needed; do not force integers
