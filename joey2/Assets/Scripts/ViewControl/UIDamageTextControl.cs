@@ -63,6 +63,7 @@ public class UIDamageTextControl : YViewControl
 	{
 		m_View.Damage.gameObject.SetActive(false);
 		m_View.Add.gameObject.SetActive(false);
+		m_View.Coin.gameObject.SetActive(false);
 		gameObject.SetActive(false);
 		CacheTrans.localScale = Vector3.one;
 		base.OnReturn();
