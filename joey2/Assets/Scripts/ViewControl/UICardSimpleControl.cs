@@ -455,6 +455,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.TimidTurkey:
 				effect = new YTimidTurkey();
 				break;
+			case ECardEffectId.PermanentAttackBoostWithRandomDamage:
+				effect = new YPermanentAttackBoostWithRandomDamage(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}
