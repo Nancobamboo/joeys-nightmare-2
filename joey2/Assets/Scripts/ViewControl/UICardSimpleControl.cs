@@ -224,11 +224,23 @@ public class UICardSimpleControl : YViewControl
 		switch (cachedCardType)
 		{
 			case ECardType.attack:
-				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+				int attackValue = cachedCard.currentAttack + damageEffect;
+				m_View.TxtAttack.text = attackValue.ToString();
+				if (damageEffect != 0)
+				{
+					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
+				}
 				break;
 
 			case ECardType.defence:
-				m_View.TxtDefence.text = cachedCard.currentDefence.ToString();
+				int defenceEffect = CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0;
+				int defenceValue = cachedCard.currentDefence + defenceEffect;
+				m_View.TxtDefence.text = defenceValue.ToString();
+				if (defenceEffect != 0)
+				{
+					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
+				}
 				break;
 
 			case ECardType.monster:
@@ -264,6 +276,23 @@ public class UICardSimpleControl : YViewControl
 			}
 		}
 
+		UpdateCounterUI();
+	}
+
+	public void AddBuff(EBuffType buffType, int value)
+	{
+		m_BuffValueArray[(int)buffType] += value;
+
+		switch (buffType)
+		{
+			case EBuffType.Counter:
+				UpdateCounterUI();
+				break;
+		}
+	}
+
+	private void UpdateCounterUI()
+	{
 		int counter = GetBuffValue(EBuffType.Counter);
 		if (counter > 0)
 		{
@@ -276,14 +305,15 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
-	public void AddBuff(EBuffType buffType, int value)
-	{
-		m_BuffValueArray[(int)buffType] += value;
-	}
-
 	public int GetBuffValue(EBuffType buffType)
 	{
 		return m_BuffValueArray[(int)buffType];
+	}
+
+	public void AddEffectValue(EEffectType effectType, int value)
+	{
+		CardEffect?.AddEffectValue(effectType, value);
+		RefreshCard();
 	}
 
 	public void AddRelic(int relicId)

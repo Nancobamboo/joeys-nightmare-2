@@ -811,10 +811,10 @@ public partial class UIGamePhaseControl : YViewControl
 			return;
 		}
 		UICardSimpleControl lastAttackCard = GetLastBagCard(ECardType.attack);
-		if (lastAttackCard != null && lastAttackCard.CardEffect != null)
+		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
-			lastAttackCard.CardEffect.AddEffectValue(EEffectType.Damage, attackValue);
+			lastAttackCard.AddEffectValue(EEffectType.Damage, attackValue);
 		}
 	}
 
