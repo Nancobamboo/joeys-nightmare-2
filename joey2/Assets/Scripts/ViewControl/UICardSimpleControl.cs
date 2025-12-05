@@ -635,7 +635,7 @@ public class UICardSimpleControl : YViewControl
 				}
 				else if (vfxLife == EVFXLife.CardLife)
 				{
-					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, CacheTrans);
+					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, m_View.Anim.transform);
 					EffectEntityList.Add(vfxTransform);
 
 					DelayHideCardLifeVFX(vfxTransform, maxDelayTime).Forget();
