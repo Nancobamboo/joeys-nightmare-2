@@ -233,6 +233,10 @@ public class UICardSimpleControl : YViewControl
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
+				else
+				{
+					m_View.TxtAttack.color = Color.black;
+				}
 				break;
 
 			case ECardType.defence:
@@ -243,10 +247,15 @@ public class UICardSimpleControl : YViewControl
 				{
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
+				else
+				{
+					m_View.TxtDefence.color = Color.black;
+				}
 				break;
 
 			case ECardType.monster:
 				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
 				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
 				break;
 
@@ -500,6 +509,15 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.TimidTurkey:
 				effect = new YTimidTurkey();
 				break;
+			case ECardEffectId.TurkeyFeather:
+				effect = new YTurkeyFeather();
+				break;
+			case ECardEffectId.DonkeyMeatFireBun:
+				effect = new YDonkeyMeatFireBun();
+				break;
+			case ECardEffectId.MonkeyBanana:
+				effect = new YMonkeyBanana();
+				break;
 			case ECardEffectId.Bone:
 				effect = new YBone();
 				break;
@@ -590,16 +608,19 @@ public class UICardSimpleControl : YViewControl
 			case ECardType.attack:
 				m_View.Attack.SetActive(true);
 				m_View.TxtAttack.text = card.attack.ToString();
+				m_View.TxtAttack.color = Color.black;
 				break;
 
 			case ECardType.defence:
 				m_View.Defence.SetActive(true);
 				m_View.TxtDefence.text = card.defence.ToString();
+				m_View.TxtDefence.color = Color.black;
 				break;
 
 			case ECardType.monster:
 				m_View.Attack.SetActive(true);
 				m_View.TxtAttack.text = card.attack.ToString();
+				m_View.TxtAttack.color = Color.black;
 				m_View.Moster.SetActive(true);
 				m_View.TextHeart.text = card.currentHealth.ToString();
 				break;
@@ -765,8 +786,8 @@ public class UICardSimpleControl : YViewControl
 			m_BuffValueArray[i] = 0;
 		}
 
-		m_View.TxtAttack.color = Color.white;
-		m_View.TxtDefence.color = Color.white;
+		m_View.TxtAttack.color = Color.black;
+		m_View.TxtDefence.color = Color.black;
 
 		gameObject.SetActive(false);
 		EffectEntityList.Clear();

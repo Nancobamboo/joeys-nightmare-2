@@ -54,21 +54,21 @@ public partial class UIGamePhaseControl
 			return;
 		}
 
-		int envIndex = FindRandomEnemy();
-		if (envIndex == -1)
-		{
-			return;
-		}
-
-		UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
-		if (enemyCardControl == null)
-		{
-			return;
-		}
-
-		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
+		//Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
 		for (int i = 0; i < attackTime; i++)
 		{
+			int envIndex = FindRandomEnemy();
+			if (envIndex == -1)
+			{
+				return;
+			}
+
+			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
+			if (enemyCardControl == null || enemyCardControl.gameObject == null || !enemyCardControl.gameObject.activeSelf)
+			{
+				return;
+			}
+
 			CancellationToken token = GetOrCreateCardToken(enemyCardControl);
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token);
 

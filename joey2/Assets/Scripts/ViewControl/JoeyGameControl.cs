@@ -348,14 +348,18 @@ public class JoeyGameControl : YViewControl
 
 		m_GamePhaseControl.SetData();
 
-		foreach (var kvp in m_GameStateCache.EnvCardDict)
-		{
-			m_GamePhaseControl.AddEnvCardList(cardIds: kvp.Value, index: kvp.Key);
-		}
-
 		foreach (var kvp in m_GameStateCache.BagCardDict)
 		{
-			m_GamePhaseControl.AddCardList(cardType: kvp.Key, cardIds: kvp.Value);
+			List<string> reversedCardIds = new List<string>(kvp.Value);
+			reversedCardIds.Reverse();
+			m_GamePhaseControl.AddCardList(cardType: kvp.Key, cardIds: reversedCardIds);
+		}
+
+		foreach (var kvp in m_GameStateCache.EnvCardDict)
+		{
+			List<string> reversedCardIds = new List<string>(kvp.Value);
+			reversedCardIds.Reverse();
+			m_GamePhaseControl.AddEnvCardList(cardIds: reversedCardIds, index: kvp.Key);
 		}
 	}
 
