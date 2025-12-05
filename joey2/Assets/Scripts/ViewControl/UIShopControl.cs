@@ -318,4 +318,13 @@ public class UIShopControl : YViewControl
 		}
 		base.OnClose();
 	}
+
+	private void OnDestroy()
+	{
+		if (m_DamageTextPool != null)
+		{
+			m_DamageTextPool.DestroyAll();
+			m_DamageTextPool = null;
+		}
+	}
 }
