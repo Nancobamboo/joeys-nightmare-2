@@ -11,6 +11,7 @@ public class UIShopSuperControl : YViewControl
     private int m_RefreshCost = 50;
     private UIBuildSuperControl m_BuildControl;
     private bool m_IsNew;
+    private MonoBehaviourPool<UIDamageTextControl> m_DamageTextPool;
 
     private class ShopCardData
     {
@@ -37,6 +38,11 @@ public class UIShopSuperControl : YViewControl
         m_View.BtnRefresh.onClick.AddListener(OnBtnRefreshClick);
         m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
         RegistAction(EActionId.OnCoinChange, OnCoinChange);
+
+        m_DamageTextPool = new MonoBehaviourPool<UIDamageTextControl>(() =>
+        {
+            return this.Asset.OpenUI<UIDamageTextControl>(null);
+        });
     }
 
     void OnControlClick()
@@ -231,14 +237,25 @@ public class UIShopSuperControl : YViewControl
     void OnCoinChange(object[] paraArray)
     {
         int coin = (int)paraArray[0];
+        int delta = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
         m_View.TxtCoin.text = coin.ToString();
+        if (delta != 0)
+        {
+            UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
+            damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
+            damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
+        }
     }
 
-    protected override void OnReturn()
+    protected override void OnClose()
     {
         m_ShopCardList.Clear();
         m_CurrentShopCards.Clear();
-        base.OnReturn();
+        if (m_DamageTextPool != null)
+        {
+            m_DamageTextPool.ReleaseAll();
+        }
+        base.OnClose();
     }
 }
 

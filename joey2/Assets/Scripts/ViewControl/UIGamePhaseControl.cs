@@ -83,6 +83,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.OnCardPointerEnter, OnCardPointerEnter);
 		RegistAction(EActionId.PermanentBoostAttack, PermanentBoostAttack);
 		RegistAction(EActionId.PermanentBoostDefence, PermanentBoostDefence);
+		RegistAction(EActionId.MoveEnvCardLeft, MoveEnvCardLeft);
+		RegistAction(EActionId.SwapEnvCardWithRandom, SwapEnvCardWithRandom);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -1482,7 +1484,14 @@ public partial class UIGamePhaseControl : YViewControl
 	void OnCoinChange(object[] paraArray)
 	{
 		int coin = (int)paraArray[0];
+		int delta = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
 		OnCoinChanged(coin);
+		if (delta != 0)
+		{
+			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
+			damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
+			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
+		}
 	}
 
 	void EscapeMonkey(object[] paraArray)

@@ -46,5 +46,8 @@ public enum EActionId
 	PermanentBoostAttack,
 	PermanentBoostDefence,
 	Bone,
-	Upper
+	MoveEnvCardLeft,
+	SwapEnvCardWithRandom,
+	Upper,
+
 }

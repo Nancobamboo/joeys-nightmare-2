@@ -251,7 +251,7 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
         dataJoeyPlayer.Coin += delta;
-        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin);
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
     }
 
     public bool AddCardToDataJoeyPlayer(Card card)
