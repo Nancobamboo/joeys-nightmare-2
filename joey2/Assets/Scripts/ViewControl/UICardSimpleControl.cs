@@ -225,9 +225,10 @@ public class UICardSimpleControl : YViewControl
 		{
 			case ECardType.attack:
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 				int attackValue = cachedCard.currentAttack + damageEffect;
 				m_View.TxtAttack.text = attackValue.ToString();
-				if (damageEffect != 0)
+				if (damageEffect != 0 || extraAttackCnt != 0)
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}

@@ -25,6 +25,9 @@ public class UIGamePhaseView : YBaseView
 	public Animator JoeyAnim;
 	public GameObject MonkeyBg;
 	public GameObject TurkeyBg;
+	public Image Heart;
+	public GameObject DonkeyBg;
+	public GameObject DeadkeyBg;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -52,5 +55,8 @@ public class UIGamePhaseView : YBaseView
 		JoeyAnim = viewItemList[17].Target.GetComponent<Animator>();
 		MonkeyBg = viewItemList[18].Target.gameObject;
 		TurkeyBg = viewItemList[19].Target.gameObject;
+		Heart = viewItemList[20].Target.GetComponent<Image>();
+		DonkeyBg = viewItemList[21].Target.gameObject;
+		DeadkeyBg = viewItemList[22].Target.gameObject;
 	}
 }

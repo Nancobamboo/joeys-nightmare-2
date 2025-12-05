@@ -11,6 +11,7 @@ public class UIRelicControl : YViewControl
 
 	public RelicInfo RelicData => m_RelicInfo;
 	public System.Action<UIRelicControl> SelectClickHandler;
+	public Transform ImgRelicTransform => m_View.ImgRelic.transform;
 
 	public static EResType GetResType()
 	{

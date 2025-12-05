@@ -57,10 +57,7 @@ public enum EEffectType
 {
     Damage,
     Heal,
-    Buff,
-    Debuff,
     ReflectDamage,
-    LifeSteal,
     Boom,
     ExtraAttackCnt,
     Electric,

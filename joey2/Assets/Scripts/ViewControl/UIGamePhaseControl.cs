@@ -117,6 +117,11 @@ public partial class UIGamePhaseControl : YViewControl
 	void OnHPChanged(int hp)
 	{
 		m_View.TextHeart.text = hp.ToString();
+		if (m_DataJoeyPlayer.playerMaxHealth > 0)
+		{
+			float ratio = (float)hp / m_DataJoeyPlayer.playerMaxHealth;
+			m_View.Heart.fillAmount = ratio;
+		}
 	}
 
 	void OnAttackChanged(int attack)
@@ -283,6 +288,11 @@ public partial class UIGamePhaseControl : YViewControl
 	private void RefreshView()
 	{
 		m_View.TextHeart.text = m_DataJoeyPlayer.playerHealth.ToString();
+		if (m_DataJoeyPlayer.playerMaxHealth > 0)
+		{
+			float ratio = (float)m_DataJoeyPlayer.playerHealth / m_DataJoeyPlayer.playerMaxHealth;
+			m_View.Heart.fillAmount = ratio;
+		}
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
 		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
@@ -1580,6 +1590,7 @@ public partial class UIGamePhaseControl : YViewControl
 				{
 					m_RelicList[i].gameObject.SetActive(true);
 					m_RelicList[i].SetGameData(relicInfo);
+					m_RelicList[i].ImgRelicTransform.localScale = Vector3.one * 2f;
 				}
 				else
 				{
