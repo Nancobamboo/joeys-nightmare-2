@@ -76,6 +76,10 @@ public class Card : IData
         {
             this.cardFrame = "Art/UI/card_bg_boss";
         }
+        else if (_id == "6001")
+        {
+            this.cardFrame = "Art/UI/card_bg_boss";
+        }
         else
         {
             this.cardFrame = "Art/UI/card_bg_normal";
