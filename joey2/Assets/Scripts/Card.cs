@@ -72,20 +72,13 @@ public class Card : IData
         this.price = _price;
         this.currentPrice = _price;
         this.stars = _stars;
-        if (_type == "other")
+        if (_stars == 3 & _type == "monster")
         {
-            this.cardFrame = "Art/UI/card_bg_end";
+            this.cardFrame = "Art/UI/card_bg_boss";
         }
         else
         {
-            if (_stars == 3)
-            {
-                this.cardFrame = "Art/UI/card_bg_boss";
-            }
-            else
-            {
-                this.cardFrame = "Art/UI/card_bg_normal";
-            }
+            this.cardFrame = "Art/UI/card_bg_normal";
         }
         this.effectId = _effectId;
         this.UniqueId = 0;
