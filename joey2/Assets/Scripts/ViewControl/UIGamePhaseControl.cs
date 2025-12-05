@@ -204,15 +204,50 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public void SetBackgroundByStageId(int stageId)
 	{
-		if (stageId <= 8)
+		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
-			m_View.MonkeyBg.SetActive(true);
-			m_View.TurkeyBg.SetActive(false);
+			EnvStage envStage = GData.Instance.GetEnvStage(stageId);
+			if (envStage != null)
+			{
+				SetBackgroundByTheme(envStage.theme);
+			}
 		}
 		else
 		{
-			m_View.MonkeyBg.SetActive(false);
-			m_View.TurkeyBg.SetActive(true);
+			if (stageId <= 8)
+			{
+				m_View.MonkeyBg.SetActive(true);
+				m_View.TurkeyBg.SetActive(false);
+			}
+			else
+			{
+				m_View.MonkeyBg.SetActive(false);
+				m_View.TurkeyBg.SetActive(true);
+			}
+		}
+	}
+
+	private void SetBackgroundByTheme(ETheme theme)
+	{
+		m_View.MonkeyBg.SetActive(false);
+		m_View.TurkeyBg.SetActive(false);
+		m_View.DonkeyBg.SetActive(false);
+		m_View.DeadkeyBg.SetActive(false);
+
+		switch (theme)
+		{
+			case ETheme.monkey:
+				m_View.MonkeyBg.SetActive(true);
+				break;
+			case ETheme.turkey:
+				m_View.TurkeyBg.SetActive(true);
+				break;
+			case ETheme.donkey:
+				m_View.DonkeyBg.SetActive(true);
+				break;
+			case ETheme.deadkey:
+				m_View.DeadkeyBg.SetActive(true);
+				break;
 		}
 	}
 

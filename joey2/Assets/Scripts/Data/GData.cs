@@ -632,6 +632,7 @@ public sealed class GData : PureSingleton<GData>
 		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
 		int MonsterIdsIdx = idx.ContainsKey("monster_ids") ? idx["monster_ids"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int ThemeIdx = idx.ContainsKey("theme") ? idx["theme"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -676,6 +677,15 @@ public sealed class GData : PureSingleton<GData>
 			else
 			{
 				envStage.type = EStageType.normal;
+			}
+			string themeStr = Get(ThemeIdx);
+			if (!string.IsNullOrEmpty(themeStr) && System.Enum.TryParse<ETheme>(themeStr, true, out ETheme theme))
+			{
+				envStage.theme = theme;
+			}
+			else
+			{
+				envStage.theme = ETheme.monkey;
 			}
 
 			EnvStageList.Add(envStage);

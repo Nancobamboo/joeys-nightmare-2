@@ -309,5 +309,11 @@ public partial class DataSystem
 
         return false;
     }
+
+    public void ResetDataJoeyPlayer()
+    {
+        m_DataJoeyPlayer = new DataJoeyPlayer();
+        SaveDataJoeyPlayer();
+    }
 }
 
