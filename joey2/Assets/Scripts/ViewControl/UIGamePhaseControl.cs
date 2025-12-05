@@ -391,7 +391,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.Yield();
 		}
 
-		rectTransform.anchoredPosition = originalPosition;
+		rectTransform.anchoredPosition = Vector2.zero;
 	}
 
 	public Card CreateCard(string cardId)
@@ -486,6 +486,16 @@ public partial class UIGamePhaseControl : YViewControl
 	public Card GetCardDataById(int uniqueId)
 	{
 		return m_CardDict[uniqueId];
+	}
+
+	public Dictionary<int, List<UICardSimpleControl>> GetEnvCardDict()
+	{
+		return m_EnvCardDict;
+	}
+
+	public Dictionary<int, List<UICardSimpleControl>> GetBagCardDict()
+	{
+		return m_BagCardDict;
 	}
 
 	public void AddSelfCardList()
