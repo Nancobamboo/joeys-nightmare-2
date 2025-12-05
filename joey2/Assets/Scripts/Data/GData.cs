@@ -958,7 +958,7 @@ public sealed class GData : PureSingleton<GData>
 
 	public List<string> CheckKeywordInDescription(string description)
 	{
-		Debug.Log("CheckKeywordInDescription: " + description);
+		//Debug.Log("CheckKeywordInDescription: " + description);
 		List<string> result = new List<string>();
 		if (string.IsNullOrEmpty(description))
 		{

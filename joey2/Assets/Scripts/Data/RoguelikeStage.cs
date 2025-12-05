@@ -4,7 +4,8 @@ public enum EStageType
 {
 	normal,
 	elite,
-	boss
+	boss,
+	final
 }
 
 public class RoguelikeStage

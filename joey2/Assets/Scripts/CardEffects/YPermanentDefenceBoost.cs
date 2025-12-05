@@ -12,7 +12,7 @@ public class YPermanentDefenceBoost : YDefaultEffect
 		Id = ECardEffectId.PermanentDefenceBoost;
 	}
 
-	public override float UseDefence(bool isOverflow = false)
+	public override float OnBecomeTopOfPile()
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
@@ -21,7 +21,19 @@ public class YPermanentDefenceBoost : YDefaultEffect
 			cardData.currentDefence += deltaPara;
 			CardControl.RefreshCard();
 		}
-		return base.UseDefence(isOverflow);
+		return base.OnBecomeTopOfPile();
+	}
+
+	public override float OnEnterBag()
+	{
+		if (CardControl != null && CardControl.CardData != null)
+		{
+			Card cardData = CardControl.CardData;
+			cardData.defence += deltaPara;
+			cardData.currentDefence += deltaPara;
+			CardControl.RefreshCard();
+		}
+		return base.OnEnterBag();
 	}
 }
 

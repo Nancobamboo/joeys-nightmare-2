@@ -36,6 +36,16 @@ public class JoeyGameControl : YViewControl
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 	private bool m_IsLobbyEnter = false;
 
+	private class GameStateCache
+	{
+		public Dictionary<int, List<string>> EnvCardDict = new Dictionary<int, List<string>>();
+		public Dictionary<ECardType, List<string>> BagCardDict = new Dictionary<ECardType, List<string>>();
+		public int PlayerHealth;
+		public int PlayerMaxHealth;
+	}
+
+	private GameStateCache m_GameStateCache;
+
 	public EGameMode GameMode = EGameMode.Battle;
 	public string[] DebugEnvCardIds = new string[0];
 	public string[] DebugBagCardIds = new string[0];
@@ -186,6 +196,7 @@ public class JoeyGameControl : YViewControl
 				List<string> cardIdList = envModeCardList[i];
 				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
+			SaveGameStateCache();
 			return;
 		}
 
@@ -271,6 +282,77 @@ public class JoeyGameControl : YViewControl
 				}
 			}
 		}
+
+		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
+		{
+			SaveGameStateCache();
+		}
+	}
+
+	private void SaveGameStateCache()
+	{
+		if (m_GamePhaseControl == null)
+		{
+			return;
+		}
+
+		m_GameStateCache = new GameStateCache();
+		m_GameStateCache.PlayerHealth = m_DataJoeyPlayer.playerHealth;
+		m_GameStateCache.PlayerMaxHealth = m_DataJoeyPlayer.playerMaxHealth;
+
+		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
+		foreach (var kvp in envCardDict)
+		{
+			List<string> cardIds = new List<string>();
+			for (int i = 0; i < kvp.Value.Count; i++)
+			{
+				UICardSimpleControl cardControl = kvp.Value[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardIds.Add(cardControl.CardData.id);
+				}
+			}
+			m_GameStateCache.EnvCardDict[kvp.Key] = cardIds;
+		}
+
+		Dictionary<int, List<UICardSimpleControl>> bagCardDict = m_GamePhaseControl.GetBagCardDict();
+		foreach (var kvp in bagCardDict)
+		{
+			ECardType cardType = (ECardType)kvp.Key;
+			List<string> cardIds = new List<string>();
+			for (int i = 0; i < kvp.Value.Count; i++)
+			{
+				UICardSimpleControl cardControl = kvp.Value[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardIds.Add(cardControl.CardData.id);
+				}
+			}
+			m_GameStateCache.BagCardDict[cardType] = cardIds;
+		}
+	}
+
+	private void RestoreGameStateCache()
+	{
+		if (m_GameStateCache == null || m_GamePhaseControl == null)
+		{
+			return;
+		}
+
+		m_DataJoeyPlayer.playerHealth = m_GameStateCache.PlayerHealth;
+		m_DataJoeyPlayer.playerMaxHealth = m_GameStateCache.PlayerMaxHealth;
+
+		m_GamePhaseControl.SetData();
+
+		foreach (var kvp in m_GameStateCache.EnvCardDict)
+		{
+			m_GamePhaseControl.AddEnvCardList(cardIds: kvp.Value, index: kvp.Key);
+		}
+
+		foreach (var kvp in m_GameStateCache.BagCardDict)
+		{
+			m_GamePhaseControl.AddCardList(cardType: kvp.Key, cardIds: kvp.Value);
+		}
 	}
 
 	public async void LoadNextLevel(bool IsLobbyEnter = false)
@@ -298,7 +380,15 @@ public class JoeyGameControl : YViewControl
 
 	public void EnterBattleStart()
 	{
-		SetGamePhase(EGamePhase.BattleStart);
+		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_GameStateCache != null)
+		{
+			RestoreGameStateCache();
+			SetGamePhase(EGamePhase.PlayerStart);
+		}
+		else
+		{
+			SetGamePhase(EGamePhase.BattleStart);
+		}
 	}
 
 	public void EndGamePhase()
@@ -312,7 +402,13 @@ public class JoeyGameControl : YViewControl
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 
-			if (currentStage != null && currentStage.type == EStageType.boss)
+			if (currentStage != null && currentStage.type == EStageType.final)
+			{
+				DataSystem.Instance.isFinishGame = true;
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+			else if (currentStage != null && currentStage.type == EStageType.boss)
 			{
 				if (m_GamePhaseControl != null)
 				{
@@ -346,7 +442,13 @@ public class JoeyGameControl : YViewControl
 			int envLevelId = m_DataJoeyPlayer.StageId;
 			EStageType stageType = GetEnvStageType(envLevelId);
 
-			if (stageType == EStageType.boss)
+			if (stageType == EStageType.final)
+			{
+				DataSystem.Instance.isFinishGame = true;
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+			else if (stageType == EStageType.boss)
 			{
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetRelicData();
@@ -375,6 +477,17 @@ public class JoeyGameControl : YViewControl
 			}
 
 			m_DataJoeyPlayer.StageId++;
+		}
+		else if (GameMode == EGameMode.Guide)
+		{
+			if (m_DataJoeyPlayer.currentLevel == 5)
+			{
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+
+			LoadNextLevel();
+
 		}
 		else
 		{
