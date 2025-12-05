@@ -1658,12 +1658,21 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	protected override void OnReturn()
+	private void OnDestroy()
 	{
 		ClearAllCardCts();
 		CurrentEffectCard = null;
 		m_MoveCardDelayAction.Cancel();
 		m_CardActionQueue.Clear();
-		base.OnReturn();
+		// 清理对象池
+		if (m_CardSimplePool != null)
+		{
+			m_CardSimplePool.ReleaseAll();
+		}
+
+		if (m_DamageTextPool != null)
+		{
+			m_DamageTextPool.ReleaseAll();
+		}
 	}
 }
