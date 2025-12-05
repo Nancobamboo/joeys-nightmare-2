@@ -650,4 +650,42 @@ public class JoeyGameControl : YViewControl
 		CancelTokenDict.Clear();
 		base.OnClose();
 	}
+
+	private void OnDestroy()
+	{
+		m_GlobalDelayAction.Cancel();
+
+		foreach (KeyValuePair<Transform, CancellationTokenSource> kvp in CancelTokenDict)
+		{
+			CancellationTokenSource cts = kvp.Value;
+			if (cts != null && !cts.IsCancellationRequested)
+			{
+				cts.Cancel();
+				cts.Dispose();
+			}
+		}
+		CancelTokenDict.Clear();
+
+		foreach (KeyValuePair<int, MonoBehaviourPool<Transform>> kvp in VFXPoolDict)
+		{
+			MonoBehaviourPool<Transform> pool = kvp.Value;
+			if (pool != null)
+			{
+				pool.ReleaseAll();
+			}
+		}
+		VFXPoolDict.Clear();
+
+		m_GameStateCache = null;
+		m_GamePhaseControl = null;
+		m_PauseControl = null;
+		m_GameOverControl = null;
+		m_View = null;
+		m_DataJoeyPlayer = null;
+
+		if (Instance == this)
+		{
+			Instance = null;
+		}
+	}
 }
