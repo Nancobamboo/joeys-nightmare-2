@@ -528,6 +528,7 @@ public sealed class GData : PureSingleton<GData>
 		int StagesIdx = idx.ContainsKey("stages") ? idx["stages"] : -1;
 		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int ThemeIdx = idx.ContainsKey("theme") ? idx["theme"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -573,6 +574,15 @@ public sealed class GData : PureSingleton<GData>
 			else
 			{
 				roguelikeStage.type = EStageType.normal;
+			}
+			string themeStr = Get(ThemeIdx);
+			if (!string.IsNullOrEmpty(themeStr) && System.Enum.TryParse<ETheme>(themeStr, true, out ETheme theme))
+			{
+				roguelikeStage.theme = theme;
+			}
+			else
+			{
+				roguelikeStage.theme = ETheme.monkey;
 			}
 
 			RoguelikeStageList.Add(roguelikeStage);
@@ -694,23 +704,20 @@ public sealed class GData : PureSingleton<GData>
 		Debug.Log($"Env stage loaded: {EnvStageList.Count} stages");
 	}
 
-	public EnvStage GetEnvStage(int level)
+	public EnvStage GetEnvStage(int index)
 	{
 		LoadEnvStage();
-		for (int i = 0; i < EnvStageList.Count; i++)
+		if (index >= 0 && index < EnvStageList.Count)
 		{
-			if (EnvStageList[i].level == level)
-			{
-				return EnvStageList[i];
-			}
+			return EnvStageList[index];
 		}
-		Debug.LogWarning($"Env stage for level {level} not found");
+		Debug.LogWarning($"Env stage index {index} out of range (count: {EnvStageList.Count})");
 		return null;
 	}
 
-	public EStageType GetEnvStageType(int level)
+	public EStageType GetEnvStageType(int index)
 	{
-		EnvStage envStage = GetEnvStage(level);
+		EnvStage envStage = GetEnvStage(index);
 		if (envStage != null)
 		{
 			return envStage.type;

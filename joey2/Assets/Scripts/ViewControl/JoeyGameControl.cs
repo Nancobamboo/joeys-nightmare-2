@@ -94,6 +94,10 @@ public class JoeyGameControl : YViewControl
 		{
 			SetGamePhase(EGamePhase.BattleStart);
 		}
+		else if (GameMode == EGameMode.Guide || GameMode == EGameMode.Battle)
+		{
+			SetGamePhase(EGamePhase.BattleStart);
+		}
 		else
 		{
 			Asset.OpenUI<UILobbyControl>();
@@ -405,6 +409,7 @@ public class JoeyGameControl : YViewControl
 			if (currentStage != null && currentStage.type == EStageType.final)
 			{
 				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
@@ -445,6 +450,7 @@ public class JoeyGameControl : YViewControl
 			if (stageType == EStageType.final)
 			{
 				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
@@ -482,6 +488,7 @@ public class JoeyGameControl : YViewControl
 		{
 			if (m_DataJoeyPlayer.currentLevel == 5)
 			{
+				ClearAllUniTasks();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
@@ -497,6 +504,7 @@ public class JoeyGameControl : YViewControl
 
 	public void ReturnToMainMenu()
 	{
+		ClearAllUniTasks();
 		SceneLoader.Instance.LoadScene("Start");
 	}
 
@@ -633,9 +641,9 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
-
-	protected override void OnClose()
+	public void ClearAllUniTasks()
 	{
+		m_GamePhaseControl.Close();
 		m_GlobalDelayAction.Cancel();
 
 		foreach (var kvp in CancelTokenDict)
@@ -648,7 +656,6 @@ public class JoeyGameControl : YViewControl
 			}
 		}
 		CancelTokenDict.Clear();
-		base.OnClose();
 	}
 
 	private void OnDestroy()
@@ -671,7 +678,7 @@ public class JoeyGameControl : YViewControl
 			MonoBehaviourPool<Transform> pool = kvp.Value;
 			if (pool != null)
 			{
-				pool.ReleaseAll();
+				pool.DestroyAll();
 			}
 		}
 		VFXPoolDict.Clear();

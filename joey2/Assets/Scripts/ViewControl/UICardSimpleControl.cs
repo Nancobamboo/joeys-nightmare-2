@@ -173,6 +173,11 @@ public class UICardSimpleControl : YViewControl
 		{
 			return;
 		}
+		if (IsEnv && cachedCardType == ECardType.other)
+		{
+			JoeyGameControl.Instance.EndGamePhase();
+			return;
+		}
 		IsEffecting = true;
 		YActionSystem.Instance.DispatchAction(EActionId.AddCardToQueue, this);
 	}
@@ -184,10 +189,6 @@ public class UICardSimpleControl : YViewControl
 			if (cachedCardType == ECardType.monster)
 			{
 				YActionSystem.Instance.DispatchAction(EActionId.TakeEnemyDamage, this, 1, EnvIndex);
-			}
-			else if (cachedCardType == ECardType.other)
-			{
-				JoeyGameControl.Instance.EndGamePhase();
 			}
 			else
 			{
