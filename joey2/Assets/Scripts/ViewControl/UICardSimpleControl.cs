@@ -505,6 +505,27 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.PermanentAttackBoostWithRandomDamage:
 				effect = new YPermanentAttackBoostWithRandomDamage(effectValue);
 				break;
+			case ECardEffectId.WalkingChicken:
+				effect = new YWalkingChicken();
+				break;
+			case ECardEffectId.DodgeChicken:
+				effect = new YDodgeChicken();
+				break;
+			case ECardEffectId.GratefulReleaseChicken:
+				effect = new YGratefulReleaseChicken();
+				break;
+			case ECardEffectId.BigChickenBoss:
+				effect = new YBigChickenBoss(effectValue);
+				break;
+			case ECardEffectId.WalkingChickenEgg:
+				effect = new YWalkingChickenEgg(effectValue);
+				break;
+			case ECardEffectId.AnswerSpringGreen:
+				effect = new YAnswerSpringGreen();
+				break;
+			case ECardEffectId.PolishStupidDonkey:
+				effect = new YPolishStupidDonkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
