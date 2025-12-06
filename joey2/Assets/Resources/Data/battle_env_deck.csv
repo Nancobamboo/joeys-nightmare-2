@@ -1,82 +1,161 @@
-level,slotIndex,cardIds,comment,,,,
-100,0,,【新手教学】基础战斗 - Theme: Basic Combat | HP: 10 | Gold: 20,,,,
-100,1,,Strategy: Use shield to block 1 attack, sword to kill 2 monkeys (5dmg x2),,,
-100,2,1002;2001;5001;5001;6001,Starting Sword(5) + Shield(3) + 2x Bad Monkeys(3atk 5hp) + Exit,,,,
-100,3,,,,,,
-100,4,,,,,,
-101,0,,【木桶惊喜】探索奖励 - Theme: Exploration Rewards | HP: 21 | Gold: 35,,,,
-101,1,1002;5009;5001,Strategy: Break barrel for loot, use resources to clear monkeys, potion for skeleton,,
-101,2,2001,Broken Sword(5) + Barrel(1hp->loot) + Bad Monkey(5hp) | Shield(3),,,,
-101,3,5003;3001;6001,Skeleton(5atk 15hp) + Health Potion(+10hp) + Exit,,,,
-101,4,,,,,,
-102,0,,【猿酒爆发】增益技巧 - Theme: Burst Damage | HP: 21 | Gold: 48,,,,
-102,1,5009;1004;3004,Strategy: Ape Wine + Iron Sword = 16dmg burst on skeleton, finish monkey with other weapons,,,
-102,2,5003;2002,Barrel + Claymore(8) + Ape Wine(dmg x2) | Skeleton(15hp) + Shield(8),,,,
-102,3,5001;6001,Bad Monkey(5hp) + Exit,,,,
-102,4,,,,,,
-103,0,,【第一次BOSS】综合考验 - Theme: Endurance | HP: 31 | Gold: 45 | SHOP,,,,
-103,1,5009;1004;2002,Strategy: Clear barrel, use potion for sustain, shields for control, dart to chip, sword to finish
-103,2,5003;3001;1003,Barrel + Iron Sword(8) + Shield(8) | Skeleton(15hp) + Health Potion(+10) + Dart(3,quick strike),,,
-103,3,5003;6001,Skeleton(15hp) + Exit,,,,
-103,4,,,,,,
-104,0,,【回旋打击】弹射机制 - Theme: AOE Intro | HP: 21 | Gold: 48,,,,
-104,1,1007;2001,Strategy: Boomerang bounces to barrel and skeleton for AOE damage,,,,
-104,2,5001;5009,Boomerang(4,bounce 2x) + Shield(3) | Bad Monkey + Barrel,,,
-104,3,5003;3001;6001,Skeleton(15hp) + Potion + Exit,,,,
-104,4,,,,,,
-105,0,,【反伤流】刃甲战术 - Theme: Reflect Damage | HP: 24 | Gold: 40,,,,
-105,1,1004;2003,Strategy: Thorn armor blocks vampire and reflects 5dmg, sword for skeleton,,,
-105,2,5003;5009,Iron Sword(8) + Thorn Armor(5def,reflect 5) | Skeleton(15hp) + Barrel,,,
-105,3,5008;3001;6001,Vampire(5atk 8hp,lifesteal 3) + Potion + Exit,,,
-105,4,,,,,,
-106,0,,【炸弹控场】范围打击 - Theme: AOE Burst | HP: 21 | Gold: 48,,,,
-106,1,1002;3002,Strategy: Bomb clears barrel and monkey in one blast, sword finishes skeleton,,,
-106,2,5001;5009,Broken Sword + Bomb(10dmg AOE) | Bad Monkey(5hp) + Barrel(1hp),,,,
-106,3,5003;2002;6001,Skeleton(15hp) + Shield(8) + Exit,,,,
-106,4,,,,,,
-107,0,,【第二次BOSS】连击大师 - Theme: Combo Master | HP: 38 | Gold: 50 | SHOP,,,,
-107,1,1006;2004,Strategy: Double Strike + Hammer = 30dmg burst on skeleton, Hand Guard cycles weapons for vampires,,,
-107,2,5003;5008;3001,Hammer(15) + Hand Guard(5def,draw weapon) | Skeleton(15hp) + Vampire(5atk 8hp) + Potion(+10),,,
-107,3,5008;1003;4001;6001,Vampire(5atk 8hp) + Dart(3) + Double Strike + Exit,,,,
-107,4,,,,,,
-108,0,,【血量管理】半血爆发 - Theme: Low HP Burst | HP: 24 | Gold: 53,,,,
-108,1,5009;1008,Strategy: Drop to half HP for Blood Lance 19dmg + Ape Wine = 38dmg burst, Blood Shield heals back,,,
-108,2,5008;5003;2006,Barrel + Blood Lance(9,half HP +10) | Vampire(8hp) + Skeleton(15hp) + Blood Shield(12def,heal),,
-108,3,3004;6001,Ape Wine + Exit,,,,
-108,4,,,,,,
-109,0,,【神秘商人】奇遇挑战 - Theme: Rare Encounter | HP: 53 | Gold: 85,,,,
-109,1,5013;2002,Strategy: Timid Turkey swaps cards when hit, use Hook Lock to cycle weapons wisely,,,
-109,2,5005;5003;5009,Shield(8) | Timid Turkey(9atk 25hp,swap 2 cards on hit) + Vampire Lord(5atk 20hp,lifesteal 3) | Skeleton(15hp) + Barrel,,
-109,3,5008;3003;3001;6001,Vampire(8hp) + Hook Lock(draw weapon) + Potion + Exit,,,,
-109,4,,,,,,
-110,0,,【匕首风暴】连锁反应 - Theme: Dagger Chain | HP: 54 | Gold: 68,,,,
-110,1,5009;1005,Strategy: Dagger Shield spawns dagger on break, use Flying Daggers for weapon flood,,,
-110,2,5008;5003;2007,Barrel + Double Swords(8,no armor +5) | Vampire(8hp) + Skeleton(15hp) + Dagger Shield(8def,spawn dagger),,
-110,3,4007;3005;6001,Flying Daggers(spawn 2 daggers) + Gift Bag(summon 3 cards) + Exit,,,,
-110,4,,,,,,
-111,0,5009;1004,【第三次BOSS】爆炸陷阱 - Theme: Explosive Trap | HP: 68 | Gold: 75 | SHOP,,,,
-111,1,1006;5004,Strategy: Exploding Barrel AOE on death, position carefully, Hammer for burst damage,,
-111,2,5004;5007;2004,Barrel + Iron Sword(8) | Hammer(15) + Big Monkey(30hp) | Exploding Barrel(1hp,death AOE 10dmg) + Vampire(8hp) + Hand Guard,,,
-111,3,3001;3002;4007;6001,Health Potion + Bomb(10 AOE) + Flying Daggers + Exit,,,,
-111,4,1003,Dart(3),,,,
-112,0,1002,【武器抛弃流】环境控制 - Theme: Weapon Discard | HP: 64 | Gold: 73,,,,
-112,1,5009;1006,Strategy: Slip Shield throws weapon to env, Discard Armor throws all equipment, control the board,,
-112,2,5008;5003;1010,Broken Sword + Barrel + Hammer(15) | Vampire(8hp) + Skeleton(15hp) + Hand Blade(8,draw defense),,,
-112,3,5004;2005;3001,Big Monkey(30hp) + Slip Shield(12def,throw weapon on death) + Potion,,,
-112,4,4008;6001,Discard Armor(throw all equipment) + Exit,,,,
-113,0,3001,【精英围攻】奇遇之战 - Theme: Elite Encounter | HP: 64 | Gold: 100,,,,
-113,1,5013;1008,Strategy: Timid Turkey swaps 2 cards when hit - control env carefully, massive gold reward if killed,,,
-113,2,5010;5009;2003,Health Potion | Timid Turkey(9atk 25hp,swap 2 cards on hit) + Blood Lance(9/19) | SiLing Donkey(3atk 20hp,half HP summon skeletons) + Barrel + Thorn Armor(reflect 5),,
-113,3,5011;3002;4006,Skeleton Donkey(15hp) + Bomb(10 AOE) + Lightning(5 AOE),,,,
-113,4,5008;3001;6001,Vampire(8hp) + Potion + Exit,,,,
-114,0,1002,【双持狂战】极限输出 - Theme: Dual Wield Berserker | HP: 74 | Gold: 88,,,,
-114,1,5009;1006,Strategy: Dual Wield doubles damage but can't use shield, high risk high reward, use potions to sustain,,
-114,2,5004;5005;2006,Broken Sword + Barrel + Hammer(15) | Big Monkey(30hp) + Vampire Lord(20hp,lifesteal 3) + Blood Shield(12,heal),,
-114,3,3004;1005;3001,Ape Wine(x2) + Double Swords(8+5) + Potion,,,,
-114,4,3003;6001,Dual Wield(x2 dmg,no shield) + Hook Lock + Exit,,,
-115,0,1003;1002,【最终BOSS：死神降临】终极考验 - Theme: Grim Reaper | HP: 86 | Gold: 100 | VICTORY,,,,
-115,1,5012;1006;2004,Strategy: Grim Reaper boss fight, use all mechanics learned, Double Strike + Hammer for burst,,
-115,2,5004;5010;3001,Dart(3) + Broken Sword | Grim Reaper(5atk 15hp,BOSS) + Hammer(15) + Hand Guard(5,draw weapon) | Big Monkey(30hp) + SiLing Donkey(20hp) + Potion(+10),,
-115,3,5005;1008;3002;4001,Vampire Lord(20hp) + Blood Lance(9/19) + Bomb(10 AOE) + Double Strike,,,,
-115,4,2003;3004;6001,Thorn Armor(reflect 5) + Ape Wine + Exit,,,,
-
+level,slotIndex,cardIds,comment
+100,0,,【Monkey丛林-1】入门 - 3列
+100,1,,
+100,2,1002;2001;5001;5001;6001,断剑+破盾+坏Monkey×2+出口
+100,3,,
+100,4,,
+101,0,,【Monkey丛林-2】探索 - 3列
+101,1,,
+101,2,1002;5009;5001;5008;2001;6001,断剑+木桶+坏Monkey+船长+破盾+出口
+101,3,,
+101,4,,
+102,0,,【Monkey丛林-3】骷髅初见 - 3列
+102,1,,
+102,2,1004;2009;5001;5003;3001;6001,铁剑+木盾+坏Monkey+骷髅Monkey+血瓶+出口
+102,3,,
+102,4,,
+103,0,,【Monkey丛林-4】精英-自爆危机 - 4列
+103,1,5009;1002,木桶+断剑
+103,2,5008;5003;2002;3001,船长+骷髅Monkey+铁盾+血瓶
+103,3,5014;1004;6001,自爆monkey+铁剑+出口
+103,4,,
+104,0,,【Monkey丛林-5】怪盗出没 - 5列
+104,1,5009;1002,木桶+断剑
+104,2,5008;5015;2009,船长+怪盗+木盾
+104,3,5030;3001;1004,小丑+血瓶+铁剑
+104,4,5009;6001,木桶+出口
+105,0,,【Monkey丛林-6】罗密欧与朱丽叶 - 5列
+105,1,5009;1004,木桶+铁剑
+105,2,5017;5018;2002,罗密欧+朱丽叶+铁盾
+105,3,5003;3001;1007,骷髅Monkey+血瓶+回旋镖
+105,4,5009;6001,木桶+出口
+106,0,,【Monkey丛林-7】猴群围攻 - 5列
+106,1,5030;1006,小丑+重锤
+106,2,5031;5008;2003,滑板+船长+刃甲
+106,3,5003;3001;1003,骷髅Monkey+血瓶+手里剑
+106,4,5016;6001,宝箱+出口
+107,0,,【Monkey丛林-8】BOSS骷髅骑士 - 5列
+107,1,5009;1006;2004,木桶+重锤+护手
+107,2,5004;5008;3001,骷髅骑士+船长+血瓶
+107,3,5003;1004;2002,骷髅Monkey+铁剑+铁盾
+107,4,5009;4001;6001,木桶+连击+出口
+108,0,,【Donkey荒漠-9】入门 - 3列
+108,1,,
+108,2,1004;2009;5011;5011;3001;6001,铁剑+木盾+骷髅Donkey×2+血瓶+出口
+108,3,,
+108,4,,
+109,0,,【Donkey荒漠-10】死灵初见 - 3列
+109,1,,
+109,2,1004;2002;5010;5011;3001;6001,铁剑+铁盾+死灵Donkey+骷髅Donkey+血瓶+出口
+109,3,,
+109,4,,
+110,0,,【Donkey荒漠-11】幽灵来袭 - 4列
+110,1,5009;1006,木桶+重锤
+110,2,5011;5011;2002;3001,骷髅Donkey×2+铁盾+血瓶
+110,3,5020;1004;6001,幽灵+铁剑+出口
+110,4,,
+111,0,,【Donkey荒漠-12】精英-大春驾到 - 4列
+111,1,5007;1008,炸药桶+染血长矛
+111,2,5021;5010;2003;3001,大春Donkey+死灵Donkey+刃甲+血瓶
+111,3,5016;1006;6001,宝箱+重锤+出口
+111,4,,
+112,0,,【Donkey荒漠-13】波兰蠢驴 - 5列
+112,1,5009;1004,木桶+铁剑
+112,2,5022;5011;2002,波兰蠢Donkey+骷髅Donkey+铁盾
+112,3,5020;3001;1007,幽灵+血瓶+回旋镖
+112,4,5009;6001,木桶+出口
+113,0,,【Donkey荒漠-14】亡灵军团 - 5列
+113,1,5009;1006,木桶+重锤
+113,2,5010;5020;2004,死灵Donkey+幽灵+护手
+113,3,5011;3001;1008,骷髅Donkey+血瓶+染血长矛
+113,4,5009;6001,木桶+出口
+114,0,,【Donkey荒漠-15】炸药陷阱 - 5列
+114,1,5007;1006,炸药桶+重锤
+114,2,5021;5022;2006,大春Donkey+波兰蠢Donkey+血魔盾
+114,3,5020;3001;1004,幽灵+血瓶+铁剑
+114,4,5016;6001,宝箱+出口
+115,0,,【Donkey荒漠-16】BOSS驴群大战 - 5列
+115,1,5007;1006;2003,炸药桶+重锤+刃甲
+115,2,5021;5010;3001,大春Donkey+死灵Donkey+血瓶
+115,3,5020;5022;1008;2002,幽灵+波兰蠢Donkey+染血长矛+铁盾
+115,4,5016;4001;6001,宝箱+连击+出口
+116,0,,【Turkey感恩节-17】入门 - 3列
+116,1,,
+116,2,1004;2002;5023;5024;3001;6001,铁剑+铁盾+坏turkey+走地turkey+血瓶+出口
+116,3,,
+116,4,,
+117,0,,【Turkey感恩节-18】闪避大师 - 3列
+117,1,,
+117,2,1006;2003;5023;5025;3001;6001,重锤+刃甲+坏turkey+闪避turkey+血瓶+出口
+117,3,,
+117,4,,
+118,0,,【Turkey感恩节-19】感恩之心 - 4列
+118,1,5009;1007,木桶+回旋镖
+118,2,5024;5025;2002;3001,走地turkey+闪避turkey+铁盾+血瓶
+118,3,5026;1006;6001,感恩turkey+重锤+出口
+118,4,,
+119,0,,【Turkey感恩节-20】精英-胆小鬼 - 4列
+119,1,5009;1008,木桶+染血长矛
+119,2,5013;5026;2004;3001,胆小Turkey+感恩turkey+护手+血瓶
+119,3,5023;1006;6001,坏turkey+重锤+出口
+119,4,,
+120,0,,【Turkey感恩节-21】孵化危机 - 5列
+120,1,5009;1006,木桶+重锤
+120,2,5028;5023;2002,走地turkey蛋+坏turkey+铁盾
+120,3,5025;3001;1004,闪避turkey+血瓶+铁剑
+120,4,5009;6001,木桶+出口
+121,0,,【Turkey感恩节-22】火鸡大军 - 5列
+121,1,5009;1006,木桶+重锤
+121,2,5013;5024;2006,胆小Turkey+走地turkey+血魔盾
+121,3,5026;3001;1007,感恩turkey+血瓶+回旋镖
+121,4,5009;6001,木桶+出口
+122,0,,【Turkey感恩节-23】感恩节狂欢 - 5列
+122,1,5009;1008,木桶+染血长矛
+122,2,5023;5023;2003,坏turkey×2+刃甲
+122,3,5025;5026;3001;1006,闪避turkey+感恩turkey+血瓶+重锤
+122,4,5016;6001,宝箱+出口
+123,0,,【Turkey感恩节-24】BOSS大turkey霸 - 5列
+123,1,5007;1006;2004,炸药桶+重锤+护手
+123,2,5027;5028;3001,大turkey霸+走地turkey蛋+血瓶
+123,3,5023;5026;1008;2002,坏turkey+感恩turkey+染血长矛+铁盾
+123,4,5016;4001;6001,宝箱+连击+出口
+124,0,,【骷髅墓地-25】入门 - 3列
+124,1,,
+124,2,1006;2002;5005;5003;3001;6001,重锤+铁盾+吸血鬼Monkey+骷髅Monkey+血瓶+出口
+124,3,,
+124,4,,
+125,0,,【骷髅墓地-26】宝箱怪 - 4列
+125,1,5009;1006,木桶+重锤
+125,2,5005;5029;2003;3001,吸血鬼Monkey+宝箱怪+刃甲+血瓶
+125,3,5009;1008;6001,木桶+染血长矛+出口
+125,4,,
+126,0,,【骷髅墓地-27】吸血危机 - 4列
+126,1,5007;1006,炸药桶+重锤
+126,2,5005;5005;2006;3001,吸血鬼Monkey×2+血魔盾+血瓶
+126,3,5016;1008;6001,宝箱+染血长矛+出口
+126,4,,
+127,0,,【骷髅墓地-28】精英-宝箱陷阱 - 5列
+127,1,5009;1006,木桶+重锤
+127,2,5029;5029;2004,宝箱怪×2+护手
+127,3,5005;3001;1008,吸血鬼Monkey+血瓶+染血长矛
+127,4,5016;6001,宝箱+出口
+128,0,,【骷髅墓地-29】幽灵再现 - 5列
+128,1,5009;1006,木桶+重锤
+128,2,5005;5029;2003,吸血鬼Monkey+宝箱怪+刃甲
+128,3,5020;3001;1008,幽灵+血瓶+染血长矛
+128,4,5009;6001,木桶+出口
+129,0,,【骷髅墓地-30】强敌联合 - 5列
+129,1,5007;1006,炸药桶+重锤
+129,2,5029;5021;2006,宝箱怪+大春Donkey+血魔盾
+129,3,5005;3001;1008,吸血鬼Monkey+血瓶+染血长矛
+129,4,5016;6001,宝箱+出口
+130,0,,【骷髅墓地-31】噩梦前夕 - 5列
+130,1,5007;1006;2004,炸药桶+重锤+护手
+130,2,5005;5005;3001,吸血鬼Monkey×2+血瓶
+130,3,5029;5027;1008;2003,宝箱怪+大turkey霸+染血长矛+刃甲
+130,4,5016;6001,宝箱+出口
+131,0,,【骷髅墓地-32】FINAL死神降临 - 5列
+131,1,5007;1006;2004,炸药桶+重锤+护手
+131,2,5012;5005;3001,死神+吸血鬼Monkey+血瓶
+131,3,5029;1008;2006;4001,宝箱怪+染血长矛+血魔盾+连击
+131,4,5007;3002;6001,炸药桶+炸弹+出口

@@ -10,7 +10,7 @@
 1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,染血长矛       ,,attack,生命值低于50%时，攻击+10,9,0,0,100,2,ExtraDamage_HalfHealth:10
 1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,手刀,,attack,亡语:从弃牌堆抽取一张防御卡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
 1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,,attack,永不消耗,3,0,0,0,1,BareHands
-1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,噬魂剑,,attack,击杀:永久攻击+1,7,0,0,150,2,PermanentAttackBoostWithRandomDamage:1
+1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,噬魂剑,,attack,击杀:永久攻击+1,7,0,0,150,2,PermanentAttackBoost:1
 1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,噬魂手里剑,,attack,击杀:永久攻击+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
 1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,重弩,,attack,,16,0,0,300,3,
 ,,,,,,,,,,,,
@@ -46,14 +46,14 @@
 4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,堡垒       ,,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,
 4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,肉盾冲击,,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,0,1,
 4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,,skill     ,群伤:5,0,0,0,100,1,Electric:5
-4007,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤两个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill
-4008,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的攻击防御卡丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
+4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤两个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill
+4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的攻击防御卡丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
-5000,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey船长,教学牌,monster      ,点击攻击,3,,10,10,1,
+5000,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,10,10,1,
 5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,5,10,1,
 5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Monkey,,monster      ,,5,,15,20,1,
 5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,骷髅骑士Monkey,,monster      ,亡语:在环境中召唤铁剑和铁盾,8,,30,30,3,
@@ -63,10 +63,10 @@
 5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey船长,,monster      ,,5,,8,15,1,
 5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,空木桶,monster,可能藏着好东西？,,,1,5,1,
 5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,死灵Donkey,,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,30,1,NecDonkey
-5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Donkey,,monster      ,,5,,15,15,1,
+5011,Art/Img/Monster/img_card_SkeletonDonkey,Art/Img/Monster/img_bg_Monster,骷髅Donkey,,monster      ,,5,,15,15,1,
 5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,死神,必须放在关卡最上方,monster      ,死神,5,,15,100,1,GrimReaper
 5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,胆小Turkey,,monster      ,亡语:获得20金币  受击:躲到下一张牌后,9,,25,100,2,TimidTurkey
-5014,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,自爆monkey,,monster,倒计时7:自爆,6,,18,30,1,AutoBoomMoney:20
+5014,Art/Img/Monster/img_card_BoomMonkey,Art/Img/Monster/img_bg_Monster,自爆monkey,,monster,倒计时7:自爆,6,,18,30,1,AutoBoomMoney:20
 5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,怪盗monkey,,monster,攻击偷取10金币 倒计时3:逃跑 亡语:返回全部金币,5,,15,30,1,StealMoney:10
 5016,Art/Img/Monster/img_card_TreasureChest,Art/Img/Monster/img_bg_Monster,宝箱,,monster,亡语:掉落宝物,0,,1,20,1,
 5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,罗密欧monkey,,monster,亡语:朱丽叶攻击+5 生命+10,4,,21,40,2,RomeoMonkey
