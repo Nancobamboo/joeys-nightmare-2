@@ -53,7 +53,7 @@ public class YActionSystem : YSingletonModule<YActionSystem>
 
     public void DispatchAction(EActionId actionId, params object[] paraArray)
     {
-        Debug.Log("DispatchAction " + actionId.ToString());
+       // Debug.Log("DispatchAction " + actionId.ToString());
         if (actions.ContainsKey((int)actionId))
         {
             actions[(int)actionId]?.Invoke(paraArray);

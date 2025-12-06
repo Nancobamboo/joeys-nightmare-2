@@ -50,17 +50,21 @@ public enum ECardEffectId
     DonkeyMeatFireBun,
     MonkeyBanana,
     Bone,
-    PermanentAttackBoostWithRandomDamage
+    PermanentAttackBoostWithRandomDamage,
+    WalkingChicken,
+    DodgeChicken,
+    GratefulReleaseChicken,
+    BigChickenBoss,
+    WalkingChickenEgg,
+    AnswerSpringGreen,
+    PolishStupidDonkey
 }
 
 public enum EEffectType
 {
     Damage,
     Heal,
-    Buff,
-    Debuff,
     ReflectDamage,
-    LifeSteal,
     Boom,
     ExtraAttackCnt,
     Electric,

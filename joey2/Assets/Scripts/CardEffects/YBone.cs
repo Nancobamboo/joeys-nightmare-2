@@ -17,22 +17,16 @@ public class YBone : YCardEffect
 			float maxDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
 		}
 
-		if (ControlUtil.IsRandomSucceed(33))
-		{
-			YActionSystem.Instance.DispatchAction(EActionId.PermanentBoostAttack);
-		}
-		else if (ControlUtil.IsRandomSucceed(50))
-		{
-			YActionSystem.Instance.DispatchAction(EActionId.PermanentBoostDefence);
-		}
-		else
-		{
-			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-			int oldMaxHealth = playerData.playerMaxHealth;
-			playerData.playerMaxHealth += 1;
+		string[] cardIds = new string[] { "3007", "3008", "3009" };
+		int randomIndex = Random.Range(0, cardIds.Length);
+		string selectedCardId = cardIds[randomIndex];
 
-			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+		Card newCard = DataSystem.Instance.CreateCard(selectedCardId);
+		if (newCard != null)
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AddCardToBagFromSelect, newCard);
 		}
+
 		return 0.3f;
 	}
 }

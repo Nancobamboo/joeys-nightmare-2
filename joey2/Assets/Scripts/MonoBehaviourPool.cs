@@ -51,5 +51,18 @@ public class MonoBehaviourPool<T> where T : Component
         }
     }
 
+    public void DestroyAll()
+    {
+        for (int i = 0; i < m_Pool.Count; i++)
+        {
+            T obj = m_Pool[i];
+            if (obj != null && obj.gameObject != null)
+            {
+                UnityEngine.Object.Destroy(obj.gameObject);
+            }
+        }
+        m_Pool.Clear();
+    }
+
     public int Count => m_Pool.Count;
 }

@@ -11,6 +11,7 @@ public partial class DataSystem
     public Dictionary<int, float> AnimDelayTimeDict = new Dictionary<int, float>();
 
     public const bool isNew = true;
+    public bool isFinishGame = false;
     public void LoadGameData()
     {
         Debug.Log("LoadGameData called");
@@ -251,7 +252,7 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
         dataJoeyPlayer.Coin += delta;
-        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin);
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
     }
 
     public bool AddCardToDataJoeyPlayer(Card card)
@@ -308,6 +309,13 @@ public partial class DataSystem
         }
 
         return false;
+    }
+
+    public void ResetDataJoeyPlayer()
+    {
+        m_DataJoeyPlayer = new DataJoeyPlayer();
+        isFinishGame = false;
+        SaveDataJoeyPlayer();
     }
 }
 

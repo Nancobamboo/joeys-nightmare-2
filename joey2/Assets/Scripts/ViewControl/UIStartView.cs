@@ -6,6 +6,8 @@ public class UIStartView : YBaseView
 {
 	public Button BtnStart;
 	public Button BtnRoguelike;
+	public Button BtnOver;
+	public Button BtnGuide;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -14,5 +16,7 @@ public class UIStartView : YBaseView
 		if(viewItemList == null || viewItemList.Count == 0) return;
 		BtnStart = viewItemList[0].Target.GetComponent<Button>();
 		BtnRoguelike = viewItemList[1].Target.GetComponent<Button>();
+		BtnOver = viewItemList[2].Target.GetComponent<Button>();
+		BtnGuide = viewItemList[3].Target.GetComponent<Button>();
 	}
 }

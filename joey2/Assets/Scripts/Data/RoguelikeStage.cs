@@ -4,7 +4,8 @@ public enum EStageType
 {
 	normal,
 	elite,
-	boss
+	boss,
+	final
 }
 
 public class RoguelikeStage
@@ -12,6 +13,7 @@ public class RoguelikeStage
 	public string stages;
 	public List<string> level = new List<string>();
 	public EStageType type;
+	public ETheme theme;
 
 	public RoguelikeStage()
 	{

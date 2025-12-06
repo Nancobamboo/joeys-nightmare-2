@@ -36,6 +36,16 @@ public class JoeyGameControl : YViewControl
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 	private bool m_IsLobbyEnter = false;
 
+	private class GameStateCache
+	{
+		public Dictionary<int, List<string>> EnvCardDict = new Dictionary<int, List<string>>();
+		public Dictionary<ECardType, List<string>> BagCardDict = new Dictionary<ECardType, List<string>>();
+		public int PlayerHealth;
+		public int PlayerMaxHealth;
+	}
+
+	private GameStateCache m_GameStateCache;
+
 	public EGameMode GameMode = EGameMode.Battle;
 	public string[] DebugEnvCardIds = new string[0];
 	public string[] DebugBagCardIds = new string[0];
@@ -81,6 +91,10 @@ public class JoeyGameControl : YViewControl
 			m_DataJoeyPlayer.currentLevel = 1;
 		}
 		if (GameMode == EGameMode.Env)
+		{
+			SetGamePhase(EGamePhase.BattleStart);
+		}
+		else if (GameMode == EGameMode.Guide || GameMode == EGameMode.Battle)
 		{
 			SetGamePhase(EGamePhase.BattleStart);
 		}
@@ -186,6 +200,7 @@ public class JoeyGameControl : YViewControl
 				List<string> cardIdList = envModeCardList[i];
 				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
+			SaveGameStateCache();
 			return;
 		}
 
@@ -271,6 +286,81 @@ public class JoeyGameControl : YViewControl
 				}
 			}
 		}
+
+		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
+		{
+			SaveGameStateCache();
+		}
+	}
+
+	private void SaveGameStateCache()
+	{
+		if (m_GamePhaseControl == null)
+		{
+			return;
+		}
+
+		m_GameStateCache = new GameStateCache();
+		m_GameStateCache.PlayerHealth = m_DataJoeyPlayer.playerHealth;
+		m_GameStateCache.PlayerMaxHealth = m_DataJoeyPlayer.playerMaxHealth;
+
+		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
+		foreach (var kvp in envCardDict)
+		{
+			List<string> cardIds = new List<string>();
+			for (int i = 0; i < kvp.Value.Count; i++)
+			{
+				UICardSimpleControl cardControl = kvp.Value[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardIds.Add(cardControl.CardData.id);
+				}
+			}
+			m_GameStateCache.EnvCardDict[kvp.Key] = cardIds;
+		}
+
+		Dictionary<int, List<UICardSimpleControl>> bagCardDict = m_GamePhaseControl.GetBagCardDict();
+		foreach (var kvp in bagCardDict)
+		{
+			ECardType cardType = (ECardType)kvp.Key;
+			List<string> cardIds = new List<string>();
+			for (int i = 0; i < kvp.Value.Count; i++)
+			{
+				UICardSimpleControl cardControl = kvp.Value[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardIds.Add(cardControl.CardData.id);
+				}
+			}
+			m_GameStateCache.BagCardDict[cardType] = cardIds;
+		}
+	}
+
+	private void RestoreGameStateCache()
+	{
+		if (m_GameStateCache == null || m_GamePhaseControl == null)
+		{
+			return;
+		}
+
+		m_DataJoeyPlayer.playerHealth = m_GameStateCache.PlayerHealth;
+		m_DataJoeyPlayer.playerMaxHealth = m_GameStateCache.PlayerMaxHealth;
+
+		m_GamePhaseControl.SetData();
+
+		foreach (var kvp in m_GameStateCache.BagCardDict)
+		{
+			List<string> reversedCardIds = new List<string>(kvp.Value);
+			reversedCardIds.Reverse();
+			m_GamePhaseControl.AddCardList(cardType: kvp.Key, cardIds: reversedCardIds);
+		}
+
+		foreach (var kvp in m_GameStateCache.EnvCardDict)
+		{
+			List<string> reversedCardIds = new List<string>(kvp.Value);
+			reversedCardIds.Reverse();
+			m_GamePhaseControl.AddEnvCardList(cardIds: reversedCardIds, index: kvp.Key);
+		}
 	}
 
 	public async void LoadNextLevel(bool IsLobbyEnter = false)
@@ -298,7 +388,15 @@ public class JoeyGameControl : YViewControl
 
 	public void EnterBattleStart()
 	{
-		SetGamePhase(EGamePhase.BattleStart);
+		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_GameStateCache != null)
+		{
+			RestoreGameStateCache();
+			SetGamePhase(EGamePhase.PlayerStart);
+		}
+		else
+		{
+			SetGamePhase(EGamePhase.BattleStart);
+		}
 	}
 
 	public void EndGamePhase()
@@ -312,7 +410,14 @@ public class JoeyGameControl : YViewControl
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
 
-			if (currentStage != null && currentStage.type == EStageType.boss)
+			if (currentStage != null && currentStage.type == EStageType.final)
+			{
+				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+			else if (currentStage != null && currentStage.type == EStageType.boss)
 			{
 				if (m_GamePhaseControl != null)
 				{
@@ -346,7 +451,14 @@ public class JoeyGameControl : YViewControl
 			int envLevelId = m_DataJoeyPlayer.StageId;
 			EStageType stageType = GetEnvStageType(envLevelId);
 
-			if (stageType == EStageType.boss)
+			if (stageType == EStageType.final)
+			{
+				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+			else if (stageType == EStageType.boss)
 			{
 				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
 				selectControl.SetRelicData();
@@ -376,6 +488,18 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
+		else if (GameMode == EGameMode.Guide)
+		{
+			if (m_DataJoeyPlayer.currentLevel == 5)
+			{
+				ClearAllUniTasks();
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+
+			LoadNextLevel();
+
+		}
 		else
 		{
 			LoadNextLevel();
@@ -384,6 +508,7 @@ public class JoeyGameControl : YViewControl
 
 	public void ReturnToMainMenu()
 	{
+		ClearAllUniTasks();
 		SceneLoader.Instance.LoadScene("Start");
 	}
 
@@ -520,9 +645,9 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
-
-	protected override void OnClose()
+	public void ClearAllUniTasks()
 	{
+		m_GamePhaseControl.Close();
 		m_GlobalDelayAction.Cancel();
 
 		foreach (var kvp in CancelTokenDict)
@@ -535,6 +660,43 @@ public class JoeyGameControl : YViewControl
 			}
 		}
 		CancelTokenDict.Clear();
-		base.OnClose();
+	}
+
+	private void OnDestroy()
+	{
+		m_GlobalDelayAction.Cancel();
+
+		foreach (KeyValuePair<Transform, CancellationTokenSource> kvp in CancelTokenDict)
+		{
+			CancellationTokenSource cts = kvp.Value;
+			if (cts != null && !cts.IsCancellationRequested)
+			{
+				cts.Cancel();
+				cts.Dispose();
+			}
+		}
+		CancelTokenDict.Clear();
+
+		foreach (KeyValuePair<int, MonoBehaviourPool<Transform>> kvp in VFXPoolDict)
+		{
+			MonoBehaviourPool<Transform> pool = kvp.Value;
+			if (pool != null)
+			{
+				pool.DestroyAll();
+			}
+		}
+		VFXPoolDict.Clear();
+
+		m_GameStateCache = null;
+		m_GamePhaseControl = null;
+		m_PauseControl = null;
+		m_GameOverControl = null;
+		m_View = null;
+		m_DataJoeyPlayer = null;
+
+		if (Instance == this)
+		{
+			Instance = null;
+		}
 	}
 }
