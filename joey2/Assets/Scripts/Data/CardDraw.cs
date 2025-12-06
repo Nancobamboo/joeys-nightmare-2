@@ -107,7 +107,15 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         LoadTutorialEnvDeck();
         if (_tutorialEnvDeckCache.ContainsKey(level))
         {
-            return _tutorialEnvDeckCache[level];
+            // Filter out EXIT_CARD_ID (6001) from the cached deck
+            // KeyPath will automatically appear when all monsters are cleared
+            List<List<string>> filteredDeck = new List<List<string>>();
+            foreach (var column in _tutorialEnvDeckCache[level])
+            {
+                List<string> filteredColumn = column.Where(id => id != EXIT_CARD_ID).ToList();
+                filteredDeck.Add(filteredColumn);
+            }
+            return filteredDeck;
         }
 
         Debug.LogWarning($"Tutorial env deck for level {level} not found in CSV, using default");
@@ -133,9 +141,9 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     }
 
     /// <summary>
-    /// Draw cards for Env mode - randomly distribute player cards + monsters + exit into 5 columns
+    /// Draw cards for Env mode - randomly distribute player cards + monsters into 5 columns
     /// Ensures at least 3 non-monster cards are at the top positions of the 5 columns
-    /// Exit card (KeyPath) is always placed at the bottom of a random column (last in list = bottom visually)
+    /// Exit card (KeyPath) will automatically appear when no monsters remain in the environment
     /// </summary>
     /// <param name="level">Current level</param>
     /// <param name="playerCardPool">Player's accumulated card pool (card IDs)</param>
@@ -193,13 +201,11 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             columns[randomColumn].Add(cardId);
         }
 
-        // Step 5: Place exit card at the BOTTOM of a random column (add LAST to the list)
-        // In AddEnvCardList, last item in list is processed first, going to visual bottom
-        int exitColumn = Random.Range(0, ENV_SLOT_COUNT);
-        columns[exitColumn].Add(EXIT_CARD_ID);
+        // Note: Exit card (KeyPath) is no longer placed here.
+        // It will automatically appear when no monsters remain in the environment.
 
         Debug.Log($"Env mode cards distributed: {ENV_SLOT_COUNT} columns, " +
-                  $"{nonMonsterTopCount} non-monster top cards guaranteed, exit at bottom of column {exitColumn}");
+                  $"{nonMonsterTopCount} non-monster top cards guaranteed, exit will appear when all monsters cleared");
 
         return columns;
     }
