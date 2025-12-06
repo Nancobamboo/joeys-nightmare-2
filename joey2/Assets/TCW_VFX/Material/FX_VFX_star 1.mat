@@ -7,11 +7,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FX_VFX_Advanced 6
+  m_Name: FX_VFX_star 1
   m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - DISSOLVE
   m_InvalidKeywords:
   - DISABLEMASK
   - DISTORTOFF
@@ -34,7 +35,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DissolveTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 461db46089a912744a1e281876934f13, type: 3}
         m_Scale: {x: 0.88, y: 0.22}
         m_Offset: {x: 0, y: 0}
     - _DissolveTex2:
@@ -50,11 +51,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: ae96359f1c163dd49800e98cc1b80228, type: 3}
+        m_Texture: {fileID: 2800000, guid: 461db46089a912744a1e281876934f13, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 461db46089a912744a1e281876934f13, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask2:
@@ -94,7 +95,7 @@ Material:
     - _Width: 1.332
     m_Colors:
     - _AnimationSettings: {r: 1, g: 0, b: 0, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1.4980391, g: 1.4980391, b: 1.4980391, a: 1}
     - _ColorAlphaBrightnessContrast: {r: 1, g: 1, b: 1, a: 1}
     - _DissolvePanner: {r: 0, g: 0, b: 0, a: 0}
     - _DistortPanner: {r: 0, g: 0, b: 0, a: 0}
