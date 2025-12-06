@@ -20,16 +20,29 @@ public sealed class GData : PureSingleton<GData>
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
-	private string m_TutorialEquipmentDeckCsvPath = "Data/tutorial_equipment_deck";
-	private string m_TutorialPlayerDataCsvPath = "Data/tutorial_player_data";
 	private string m_RoguelikeCharacterCsvPath = "Data/roguelike_character";
 	private string m_RoguelikeStageCsvPath = "Data/roguelike_stage";
 	private string m_EquipmentUnlockCsvPath = "Data/equipment_unlock";
 	private string m_KeywordCsvPath = "Data/keyword";
 	private string m_RelicInfoCsvPath = "Data/relic_info";
 	private string m_EnvStageCsvPath = "Data/env_stage";
-	private Dictionary<int, Dictionary<string, List<string>>> m_TutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
-	private Dictionary<int, (int health, int maxHealth)> m_TutorialPlayerDataCache = new Dictionary<int, (int, int)>();
+
+	// Separated equipment deck config files
+	private static readonly string[] m_EquipmentDeckCsvPaths = new string[]
+	{
+		"Data/tutorial_equipment_deck",  // Tutorial levels (1-5)
+		"Data/debug_equipment_deck"      // Debug level (999)
+	};
+
+	// Separated player data config files
+	private static readonly string[] m_PlayerDataCsvPaths = new string[]
+	{
+		"Data/tutorial_player_data",     // Tutorial levels (1-5)
+		"Data/debug_player_data"         // Debug level (999)
+	};
+
+	private Dictionary<int, Dictionary<string, List<string>>> m_EquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
+	private Dictionary<int, (int health, int maxHealth)> m_PlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool m_CardsLoaded = false;
 	private bool m_DeckLoaded = false;
 	private System.DateTime m_CardsMTime = System.DateTime.MinValue;
@@ -262,13 +275,25 @@ public sealed class GData : PureSingleton<GData>
 
 	public void LoadTutorialEquipmentDeck(bool force = false)
 	{
-		if (!force && m_TutorialEquipmentDeckCache.Count > 0) return;
+		if (!force && m_EquipmentDeckCache.Count > 0) return;
 
-		m_TutorialEquipmentDeckCache.Clear();
-		TextAsset ta = Resources.Load<TextAsset>(m_TutorialEquipmentDeckCsvPath);
+		m_EquipmentDeckCache.Clear();
+
+		// Load all equipment deck files
+		foreach (string path in m_EquipmentDeckCsvPaths)
+		{
+			LoadEquipmentDeckFile(path);
+		}
+
+		Debug.Log($"Equipment deck loaded: {m_EquipmentDeckCache.Count} levels from {m_EquipmentDeckCsvPaths.Length} files");
+	}
+
+	private void LoadEquipmentDeckFile(string path)
+	{
+		TextAsset ta = Resources.Load<TextAsset>(path);
 		if (ta == null)
 		{
-			Debug.LogWarning($"Tutorial equipment deck CSV not found: {m_TutorialEquipmentDeckCsvPath}");
+			Debug.LogWarning($"Equipment deck CSV not found: {path}");
 			return;
 		}
 
@@ -320,36 +345,46 @@ public sealed class GData : PureSingleton<GData>
 				}
 			}
 
-			if (!m_TutorialEquipmentDeckCache.ContainsKey(level))
+			if (!m_EquipmentDeckCache.ContainsKey(level))
 			{
-				m_TutorialEquipmentDeckCache[level] = new Dictionary<string, List<string>>();
+				m_EquipmentDeckCache[level] = new Dictionary<string, List<string>>();
 			}
-			m_TutorialEquipmentDeckCache[level][type] = cardIds;
+			m_EquipmentDeckCache[level][type] = cardIds;
 		}
-
-		Debug.Log($"Tutorial equipment deck loaded: {m_TutorialEquipmentDeckCache.Count} levels");
 	}
 
 	public Dictionary<string, List<string>> GetTutorialEquipmentDeck(int level)
 	{
 		LoadTutorialEquipmentDeck();
-		if (m_TutorialEquipmentDeckCache.ContainsKey(level))
+		if (m_EquipmentDeckCache.ContainsKey(level))
 		{
-			return m_TutorialEquipmentDeckCache[level];
+			return m_EquipmentDeckCache[level];
 		}
-		Debug.LogWarning($"Tutorial equipment deck for level {level} not found in CSV");
+		Debug.LogWarning($"Equipment deck for level {level} not found in CSV");
 		return new Dictionary<string, List<string>>();
 	}
 
 	public void LoadTutorialPlayerData(bool force = false)
 	{
-		if (!force && m_TutorialPlayerDataCache.Count > 0) return;
+		if (!force && m_PlayerDataCache.Count > 0) return;
 
-		m_TutorialPlayerDataCache.Clear();
-		TextAsset ta = Resources.Load<TextAsset>(m_TutorialPlayerDataCsvPath);
+		m_PlayerDataCache.Clear();
+
+		// Load all player data files
+		foreach (string path in m_PlayerDataCsvPaths)
+		{
+			LoadPlayerDataFile(path);
+		}
+
+		Debug.Log($"Player data loaded: {m_PlayerDataCache.Count} levels from {m_PlayerDataCsvPaths.Length} files");
+	}
+
+	private void LoadPlayerDataFile(string path)
+	{
+		TextAsset ta = Resources.Load<TextAsset>(path);
 		if (ta == null)
 		{
-			Debug.LogWarning($"Tutorial player data CSV not found: {m_TutorialPlayerDataCsvPath}");
+			Debug.LogWarning($"Player data CSV not found: {path}");
 			return;
 		}
 
@@ -389,18 +424,16 @@ public sealed class GData : PureSingleton<GData>
 			if (!int.TryParse(Get(HealthIdx), out int health)) health = 30;
 			if (!int.TryParse(Get(MaxHealthIdx), out int maxHealth)) maxHealth = 30;
 
-			m_TutorialPlayerDataCache[level] = (health, maxHealth);
+			m_PlayerDataCache[level] = (health, maxHealth);
 		}
-
-		Debug.Log($"Tutorial player data loaded: {m_TutorialPlayerDataCache.Count} levels");
 	}
 
 	public (int health, int maxHealth)? GetTutorialPlayerData(int level)
 	{
 		LoadTutorialPlayerData();
-		if (m_TutorialPlayerDataCache.ContainsKey(level))
+		if (m_PlayerDataCache.ContainsKey(level))
 		{
-			return m_TutorialPlayerDataCache[level];
+			return m_PlayerDataCache[level];
 		}
 		return null;
 	}

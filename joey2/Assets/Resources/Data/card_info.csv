@@ -64,7 +64,7 @@
 5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,空木桶,monster,可能藏着好东西？,,,1,5,1,
 5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,死灵Donkey,,monster      ,生命值降至一半以下时召唤两个骷髅monkey,3,,20,30,1,NecDonkey
 5011,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Donkey,,monster      ,,5,,15,15,1,
-5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,死神,,monster      ,死神,5,,15,100,1,GrimReaper
+5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,死神,必须放在关卡最上方,monster      ,死神,5,,15,100,1,GrimReaper
 5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,胆小Turkey,,monster      ,亡语:获得20金币  受击:躲到下一张牌后,9,,25,100,2,TimidTurkey
 5014,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,自爆monkey,,monster,倒计时7:自爆,6,,18,30,1,AutoBoomMoney:20
 5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,怪盗monkey,,monster,攻击偷取10金币 倒计时3:逃跑 亡语:返回全部金币,5,,15,30,1,StealMoney:10
@@ -72,7 +72,7 @@
 5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,罗密欧monkey,,monster,亡语:朱丽叶攻击+5 生命+10,4,,21,40,2,RomeoMonkey
 5018,Art/Img/Monster/img_card_Juliet_Monkey,Art/Img/Monster/img_bg_Monster,朱丽叶monkey,,monster,亡语:罗密欧攻击+5 生命+10,4,,21,40,2,JulietMonkey
 5019,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,大坏monkey,,monster,场上每有一个怪物 攻击加3,10,,40,80,3,BadMonkey:3
-5020,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,幽灵monkey,,monster,倒计时5:主动攻击,9,,20,50,2,Ghost
+5020,Art/Img/Monster/img_card_ghost,Art/Img/Monster/img_bg_Monster,幽灵monkey,,monster,倒计时5:主动攻击,9,,20,50,2,Ghost
 5021,Art/Img/Monster/img_card_BigDumbDonkey,Art/Img/Monster/img_bg_Monster,大春Donkey,2戈壁,monster,受击:将玩家的武器踢到环境里,11,,20,40,2,KickWeaponToEnv_OnHit
 5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,波兰蠢Donkey,2戈壁,monster,亡语:玩家获得10金币,10,,18,30,1,GiveGold_OnDead:10
 5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏turkey,3感恩节,monster,,9,,16,25,1,

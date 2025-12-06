@@ -5,31 +5,49 @@ using System.Linq;
 
 public sealed class CardDraw : PureSingleton<CardDraw>
 {
-    private Dictionary<int, List<List<string>>> _tutorialEnvDeckCache = new Dictionary<int, List<List<string>>>();
-    private bool _tutorialEnvDeckLoaded = false;
-    private string TutorialEnvDeckCsvPath = "Data/tutorial_env_deck";
+    private Dictionary<int, List<List<string>>> _envDeckCache = new Dictionary<int, List<List<string>>>();
+    private bool _envDeckLoaded = false;
+
+    // Separated env deck config files
+    private static readonly string[] EnvDeckCsvPaths = new string[]
+    {
+        "Data/tutorial_env_deck",   // Tutorial levels (1-5)
+        "Data/battle_env_deck",     // Battle levels (100-115)
+        "Data/debug_env_deck"       // Debug level (999)
+    };
 
     private const int ENV_SLOT_COUNT = 5;
     private const int MIN_NON_MONSTER_TOP_CARDS = 3;
     private const string EXIT_CARD_ID = "6001";
 
-    private void LoadTutorialEnvDeck()
+    private void LoadEnvDeck()
     {
-        if (_tutorialEnvDeckLoaded) return;
+        if (_envDeckLoaded) return;
 
-        _tutorialEnvDeckCache.Clear();
-        var ta = Resources.Load<TextAsset>(TutorialEnvDeckCsvPath);
+        _envDeckCache.Clear();
+
+        // Load all env deck files
+        foreach (string path in EnvDeckCsvPaths)
+        {
+            LoadEnvDeckFile(path);
+        }
+
+        _envDeckLoaded = true;
+        Debug.Log($"Env deck loaded: {_envDeckCache.Count} levels from {EnvDeckCsvPaths.Length} files");
+    }
+
+    private void LoadEnvDeckFile(string path)
+    {
+        var ta = Resources.Load<TextAsset>(path);
         if (ta == null)
         {
-            Debug.LogWarning($"Tutorial env deck CSV not found: {TutorialEnvDeckCsvPath}");
-            _tutorialEnvDeckLoaded = true;
+            Debug.LogWarning($"Env deck CSV not found: {path}");
             return;
         }
 
         var lines = ta.text.Split('\n');
         if (lines.Length <= 1)
         {
-            _tutorialEnvDeckLoaded = true;
             return;
         }
 
@@ -95,22 +113,19 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             {
                 deck.Add(slot.cardIds);
             }
-            _tutorialEnvDeckCache[level] = deck;
+            _envDeckCache[level] = deck;
         }
-
-        _tutorialEnvDeckLoaded = true;
-        Debug.Log($"Tutorial env deck loaded: {_tutorialEnvDeckCache.Count} levels");
     }
 
     public List<List<string>> DrawCardEnv(int level)
     {
-        LoadTutorialEnvDeck();
-        if (_tutorialEnvDeckCache.ContainsKey(level))
+        LoadEnvDeck();
+        if (_envDeckCache.ContainsKey(level))
         {
             // Filter out EXIT_CARD_ID (6001) from the cached deck
             // KeyPath will automatically appear when all monsters are cleared
             List<List<string>> filteredDeck = new List<List<string>>();
-            foreach (var column in _tutorialEnvDeckCache[level])
+            foreach (var column in _envDeckCache[level])
             {
                 List<string> filteredColumn = column.Where(id => id != EXIT_CARD_ID).ToList();
                 filteredDeck.Add(filteredColumn);
@@ -118,7 +133,7 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             return filteredDeck;
         }
 
-        Debug.LogWarning($"Tutorial env deck for level {level} not found in CSV, using default");
+        Debug.LogWarning($"Env deck for level {level} not found in CSV, using default");
         return new List<List<string>>
         {
             new List<string> { "1001", "1002" },
