@@ -1,0 +1,6 @@
+level,type,cardIds
+999,attack,1003
+999,defence,2003
+999,item,3001;3003
+999,skill,4001
+
