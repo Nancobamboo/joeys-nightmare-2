@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 public class UIDamageTextControl : YViewControl
 {
 	private UIDamageTextView m_View;
-	private Animator m_Animator;
 	public Transform CacheTrans;
 
 	public static EResType GetResType()
@@ -18,32 +17,38 @@ public class UIDamageTextControl : YViewControl
 		base.OnInit();
 		CacheTrans = transform;
 		m_View = CreateView<UIDamageTextView>();
-		m_Animator = GetComponent<Animator>();
 	}
 
 	public void SetData(int value, Transform parent, Vector3 localPositionShift, bool isDamage = true)
 	{
+		m_View.Coin.gameObject.SetActive(false);
 		CacheTrans.SetParent(parent);
 		CacheTrans.localPosition = localPositionShift;
+		CacheTrans.localScale = Vector3.one;
 
 		if (isDamage)
 		{
 			m_View.Damage.text = "-" + value.ToString();
-			m_View.Damage.gameObject.SetActive(true);
-			m_View.Add.gameObject.SetActive(false);
 		}
 		else
 		{
 			m_View.Add.text = "+" + value.ToString();
-			m_View.Add.gameObject.SetActive(true);
-			m_View.Damage.gameObject.SetActive(false);
 		}
 
-		if (m_Animator != null)
-		{
-			string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
-			m_Animator.Play(animName);
-		}
+		string animName = isDamage ? "UIDamage_kouxue" : "UIDamage_huixue";
+		m_View.Anim.Play(animName);
+
+		DelayReturn().Forget();
+	}
+
+	public void SetCoinData(int value, Transform parent, Vector3 localPositionShift)
+	{
+		CacheTrans.SetParent(parent);
+		CacheTrans.localPosition = localPositionShift;
+		CacheTrans.localScale = Vector3.one;
+
+		m_View.Coin.text = "+" + value.ToString();
+		m_View.Anim.Play("UIDamage_Coin");
 
 		DelayReturn().Forget();
 	}
@@ -58,7 +63,9 @@ public class UIDamageTextControl : YViewControl
 	{
 		m_View.Damage.gameObject.SetActive(false);
 		m_View.Add.gameObject.SetActive(false);
+		m_View.Coin.gameObject.SetActive(false);
 		gameObject.SetActive(false);
+		CacheTrans.localScale = Vector3.one;
 		base.OnReturn();
 	}
 }

@@ -10,6 +10,7 @@ public partial class DataSystem
     public Dictionary<int, float> VFXDelayTimeDict = new Dictionary<int, float>();
     public Dictionary<int, float> AnimDelayTimeDict = new Dictionary<int, float>();
 
+    public const bool isNew = true;
     public void LoadGameData()
     {
         Debug.Log("LoadGameData called");
@@ -123,10 +124,20 @@ public partial class DataSystem
 
         dataJoeyPlayer.Coin = characterData.coins;
 
-        dataJoeyPlayer.MaxEquipedAttackNum = 3;
-        dataJoeyPlayer.MaxEquipedDefenceNum = 3;
-        dataJoeyPlayer.MaxEquipedItemNum = 3;
-        dataJoeyPlayer.MaxEquipedSkillNum = 3;
+        if (isNew)
+        {
+            dataJoeyPlayer.MaxEquipedAttackNum = 7;
+            dataJoeyPlayer.MaxEquipedDefenceNum = 7;
+            dataJoeyPlayer.MaxEquipedItemNum = 7;
+            dataJoeyPlayer.MaxEquipedSkillNum = 7;
+        }
+        else
+        {
+            dataJoeyPlayer.MaxEquipedAttackNum = 3;
+            dataJoeyPlayer.MaxEquipedDefenceNum = 3;
+            dataJoeyPlayer.MaxEquipedItemNum = 3;
+            dataJoeyPlayer.MaxEquipedSkillNum = 3;
+        }
 
         if (characterData.maxHealth > 0)
         {
@@ -143,7 +154,6 @@ public partial class DataSystem
             {
                 dataJoeyPlayer.currentLevel = levelId;
             }
-            dataJoeyPlayer.StageId = 0;
         }
 
         SaveDataJoeyPlayer();
@@ -164,6 +174,71 @@ public partial class DataSystem
             }
         }
 
+        SaveDataJoeyPlayer();
+    }
+
+    public void InitEnvModeCharacterData(RoguelikeCharacter characterData)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        //dataJoeyPlayer.ClearEnvCardPool();
+
+        for (int i = 0; i < characterData.equipmentAttack.Count; i++)
+        {
+            string cardId = characterData.equipmentAttack[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentDefence.Count; i++)
+        {
+            string cardId = characterData.equipmentDefence[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentItem.Count; i++)
+        {
+            string cardId = characterData.equipmentItem[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.equipmentSkill.Count; i++)
+        {
+            string cardId = characterData.equipmentSkill[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        for (int i = 0; i < characterData.cardDeck.Count; i++)
+        {
+            string cardId = characterData.cardDeck[i];
+            if (!string.IsNullOrEmpty(cardId))
+            {
+                dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        dataJoeyPlayer.Coin = characterData.coins;
+
+        if (characterData.maxHealth > 0)
+        {
+            dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
+            dataJoeyPlayer.playerHealth = characterData.maxHealth;
+        }
+
+        dataJoeyPlayer.currentLevel = 1;
+
+        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool");
         SaveDataJoeyPlayer();
     }
 

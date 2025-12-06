@@ -35,7 +35,7 @@ public class YAddKnifeToEnv_OnDefense : YCardEffect
 
 public partial class UIGamePhaseControl
 {
-	public void AddCardToEnv(UICardSimpleControl cardControl, string cardId)
+	public void AddCardToEnv(UICardSimpleControl cardControl, string cardId, int envIndex = -1)
 	{
         if (cardControl == null || cardControl.CardData == null || string.IsNullOrEmpty(cardId))
         {
@@ -47,7 +47,7 @@ public partial class UIGamePhaseControl
         }
         // TODO fix card id to knife card id
         Card knifeCard = CreateCard(cardId);
-        int randomIndex = Random.Range(0, m_EnvPanels.Count);
+        int randomIndex = envIndex == -1 ? Random.Range(0, m_EnvPanels.Count) : envIndex;
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
         m_CardDict[knifeCard.UniqueId] = knifeCard;
         UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);

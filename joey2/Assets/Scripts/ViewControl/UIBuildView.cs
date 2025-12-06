@@ -19,6 +19,19 @@ public class UIBuildView : YBaseView
 	public Button BtnSkill;
 	public RectTransform Content;
 	public Image BtnDelete;
+	public Image Empty1;
+	public Image Empty2;
+	public Image Empty3;
+	public Image Empty4;
+	public Image Empty5;
+	public Image Empty6;
+	public Image Empty7;
+	public Image Empty8;
+	public Image Empty9;
+	public GameObject SelectAttack;
+	public GameObject SelectDefence;
+	public GameObject SelectItem;
+	public GameObject SelectSkill;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -40,5 +53,18 @@ public class UIBuildView : YBaseView
 		BtnSkill = viewItemList[12].Target.GetComponent<Button>();
 		Content = viewItemList[13].Target.GetComponent<RectTransform>();
 		BtnDelete = viewItemList[14].Target.GetComponent<Image>();
+		Empty1 = viewItemList[15].Target.GetComponent<Image>();
+		Empty2 = viewItemList[16].Target.GetComponent<Image>();
+		Empty3 = viewItemList[17].Target.GetComponent<Image>();
+		Empty4 = viewItemList[18].Target.GetComponent<Image>();
+		Empty5 = viewItemList[19].Target.GetComponent<Image>();
+		Empty6 = viewItemList[20].Target.GetComponent<Image>();
+		Empty7 = viewItemList[21].Target.GetComponent<Image>();
+		Empty8 = viewItemList[22].Target.GetComponent<Image>();
+		Empty9 = viewItemList[23].Target.GetComponent<Image>();
+		SelectAttack = viewItemList[24].Target.gameObject;
+		SelectDefence = viewItemList[25].Target.gameObject;
+		SelectItem = viewItemList[26].Target.gameObject;
+		SelectSkill = viewItemList[27].Target.gameObject;
 	}
 }

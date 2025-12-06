@@ -10,6 +10,8 @@ public class UIShopControl : YViewControl
 	private DataJoeyPlayer m_PlayerData;
 	private int m_RefreshCost = 50;
 	private UIBuildControl m_BuildControl;
+	private UIBuildNewControl m_BuildNewControl;
+	private bool m_IsNew;
 
 	private class ShopCardData
 	{
@@ -32,7 +34,7 @@ public class UIShopControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIShopView>();
-		m_View.Control.onClick.AddListener(OnControlClick);
+		//m_View.Control.onClick.AddListener(OnControlClick);
 		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
 		m_View.BtnRefresh.onClick.AddListener(OnBtnRefreshClick);
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
@@ -41,18 +43,41 @@ public class UIShopControl : YViewControl
 
 	void OnControlClick()
 	{
-		Close();
+		for (int i = 0; i < m_ShopCardList.Count; i++)
+		{
+			if (m_ShopCardList[i] != null)
+			{
+				m_ShopCardList[i].CleanupDescExt();
+			}
+		}
+		gameObject.SetActive(false);
 	}
 
 	void OnBtnCloseClick()
 	{
-		m_BuildControl.SaveBuild(m_BuildControl.m_CurrentCardType);
+		if (m_IsNew)
+		{
+			if (m_BuildNewControl != null)
+			{
+				m_BuildNewControl.SaveBuild(m_BuildNewControl.m_CurrentCardType);
+			}
+		}
+		else
+		{
+			if (m_BuildControl != null)
+			{
+				m_BuildControl.SaveBuild(m_BuildControl.m_CurrentCardType);
+			}
+		}
 
-		Close();
-	}
-
-	public new void Close()
-	{
+		DataSystem.Instance.SaveDataJoeyPlayer();
+		for (int i = 0; i < m_ShopCardList.Count; i++)
+		{
+			if (m_ShopCardList[i] != null)
+			{
+				m_ShopCardList[i].CleanupDescExt();
+			}
+		}
 		gameObject.SetActive(false);
 	}
 
@@ -80,28 +105,42 @@ public class UIShopControl : YViewControl
 		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 
-	public void SetData()
+	public void SetData(bool isNew = false)
 	{
+		m_IsNew = isNew;
 		GenerateShopCards();
 		RefreshShopDisplay();
 		m_View.TxtCoin.text = m_PlayerData.Coin.ToString();
 
-		if (m_BuildControl == null)
+		if (isNew)
 		{
-			m_BuildControl = Asset.OpenUI<UIBuildControl>(transform);
+			if (m_BuildNewControl == null)
+			{
+				m_BuildNewControl = Asset.OpenUI<UIBuildNewControl>(m_View.BuildRoot);
+			}
+			else
+			{
+				m_BuildNewControl.gameObject.SetActive(true);
+			}
+			m_BuildNewControl.SetShopData();
 		}
 		else
 		{
-			m_BuildControl.gameObject.SetActive(true);
+			if (m_BuildControl == null)
+			{
+				m_BuildControl = Asset.OpenUI<UIBuildControl>(m_View.BuildRoot);
+			}
+			else
+			{
+				m_BuildControl.gameObject.SetActive(true);
+			}
+			m_BuildControl.SetShopData();
 		}
-		m_BuildControl.SetShopData();
 	}
 
 	void GenerateShopCards()
 	{
 		m_CurrentShopCards.Clear();
-
-		GData.Instance.LoadCards();
 
 		List<Card> allCards = GData.Instance.CardDict.Values.ToList();
 		List<Card> availableCards = allCards.Where(c =>
@@ -203,6 +242,17 @@ public class UIShopControl : YViewControl
 			return;
 		}
 
+		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		{
+			m_PlayerData.AddEnvCardPoolData(shopCardData.card.id);
+			DataSystem.Instance.AddCoin(-price);
+			m_CurrentShopCards.Remove(shopCardData);
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			RefreshShopDisplay();
+			Debug.Log("Env mode: 购买成功！花费 " + price + " 金币，卡牌 " + shopCardData.card.cardName + " 已加入卡牌池");
+			return;
+		}
+
 		Card newCard = DataSystem.Instance.CreateCard(shopCardData.card.id);
 		bool success = DataSystem.Instance.AddCardToDataJoeyPlayer(newCard);
 
@@ -221,7 +271,20 @@ public class UIShopControl : YViewControl
 		RefreshShopDisplay();
 
 		ECardType cardType = newCard.GetCardType();
-		m_BuildControl.RefreshEquipedCardsByType(cardType);
+		if (m_IsNew)
+		{
+			if (m_BuildNewControl != null)
+			{
+				m_BuildNewControl.RefreshEquipedCardsByType(cardType, false);
+			}
+		}
+		else
+		{
+			if (m_BuildControl != null)
+			{
+				m_BuildControl.RefreshEquipedCardsByType(cardType, false);
+			}
+		}
 
 		Debug.Log("购买成功！花费 " + price + " 金币购买了 " + newCard.cardName);
 	}

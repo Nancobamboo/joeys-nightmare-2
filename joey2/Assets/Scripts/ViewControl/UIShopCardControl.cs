@@ -13,6 +13,7 @@ public class UIShopCardControl : YViewControl
     private Vector3 m_OriginalScale;
     private bool m_IsMoving;
     private int m_ShopPrice; // Shop price (discounted)
+    private UIDescExtControl m_DescExtControl;
 
     public ECardType CardType => cachedCardType;
     public Card CardData => cachedCard;
@@ -44,12 +45,33 @@ public class UIShopCardControl : YViewControl
         if (m_IsMoving) return;
         m_OriginalScale = CacheTrans.localScale;
         CacheTrans.localScale = m_OriginalScale * 1.1f;
+
+        if (cachedCard != null)
+        {
+            List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+            if (keywordDescriptions != null && keywordDescriptions.Count > 0)
+            {
+                m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
+                m_DescExtControl.SetData(keywordDescriptions);
+                RectTransform cardRect = CacheTrans as RectTransform;
+                if (cardRect != null)
+                {
+                    m_DescExtControl.SetPositionRelativeTo(cardRect);
+                }
+            }
+        }
     }
 
     private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
     {
         if (m_IsMoving) return;
         CacheTrans.localScale = m_OriginalScale;
+
+        if (m_DescExtControl != null)
+        {
+            m_DescExtControl.Close();
+            m_DescExtControl = null;
+        }
     }
 
     public void SetMoving(bool isMoving)
@@ -98,6 +120,7 @@ public class UIShopCardControl : YViewControl
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
+        m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
         m_View.Description.text = card.description;
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
@@ -165,11 +188,19 @@ public class UIShopCardControl : YViewControl
     {
         return Resources.Load<Sprite>(path);
     }
-    
-    // Get shop price
+
     public int GetShopPrice()
     {
         return m_ShopPrice;
+    }
+
+    public void CleanupDescExt()
+    {
+        if (m_DescExtControl != null)
+        {
+            m_DescExtControl.Close();
+            m_DescExtControl = null;
+        }
     }
 }
 

@@ -47,12 +47,12 @@ public class YDefaultEffect : YCardEffect
             var vfxNames = new List<EVFXName> { };
             ECardAnimName animName = CardControl.CardType == ECardType.monster ? ECardAnimName.UI_Carditem_guaiwugongji : ECardAnimName.UI_Carditem_gongji;
             float maxDelayTime = CardControl.PlayVFX(vfxNames, animName, EVFXLife.CardLife);
-            return maxDelayTime > 0f ? maxDelayTime : base.OnDealDamage();
+            return 0.35f;
         }
         return base.OnDealDamage();
     }
 
-    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         if (CardControl != null && CardControl.gameObject != null)
         {

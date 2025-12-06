@@ -107,7 +107,7 @@ public class UIBuildCardControl : YViewControl
         BuildClickHandler?.Invoke(this);
     }
 
-    public void SetData(Card card, bool isEquipedSlot = true)
+    public void SetData(Card card)
     {
         RectTransform animRect = m_View.Anim.transform as RectTransform;
         if (animRect != null)
@@ -123,6 +123,7 @@ public class UIBuildCardControl : YViewControl
         m_View.Description.text = card.description;
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
+        m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 
         SetTypeUI(card);
         SetStars(card.stars);

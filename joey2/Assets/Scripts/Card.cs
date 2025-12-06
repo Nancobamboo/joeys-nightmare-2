@@ -9,6 +9,7 @@ public class Card : IData
     public string type;
     public string iconType;
     public string cardImage;
+    public string cardBackground;
     public string cardFrame;
     public string cardName;
     public string description;
@@ -29,12 +30,14 @@ public class Card : IData
 
     }
 
-    public Card(string _id, string _type, string _cardImage, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, string _effectId)
+    public Card(string _id, string _type, string _cardImage, string _cardBackground, string _cardName, string _description, int _attack, int _defence, int _health, int _price, int _stars, string _effectId)
     {
         this.id = _id;
         this.type = _type;
         this.cardImage = _cardImage;
         this.cardName = _cardName;
+        this.cardBackground = _cardBackground;
+
         if (_type == "defence")
         {
             this.iconType = "Art/UI/icon_defense";
@@ -69,20 +72,17 @@ public class Card : IData
         this.price = _price;
         this.currentPrice = _price;
         this.stars = _stars;
-        if (_type == "other")
+        if (_stars == 3 & _type == "monster")
         {
-            this.cardFrame = "Art/UI/card_bg_end";
+            this.cardFrame = "Art/UI/card_bg_boss";
+        }
+        else if (_id == "6001")
+        {
+            this.cardFrame = "Art/UI/card_bg_boss";
         }
         else
         {
-            if (_stars == 3)
-            {
-                this.cardFrame = "Art/UI/card_bg_boss";
-            }
-            else
-            {
-                this.cardFrame = "Art/UI/card_bg_normal";
-            }
+            this.cardFrame = "Art/UI/card_bg_normal";
         }
         this.effectId = _effectId;
         this.UniqueId = 0;
@@ -90,7 +90,7 @@ public class Card : IData
 
     public Card Clone()
     {
-        var c = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectId);
+        var c = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
         return c;
     }
 
@@ -138,6 +138,7 @@ public class Card : IData
         type = (string)jobject["type"];
         iconType = (string)jobject["iconType"];
         cardImage = (string)jobject["cardImage"];
+        cardBackground = (string)jobject["cardBackground"];
         cardFrame = (string)jobject["cardFrame"];
         cardName = (string)jobject["cardName"];
         description = (string)jobject["description"];
@@ -160,6 +161,7 @@ public class Card : IData
         jobject.Add("type", type);
         jobject.Add("iconType", iconType);
         jobject.Add("cardImage", cardImage);
+        jobject.Add("cardBackground", cardBackground);
         jobject.Add("cardFrame", cardFrame);
         jobject.Add("cardName", cardName);
         jobject.Add("description", description);

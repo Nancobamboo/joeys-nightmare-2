@@ -27,9 +27,14 @@ public enum EBuffType
 
 public enum ERelicType
 {
-	LifeSteal,
-	EnvAttack,
-	EnvDefence,
+	EnvAttack = 9001,
+	EnvDefence = 9002,
+	GetSpecialCardByAttack = 9003,
+	GetSpecialCardByItem = 9004,
+	GetSpecialCardBySkill = 9005,
+	GetSpecialCardByDefence = 9006,
+	LifeSteal = 9007,
+	HealOnKill = 9008,
 }
 
 public class UICardSimpleControl : YViewControl
@@ -48,10 +53,14 @@ public class UICardSimpleControl : YViewControl
 	private List<CancellationTokenSource> CancelTokenList = new List<CancellationTokenSource>();
 	private Vector3 m_OriginalScale;
 	private bool m_IsMoving;
+	private bool m_IsHovering;
 
 	public YCardEffect CardEffect;
 
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
+	private UIDescExtControl m_DescExtControl;
+
+	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
 
 	public static EResType GetResType()
 	{
@@ -77,18 +86,59 @@ public class UICardSimpleControl : YViewControl
 	private void OnPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
 		if (m_IsMoving) return;
+		YActionSystem.Instance.DispatchAction(EActionId.OnCardPointerEnter, this);
+	}
+
+	public void ShowCardHoverEffect()
+	{
+		m_IsHovering = true;
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
+
+		if (cachedCard != null && !IsEnv)
+		{
+			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+			if (keywordDescriptions != null && keywordDescriptions.Count > 0)
+			{
+				m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
+				m_DescExtControl.SetData(keywordDescriptions);
+				RectTransform cardRect = CacheTrans as RectTransform;
+				if (cardRect != null)
+				{
+					m_DescExtControl.SetPositionRelativeTo(cardRect);
+				}
+			}
+		}
 	}
 
 	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
 	{
-		if (m_IsMoving) return;
+		if (m_IsMoving || !m_IsHovering) return;
+		m_IsHovering = false;
 		CacheTrans.localScale = m_OriginalScale;
+
+		if (m_DescExtControl != null)
+		{
+			m_DescExtControl.Close();
+			m_DescExtControl = null;
+		}
 	}
 
 	public void SetMoving(bool isMoving)
 	{
+		if (isMoving && !m_IsMoving)
+		{
+			if (m_IsHovering)
+			{
+				CacheTrans.localScale = m_OriginalScale;
+				if (m_DescExtControl != null)
+				{
+					m_DescExtControl.Close();
+					m_DescExtControl = null;
+				}
+				m_IsHovering = false;
+			}
+		}
 		m_IsMoving = isMoving;
 	}
 
@@ -161,7 +211,7 @@ public class UICardSimpleControl : YViewControl
 	{
 		Debug.Log(CardData.cardName);
 		cachedCard.TakeDamage(damage);
-		float delayTime = CardEffect?.OnTakeDamage(effectType) ?? 0f;
+		float delayTime = CardEffect?.OnTakeDamage(effectType, damage) ?? 0f;
 		RefreshCard();
 		return delayTime;
 	}
@@ -174,11 +224,23 @@ public class UICardSimpleControl : YViewControl
 		switch (cachedCardType)
 		{
 			case ECardType.attack:
-				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+				int attackValue = cachedCard.currentAttack + damageEffect;
+				m_View.TxtAttack.text = attackValue.ToString();
+				if (damageEffect != 0)
+				{
+					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
+				}
 				break;
 
 			case ECardType.defence:
-				m_View.TxtDefence.text = cachedCard.currentDefence.ToString();
+				int defenceEffect = CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0;
+				int defenceValue = cachedCard.currentDefence + defenceEffect;
+				m_View.TxtDefence.text = defenceValue.ToString();
+				if (defenceEffect != 0)
+				{
+					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
+				}
 				break;
 
 			case ECardType.monster:
@@ -213,11 +275,77 @@ public class UICardSimpleControl : YViewControl
 				m_BuffValueArray[i] = newValue;
 			}
 		}
+
+		UpdateCounterUI();
 	}
 
 	public void AddBuff(EBuffType buffType, int value)
 	{
 		m_BuffValueArray[(int)buffType] += value;
+
+		switch (buffType)
+		{
+			case EBuffType.Counter:
+				UpdateCounterUI();
+				break;
+		}
+	}
+
+	private void UpdateCounterUI()
+	{
+		int counter = GetBuffValue(EBuffType.Counter);
+		if (counter > 0)
+		{
+			m_View.Counter.SetActive(true);
+			m_View.TxtCnt.text = counter.ToString();
+		}
+		else
+		{
+			m_View.Counter.SetActive(false);
+		}
+	}
+
+	public int GetBuffValue(EBuffType buffType)
+	{
+		return m_BuffValueArray[(int)buffType];
+	}
+
+	public void AddEffectValue(EEffectType effectType, int value)
+	{
+		CardEffect?.AddEffectValue(effectType, value);
+		RefreshCard();
+	}
+
+	public void AddRelic(int relicId)
+	{
+		if (cachedCard == null)
+		{
+			return;
+		}
+		ERelicType relicType = (ERelicType)relicId;
+		switch (relicType)
+		{
+			case ERelicType.EnvAttack:
+				if (IsEnv && cachedCardType == ECardType.attack)
+				{
+					cachedCard.attack += 1;
+					cachedCard.currentAttack += 1;
+					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
+				}
+				break;
+			case ERelicType.EnvDefence:
+				if (IsEnv && cachedCardType == ECardType.defence)
+				{
+					cachedCard.defence += 1;
+					cachedCard.currentDefence += 1;
+					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
+				}
+				break;
+		}
+		if (IsEnv)
+		{
+			RefreshCard();
+		}
 	}
 
 	public void AddRelicList(List<int> relicList)
@@ -228,28 +356,7 @@ public class UICardSimpleControl : YViewControl
 		}
 		for (int i = 0; i < relicList.Count; i++)
 		{
-			ERelicType relicType = (ERelicType)relicList[i];
-			switch (relicType)
-			{
-				case ERelicType.EnvAttack:
-					if (IsEnv)
-					{
-						cachedCard.attack += 1;
-						cachedCard.currentAttack += 1;
-					}
-					break;
-				case ERelicType.EnvDefence:
-					if (IsEnv)
-					{
-						cachedCard.defence += 1;
-						cachedCard.currentDefence += 1;
-					}
-					break;
-			}
-		}
-		if (IsEnv)
-		{
-			RefreshCard();
+			AddRelic(relicList[i]);
 		}
 	}
 
@@ -349,9 +456,6 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.GrimReaper:
 				effect = new YGrimReaper();
 				break;
-			case ECardEffectId.GrimReaperClone:
-				effect = new YGrimReaperClone();
-				break;
 			case ECardEffectId.ExtraDamage_HalfHealth:
 				effect = new YExtraDamage_HalfHealth(effectValue);
 				break;
@@ -382,6 +486,24 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ThrowWeaponDefenceToStack_UseSkill:
 				effect = new YThrowWeaponDefenceToStack_UseSkill();
 				break;
+			case ECardEffectId.VampireMonkey:
+				effect = new YVampireMonkey();
+				break;
+			case ECardEffectId.NecDonkey:
+				effect = new YNecDonkey();
+				break;
+			case ECardEffectId.BareHands:
+				effect = new YBareHands();
+				break;
+			case ECardEffectId.TimidTurkey:
+				effect = new YTimidTurkey();
+				break;
+			case ECardEffectId.Bone:
+				effect = new YBone();
+				break;
+			case ECardEffectId.PermanentAttackBoostWithRandomDamage:
+				effect = new YPermanentAttackBoostWithRandomDamage(effectValue);
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -410,9 +532,11 @@ public class UICardSimpleControl : YViewControl
 		IsEnv = isEnv;
 		EnvIndex = envIndex;
 		m_IsMoving = false;
+		m_IsHovering = false;
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
+		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
 		m_View.Description.text = card.description;
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
@@ -421,6 +545,15 @@ public class UICardSimpleControl : YViewControl
 		SetStars(card.stars);
 		CardEffect = GetCardEffect();
 		IsEffecting = false;
+
+		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
+		{
+			DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+			if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
+			{
+				AddRelicList(dataJoeyPlayer.RelicList);
+			}
+		}
 	}
 
 	private void SetTypeUI(Card card)
@@ -532,7 +665,7 @@ public class UICardSimpleControl : YViewControl
 				}
 				else if (vfxLife == EVFXLife.CardLife)
 				{
-					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, CacheTrans);
+					Transform vfxTransform = JoeyGameControl.Instance.GetVFX(vfxName, m_View.Anim.transform);
 					EffectEntityList.Add(vfxTransform);
 
 					DelayHideCardLifeVFX(vfxTransform, maxDelayTime).Forget();
@@ -578,6 +711,16 @@ public class UICardSimpleControl : YViewControl
 	{
 		StopAllEffects();
 
+		if (m_IsHovering)
+		{
+			CacheTrans.localScale = m_OriginalScale;
+			if (m_DescExtControl != null)
+			{
+				m_DescExtControl.Close();
+				m_DescExtControl = null;
+			}
+		}
+
 		for (int i = 0; i < EffectEntityList.Count; i++)
 		{
 			var go = EffectEntityList[i];
@@ -593,10 +736,15 @@ public class UICardSimpleControl : YViewControl
 			animRect.anchoredPosition = Vector2.zero;
 		}
 		m_IsMoving = false;
+		m_IsHovering = false;
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
 		{
 			m_BuffValueArray[i] = 0;
 		}
+
+		m_View.TxtAttack.color = Color.white;
+		m_View.TxtDefence.color = Color.white;
+
 		gameObject.SetActive(false);
 		EffectEntityList.Clear();
 		base.OnReturn();

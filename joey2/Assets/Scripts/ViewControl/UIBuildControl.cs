@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 
@@ -11,6 +12,8 @@ public class UIBuildControl : YViewControl
 	private List<UIBuildCardControl> EquipedCardList = new List<UIBuildCardControl>();
 	private RectTransform[] m_EquipedItemArray;
 	private RectTransform[] m_TempItemArray;
+	private Image[] m_EmptyArray;
+	private Button[] m_ButtonArray;
 	private DataJoeyPlayer m_PlayerData;
 	public ECardType m_CurrentCardType;
 
@@ -32,6 +35,19 @@ public class UIBuildControl : YViewControl
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
 		m_EquipedItemArray = new RectTransform[] { m_View.Item1, m_View.Item2, m_View.Item3, m_View.Item4, m_View.Item5, m_View.Item6 };
 		m_TempItemArray = new RectTransform[] { m_View.Item7, m_View.Item8, m_View.Item9 };
+		m_EmptyArray = new Image[] { m_View.Empty1, m_View.Empty2, m_View.Empty3, m_View.Empty4, m_View.Empty5, m_View.Empty6 };
+		m_ButtonArray = new Button[m_EmptyArray.Length];
+		for (int i = 0; i < m_EmptyArray.Length; i++)
+		{
+			Button button = m_EmptyArray[i].gameObject.GetComponent<Button>();
+			if (button == null)
+			{
+				button = m_EmptyArray[i].gameObject.AddComponent<Button>();
+			}
+			int index = i;
+			button.onClick.AddListener(() => OnEmptyButtonClick(index));
+			m_ButtonArray[i] = button;
+		}
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
 		m_CurrentCardType = ECardType.other;
 	}
@@ -63,29 +79,47 @@ public class UIBuildControl : YViewControl
 
 
 
-	public void RefreshEquipedCardsByType(ECardType cardType)
+	public void RefreshEquipedCardsByType(ECardType cardType, bool isSaveBuild = true)
 	{
-		SaveBuild(m_CurrentCardType);
+		if (isSaveBuild && m_CurrentCardType != ECardType.other)
+		{
+			SaveBuild(m_CurrentCardType);
+		}
 		m_CurrentCardType = cardType;
+
+		m_View.SelectAttack.SetActive(false);
+		m_View.SelectDefence.SetActive(false);
+		m_View.SelectItem.SetActive(false);
+		m_View.SelectSkill.SetActive(false);
+
 		List<int> equipList = null;
 		List<int> tempList = null;
+		int maxEquipedNum = 0;
 		switch (cardType)
 		{
 			case ECardType.attack:
 				equipList = m_PlayerData.EquipedAttackList;
 				tempList = m_PlayerData.TempAttackList;
+				maxEquipedNum = m_PlayerData.MaxEquipedAttackNum;
+				m_View.SelectAttack.SetActive(true);
 				break;
 			case ECardType.defence:
 				equipList = m_PlayerData.EquipedDefenceList;
 				tempList = m_PlayerData.TempDefenceList;
+				maxEquipedNum = m_PlayerData.MaxEquipedDefenceNum;
+				m_View.SelectDefence.SetActive(true);
 				break;
 			case ECardType.item:
 				equipList = m_PlayerData.EquipedItemList;
 				tempList = m_PlayerData.TempItemList;
+				maxEquipedNum = m_PlayerData.MaxEquipedItemNum;
+				m_View.SelectItem.SetActive(true);
 				break;
 			case ECardType.skill:
 				equipList = m_PlayerData.EquipedSkillList;
 				tempList = m_PlayerData.TempSkillList;
+				maxEquipedNum = m_PlayerData.MaxEquipedSkillNum;
+				m_View.SelectSkill.SetActive(true);
 				break;
 			default:
 				return;
@@ -93,12 +127,37 @@ public class UIBuildControl : YViewControl
 
 		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
+			if (i >= maxEquipedNum)
+			{
+				m_EquipedItemArray[i].gameObject.SetActive(false);
+				if (i < m_EmptyArray.Length)
+				{
+					m_EmptyArray[i].color = Color.grey;
+				}
+				if (i < m_ButtonArray.Length && m_ButtonArray[i] != null)
+				{
+					m_ButtonArray[i].enabled = true;
+				}
+			}
+			else
+			{
+				m_EquipedItemArray[i].gameObject.SetActive(true);
+				if (i < m_EmptyArray.Length)
+				{
+					m_EmptyArray[i].color = Color.white;
+				}
+				if (i < m_ButtonArray.Length && m_ButtonArray[i] != null)
+				{
+					m_ButtonArray[i].enabled = false;
+				}
+			}
+
 			UIBuildCardControl cardControl = EquipedCardList[i];
 			if (i < equipList.Count)
 			{
 				int cardUniqueId = equipList[i];
 				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
-				if (card != null && card.GetCardType() == cardType)
+				if (card != null)
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
@@ -122,7 +181,7 @@ public class UIBuildControl : YViewControl
 			{
 				int cardUniqueId = tempList[i];
 				Card card = m_PlayerData.GetSelfCardDictData(cardUniqueId);
-				if (card != null && card.GetCardType() == cardType)
+				if (card != null)
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
@@ -137,6 +196,58 @@ public class UIBuildControl : YViewControl
 				cardControl.gameObject.SetActive(false);
 			}
 		}
+	}
+
+	private void OnEmptyButtonClick(int index)
+	{
+		if (index < 0 || index >= m_EquipedItemArray.Length)
+		{
+			return;
+		}
+
+		int cardTypeInt = (int)m_CurrentCardType;
+		EquipmentUnlock equipmentUnlock = GData.Instance.GetEquipmentUnlock(cardTypeInt, index);
+		if (equipmentUnlock == null)
+		{
+			return;
+		}
+
+		if (m_PlayerData.Coin < equipmentUnlock.cost)
+		{
+			return;
+		}
+
+		DataSystem.Instance.AddCoin(-equipmentUnlock.cost);
+
+		switch (m_CurrentCardType)
+		{
+			case ECardType.attack:
+				m_PlayerData.MaxEquipedAttackNum++;
+				break;
+			case ECardType.defence:
+				m_PlayerData.MaxEquipedDefenceNum++;
+				break;
+			case ECardType.item:
+				m_PlayerData.MaxEquipedItemNum++;
+				break;
+			case ECardType.skill:
+				m_PlayerData.MaxEquipedSkillNum++;
+				break;
+			default:
+				return;
+		}
+
+		m_EquipedItemArray[index].gameObject.SetActive(true);
+		if (index < m_EmptyArray.Length)
+		{
+			m_EmptyArray[index].color = Color.white;
+		}
+		if (index < m_ButtonArray.Length && m_ButtonArray[index] != null)
+		{
+			m_ButtonArray[index].enabled = false;
+		}
+
+		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 
 	public void SetShopData()
@@ -200,13 +311,17 @@ public class UIBuildControl : YViewControl
 			UIBuildCardControl cardControl = EquipedCardList[i];
 			if (cardControl.gameObject.activeSelf && cardControl.CardData != null)
 			{
-				if (cardControl.EquipIndex < 6)
+				ECardType cardControlType = cardControl.CardData.GetCardType();
+				if (cardControlType == cardType)
 				{
-					equipList.Add(cardControl.CardData.UniqueId);
-				}
-				else
-				{
-					tempList.Add(cardControl.CardData.UniqueId);
+					if (cardControl.EquipIndex < 6)
+					{
+						equipList.Add(cardControl.CardData.UniqueId);
+					}
+					else
+					{
+						tempList.Add(cardControl.CardData.UniqueId);
+					}
 				}
 			}
 		}
@@ -222,7 +337,7 @@ public class UIBuildControl : YViewControl
 
 		for (int i = 0; i < m_EquipedItemArray.Length; i++)
 		{
-			if (m_EquipedItemArray[i] != null)
+			if (m_EquipedItemArray[i] != null && m_EquipedItemArray[i].gameObject.activeSelf)
 			{
 				RectTransform itemRect = m_EquipedItemArray[i];
 				if (RectTransformUtility.RectangleContainsScreenPoint(
@@ -359,7 +474,8 @@ public class UIBuildControl : YViewControl
 
 		draggedCard.gameObject.SetActive(false);
 
-		RefreshEquipedCardsByType(m_CurrentCardType);
+		//SaveBuild(cardType);
+		//RefreshEquipedCardsByType(m_CurrentCardType);
 	}
 
 	private void OnCardDragEndSwap(UIBuildCardControl draggedCard, int targetItemIndex)
@@ -424,6 +540,8 @@ public class UIBuildControl : YViewControl
 				draggedCard.CacheTrans.localPosition = m_TempItemArray[tempIndex].localPosition;
 			}
 		}
+
+		SaveBuild(m_CurrentCardType);
 	}
 
 	protected override void OnReturn()

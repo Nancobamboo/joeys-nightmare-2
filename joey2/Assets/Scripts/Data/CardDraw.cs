@@ -9,6 +9,10 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     private bool _tutorialEnvDeckLoaded = false;
     private string TutorialEnvDeckCsvPath = "Data/tutorial_env_deck";
 
+    private const int ENV_SLOT_COUNT = 5;
+    private const int MIN_NON_MONSTER_TOP_CARDS = 3;
+    private const string EXIT_CARD_ID = "6001";
+
     private void LoadTutorialEnvDeck()
     {
         if (_tutorialEnvDeckLoaded) return;
@@ -115,6 +119,113 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             new List<string> { "4001", "4002" },
             new List<string> { "5001", "5002" }
         };
+    }
+
+    public List<string> GetEnvStageMonsters(int level)
+    {
+        EnvStage envStage = GData.Instance.GetEnvStage(level);
+        if (envStage != null)
+        {
+            return new List<string>(envStage.monsterIds);
+        }
+        Debug.LogWarning($"Env stage for level {level} not found, using default monsters");
+        return new List<string> { "5001", "5001", "5003" };
+    }
+
+    /// <summary>
+    /// Draw cards for Env mode - randomly distribute player cards + monsters + exit into 5 columns
+    /// Ensures at least 3 non-monster cards are at the top positions of the 5 columns
+    /// Exit card (KeyPath) is always placed at the bottom of a random column (last in list = bottom visually)
+    /// </summary>
+    /// <param name="level">Current level</param>
+    /// <param name="playerCardPool">Player's accumulated card pool (card IDs)</param>
+    /// <returns>List of 5 columns, each containing card IDs (first=top, last=bottom due to reverse iteration in AddEnvCardList)</returns>
+    public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool)
+    {
+        List<string> monsters = GetEnvStageMonsters(level);
+        List<string> nonMonsterCards = new List<string>(playerCardPool);
+
+        // Shuffle both lists
+        ShuffleList(monsters);
+        ShuffleList(nonMonsterCards);
+
+        // Initialize 5 columns
+        List<List<string>> columns = new List<List<string>>();
+        for (int i = 0; i < ENV_SLOT_COUNT; i++)
+        {
+            columns.Add(new List<string>());
+        }
+
+        // Step 1: Reserve non-monster cards for top positions (will be added first = top visually)
+        List<int> topSlotIndices = Enumerable.Range(0, ENV_SLOT_COUNT).ToList();
+        ShuffleList(topSlotIndices);
+
+        int nonMonsterTopCount = Mathf.Min(MIN_NON_MONSTER_TOP_CARDS, nonMonsterCards.Count);
+        List<int> nonMonsterTopSlots = topSlotIndices.Take(nonMonsterTopCount).ToList();
+
+        // Track which cards are used for top positions
+        List<string> topNonMonsterCards = new List<string>();
+        for (int i = 0; i < nonMonsterTopCount && i < nonMonsterCards.Count; i++)
+        {
+            topNonMonsterCards.Add(nonMonsterCards[i]);
+        }
+
+        // Remove used cards from the pool
+        List<string> remainingNonMonsterCards = nonMonsterCards.Skip(nonMonsterTopCount).ToList();
+
+        // Step 2: Place the reserved non-monster cards at top (add them FIRST to the list)
+        for (int i = 0; i < nonMonsterTopCount; i++)
+        {
+            int slotIndex = nonMonsterTopSlots[i];
+            columns[slotIndex].Add(topNonMonsterCards[i]);
+        }
+
+        // Step 3: Combine remaining cards and shuffle
+        List<string> remainingCards = new List<string>();
+        remainingCards.AddRange(remainingNonMonsterCards);
+        remainingCards.AddRange(monsters);
+        ShuffleList(remainingCards);
+
+        // Step 4: Distribute remaining cards randomly to columns
+        foreach (string cardId in remainingCards)
+        {
+            int randomColumn = Random.Range(0, ENV_SLOT_COUNT);
+            columns[randomColumn].Add(cardId);
+        }
+
+        // Step 5: Place exit card at the BOTTOM of a random column (add LAST to the list)
+        // In AddEnvCardList, last item in list is processed first, going to visual bottom
+        int exitColumn = Random.Range(0, ENV_SLOT_COUNT);
+        columns[exitColumn].Add(EXIT_CARD_ID);
+
+        Debug.Log($"Env mode cards distributed: {ENV_SLOT_COUNT} columns, " +
+                  $"{nonMonsterTopCount} non-monster top cards guaranteed, exit at bottom of column {exitColumn}");
+
+        return columns;
+    }
+
+    /// <summary>
+    /// Check if a card ID represents a monster card
+    /// Monster cards have IDs starting with 5 (5xxx)
+    /// </summary>
+    private bool IsMonsterCard(string cardId)
+    {
+        if (string.IsNullOrEmpty(cardId)) return false;
+        return cardId.StartsWith("5");
+    }
+
+    /// <summary>
+    /// Shuffle a list using Fisher-Yates algorithm
+    /// </summary>
+    private void ShuffleList<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            T temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
     }
 
 }

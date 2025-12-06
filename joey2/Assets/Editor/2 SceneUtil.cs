@@ -21,9 +21,13 @@ public class SceneUtil : EditorWindow
     {
         AStar,
         Battle,
+        BattleEnv,
+        BattleGuide,
         BattleTest,
+        BuildNew,
         main,
         main2,
+        SceneTest,
         Start,
         Upper
     }

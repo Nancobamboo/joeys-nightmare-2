@@ -12,8 +12,11 @@ public sealed class GData : PureSingleton<GData>
 
 	public List<RoguelikeCharacter> RoguelikeCharacterList { get; private set; } = new List<RoguelikeCharacter>();
 	public List<RoguelikeStage> RoguelikeStageList { get; private set; } = new List<RoguelikeStage>();
+	public List<EnvStage> EnvStageList { get; private set; } = new List<EnvStage>();
 
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
+	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
+	public Dictionary<int, RelicInfo> RelicInfoDict { get; private set; } = new Dictionary<int, RelicInfo>();
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
@@ -22,6 +25,9 @@ public sealed class GData : PureSingleton<GData>
 	private string m_RoguelikeCharacterCsvPath = "Data/roguelike_character";
 	private string m_RoguelikeStageCsvPath = "Data/roguelike_stage";
 	private string m_EquipmentUnlockCsvPath = "Data/equipment_unlock";
+	private string m_KeywordCsvPath = "Data/keyword";
+	private string m_RelicInfoCsvPath = "Data/relic_info";
+	private string m_EnvStageCsvPath = "Data/env_stage";
 	private Dictionary<int, Dictionary<string, List<string>>> m_TutorialEquipmentDeckCache = new Dictionary<int, Dictionary<string, List<string>>>();
 	private Dictionary<int, (int health, int maxHealth)> m_TutorialPlayerDataCache = new Dictionary<int, (int, int)>();
 	private bool m_CardsLoaded = false;
@@ -38,6 +44,9 @@ public sealed class GData : PureSingleton<GData>
 		LoadRoguelikeCharacter();
 		LoadRoguelikeStage();
 		LoadEquipmentUnlock();
+		LoadKeyword();
+		LoadRelicInfo();
+		LoadEnvStage();
 	}
 
 	public void SaveAll()
@@ -61,6 +70,7 @@ public sealed class GData : PureSingleton<GData>
 		}
 		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int CardBackgroundIdx = idx.ContainsKey("cardBackground") ? idx["cardBackground"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
 		int CardNameIdx = idx.ContainsKey("cardName") ? idx["cardName"] : -1;
 		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
@@ -96,6 +106,7 @@ public sealed class GData : PureSingleton<GData>
 
 			string id = Get(IdIdx);
 			string cardImage = Get(CardImageIdx);
+			string cardBackground = Get(CardBackgroundIdx);
 			string type = Get(TypeIdx);
 			string cardName = Get(CardNameIdx);
 			string description = Get(DescriptionIdx);
@@ -118,7 +129,7 @@ public sealed class GData : PureSingleton<GData>
 				}
 			}
 
-			Card card = new Card(id, type, cardImage, cardName, description, attack, defence, health, price, stars, effectId);
+			Card card = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
 
 			CardDict[id] = card;
 		}
@@ -592,6 +603,111 @@ public sealed class GData : PureSingleton<GData>
 		return null;
 	}
 
+	public void LoadEnvStage(bool force = false)
+	{
+		if (!force && EnvStageList.Count > 0) return;
+
+		EnvStageList.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_EnvStageCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Env stage CSV not found: {m_EnvStageCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
+		int MonsterIdsIdx = idx.ContainsKey("monster_ids") ? idx["monster_ids"] : -1;
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			List<string> ParseList(int index)
+			{
+				List<string> result = new List<string>();
+				string value = Get(index);
+				if (!string.IsNullOrWhiteSpace(value))
+				{
+					string[] parts = value.Split(new char[] { ';', '|' }, System.StringSplitOptions.RemoveEmptyEntries);
+					for (int j = 0; j < parts.Length; j++)
+					{
+						string id = parts[j].Trim();
+						if (!string.IsNullOrEmpty(id)) result.Add(id);
+					}
+				}
+				return result;
+			}
+
+			if (!int.TryParse(Get(LevelIdx), out int level)) continue;
+
+			EnvStage envStage = new EnvStage();
+			envStage.level = level;
+			envStage.monsterIds = ParseList(MonsterIdsIdx);
+			string typeStr = Get(TypeIdx);
+			if (!string.IsNullOrEmpty(typeStr) && System.Enum.TryParse<EStageType>(typeStr, true, out EStageType stageType))
+			{
+				envStage.type = stageType;
+			}
+			else
+			{
+				envStage.type = EStageType.normal;
+			}
+
+			EnvStageList.Add(envStage);
+		}
+
+		Debug.Log($"Env stage loaded: {EnvStageList.Count} stages");
+	}
+
+	public EnvStage GetEnvStage(int level)
+	{
+		LoadEnvStage();
+		for (int i = 0; i < EnvStageList.Count; i++)
+		{
+			if (EnvStageList[i].level == level)
+			{
+				return EnvStageList[i];
+			}
+		}
+		Debug.LogWarning($"Env stage for level {level} not found");
+		return null;
+	}
+
+	public EStageType GetEnvStageType(int level)
+	{
+		EnvStage envStage = GetEnvStage(level);
+		if (envStage != null)
+		{
+			return envStage.type;
+		}
+		return EStageType.normal;
+	}
+
 	public void LoadEquipmentUnlock(bool force = false)
 	{
 		if (!force && EquipmentUnlockDict.Count > 0) return;
@@ -618,8 +734,9 @@ public sealed class GData : PureSingleton<GData>
 			if (!idx.ContainsKey(key)) idx[key] = i;
 		}
 
-		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int IndexIdx = idx.ContainsKey("index") ? idx["index"] : -1;
+		int CostIdx = idx.ContainsKey("cost") ? idx["cost"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -635,23 +752,37 @@ public sealed class GData : PureSingleton<GData>
 				return values[index].Trim();
 			}
 
-			string id = Get(IdIdx);
-			string typeStr = Get(TypeIdx);
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
 
-			if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(typeStr)) continue;
+			string typeStr = Get(TypeIdx);
+			int index = GetInt(IndexIdx, -1);
+			int cost = GetInt(CostIdx, 0);
+
+			if (string.IsNullOrEmpty(typeStr) || index < 0) continue;
 
 			if (System.Enum.TryParse<ECardType>(typeStr, true, out ECardType cardType))
 			{
 				EquipmentUnlock equipmentUnlock = new EquipmentUnlock();
-				equipmentUnlock.id = id;
+				equipmentUnlock.id = "";
 				equipmentUnlock.type = cardType;
+				equipmentUnlock.cost = cost;
 
 				int cardTypeInt = (int)cardType;
 				if (!EquipmentUnlockDict.ContainsKey(cardTypeInt))
 				{
 					EquipmentUnlockDict[cardTypeInt] = new List<EquipmentUnlock>();
 				}
-				EquipmentUnlockDict[cardTypeInt].Add(equipmentUnlock);
+				while (EquipmentUnlockDict[cardTypeInt].Count <= index)
+				{
+					EquipmentUnlockDict[cardTypeInt].Add(null);
+				}
+				EquipmentUnlockDict[cardTypeInt][index] = equipmentUnlock;
 			}
 		}
 
@@ -669,6 +800,175 @@ public sealed class GData : PureSingleton<GData>
 			}
 		}
 		return null;
+	}
+
+	public void LoadKeyword(bool force = false)
+	{
+		if (!force && KeywordDict.Count > 0) return;
+
+		KeywordDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_KeywordCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Keyword CSV not found: {m_KeywordCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int KeywordIdx = idx.ContainsKey("keyword") ? idx["keyword"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			string keyword = Get(KeywordIdx);
+			string description = Get(DescriptionIdx);
+
+			if (string.IsNullOrEmpty(keyword)) continue;
+
+			keyword = keyword.Trim();
+			description = description.Trim();
+			KeywordDict[keyword] = description;
+		}
+
+		Debug.Log($"Keyword loaded: {KeywordDict.Count} keywords");
+	}
+
+	public void LoadRelicInfo(bool force = false)
+	{
+		if (!force && RelicInfoDict.Count > 0) return;
+
+		RelicInfoDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_RelicInfoCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Relic info CSV not found: {m_RelicInfoCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
+		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
+		int NameIdx = idx.ContainsKey("name") ? idx["name"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
+
+			int id = GetInt(IdIdx, 0);
+			if (id == 0) continue;
+
+			string cardImage = Get(CardImageIdx);
+			string name = Get(NameIdx);
+			string description = Get(DescriptionIdx);
+
+			RelicInfo relicInfo = new RelicInfo(id, cardImage, name, description);
+			RelicInfoDict[id] = relicInfo;
+		}
+
+		Debug.Log($"Relic info loaded: {RelicInfoDict.Count} relics");
+	}
+
+	public RelicInfo GetRelicInfo(ERelicType relicType)
+	{
+		LoadRelicInfo();
+		int id = (int)relicType;
+		if (RelicInfoDict.TryGetValue(id, out RelicInfo relicInfo))
+		{
+			return relicInfo;
+		}
+		return null;
+	}
+
+	public string GetKeyword(string keyword)
+	{
+		LoadKeyword();
+		if (KeywordDict.TryGetValue(keyword, out string description))
+		{
+			return description;
+		}
+		return null;
+	}
+
+	public List<string> CheckKeywordInDescription(string description)
+	{
+		Debug.Log("CheckKeywordInDescription: " + description);
+		List<string> result = new List<string>();
+		if (string.IsNullOrEmpty(description))
+		{
+			return result;
+		}
+
+		foreach (KeyValuePair<string, string> kvp in KeywordDict)
+		{
+			string keyword = kvp.Key;
+			if (description.Contains(keyword))
+			{
+				result.Add(kvp.Value);
+			}
+		}
+
+		foreach (string r in result)
+		{
+			Debug.Log("CheckKeywordInDescription result: " + r);
+		}
+		return result;
 	}
 
 }

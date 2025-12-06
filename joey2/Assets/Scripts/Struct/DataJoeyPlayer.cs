@@ -28,6 +28,7 @@ public class DataJoeyPlayer : IData
 	public int MaxEquipedItemNum;
 	public int MaxEquipedSkillNum;
 	public int StageId;
+	public List<string> EnvCardPool = new List<string>();
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -58,6 +59,7 @@ public class DataJoeyPlayer : IData
 		MaxEquipedItemNum = (int)jobject["MaxEquipedItemNum"];
 		MaxEquipedSkillNum = (int)jobject["MaxEquipedSkillNum"];
 		StageId = (int)jobject["StageId"];
+		JsonUtil.ToList(jobject, "EnvCardPool", ref EnvCardPool);
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -85,6 +87,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("MaxEquipedItemNum", MaxEquipedItemNum);
 		jobject.Add("MaxEquipedSkillNum", MaxEquipedSkillNum);
 		jobject.Add("StageId", StageId);
+		jobject.Add("EnvCardPool", JsonUtil.ToJArray(EnvCardPool));
 	}
 	public void AddRelicListData(int data)
 	{
@@ -207,6 +210,18 @@ public class DataJoeyPlayer : IData
 	public int GetTempSkillListData(int dataIndex)
 	{
 		return TempSkillList[dataIndex];
+	}
+	public void AddEnvCardPoolData(string data)
+	{
+		EnvCardPool.Add(data);
+	}
+	public void RemoveEnvCardPoolData(string data)
+	{
+		EnvCardPool.Remove(data);
+	}
+	public string GetEnvCardPoolData(int dataIndex)
+	{
+		return EnvCardPool[dataIndex];
 	}
 }
 public partial class DataSystem

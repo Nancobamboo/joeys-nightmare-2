@@ -32,7 +32,6 @@ public enum ECardEffectId
     MoveWeaponToEnv,
     Ghost,
     GrimReaper,
-    GrimReaperClone,
     ExtraDamage_HalfHealth,
     ThrowWeaponToStack_OnDefence,
     HealPlayer_OnDefense,
@@ -42,7 +41,16 @@ public enum ECardEffectId
     DartScroll,
     HookDefenceFromDiscard_OnRemoveCard,
     AddKnifeToEnv_UseSkill,
-    ThrowWeaponDefenceToStack_UseSkill
+    ThrowWeaponDefenceToStack_UseSkill,
+    VampireMonkey,
+    NecDonkey,
+    TimidTurkey,
+    BareHands,
+    TurkeyFeather,
+    DonkeyMeatFireBun,
+    MonkeyBanana,
+    Bone,
+    PermanentAttackBoostWithRandomDamage
 }
 
 public enum EEffectType
@@ -121,7 +129,7 @@ public class YCardEffect
         return 0f;
     }
 
-    public virtual float OnTakeDamage(EEffectType effectType = EEffectType.Damage)
+    public virtual float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         return 0f;
     }
@@ -161,8 +169,12 @@ public class YCardEffect
         return 0f;
     }
 
-    public virtual float OnUseFinished()
+    public virtual float OnUseFinished(bool IsSkip = false)
     {
+        if (IsSkip)
+        {
+            return 0f;
+        }
         if (CardControl != null && CardControl.gameObject != null)
         {
             var vfxNames = new List<EVFXName> { };
@@ -200,7 +212,7 @@ public class YCardEffect
     {
         return value;
     }
-    
+
 
 }
 
