@@ -50,7 +50,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d220990e039f2bb498121af8d2cbdec7, type: 3}
+        m_Texture: {fileID: 2800000, guid: f8bd41bce4ce8794692e535d2017cb0e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
@@ -101,7 +101,7 @@ Material:
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
-    - _FixValue: {r: 1, g: 0, b: 0, a: 0}
+    - _FixValue: {r: 0, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
