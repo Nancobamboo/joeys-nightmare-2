@@ -35,6 +35,8 @@ public partial class UIGamePhaseControl : YViewControl
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
+	private const string EXIT_CARD_ID = "6001";  // KeyPath card ID
+	private bool m_KeyPathSpawned = false;       // Track if keypath has been spawned this level
 
 	public static EResType GetResType()
 	{
@@ -210,6 +212,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
+		m_KeyPathSpawned = false;  // Reset keypath flag when setting up new level
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -324,6 +327,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UsedCardList.Clear();
 		ClearGrimReaperData();
 		CreateFistCardCache();
+		m_KeyPathSpawned = false;  // Reset keypath flag when setting up new level
 	}
 
 	private void RefreshView()
@@ -342,6 +346,10 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				m_View.TxtStage.text = envStage.level.ToString();
 			}
+		}
+		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
+		{
+			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
 		}
 		else
 		{
@@ -1460,7 +1468,68 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			IsEnvDirty = false;
 			UpdateBadMonkeyAttack();
+			CheckAndSpawnKeyPath();
 		}
+	}
+
+	/// <summary>
+	/// Check if environment has any monsters at all (including buried ones)
+	/// </summary>
+	private bool HasAnyMonsterInEnv()
+	{
+		foreach (var kvp in m_EnvCardDict)
+		{
+			if (kvp.Value != null)
+			{
+				foreach (var card in kvp.Value)
+				{
+					if (card != null && card.gameObject.activeSelf && card.CardType == ECardType.monster)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Check if keypath should be spawned and spawn it if conditions are met
+	/// Keypath appears when there are no monsters left in the environment
+	/// </summary>
+	private void CheckAndSpawnKeyPath()
+	{
+		// Skip if keypath already spawned this level
+		if (m_KeyPathSpawned)
+		{
+			return;
+		}
+
+		// Only spawn keypath if no monsters remain
+		if (!HasAnyMonsterInEnv())
+		{
+			SpawnKeyPath();
+		}
+	}
+
+	/// <summary>
+	/// Spawn the KeyPath (exit) card at fixed column index 2 (center)
+	/// </summary>
+	private void SpawnKeyPath()
+	{
+		m_KeyPathSpawned = true;
+
+		// Fixed column index 2 (center column)
+		int exitColumn = 2;
+		
+		Card card = CreateCard(EXIT_CARD_ID);
+		VerticalLayoutGroup parent = m_EnvPanels[exitColumn];
+		UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
+		cardControl.SetData(card, isEnv: true, envIndex: exitColumn);
+		AddEnvCard(exitColumn, cardControl);
+		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+
+		Debug.Log($"KeyPath spawned at column {exitColumn} - all monsters cleared!");
 	}
 
 	public void ClearCardQueue()
