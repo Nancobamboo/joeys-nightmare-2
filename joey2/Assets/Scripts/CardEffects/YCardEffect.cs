@@ -57,7 +57,11 @@ public enum ECardEffectId
     BigChickenBoss,
     WalkingChickenEgg,
     AnswerSpringGreen,
-    PolishStupidDonkey
+    PolishStupidDonkey,
+    HolyLight_UseSkill,
+    BattleFury,
+    KingShield_OnAttack,
+    KingShield_OnDefense
 }
 
 public enum EEffectType

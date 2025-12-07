@@ -48,6 +48,10 @@ public enum EActionId
 	Bone,
 	MoveEnvCardLeft,
 	SwapEnvCardWithRandom,
+	KillSkeletonMonster,
+	DealSplashDamage,
+	KingShieldSwitchToShield,
+	KingShieldSwitchToSword,
 	Upper,
 
 }

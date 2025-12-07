@@ -56,8 +56,8 @@ public partial class UIGamePhaseControl
 		Debug.Log("ThrowWeaponToEnv env card count before: " + envCardCount);
 		Debug.Log("ThrowWeaponToEnv discard card count before: " + UsedCardList.Count);
 		UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
-		// TODO judge whether the weapon card is fist
-		if (weaponCard != null)
+		// 王者盾牌不触发
+		if (weaponCard != null && weaponCard.CardData.id != "1016")
 		{
 			// 等待所有伤害结算完成，确保动画在正确的时机播放
 			await UniTask.Yield();

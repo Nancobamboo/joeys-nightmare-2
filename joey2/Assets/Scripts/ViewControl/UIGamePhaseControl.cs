@@ -37,6 +37,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private UICardSimpleControl m_FistCardCache;
 	private const string EXIT_CARD_ID = "6001";  // KeyPath card ID
 	private bool m_KeyPathSpawned = false;       // Track if keypath has been spawned this level
+	private int m_CurrentAttackTargetEnvIndex = -1;  // 当前被攻击目标的环境索引，用于溅射伤害
 
 	public static EResType GetResType()
 	{
@@ -89,6 +90,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.PermanentBoostDefence, PermanentBoostDefence);
 		RegistAction(EActionId.MoveEnvCardLeft, MoveEnvCardLeft);
 		RegistAction(EActionId.SwapEnvCardWithRandom, SwapEnvCardWithRandom);
+		RegistAction(EActionId.KillSkeletonMonster, KillSkeletonMonster);
+		RegistAction(EActionId.DealSplashDamage, DealSplashDamage);
+		RegistAction(EActionId.KingShieldSwitchToShield, KingShieldSwitchToShield);
+		RegistAction(EActionId.KingShieldSwitchToSword, KingShieldSwitchToSword);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -677,6 +682,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardData.currentHealth <= 0 && cardControl.CardType == ECardType.monster)
 		{
+			Debug.Log("Monster dead: " + cardControl.CardData.id);
 			string monsterId = cardControl.CardData.id;
 			List<Card> dropCards = GetMonsterDropCard(monsterId);
 
@@ -904,6 +910,76 @@ public partial class UIGamePhaseControl : YViewControl
 			ApplyPlayerHealthChange(currentMonsterAttack, true);
 		}
 		currentMonsterAttack = 0;
+	}
+
+	// 王之盾: 剑(1016)切换到盾(2011)
+	void KingShieldSwitchToShield(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = paraArray.Length > 0 && paraArray[0] is UICardSimpleControl ? (UICardSimpleControl)paraArray[0] : null;
+		int currentSwitchCount = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
+		
+		if (cardControl == null)
+		{
+			return;
+		}
+		
+		// 创建新的盾牌卡(2011)并加入防御牌堆
+		string shieldCardId = "2011";
+		Card newCard = CreateCard(shieldCardId);
+		ECardType cardType = newCard.GetCardType();
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
+		{
+			return;
+		}
+		m_CardDict[newCard.UniqueId] = newCard;
+		UICardSimpleControl newCardControl = GetCardSimple(parent, false);
+		newCardControl.SetData(newCard);
+		AddBagCard(cardType, newCardControl);
+		newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		
+		// 传递切换计数到新卡的 CardEffect
+		if (newCardControl.CardEffect is YKingShield_OnDefense shieldEffect)
+		{
+			shieldEffect.SwitchCount = currentSwitchCount + 1;
+		}
+		
+		Debug.Log($"KingShield: 剑切换到盾，当前计数: {currentSwitchCount + 1}");
+	}
+
+	// 王之盾: 盾(2011)切换到剑(1016)
+	void KingShieldSwitchToSword(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = paraArray.Length > 0 && paraArray[0] is UICardSimpleControl ? (UICardSimpleControl)paraArray[0] : null;
+		int currentSwitchCount = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
+		
+		if (cardControl == null)
+		{
+			return;
+		}
+		
+		// 创建新的剑卡(1016)并加入攻击牌堆
+		string swordCardId = "1016";
+		Card newCard = CreateCard(swordCardId);
+		ECardType cardType = newCard.GetCardType();
+		Transform parent = GetParentByCardType(cardType);
+		if (parent == null)
+		{
+			return;
+		}
+		m_CardDict[newCard.UniqueId] = newCard;
+		UICardSimpleControl newCardControl = GetCardSimple(parent, false);
+		newCardControl.SetData(newCard);
+		AddBagCard(cardType, newCardControl);
+		newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		
+		// 传递切换计数到新卡的 CardEffect
+		if (newCardControl.CardEffect is YKingShield_OnAttack swordEffect)
+		{
+			swordEffect.SwitchCount = currentSwitchCount + 1;
+		}
+		
+		Debug.Log($"KingShield: 盾切换到剑，当前计数: {currentSwitchCount + 1}");
 	}
 
 	void RemoveCardData(int uniqueId)
@@ -1167,6 +1243,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl enemyCardControl = (UICardSimpleControl)paraArray[0];
 		int attackCount = (int)paraArray[1];
 		int envIndex = (int)paraArray[2];
+		m_CurrentAttackTargetEnvIndex = envIndex;  // 记录当前攻击目标位置，供溅射效果使用
 		UICardSimpleControl attackCardControl = GetLastBagCard(ECardType.attack);
 		if (attackCardControl == null)
 		{

@@ -1,88 +1,92 @@
 id   ,cardImage ,cardBackground,cardName            ,comment,type,description,attack ,defence ,health ,price ,stars,effectIds
-1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,ÎäÆ÷ÅÆ1,½ÌÑ§ÅÆ,attack,µã»÷¶Ñµşµ½ÊÖÅÆ,5,0,0,0,1,
-1001,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,ÎäÆ÷ÅÆ2,½ÌÑ§ÅÆ,attack,µã»÷¶Ñµşµ½ÊÖÅÆ,8,0,0,0,1,
-1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,¶Ï½£   ,,attack,,5,0,0,50,1,
-1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,ÊÖÀï½£        ,,attack,×°±¸£ºÑ¸»÷,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop
-1004,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,Ìú½£        ,,attack,,8,0,0,100,1,
-1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,¶Ô½£,,attack,Ã»ÓĞ·À¾ßÊ±£¬¶îÍâÉËº¦£º5 ,9,0,0,100,2,ExtraDamage_NoDefence:5
-1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,ÖØ´¸        ,,attack,,12,0,0,300,3,
-1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,»ØĞıïÚ       ,,attack,¹¥»÷Ê±£¬ÏòÖÜÎ§µĞÈËµ¯Éä2´Î,5,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2
-1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,È¾Ñª³¤Ã¬       ,,attack,ÉúÃüÖµµÍÓÚ50%Ê±£¬¹¥»÷+10,9,0,0,100,2,ExtraDamage_HalfHealth:10
-1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,ÊÖµ¶,,attack,ÍöÓï:´ÓÆúÅÆ¶Ñ³éÈ¡Ò»ÕÅ·ÀÓù¿¨,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
-1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,³àÊÖ¿ÕÈ­,,attack,ÓÀ²»ÏûºÄ,3,0,0,0,1,BareHands
-1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,ÊÉ»ê½£,,attack,»÷É±:ÓÀ¾Ã¹¥»÷+1,7,0,0,150,2,PermanentAttackBoost:1
-1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,ÊÉ»êÊÖÀï½£,,attack,»÷É±:ÓÀ¾Ã¹¥»÷+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
-1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,ÖØåó,,attack,,16,0,0,300,3,
+1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,æ­¦å™¨ç‰Œ1,æ•™å­¦ç‰Œ,attack,ç‚¹å‡»å †å åˆ°æ‰‹ç‰Œ,5,0,0,0,1,
+1001,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,æ­¦å™¨ç‰Œ2,æ•™å­¦ç‰Œ,attack,ç‚¹å‡»å †å åˆ°æ‰‹ç‰Œ,8,0,0,0,1,
+1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,æ–­å‰‘   ,,attack,,5,0,0,50,1,
+1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,æ‰‹é‡Œå‰‘        ,,attack,è£…å¤‡ï¼šè¿…å‡»,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop
+1004,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,é“å‰‘        ,,attack,,8,0,0,100,1,
+1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,å¯¹å‰‘,,attack,æ²¡æœ‰é˜²å…·æ—¶ï¼Œé¢å¤–ä¼¤å®³ï¼š5 ,9,0,0,100,2,ExtraDamage_NoDefence:5
+1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,é‡é”¤        ,,attack,,12,0,0,300,3,
+1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,å›æ—‹é•–       ,,attack,æ”»å‡»æ—¶ï¼Œå‘å‘¨å›´æ•Œäººå¼¹å°„2æ¬¡,5,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2
+1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,æŸ“è¡€é•¿çŸ›       ,,attack,ç”Ÿå‘½å€¼ä½äº50%æ—¶ï¼Œæ”»å‡»+10,9,0,0,100,2,ExtraDamage_HalfHealth:10
+1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,æ‰‹åˆ€,,attack,äº¡è¯­:ä»å¼ƒç‰Œå †æŠ½å–ä¸€å¼ é˜²å¾¡å¡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
+1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,èµ¤æ‰‹ç©ºæ‹³,,attack,æ°¸ä¸æ¶ˆè€—,3,0,0,0,1,BareHands
+1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,å™¬é­‚å‰‘,,attack,å‡»æ€:æ°¸ä¹…æ”»å‡»+1,7,0,0,150,2,PermanentAttackBoost:1
+1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,å™¬é­‚æ‰‹é‡Œå‰‘,,attack,å‡»æ€:æ°¸ä¹…æ”»å‡»+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
+1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,é‡å¼©,,attack,,16,0,0,300,3,
+1015,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,æˆ˜æ–—ç‹‚æ€’,,attack,,10,0,0,300,3,BattleFury:50
+1016,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,ç‹è€…ç›¾ç‰Œ(å‰‘),,attack,,5,0,0,300,2,KingShield_OnAttack
 ,,,,,,,,,,,,
-2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,·ÀÓùÅÆ,½ÌÑ§ÅÆ,defence,µã»÷¶Ñµşµ½ÊÖÅÆ,0,3,0,0,1,
-2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,ÆÆ¶Ü       ,,defence,,0,3,0,50,1,
-2009,Art/Img/Defence/img_card_WoodenShield,Art/Img/Defence/img_bg_Defence,Ä¾¶Ü,,defence,,0,6,0,100,1,
-2002,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,Ìú¶Ü       ,,defence,,0,9,0,200,2,
-2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,ÈĞ¼×,,defence,ÊÜ»÷Ê±£º·´µ¯5µãÉËº¦,0,6,0,200,2,DealDamage_UseDefence:5
-2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,»¤ÊÖ,,defence,ÊÜ»÷Ê±£º´ÓÆúÅÆ¶ÑËæ»ú³éÒ»ÕÅÎäÆ÷ÅÆÖÃÈëÊÖÅÆ,0,6,0,200,2,HookEquipWeaponFromDiscard_OnDefence
-2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,ÊÖ»¬¶Ü,,defence,ÍöÓï:¶ªÆúµ±Ç°¹¥»÷ÊÖÅÆµ½»·¾³ÖĞ,0,8,0,200,2,ThrowWeaponToStack_OnDefence
-2006,Art/Img/Defence/img_card_BloodDemonShield,Art/Img/Defence/img_bg_Defence,ÑªÄ§¶Ü,,defence,»Ø¸´ºÍµÖµ²ÉËº¦ÏàÍ¬ÊıÖµµÄÉúÃü,0,8,0,200,2,HealPlayer_OnDefense
-2007,Art/Img/Defence/img_card_DaggerShield,Art/Img/Defence/img_bg_Defence,Ø°Ê×»¤¶Ü,,defence,ÍöÓï:ÔÚ»·¾³ÖĞÕÙ»½Ò»°ÑØ°Ê×,0,7,0,200,2,AddKnifeToEnv_OnDefense
-2008,Art/Img/Defence/img_card_InfiniteDefensc,Art/Img/Defence/img_bg_Defence,ÎŞÏŞ·ÀÓù,,defence,×°±¸:»¤¼×ÖµÓÀ¾Ã+1,0,6,0,300,3,PermanentDefenceBoost:1
-2010,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,¸Ö¶Ü,,defence,,,12,0,300,3,
+2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,é˜²å¾¡ç‰Œ,æ•™å­¦ç‰Œ,defence,ç‚¹å‡»å †å åˆ°æ‰‹ç‰Œ,0,3,0,0,1,
+2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,ç ´ç›¾       ,,defence,,0,3,0,50,1,
+2009,Art/Img/Defence/img_card_WoodenShield,Art/Img/Defence/img_bg_Defence,æœ¨ç›¾,,defence,,0,6,0,100,1,
+2002,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,é“ç›¾       ,,defence,,0,9,0,200,2,
+2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,åˆƒç”²,,defence,å—å‡»æ—¶ï¼šåå¼¹5ç‚¹ä¼¤å®³,0,6,0,200,2,DealDamage_UseDefence:5
+2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,æŠ¤æ‰‹,,defence,å—å‡»æ—¶ï¼šä»å¼ƒç‰Œå †éšæœºæŠ½ä¸€å¼ æ­¦å™¨ç‰Œç½®å…¥æ‰‹ç‰Œ,0,6,0,200,2,HookEquipWeaponFromDiscard_OnDefence
+2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,æ‰‹æ»‘ç›¾,,defence,äº¡è¯­:ä¸¢å¼ƒå½“å‰æ”»å‡»æ‰‹ç‰Œåˆ°ç¯å¢ƒä¸­,0,8,0,200,2,ThrowWeaponToStack_OnDefence
+2006,Art/Img/Defence/img_card_BloodDemonShield,Art/Img/Defence/img_bg_Defence,è¡€é­”ç›¾,,defence,å›å¤å’ŒæŠµæŒ¡ä¼¤å®³ç›¸åŒæ•°å€¼çš„ç”Ÿå‘½,0,8,0,200,2,HealPlayer_OnDefense
+2007,Art/Img/Defence/img_card_DaggerShield,Art/Img/Defence/img_bg_Defence,åŒ•é¦–æŠ¤ç›¾,,defence,äº¡è¯­:åœ¨ç¯å¢ƒä¸­å¬å”¤ä¸€æŠŠåŒ•é¦–,0,7,0,200,2,AddKnifeToEnv_OnDefense
+2008,Art/Img/Defence/img_card_InfiniteDefensc,Art/Img/Defence/img_bg_Defence,æ— é™é˜²å¾¡,,defence,è£…å¤‡:æŠ¤ç”²å€¼æ°¸ä¹…+1,0,6,0,300,3,PermanentDefenceBoost:1
+2010,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,é’¢ç›¾,,defence,,,12,0,300,3,
+2011,Art/Img/Defence/img_card_DaggerShield,Art/Img/Defence/img_bg_Defence,ç‹è€…ç›¾ç‰Œ(ç›¾),,defence,,0,12,0,300,3,KingShield_OnDefense
 ,,,,,,,,,,,,
-3000,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,µÀ¾ßÅÆ,½ÌÑ§ÅÆ,item   ,»Ö¸´10µãÉúÃüÖµ,0,0,0,0,2,HealPlayer_OnPlay:10
-3001,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,Ğ¡ÑªÆ¿  ,,item   ,»Ö¸´10µãÉúÃüÖµ,0,0,0,200,2,HealPlayer_OnPlay:10
-3002,Art/Img/Item/img_card_Boom,Art/Img/Item/img_bg_Item,Õ¨µ¯,,item   ,¶ÔËæ»úµĞÈË¼°Á½²àÄ¿±êÔì³É10µãÉËº¦,,,,300,3,Boom_OnPlay:10
-3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,¹³Ë÷,,item        ,´ÓÆúÅÆ¶ÑËæ»ú³éÒ»ÕÅÎäÆ÷ÅÆÖÃÈëÊÖÅÆ,,,,200,2,HookEquipWeaponFromDiscard_OnPlay
-3004,Art/Img/Item/img_card_MonkeyWine,Art/Img/Item/img_bg_Item,Ô³¾Æ,,item   ,ÏÂ´Î¹¥»÷ÉËº¦·­±¶,,,,200,2,ApeWine
-3005,Art/Img/Item/img_card_GiftBox,Art/Img/Item/img_bg_Item,ÀñÎï´ü,,item   ,ÔÚ»·¾³¿¨ÖĞËæ»úÕÙ»½3ÕÅÅÆ,,,,300,3,GiftBox:3
-3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,ÊÖÀï½£¾íÖá,,item   ,ÔÚ»·¾³ÖĞÕÙ»½3¸ö·æÀûÊÖÀï½£,,,,200,2,DartScroll
-3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,»ğ¼¦ÓğÃ«,,item   ,µ±Ç°×°±¸µÄ·ÀÓù¿¨ÓÀ¾Ã·ÀÓù+1,,,,300,3,TurkeyFeather
-3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,Â¿Èâ»ğÉÕ,,item   ,ÉúÃüÉÏÏŞÓÀ¾Ã+1,,,,300,3,DonkeyMeatFireBun
-3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,ºï×ÓÏã½¶,,item   ,µ±Ç°×°±¸µÄ¹¥»÷¿¨ÓÀ¾Ã¹¥»÷+1,,,,300,3,MonkeyBanana
-3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,÷¼÷Ãº¡¹Ç,,item   ,Ëæ»ú»ñµÃ»ğ¼¦ÓğÃ«/Â¿Èâ»ğÉÕ/ºï×ÓÏã½¶µÄĞ§¹û,,,,300,3,Bone
-3011,Art/Img/Item/img_card_GravityShoes,Art/Img/Item/img_bg_Item,ÖØÁ¦Ğ¬,1´ÔÁÖ,item   ,½«»·¾³¿¨ÖĞÈ«²¿¿¨ÅÆºÍËüÏÂ·½µÄ¿¨ÅÆ½»»»Î»ÖÃ,,,,200,2,GravityShoes
+3000,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,é“å…·ç‰Œ,æ•™å­¦ç‰Œ,item   ,æ¢å¤10ç‚¹ç”Ÿå‘½å€¼,0,0,0,0,2,HealPlayer_OnPlay:10
+3001,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,å°è¡€ç“¶  ,,item   ,æ¢å¤10ç‚¹ç”Ÿå‘½å€¼,0,0,0,200,2,HealPlayer_OnPlay:10
+3002,Art/Img/Item/img_card_Boom,Art/Img/Item/img_bg_Item,ç‚¸å¼¹,,item   ,å¯¹éšæœºæ•ŒäººåŠä¸¤ä¾§ç›®æ ‡é€ æˆ10ç‚¹ä¼¤å®³,,,,300,3,Boom_OnPlay:10
+3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,é’©ç´¢,,item        ,ä»å¼ƒç‰Œå †éšæœºæŠ½ä¸€å¼ æ­¦å™¨ç‰Œç½®å…¥æ‰‹ç‰Œ,,,,200,2,HookEquipWeaponFromDiscard_OnPlay
+3004,Art/Img/Item/img_card_MonkeyWine,Art/Img/Item/img_bg_Item,çŒ¿é…’,,item   ,ä¸‹æ¬¡æ”»å‡»ä¼¤å®³ç¿»å€,,,,200,2,ApeWine
+3005,Art/Img/Item/img_card_GiftBox,Art/Img/Item/img_bg_Item,ç¤¼ç‰©è¢‹,,item   ,åœ¨ç¯å¢ƒå¡ä¸­éšæœºå¬å”¤3å¼ ç‰Œ,,,,300,3,GiftBox:3
+3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,æ‰‹é‡Œå‰‘å·è½´,,item   ,åœ¨ç¯å¢ƒä¸­å¬å”¤3ä¸ªé”‹åˆ©æ‰‹é‡Œå‰‘,,,,200,2,DartScroll
+3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,ç«é¸¡ç¾½æ¯›,,item   ,å½“å‰è£…å¤‡çš„é˜²å¾¡å¡æ°¸ä¹…é˜²å¾¡+1,,,,300,3,TurkeyFeather
+3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,é©´è‚‰ç«çƒ§,,item   ,ç”Ÿå‘½ä¸Šé™æ°¸ä¹…+1,,,,300,3,DonkeyMeatFireBun
+3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,çŒ´å­é¦™è•‰,,item   ,å½“å‰è£…å¤‡çš„æ”»å‡»å¡æ°¸ä¹…æ”»å‡»+1,,,,300,3,MonkeyBanana
+3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,éª·é«…éª¸éª¨,,item   ,éšæœºè·å¾—ç«é¸¡ç¾½æ¯›/é©´è‚‰ç«çƒ§/çŒ´å­é¦™è•‰çš„æ•ˆæœ,,,,300,3,Bone
+3011,Art/Img/Item/img_card_GravityShoes,Art/Img/Item/img_bg_Item,é‡åŠ›é‹,1ä¸›æ—,item   ,å°†ç¯å¢ƒå¡ä¸­å…¨éƒ¨å¡ç‰Œå’Œå®ƒä¸‹æ–¹çš„å¡ç‰Œäº¤æ¢ä½ç½®,,,,200,2,GravityShoes
 ,,,,,,,,,,,,
-4000,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,¼¼ÄÜÅÆ,½ÌÑ§ÅÆ,skill     ,ÏÂ´ÎÊ¹ÓÃ¹¥»÷ÅÆÊ±»á¹¥»÷Á½´Î,0,0,0,0,2,DoubleAttack_OnPlay
-4001,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,Á¬»÷       ,,skill     ,ÏÂ´ÎÊ¹ÓÃ¹¥»÷ÅÆÊ±»á¹¥»÷Á½´Î,0,0,0,200,2,DoubleAttack_OnPlay
-4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,Í´»÷       ,,skill     ,ÏÂ´Î¹¥»÷Ê¹¹ÖÎï´¦ÓÚÁ½²ãÒ×ÉËĞ§¹û,0,0,0,0,1,
-4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,Ë«³ÖÎäÆ÷       ,,skill     ,ÏÂ´Î¹¥»÷Ôì³ÉË«±¶ÉËº¦£¬µ«ÊÇÎŞ·¨Ê¹ÓÃ»¤¶Ü,0,0,0,0,1,
-4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,±¤Àİ       ,,skill     ,ÏÂ´Î¸ñµ²Ê±£¬¿ÉÒÔÊ¹ÓÃÁ½¸ö·À¾ß,0,0,0,0,1,
-4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,Èâ¶Ü³å»÷,,skill     ,ÏÂ´Î¹¥»÷Ê±£¬Ôì³ÉÏàµ±ÓÚ·ÀÓùÖµµÄ¶îÍâÉËº¦,,,,0,1,
-4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,Á¬»·ÉÁµç    ,,skill     ,ÈºÉË:5,0,0,0,100,1,Electric:5
-4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,Ø°Ê×·ÉÀ´,,skill     ,ÔÚ»·¾³ÖĞÕÙ»½Á½¸öØ°Ê×,0,0,0,200,2,AddKnifeToEnv_UseSkill
-4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,¶ª¿øÆú¼×,,skill     ,½«×°±¸ÖĞµÄ¹¥»÷·ÀÓù¿¨¶ªÈë»·¾³ÖĞ,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
-,,,,,,,,,,,,
-,,,,,,,,,,,,
-,,,,,,,,,,,,
+4000,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,æŠ€èƒ½ç‰Œ,æ•™å­¦ç‰Œ,skill     ,ä¸‹æ¬¡ä½¿ç”¨æ”»å‡»ç‰Œæ—¶ä¼šæ”»å‡»ä¸¤æ¬¡,0,0,0,0,2,DoubleAttack_OnPlay
+4001,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,è¿å‡»       ,,skill     ,ä¸‹æ¬¡ä½¿ç”¨æ”»å‡»ç‰Œæ—¶ä¼šæ”»å‡»ä¸¤æ¬¡,0,0,0,200,2,DoubleAttack_OnPlay
+4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,ç—›å‡»       ,,skill     ,ä¸‹æ¬¡æ”»å‡»ä½¿æ€ªç‰©å¤„äºä¸¤å±‚æ˜“ä¼¤æ•ˆæœ,0,0,0,0,1,
+4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,åŒæŒæ­¦å™¨       ,,skill     ,ä¸‹æ¬¡æ”»å‡»é€ æˆåŒå€ä¼¤å®³ï¼Œä½†æ˜¯æ— æ³•ä½¿ç”¨æŠ¤ç›¾,0,0,0,0,1,
+4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,å ¡å’       ,,skill     ,ä¸‹æ¬¡æ ¼æŒ¡æ—¶ï¼Œå¯ä»¥ä½¿ç”¨ä¸¤ä¸ªé˜²å…·,0,0,0,0,1,
+4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,è‚‰ç›¾å†²å‡»,,skill     ,ä¸‹æ¬¡æ”»å‡»æ—¶ï¼Œé€ æˆç›¸å½“äºé˜²å¾¡å€¼çš„é¢å¤–ä¼¤å®³,,,,0,1,
+4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,è¿ç¯é—ªç”µ    ,,skill     ,ç¾¤ä¼¤:5,0,0,0,100,1,Electric:5
+4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,åŒ•é¦–é£æ¥,,skill     ,åœ¨ç¯å¢ƒä¸­å¬å”¤ä¸¤ä¸ªåŒ•é¦–,0,0,0,200,2,AddKnifeToEnv_UseSkill
+4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,ä¸¢ç›”å¼ƒç”²,,skill     ,å°†è£…å¤‡ä¸­çš„æ”»å‡»é˜²å¾¡å¡ä¸¢å…¥ç¯å¢ƒä¸­,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
+4009,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,é©±é­‚åœ£å…‰,,skill     ,ç›´æ¥æ¶ˆç­ä¸€ä¸ªéª·é«…å‹æ€ªç‰©ï¼Œè‹¥å½“å‰åœºä¸Šæ²¡æœ‰éª·é«…å‹æ€ªç‰©åˆ™ä½¿ç”¨å¤±è´¥,0,0,0,180,2,HolyLight_UseSkill
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
-5000,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,»µMonkey,½ÌÑ§ÅÆ,monster      ,µã»÷¹¥»÷,3,,10,10,1,
-5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,»µMonkey,½ÌÑ§ÅÆ,monster      ,µã»÷¹¥»÷,3,,5,10,1,
-5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,÷¼÷ÃMonkey,,monster      ,,5,,15,20,1,
-5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,÷¼÷ÃÆïÊ¿Monkey,,monster      ,ÍöÓï:ÔÚ»·¾³ÖĞÕÙ»½Ìú½£ºÍÌú¶Ü,8,,30,30,3,
-5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,ÎüÑª¹íMonkey,,monster      ,Ã¿´Î¹¥»÷Ê±»Ø¸´3µãÑªÁ¿,5,,20,20,1,VampireMonkey
-5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,Ä¾Í°,,monster,¿ÉÄÜ²Ø×ÅºÃ¶«Î÷£¿,,,1,5,1,
-5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,Õ¨Ò©Í°,,monster,ÍöÓï£º¶ÔÁ½²àµĞÈË¸÷Ôì³É10µãÉËº¦,,,1,15,3,Boom_OnDead:10
-5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey´¬³¤,,monster      ,,5,,8,15,1,
-5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,Ä¾Í°,¿ÕÄ¾Í°,monster,¿ÉÄÜ²Ø×ÅºÃ¶«Î÷£¿,,,1,5,1,
-5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,ËÀÁéDonkey,,monster      ,ÉúÃüÖµ½µÖÁÒ»°ëÒÔÏÂÊ±ÕÙ»½Á½¸ö÷¼÷Ãmonkey,3,,20,30,1,NecDonkey
-5011,Art/Img/Monster/img_card_SkeletonDonkey,Art/Img/Monster/img_bg_Monster,÷¼÷ÃDonkey,,monster      ,,5,,15,15,1,
-5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,ËÀÉñ,±ØĞë·ÅÔÚ¹Ø¿¨×îÉÏ·½,monster      ,ËÀÉñ,5,,15,100,1,GrimReaper
-5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,µ¨Ğ¡Turkey,,monster      ,ÍöÓï:»ñµÃ20½ğ±Ò  ÊÜ»÷:¶ãµ½ÏÂÒ»ÕÅÅÆºó,9,,25,100,2,TimidTurkey
-5014,Art/Img/Monster/img_card_BoomMonkey,Art/Img/Monster/img_bg_Monster,×Ô±¬monkey,,monster,µ¹¼ÆÊ±7:×Ô±¬,6,,18,30,1,AutoBoomMoney:20
-5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,¹ÖµÁmonkey,,monster,¹¥»÷ÍµÈ¡10½ğ±Ò µ¹¼ÆÊ±3:ÌÓÅÜ ÍöÓï:·µ»ØÈ«²¿½ğ±Ò,5,,15,30,1,StealMoney:10
-5016,Art/Img/Monster/img_card_TreasureChest,Art/Img/Monster/img_bg_Monster,±¦Ïä,,monster,ÍöÓï:µôÂä±¦Îï,0,,1,20,1,
-5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,ÂŞÃÜÅ·monkey,,monster,ÍöÓï:ÖìÀöÒ¶¹¥»÷+5 ÉúÃü+10,4,,21,40,2,RomeoMonkey
-5018,Art/Img/Monster/img_card_Juliet_Monkey,Art/Img/Monster/img_bg_Monster,ÖìÀöÒ¶monkey,,monster,ÍöÓï:ÂŞÃÜÅ·¹¥»÷+5 ÉúÃü+10,4,,21,40,2,JulietMonkey
-5019,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,´ó»µmonkey,,monster,³¡ÉÏÃ¿ÓĞÒ»¸ö¹ÖÎï ¹¥»÷¼Ó3,10,,40,80,3,BadMonkey:3
-5020,Art/Img/Monster/img_card_ghost,Art/Img/Monster/img_bg_Monster,ÓÄÁémonkey,,monster,µ¹¼ÆÊ±5:Ö÷¶¯¹¥»÷,9,,20,50,2,Ghost
-5021,Art/Img/Monster/img_card_BigDumbDonkey,Art/Img/Monster/img_bg_Monster,´ó´ºDonkey,2¸ê±Ú,monster,ÊÜ»÷:½«Íæ¼ÒµÄÎäÆ÷Ìßµ½»·¾³Àï,11,,20,40,2,KickWeaponToEnv_OnHit
-5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,²¨À¼´ÀDonkey,2¸ê±Ú,monster,ÍöÓï:Íæ¼Ò»ñµÃ10½ğ±Ò,10,,18,30,1,GiveGold_OnDead:10
-5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,»µturkey,3¸Ğ¶÷½Ú,monster,,9,,16,25,1,
-5024,Art/Img/Monster/img_card_WalkingChicken,Art/Img/Monster/img_bg_Monster,×ßµØturkey,3¸Ğ¶÷½Ú,monster,µ¹¼ÆÊ±2:Ïò×óÒÆ¶¯,8,,17,25,1,MoveLeft_Countdown:2
-5025,Art/Img/Monster/img_card_DodgeChicken,Art/Img/Monster/img_bg_Monster,ÉÁ±Üturkey,3¸Ğ¶÷½Ú,monster,ÊÜ»÷:ºÍ»·¾³ÖĞËæ»úÒ»ÕÅ¿¨ÅÆ½»»»Î»ÖÃ,7,,18,30,1,SwapWithEnvCard_OnHit
-5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,¸Ğ¶÷turkey,3¸Ğ¶÷½Ú,monster,µÖµ²Ò»´ÎÖÂÃüÉËº¦,9,,19,40,2,BlockFatalDamage
-5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,´óturkey°Ô,3¸Ğ¶÷½Ú,monster,ÊÜ»÷:Ğ¡¸ÅÂÊÕÙ»½Ò»Ö»×ßµØ¼¦µ°,16,,45,80,3,SpawnChickenEgg_OnHit
-5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,×ßµØturkeyµ°,3¸Ğ¶÷½Ú,monster,µ¹¼ÆÊ±2:ÕÙ»½Ò»Ö»×ßµØ¼¦,0,,13,15,1,SpawnWalkingChicken_Countdown:2
-5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,±¦Ïä¹Ö,,monster,,8,,25,40,2,
-5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,Ğ¡³óMonkey,,monster,,6,,20,30,1,
-5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,»¬°åMonkey,,monster,,7,,18,25,1,
 ,,,,,,,,,,,,
-6001,Art/Img/Other/img_card_door,Art/Img/Other/img_bg_Door,Key Path,,other,´«ËÍµ½ÏÂÒ»¹Ø,,,,,3,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+5000,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,åMonkey,æ•™å­¦ç‰Œ,monster      ,ç‚¹å‡»æ”»å‡»,3,,10,10,1,
+5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,åMonkey,æ•™å­¦ç‰Œ,monster      ,ç‚¹å‡»æ”»å‡»,3,,5,10,1,
+5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,éª·é«…Monkey,,monster      ,,5,,15,20,1,
+5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,éª·é«…éª‘å£«Monkey,,monster      ,äº¡è¯­:åœ¨ç¯å¢ƒä¸­å¬å”¤é“å‰‘å’Œé“ç›¾,8,,30,30,3,
+5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,å¸è¡€é¬¼Monkey,,monster      ,æ¯æ¬¡æ”»å‡»æ—¶å›å¤3ç‚¹è¡€é‡,5,,20,20,1,VampireMonkey
+5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,æœ¨æ¡¶,,monster,å¯èƒ½è—ç€å¥½ä¸œè¥¿ï¼Ÿ,,,1,5,1,
+5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,ç‚¸è¯æ¡¶,,monster,äº¡è¯­ï¼šå¯¹ä¸¤ä¾§æ•Œäººå„é€ æˆ10ç‚¹ä¼¤å®³,,,1,15,3,Boom_OnDead:10
+5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkeyèˆ¹é•¿,,monster      ,,5,,8,15,1,
+5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,æœ¨æ¡¶,ç©ºæœ¨æ¡¶,monster,å¯èƒ½è—ç€å¥½ä¸œè¥¿ï¼Ÿ,,,1,5,1,
+5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,æ­»çµDonkey,,monster      ,ç”Ÿå‘½å€¼é™è‡³ä¸€åŠä»¥ä¸‹æ—¶å¬å”¤ä¸¤ä¸ªéª·é«…Donkey,3,,20,30,1,NecDonkey
+5011,Art/Img/Monster/img_card_SkeletonDonkey,Art/Img/Monster/img_bg_Monster,éª·é«…Donkey,,monster      ,,5,,15,15,1,
+5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,æ­»ç¥,å¿…é¡»æ”¾åœ¨å…³å¡æœ€ä¸Šæ–¹,monster      ,æ­»ç¥,5,,15,100,1,GrimReaper
+5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,èƒ†å°Turkey,,monster      ,äº¡è¯­:è·å¾—20é‡‘å¸  å—å‡»:èº²åˆ°ä¸‹ä¸€å¼ ç‰Œå,9,,25,100,2,TimidTurkey
+5014,Art/Img/Monster/img_card_BoomMonkey,Art/Img/Monster/img_bg_Monster,è‡ªçˆ†monkey,,monster,å€’è®¡æ—¶7:è‡ªçˆ†,6,,18,30,1,AutoBoomMoney:20
+5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,æ€ªç›—monkey,,monster,æ”»å‡»å·å–10é‡‘å¸ å€’è®¡æ—¶3:é€ƒè·‘ äº¡è¯­:è¿”å›å…¨éƒ¨é‡‘å¸,5,,15,30,1,StealMoney:10
+5016,Art/Img/Monster/img_card_TreasureChest,Art/Img/Monster/img_bg_Monster,å®ç®±,,monster,äº¡è¯­:æ‰è½å®ç‰©,0,,1,20,1,
+5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,ç½—å¯†æ¬§monkey,,monster,äº¡è¯­:æœ±ä¸½å¶æ”»å‡»+5 ç”Ÿå‘½+10,4,,21,40,2,RomeoMonkey
+5018,Art/Img/Monster/img_card_Juliet_Monkey,Art/Img/Monster/img_bg_Monster,æœ±ä¸½å¶monkey,,monster,äº¡è¯­:ç½—å¯†æ¬§æ”»å‡»+5 ç”Ÿå‘½+10,4,,21,40,2,JulietMonkey
+5019,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,å¤§åmonkey,,monster,åœºä¸Šæ¯æœ‰ä¸€ä¸ªæ€ªç‰© æ”»å‡»åŠ 3,10,,40,80,3,BadMonkey:3
+5020,Art/Img/Monster/img_card_ghost,Art/Img/Monster/img_bg_Monster,å¹½çµmonkey,,monster,å€’è®¡æ—¶5:ä¸»åŠ¨æ”»å‡»,9,,20,50,2,Ghost
+5021,Art/Img/Monster/img_card_BigDumbDonkey,Art/Img/Monster/img_bg_Monster,å¤§æ˜¥Donkey,2æˆˆå£,monster,å—å‡»:å°†ç©å®¶çš„æ­¦å™¨è¸¢åˆ°ç¯å¢ƒé‡Œ,11,,20,40,2,KickWeaponToEnv_OnHit
+5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,æ³¢å…°è ¢Donkey,2æˆˆå£,monster,äº¡è¯­:ç©å®¶è·å¾—10é‡‘å¸,10,,18,30,1,GiveGold_OnDead:10
+5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,åturkey,3æ„Ÿæ©èŠ‚,monster,,9,,16,25,1,
+5024,Art/Img/Monster/img_card_WalkingChicken,Art/Img/Monster/img_bg_Monster,èµ°åœ°turkey,3æ„Ÿæ©èŠ‚,monster,å€’è®¡æ—¶2:å‘å·¦ç§»åŠ¨,8,,17,25,1,MoveLeft_Countdown:2
+5025,Art/Img/Monster/img_card_DodgeChicken,Art/Img/Monster/img_bg_Monster,é—ªé¿turkey,3æ„Ÿæ©èŠ‚,monster,å—å‡»:å’Œç¯å¢ƒä¸­éšæœºä¸€å¼ å¡ç‰Œäº¤æ¢ä½ç½®,7,,18,30,1,SwapWithEnvCard_OnHit
+5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,æ„Ÿæ©turkey,3æ„Ÿæ©èŠ‚,monster,æŠµæŒ¡ä¸€æ¬¡è‡´å‘½ä¼¤å®³,9,,19,40,2,BlockFatalDamage
+5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,å¤§turkeyéœ¸,3æ„Ÿæ©èŠ‚,monster,å—å‡»:å°æ¦‚ç‡å¬å”¤ä¸€åªèµ°åœ°é¸¡è›‹,16,,45,80,3,SpawnChickenEgg_OnHit
+5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,èµ°åœ°turkeyè›‹,3æ„Ÿæ©èŠ‚,monster,å€’è®¡æ—¶2:å¬å”¤ä¸€åªèµ°åœ°é¸¡,0,,13,15,1,SpawnWalkingChicken_Countdown:2
+5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,å®ç®±æ€ª,,monster,,8,,25,40,2,
+5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,å°ä¸‘Monkey,,monster,,6,,20,30,1,
+5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,æ»‘æ¿Monkey,,monster,,7,,18,25,1,
+,,,,,,,,,,,,
+6001,Art/Img/Other/img_card_door,Art/Img/Other/img_bg_Door,Key Path,,other,ä¼ é€åˆ°ä¸‹ä¸€å…³,,,,,3,

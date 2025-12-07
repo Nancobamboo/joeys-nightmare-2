@@ -545,6 +545,18 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.PolishStupidDonkey:
 				effect = new YPolishStupidDonkey();
 				break;
+			case ECardEffectId.HolyLight_UseSkill:
+				effect = new YHolyLight_UseSkill();
+				break;
+			case ECardEffectId.BattleFury:
+				effect = new YBattleFury();
+				break;
+			case ECardEffectId.KingShield_OnAttack:
+				effect = new YKingShield_OnAttack();
+				break;
+			case ECardEffectId.KingShield_OnDefense:
+				effect = new YKingShield_OnDefense();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
