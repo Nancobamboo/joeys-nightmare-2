@@ -30,6 +30,7 @@ public class YGhost : YDefaultEffect
                 {
                     if (CardControl.CardData != null)
                     {
+                        value = 5;
                         int attack = CardControl.CardData.currentAttack;
                         YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
                     }

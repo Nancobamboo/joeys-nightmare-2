@@ -293,6 +293,7 @@ public class UICardSimpleControl : YViewControl
 
 	public void AddBuff(EBuffType buffType, int value)
 	{
+		Debug.Log(this.name + " AddBuff " + buffType + " " + value);
 		m_BuffValueArray[(int)buffType] += value;
 
 		switch (buffType)

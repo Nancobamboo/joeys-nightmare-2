@@ -12,7 +12,10 @@ public class YAnswerSpringGreen : YDefaultEffect
     {
         //if (effectType == EEffectType.Damage)
         {
-            YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv);
+            JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+            {
+                YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv);
+            }, 0.3f);
         }
         return base.OnTakeDamage(effectType, damage);
     }

@@ -29,6 +29,7 @@ public class YWalkingChicken : YDefaultEffect
                 if (value == 0)
                 {
                     YActionSystem.Instance.DispatchAction(EActionId.MoveEnvCardLeft, CardControl);
+                    value = 2;
                 }
             }
         }
