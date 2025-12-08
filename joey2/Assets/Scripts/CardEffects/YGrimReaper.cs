@@ -26,7 +26,11 @@ public class YGrimReaper : YDefaultEffect
     {
         if (buffType == EBuffType.Counter)
         {
-            value--;
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
+            {
+                value--;
+            }
         }
         return value;
     }

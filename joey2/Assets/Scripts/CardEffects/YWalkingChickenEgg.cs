@@ -24,10 +24,14 @@ public class YWalkingChickenEgg : YDefaultEffect
     {
         if (buffType == EBuffType.Counter)
         {
-            value--;
-            if (value == 0)
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                YActionSystem.Instance.DispatchAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
+                value--;
+                if (value == 0)
+                {
+                    YActionSystem.Instance.DispatchAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
+                }
             }
         }
         return value;

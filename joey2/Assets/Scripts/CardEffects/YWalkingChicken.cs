@@ -22,10 +22,14 @@ public class YWalkingChicken : YDefaultEffect
     {
         if (buffType == EBuffType.Counter)
         {
-            value--;
-            if (value == 0)
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                YActionSystem.Instance.DispatchAction(EActionId.MoveEnvCardLeft, CardControl);
+                value--;
+                if (value == 0)
+                {
+                    YActionSystem.Instance.DispatchAction(EActionId.MoveEnvCardLeft, CardControl);
+                }
             }
         }
         return value;

@@ -20,9 +20,12 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 			{
 				CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
 
-				int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+				{
+					int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
+					int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
+					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+				}, 0.3f);
 			}
 		}
 		return base.OnBecomeTopOfPile();
@@ -35,9 +38,14 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 			if (JoeyGameControl.Instance.HasEnemy())
 			{
 				CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
-				int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+
+				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+		   		{
+					   int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
+					   int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
+					   YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+		   		}, 0.3f);
+
 			}
 		}
 		return base.OnEnterBag();
