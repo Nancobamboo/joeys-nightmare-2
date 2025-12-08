@@ -1,10 +1,10 @@
 // Scripts/CardEffects/Effects/YThrowWeaponToStack_OnDefence.cs
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using Cysharp.Threading.Tasks;
 using Random = UnityEngine.Random;
 
 public class YThrowWeaponToStack_OnDefence : YCardEffect
@@ -28,7 +28,7 @@ public class YThrowWeaponToStack_OnDefence : YCardEffect
 
 	public override float OnRemoveCard()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv, CardControl);
+		YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv);
 		return 0f;
 	}
 }
@@ -45,32 +45,13 @@ public partial class UIGamePhaseControl
 		return false;
 	}
 
-	async void ThrowWeaponToEnv(UICardSimpleControl cardControl)
+	async void ThrowWeaponToEnv()
 	{
-		// check env card count number
-		int envCardCount = 0;
-		foreach (var kvp in m_EnvCardDict)
-		{
-			envCardCount += kvp.Value.Count;
-		}
-		Debug.Log("ThrowWeaponToEnv env card count before: " + envCardCount);
-		Debug.Log("ThrowWeaponToEnv discard card count before: " + UsedCardList.Count);
 		UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
-		// 王者盾牌不触发
 		if (weaponCard != null && weaponCard.CardData.id != "1016")
 		{
-			// 等待所有伤害结算完成，确保动画在正确的时机播放
-			await UniTask.Yield();
 			await AddEnvCardFromBagAsync(weaponCard);
-			// weaponCard.Return();
 		}
-		envCardCount = 0;
-		foreach (var kvp in m_EnvCardDict)
-		{
-			envCardCount += kvp.Value.Count;
-		}
-		Debug.Log("ThrowWeaponToEnv env card count after: " + envCardCount);
-		Debug.Log("ThrowWeaponToEnv discard card count after: " + UsedCardList.Count);
 	}
 
 	private async UniTask AddEnvCardFromBagAsync(UICardSimpleControl cardControl)

@@ -4,10 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
-using Cysharp.Threading.Tasks;
 using Random = UnityEngine.Random;
 
 public partial class UIGamePhaseControl : YViewControl
@@ -27,6 +27,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private Transform[] m_EffectRoots;
 	private Queue<UICardSimpleControl> m_CardActionQueue = new Queue<UICardSimpleControl>();
 	public UICardSimpleControl CurrentEffectCard;
+	public List<UICardSimpleControl> CardActionQueueDebug = new List<UICardSimpleControl>();
 	private Dictionary<UICardSimpleControl, CancellationTokenSource> m_CardCtsDict = new Dictionary<UICardSimpleControl, CancellationTokenSource>();
 	private CancellationTokenSource m_ShakeScreenCts;
 	private CancellationTokenSource m_MoveBagCardsCts;
@@ -848,8 +849,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	void ThrowWeaponToEnv(object[] paraArray)
 	{
-		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		ThrowWeaponToEnv(cardControl);
+		ThrowWeaponToEnv();
 	}
 	void ThrowWeaponDefenceToEnv(object[] paraArray)
 	{
@@ -1519,6 +1519,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (cardControl.gameObject.activeSelf)
 			{
 				m_CardActionQueue.Enqueue(cardControl);
+				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
 			}
 			CheckAndSpawnKeyPath();
 		}
@@ -1537,6 +1538,7 @@ public partial class UIGamePhaseControl : YViewControl
 		if (CurrentEffectCard == null && m_CardActionQueue.Count > 0)
 		{
 			CurrentEffectCard = m_CardActionQueue.Dequeue();
+			CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
 			if (CurrentEffectCard != null)
 			{
 				GetOrCreateCardToken(CurrentEffectCard);
@@ -1618,6 +1620,7 @@ public partial class UIGamePhaseControl : YViewControl
 			RemoveCardCts(cardControl);
 			cardControl.Return();
 		}
+		CardActionQueueDebug = null;
 
 	}
 

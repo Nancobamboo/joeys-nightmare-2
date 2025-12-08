@@ -10,9 +10,9 @@ public class YAnswerSpringGreen : YDefaultEffect
 
     public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
-        if (CardControl != null && effectType == EEffectType.Damage)
+        //if (effectType == EEffectType.Damage)
         {
-            YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv, CardControl);
+            YActionSystem.Instance.DispatchAction(EActionId.ThrowWeaponToEnv);
         }
         return base.OnTakeDamage(effectType, damage);
     }
