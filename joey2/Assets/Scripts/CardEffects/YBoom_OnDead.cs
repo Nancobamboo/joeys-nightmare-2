@@ -1,10 +1,10 @@
 // Scripts/CardEffects/Effects/YBoom_OnKill.cs
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
-using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YBoom_OnDead : YCardEffect
 {
@@ -52,12 +52,6 @@ public partial class UIGamePhaseControl
 {
 	public async UniTask BoomEnvCardAtPosition(int envIndex, int boomDamage, bool isExcludeSelf)
 	{
-		Debug.Log("BoomEnvCard: envIndex = " + envIndex);
-		foreach (KeyValuePair<int, List<UICardSimpleControl>> kvp in m_EnvCardDict)
-		{
-			Debug.Log("BoomEnvCard: envIndex = " + kvp.Key + " " + kvp.Value.Count);
-		}
-
 		int[] indices;
 		if (isExcludeSelf)
 		{
@@ -71,15 +65,16 @@ public partial class UIGamePhaseControl
 		for (int i = 0; i < indices.Length; i++)
 		{
 			int index = indices[i];
-			if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
+			if (index < 0 || index >= m_EnvPanels.Count)
 			{
-				if (cardList != null && cardList.Count > 0)
-				{
-					UICardSimpleControl lastCard = cardList[cardList.Count - 1];
-					CancellationToken token = GetOrCreateCardToken(lastCard);
-					await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom, token);
-					RemoveCardCts(lastCard);
-				}
+				continue;
+			}
+			UICardSimpleControl lastCard = GetLastEnvCard(index);
+			if (lastCard != null && lastCard.gameObject.activeSelf)
+			{
+				CancellationToken token = GetOrCreateCardToken(lastCard);
+				await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom, token);
+				RemoveCardCts(lastCard);
 			}
 		}
 	}

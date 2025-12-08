@@ -221,6 +221,10 @@ public partial class UIGamePhaseControl : YViewControl
 		ClearAllCard();
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
+		if (m_KeyPathCardCache != null)
+		{
+			m_KeyPathCardCache.gameObject.SetActive(false);
+		}
 		m_KeyPathSpawned = false;
 	}
 
@@ -355,6 +359,10 @@ public partial class UIGamePhaseControl : YViewControl
 		ClearGrimReaperData();
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
+		if (m_KeyPathCardCache != null)
+		{
+			m_KeyPathCardCache.gameObject.SetActive(false);
+		}
 		m_KeyPathSpawned = false;
 	}
 

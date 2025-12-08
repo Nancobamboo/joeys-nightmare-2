@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Cysharp.Threading.Tasks;
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 {
@@ -30,14 +30,17 @@ public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
-			CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
-
-			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+			if (JoeyGameControl.Instance.HasEnemy())
 			{
-				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
-			}, 0.4f);
+				CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+
+				int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
+				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
+				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+				{
+					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+				}, 0.3f);
+			}
 		}
 		return base.OnBecomeTopOfPile();
 	}
@@ -46,13 +49,16 @@ public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 	{
 		if (CardControl != null && CardControl.CardData != null)
 		{
-			CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
-			int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-			int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+			if (JoeyGameControl.Instance.HasEnemy())
 			{
-				YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
-			}, 0.4f);
+				CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+				int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
+				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
+				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+				{
+					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+				}, 0.3f);
+			}
 		}
 		return base.OnEnterBag();
 	}
