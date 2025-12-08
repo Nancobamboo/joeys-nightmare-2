@@ -20,15 +20,19 @@ public class YGhost : YDefaultEffect
 
     public override int OnBuffValueChange(EBuffType buffType, int value)
     {
-        if (buffType == EBuffType.Counter && value == 0)
+        if (buffType == EBuffType.Counter)
         {
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                if (CardControl.CardData != null)
+                value--;
+                if (value == 0)
                 {
-                    int attack = CardControl.CardData.currentAttack;
-                    YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
+                    if (CardControl.CardData != null)
+                    {
+                        int attack = CardControl.CardData.currentAttack;
+                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
+                    }
                 }
             }
         }
