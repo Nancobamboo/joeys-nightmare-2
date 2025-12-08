@@ -29,6 +29,7 @@ public partial class UIGamePhaseControl : YViewControl
 	public UICardSimpleControl CurrentEffectCard;
 	public List<UICardSimpleControl> CardActionQueueDebug = new List<UICardSimpleControl>();
 	private Dictionary<UICardSimpleControl, CancellationTokenSource> m_CardCtsDict = new Dictionary<UICardSimpleControl, CancellationTokenSource>();
+	public List<UICardSimpleControl> CardCtsDictDebug = new List<UICardSimpleControl>();
 	private CancellationTokenSource m_ShakeScreenCts;
 	private CancellationTokenSource m_MoveBagCardsCts;
 	private bool IsEnvDirty = false;
@@ -1520,6 +1521,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				m_CardActionQueue.Enqueue(cardControl);
 				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
+				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
 			}
 			CheckAndSpawnKeyPath();
 		}
@@ -1539,6 +1541,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			CurrentEffectCard = m_CardActionQueue.Dequeue();
 			CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
+			CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
 			if (CurrentEffectCard != null)
 			{
 				GetOrCreateCardToken(CurrentEffectCard);
@@ -1621,6 +1624,7 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.Return();
 		}
 		CardActionQueueDebug = null;
+		CardCtsDictDebug = null;
 
 	}
 
