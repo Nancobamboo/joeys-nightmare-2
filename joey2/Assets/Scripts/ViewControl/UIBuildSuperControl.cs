@@ -28,6 +28,7 @@ public class UIBuildSuperControl : YViewControl
         m_EquipedItemArray = new RectTransform[] { m_View.item1, m_View.item2, m_View.item3, m_View.item4, m_View.item5, m_View.item6, m_View.item7 };
         m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
         m_CurrentCardType = ECardType.other;
+        RegistAction(EActionId.OnCoinChange, OnCoinChange);
     }
     void OnBtnAttackClick()
     {
@@ -135,6 +136,19 @@ public class UIBuildSuperControl : YViewControl
         }
 
         RefreshEquipedCardsByType(ECardType.attack);
+        UpdateTxtCoin();
+    }
+
+    void OnCoinChange(object[] paraArray)
+    {
+        int coin = (int)paraArray[0];
+        UpdateTxtCoin();
+    }
+
+    void UpdateTxtCoin()
+    {
+        int sellCost = GetSellCardCost();
+        m_View.TxtCoin.text = sellCost.ToString();
     }
 
     public void SaveBuild(ECardType cardType)
@@ -236,6 +250,7 @@ public class UIBuildSuperControl : YViewControl
         m_SellCardCount++;
         Debug.Log($"卖卡成功！花费 {sellCost} 金币，当前卖卡次数: {m_SellCardCount}");
 
+        UpdateTxtCoin();
         DataSystem.Instance.SaveDataJoeyPlayer();
 
         RectTransform rectTransform2 = draggedCard.CacheTrans as RectTransform;
@@ -309,7 +324,6 @@ public class UIBuildSuperControl : YViewControl
     protected override void OnReturn()
     {
         EquipedCardList.Clear();
-
         base.OnReturn();
     }
 }

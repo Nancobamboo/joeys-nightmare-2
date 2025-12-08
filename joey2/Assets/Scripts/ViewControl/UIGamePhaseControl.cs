@@ -824,20 +824,21 @@ public partial class UIGamePhaseControl : YViewControl
 	private int FindRandomEnemy()
 	{
 		List<int> enemyIndices = new List<int>();
-		foreach (var kvp in m_EnvCardDict)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
 		{
-			if (kvp.Value != null && kvp.Value.Count > 0)
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster && lastCard.CardData.currentHealth > 0)
 			{
-				UICardSimpleControl lastCard = kvp.Value[kvp.Value.Count - 1];
-				if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster && lastCard.CardData.currentHealth > 0)
-				{
-					enemyIndices.Add(kvp.Key);
-				}
+				enemyIndices.Add(i);
 			}
 		}
 		if (enemyIndices.Count == 0)
 		{
 			return -1;
+		}
+		if (enemyIndices.Count == 1)
+		{
+			return enemyIndices[0];
 		}
 		return enemyIndices[Random.Range(0, enemyIndices.Count)];
 	}
