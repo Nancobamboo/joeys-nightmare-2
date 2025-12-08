@@ -628,6 +628,15 @@ public class JoeyGameControl : YViewControl
 		return false;
 	}
 
+	public bool HasEnemy()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.HasEnemy();
+		}
+		return false;
+	}
+
 	public bool IsPlayerHalfHealth()
 	{
 		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;

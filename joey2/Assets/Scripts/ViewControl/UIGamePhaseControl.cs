@@ -607,6 +607,11 @@ public partial class UIGamePhaseControl : YViewControl
 		return cardList != null && cardList.Count > 0;
 	}
 
+	public bool HasEnemy()
+	{
+		return FindRandomEnemy() != -1;
+	}
+
 
 	private UICardSimpleControl GetFistCard()
 	{
@@ -1174,7 +1179,7 @@ public partial class UIGamePhaseControl : YViewControl
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 		float delayTime;
-		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0.5f;
+		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
