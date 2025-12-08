@@ -702,6 +702,7 @@ public partial class UIGamePhaseControl : YViewControl
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 			RemoveCardCts(cardControl);
+			CheckAndSpawnKeyPath();
 
 			if (dropCards != null && dropCards.Count > 0)
 			{
