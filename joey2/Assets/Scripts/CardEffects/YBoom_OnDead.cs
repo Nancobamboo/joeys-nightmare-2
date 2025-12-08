@@ -32,7 +32,7 @@ public class YBoom_OnDead : YCardEffect
 
 	public override float OnDead()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, m_EnvIndex, baseExtra, true);
+		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, m_EnvIndex, baseExtra, true, CardControl);
 		return 0f;
 	}
 

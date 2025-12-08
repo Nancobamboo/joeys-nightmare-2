@@ -242,7 +242,14 @@ public class UIShopSuperControl : YViewControl
         if (delta != 0)
         {
             UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
-            damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
+            if (delta > 0)
+            {
+                damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
+            }
+            else
+            {
+                damageTextControl.SetData(-delta, Asset.UIRoot, Vector3.zero, true);
+            }
             damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
         }
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class YMimicChest : YCardEffect
+public class YMimicChest : YDefaultEffect
 {
     public int baseExtra;
     private Card m_RealCard;
@@ -30,7 +30,7 @@ public class YMimicChest : YCardEffect
         }
     }
 
-    public override float OnDealDamage()
+    public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
         if (CardControl != null && m_RealCard != null && !m_IsRevealed)
         {
