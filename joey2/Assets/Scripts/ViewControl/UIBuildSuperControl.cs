@@ -10,6 +10,7 @@ public class UIBuildSuperControl : YViewControl
     private RectTransform[] m_EquipedItemArray;
     private DataJoeyPlayer m_PlayerData;
     public ECardType m_CurrentCardType;
+    private int m_SellCardCount = 0;
 
     public static EResType GetResType()
     {
@@ -215,25 +216,45 @@ public class UIBuildSuperControl : YViewControl
         Card card = draggedCard.CardData;
         string cardId = card.id;
 
-        m_PlayerData.RemoveEnvCardPoolData(cardId);
+        int sellCost = GetSellCardCost();
+        if (m_PlayerData.Coin < sellCost)
+        {
+            Debug.Log($"金币不足！卖卡需要 {sellCost} 金币，当前只有 {m_PlayerData.Coin} 金币");
+            RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
+            if (rectTransform != null)
+            {
+                if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
+                {
+                    rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+                }
+            }
+            return;
+        }
 
-        int halfPrice = Mathf.RoundToInt(card.price / 2f);
-        DataSystem.Instance.AddCoin(halfPrice);
+        m_PlayerData.RemoveEnvCardPoolData(cardId);
+        DataSystem.Instance.AddCoin(-sellCost);
+        m_SellCardCount++;
+        Debug.Log($"卖卡成功！花费 {sellCost} 金币，当前卖卡次数: {m_SellCardCount}");
 
         DataSystem.Instance.SaveDataJoeyPlayer();
 
-        RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
-        if (rectTransform != null)
+        RectTransform rectTransform2 = draggedCard.CacheTrans as RectTransform;
+        if (rectTransform2 != null)
         {
             if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
             {
-                rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+                rectTransform2.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
             }
         }
 
         draggedCard.gameObject.SetActive(false);
 
         RefreshEquipedCardsByType(m_CurrentCardType);
+    }
+
+    private int GetSellCardCost()
+    {
+        return 50 * (m_SellCardCount + 1);
     }
 
     private void OnCardDragEndSwap(UIBuildCardNewControl draggedCard, int targetItemIndex)

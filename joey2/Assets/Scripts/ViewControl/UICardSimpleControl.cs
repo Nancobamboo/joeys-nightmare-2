@@ -575,6 +575,7 @@ public class UICardSimpleControl : YViewControl
 
 	public void SetData(Card card, bool isEnv = false, int envIndex = -1)
 	{
+		this.name = card.cardName;
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)
 		{
