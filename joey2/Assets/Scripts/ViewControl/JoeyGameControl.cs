@@ -655,6 +655,18 @@ public class JoeyGameControl : YViewControl
 		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;
 	}
 
+	/// <summary>
+	/// 获取当前攻击目标的卡牌控制器（用于斩杀之刃等效果）
+	/// </summary>
+	public UICardSimpleControl GetCurrentAttackTarget()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.GetCurrentAttackTarget();
+		}
+		return null;
+	}
+
 	public void ShowGameOver()
 	{
 		if (m_GameOverControl == null)

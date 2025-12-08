@@ -97,6 +97,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.DealSplashDamage, DealSplashDamage);
 		RegistAction(EActionId.KingShieldSwitchToShield, KingShieldSwitchToShield);
 		RegistAction(EActionId.KingShieldSwitchToSword, KingShieldSwitchToSword);
+		RegistAction(EActionId.BloodStorageActivate, BloodStorageActivate);
+		RegistAction(EActionId.BloodStorageDeduct, BloodStorageDeduct);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -976,6 +978,8 @@ public partial class UIGamePhaseControl : YViewControl
 		// 创建新的盾牌卡(2011)并加入防御牌堆
 		string shieldCardId = "2011";
 		Card newCard = CreateCard(shieldCardId);
+		var description = newCard.description;
+		newCard.description = description.Substring(0, description.Length - 1) + (1 - currentSwitchCount);
 		ECardType cardType = newCard.GetCardType();
 		Transform parent = GetParentByCardType(cardType);
 		if (parent == null)
@@ -1011,6 +1015,8 @@ public partial class UIGamePhaseControl : YViewControl
 		// 创建新的剑卡(1016)并加入攻击牌堆
 		string swordCardId = "1016";
 		Card newCard = CreateCard(swordCardId);
+		var description = newCard.description;
+		newCard.description = description.Substring(0, description.Length - 1) + (1 - currentSwitchCount);
 		ECardType cardType = newCard.GetCardType();
 		Transform parent = GetParentByCardType(cardType);
 		if (parent == null)
@@ -1615,6 +1621,10 @@ public partial class UIGamePhaseControl : YViewControl
 		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
 		{
 			Debug.Log($"[Update] Clearing CurrentEffectCard - card:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
+			
+			// 行动完成后触发血量存储效果的回合恢复
+			TryBloodStorageHeal();
+			
 			CurrentEffectCard = null;
 		}
 		else if (CurrentEffectCard != null)

@@ -52,6 +52,8 @@ public enum EActionId
 	DealSplashDamage,
 	KingShieldSwitchToShield,
 	KingShieldSwitchToSword,
+	BloodStorageActivate,
+	BloodStorageDeduct,
 	Upper,
 
 }

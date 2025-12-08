@@ -62,7 +62,9 @@ public enum ECardEffectId
     BattleFury,
     KingShield_OnAttack,
     KingShield_OnDefense,
-    MimicChest
+    MimicChest,
+    CullingBlade,
+    BloodStorage_UseSkill
 }
 
 public enum EEffectType

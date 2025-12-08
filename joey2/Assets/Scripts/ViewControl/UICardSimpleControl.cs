@@ -588,6 +588,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.MimicChest:
 				effect = new YMimicChest(effectValue);
 				break;
+			case ECardEffectId.CullingBlade:
+				effect = new YCullingBlade();
+				break;
+			case ECardEffectId.BloodStorage_UseSkill:
+				effect = new YBloodStorage_UseSkill();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
