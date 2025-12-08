@@ -2,10 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
-using System.Threading;
 
 public enum ECardType
 {
