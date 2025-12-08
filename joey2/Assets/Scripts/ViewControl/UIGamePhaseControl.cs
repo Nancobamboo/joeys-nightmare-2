@@ -602,7 +602,7 @@ public partial class UIGamePhaseControl : YViewControl
 		return null;
 	}
 
-	private UICardSimpleControl GetLastEnvCard(int envIndex)
+	public UICardSimpleControl GetLastEnvCard(int envIndex)
 	{
 		if (m_EnvCardDict.TryGetValue(envIndex, out List<UICardSimpleControl> cardList))
 		{
@@ -922,12 +922,12 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		UICardSimpleControl cardControl = paraArray.Length > 0 && paraArray[0] is UICardSimpleControl ? (UICardSimpleControl)paraArray[0] : null;
 		int currentSwitchCount = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
-		
+
 		if (cardControl == null)
 		{
 			return;
 		}
-		
+
 		// 创建新的盾牌卡(2011)并加入防御牌堆
 		string shieldCardId = "2011";
 		Card newCard = CreateCard(shieldCardId);
@@ -942,13 +942,13 @@ public partial class UIGamePhaseControl : YViewControl
 		newCardControl.SetData(newCard);
 		AddBagCard(cardType, newCardControl);
 		newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-		
+
 		// 传递切换计数到新卡的 CardEffect
 		if (newCardControl.CardEffect is YKingShield_OnDefense shieldEffect)
 		{
 			shieldEffect.SwitchCount = currentSwitchCount + 1;
 		}
-		
+
 		Debug.Log($"KingShield: 剑切换到盾，当前计数: {currentSwitchCount + 1}");
 	}
 
@@ -957,12 +957,12 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		UICardSimpleControl cardControl = paraArray.Length > 0 && paraArray[0] is UICardSimpleControl ? (UICardSimpleControl)paraArray[0] : null;
 		int currentSwitchCount = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
-		
+
 		if (cardControl == null)
 		{
 			return;
 		}
-		
+
 		// 创建新的剑卡(1016)并加入攻击牌堆
 		string swordCardId = "1016";
 		Card newCard = CreateCard(swordCardId);
@@ -977,13 +977,13 @@ public partial class UIGamePhaseControl : YViewControl
 		newCardControl.SetData(newCard);
 		AddBagCard(cardType, newCardControl);
 		newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-		
+
 		// 传递切换计数到新卡的 CardEffect
 		if (newCardControl.CardEffect is YKingShield_OnAttack swordEffect)
 		{
 			swordEffect.SwitchCount = currentSwitchCount + 1;
 		}
-		
+
 		Debug.Log($"KingShield: 盾切换到剑，当前计数: {currentSwitchCount + 1}");
 	}
 
@@ -1514,7 +1514,10 @@ public partial class UIGamePhaseControl : YViewControl
 					lastCard.UpdateBuffValue();
 				}
 			}
-			m_CardActionQueue.Enqueue(cardControl);
+			if (cardControl.gameObject.activeSelf)
+			{
+				m_CardActionQueue.Enqueue(cardControl);
+			}
 		}
 	}
 
@@ -1603,7 +1606,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		// Fixed column index 2 (center column)
 		int exitColumn = 2;
-		
+
 		Card card = CreateCard(EXIT_CARD_ID);
 		VerticalLayoutGroup parent = m_EnvPanels[exitColumn];
 		UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);

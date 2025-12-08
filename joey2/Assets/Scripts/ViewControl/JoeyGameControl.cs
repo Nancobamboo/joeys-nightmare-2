@@ -637,6 +637,12 @@ public class JoeyGameControl : YViewControl
 		return false;
 	}
 
+	public bool IsCardOnTop(UICardSimpleControl cardControl, int envIndex)
+	{
+		UICardSimpleControl lastCard = m_GamePhaseControl.GetLastEnvCard(envIndex);
+		return lastCard != null && lastCard == cardControl;
+	}
+
 	public bool IsPlayerHalfHealth()
 	{
 		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;

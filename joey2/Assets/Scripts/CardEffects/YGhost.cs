@@ -22,11 +22,14 @@ public class YGhost : YDefaultEffect
     {
         if (buffType == EBuffType.Counter && value == 0)
         {
-            if (CardControl != null && CardControl.CardData != null)
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                int attack = CardControl.CardData.currentAttack;
-                int envIndex = CardControl.EnvIndex;
-                YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
+                if (CardControl.CardData != null)
+                {
+                    int attack = CardControl.CardData.currentAttack;
+                    YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
+                }
             }
         }
         return value;

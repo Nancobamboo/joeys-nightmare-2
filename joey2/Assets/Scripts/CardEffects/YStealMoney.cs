@@ -36,10 +36,14 @@ public class YStealMoney : YDefaultEffect
     {
         if (buffType == EBuffType.Counter)
         {
-            value--;
-            if (value == 0)
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                YActionSystem.Instance.DispatchAction(EActionId.EscapeMonkey, CardControl);
+                value--;
+                if (value == 0)
+                {
+                    YActionSystem.Instance.DispatchAction(EActionId.EscapeMonkey, CardControl);
+                }
             }
         }
         return value;
