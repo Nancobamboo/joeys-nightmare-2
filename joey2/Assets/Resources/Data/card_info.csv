@@ -85,7 +85,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,感恩turkey,3感恩节,monster,抵挡一次致命伤害,9,,19,40,2,GratefulReleaseChicken
 5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,大turkey霸,3感恩节,monster,受击:小概率召唤一只走地鸡蛋,16,,45,80,3,BigChickenBoss:5028
 5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,走地turkey蛋,3感恩节,monster,倒计时2:召唤一只走地鸡,0,,13,15,1,WalkingChickenEgg:5024
-5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,宝箱怪,,monster,,8,,25,40,2,
+5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,宝箱怪,,monster,,8,,25,40,2,MimicChest:5016
 5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,小丑Monkey,,monster,,6,,20,30,1,
 5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,滑板Monkey,,monster,,7,,18,25,1,
 ,,,,,,,,,,,,

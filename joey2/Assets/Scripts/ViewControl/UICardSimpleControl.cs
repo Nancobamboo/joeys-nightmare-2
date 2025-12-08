@@ -276,6 +276,35 @@ public class UICardSimpleControl : YViewControl
 		SetStars(cachedCard.stars);
 	}
 
+	public void UpdateCardDisplay(Card card)
+	{
+		if (card == null)
+		{
+			return;
+		}
+
+		m_View.CardName.text = card.cardName;
+
+		if (!string.IsNullOrEmpty(card.cardImage))
+		{
+			m_View.CardImg.sprite = LoadSprite(card.cardImage);
+		}
+
+		if (cachedCardType == ECardType.monster)
+		{
+			if (m_View.Attack.activeSelf)
+			{
+				m_View.TxtAttack.text = card.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
+			}
+
+			if (m_View.TextHeart != null)
+			{
+				m_View.TextHeart.text = card.currentHealth.ToString();
+			}
+		}
+	}
+
 	public void UpdateBuffValue()
 	{
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
@@ -558,6 +587,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.KingShield_OnDefense:
 				effect = new YKingShield_OnDefense();
+				break;
+			case ECardEffectId.MimicChest:
+				effect = new YMimicChest(effectValue);
 				break;
 			default:
 				return GetDefaultEffect();
