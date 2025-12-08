@@ -1,9 +1,9 @@
 // Scripts/CardEffects/YCardEffect.cs
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Cysharp.Threading.Tasks;
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public enum ECardEffectId
 {
@@ -61,7 +61,8 @@ public enum ECardEffectId
     HolyLight_UseSkill,
     BattleFury,
     KingShield_OnAttack,
-    KingShield_OnDefense
+    KingShield_OnDefense,
+    MimicChest
 }
 
 public enum EEffectType
