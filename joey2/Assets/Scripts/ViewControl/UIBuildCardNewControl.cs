@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIBuildCardNewControl : YViewControl
 {
-	private UIBuildCardNewView m_View;
+    private UIBuildCardNewView m_View;
 
     private Card m_CachedCard;
     private ECardType m_CachedCardType;
@@ -16,6 +16,7 @@ public class UIBuildCardNewControl : YViewControl
     public int EquipIndex;
     public System.Action<UIBuildCardNewControl> BuildClickHandler;
     public System.Action<UIBuildCardNewControl, PointerEventData> OnDragEndHandler;
+    public System.Action<UIBuildCardNewControl> OnBeginDragHandler;
 
     public ECardType CardType => m_CachedCardType;
     public Card CardData => m_CachedCard;
@@ -45,6 +46,10 @@ public class UIBuildCardNewControl : YViewControl
 
     private void OnBeginDrag(GameObject go, PointerEventData eventData)
     {
+        if (OnBeginDragHandler != null)
+        {
+            OnBeginDragHandler(this);
+        }
     }
 
     private void OnDrag(GameObject go, PointerEventData eventData)

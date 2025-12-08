@@ -29,7 +29,7 @@ public class UIBuildNewControl : YViewControl
 		m_View.BtnDefence.onClick.AddListener(OnBtnDefenceClick);
 		m_View.BtnItem.onClick.AddListener(OnBtnItemClick);
 		m_View.BtnSkill.onClick.AddListener(OnBtnSkillClick);
-		m_EquipedItemArray = new RectTransform[] { m_View.item1, m_View.item2, m_View.item3, m_View.item4, m_View.item5, m_View.item6, m_View.item7};
+		m_EquipedItemArray = new RectTransform[] { m_View.item1, m_View.item2, m_View.item3, m_View.item4, m_View.item5, m_View.item6, m_View.item7 };
 		m_PlayerData = DataSystem.Instance.GetDataJoeyPlayer();
 		m_CurrentCardType = ECardType.other;
 	}
@@ -107,6 +107,7 @@ public class UIBuildNewControl : YViewControl
 				{
 					cardControl.gameObject.SetActive(true);
 					cardControl.SetData(card);
+					cardControl.OnBeginDragHandler = OnCardBeginDrag;
 				}
 				else
 				{
@@ -131,6 +132,7 @@ public class UIBuildNewControl : YViewControl
 			cardControl.CacheTrans.localScale = Vector3.one;
 			cardControl.EquipIndex = i;
 			cardControl.OnDragEndHandler = OnCardDragEnd;
+			cardControl.OnBeginDragHandler = OnCardBeginDrag;
 			EquipedCardList.Add(cardControl);
 		}
 
@@ -173,8 +175,19 @@ public class UIBuildNewControl : YViewControl
 		}
 	}
 
+	private void OnCardBeginDrag(UIBuildCardNewControl draggedCard)
+	{
+		if (draggedCard.CardData != null)
+		{
+			int sellPrice = Mathf.RoundToInt(draggedCard.CardData.price / 2f);
+			m_View.TxtCoin.text = sellPrice.ToString();
+		}
+	}
+
 	private void OnCardDragEnd(UIBuildCardNewControl draggedCard, PointerEventData eventData)
 	{
+		m_View.TxtCoin.text = "";
+
 		if (CheckCardInDeleteArea(draggedCard, eventData))
 		{
 			DeleteCard(draggedCard);
