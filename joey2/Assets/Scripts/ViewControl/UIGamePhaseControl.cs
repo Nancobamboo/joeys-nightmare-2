@@ -708,6 +708,9 @@ public partial class UIGamePhaseControl : YViewControl
 				AddEnvDropCard(dropCards, envIndex);
 			}
 
+			// Check if all monsters are cleared and spawn KeyPath
+			CheckAndSpawnKeyPath();
+
 			return true;
 		}
 
