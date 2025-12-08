@@ -35,9 +35,9 @@ public partial class UIGamePhaseControl : YViewControl
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
-	private const string EXIT_CARD_ID = "6001";  // KeyPath card ID
-	private bool m_KeyPathSpawned = false;       // Track if keypath has been spawned this level
-	private int m_CurrentAttackTargetEnvIndex = -1;  // 当前被攻击目标的环境索引，用于溅射伤害
+	private const string EXIT_CARD_ID = "6001";
+	private bool m_KeyPathSpawned = false;
+	private int m_CurrentAttackTargetEnvIndex = -1;
 
 	public static EResType GetResType()
 	{
@@ -217,7 +217,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
-		m_KeyPathSpawned = false;  // Reset keypath flag when setting up new level
+		m_KeyPathSpawned = false;
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -332,7 +332,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UsedCardList.Clear();
 		ClearGrimReaperData();
 		CreateFistCardCache();
-		m_KeyPathSpawned = false;  // Reset keypath flag when setting up new level
+		m_KeyPathSpawned = false;
 	}
 
 	private void RefreshView()
@@ -638,7 +638,6 @@ public partial class UIGamePhaseControl : YViewControl
 			m_EnvCardDict[index] = new List<UICardSimpleControl>();
 		}
 		m_EnvCardDict[index].Add(cardControl);
-		IsEnvDirty = true;
 	}
 
 	private void RemoveEnvCard(int index, UICardSimpleControl cardControl)
@@ -648,7 +647,6 @@ public partial class UIGamePhaseControl : YViewControl
 			cardList.Remove(cardControl);
 			RemoveCardData(cardControl.CardData.UniqueId);
 			cardControl.Return();
-			IsEnvDirty = true;
 		}
 	}
 
@@ -1518,6 +1516,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				m_CardActionQueue.Enqueue(cardControl);
 			}
+			CheckAndSpawnKeyPath();
 		}
 	}
 
@@ -1549,17 +1548,8 @@ public partial class UIGamePhaseControl : YViewControl
 
 	void LateUpdate()
 	{
-		if (IsEnvDirty)
-		{
-			IsEnvDirty = false;
-			UpdateBadMonkeyAttack();
-			CheckAndSpawnKeyPath();
-		}
 	}
 
-	/// <summary>
-	/// Check if environment has any monsters at all (including buried ones)
-	/// </summary>
 	private bool HasAnyMonsterInEnv()
 	{
 		foreach (var kvp in m_EnvCardDict)
@@ -1578,33 +1568,23 @@ public partial class UIGamePhaseControl : YViewControl
 		return false;
 	}
 
-	/// <summary>
-	/// Check if keypath should be spawned and spawn it if conditions are met
-	/// Keypath appears when there are no monsters left in the environment
-	/// </summary>
 	private void CheckAndSpawnKeyPath()
 	{
-		// Skip if keypath already spawned this level
 		if (m_KeyPathSpawned)
 		{
 			return;
 		}
 
-		// Only spawn keypath if no monsters remain
 		if (!HasAnyMonsterInEnv())
 		{
 			SpawnKeyPath();
 		}
 	}
 
-	/// <summary>
-	/// Spawn the KeyPath (exit) card at fixed column index 2 (center)
-	/// </summary>
 	private void SpawnKeyPath()
 	{
 		m_KeyPathSpawned = true;
 
-		// Fixed column index 2 (center column)
 		int exitColumn = 2;
 
 		Card card = CreateCard(EXIT_CARD_ID);

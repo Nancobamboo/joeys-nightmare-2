@@ -643,6 +643,13 @@ public class JoeyGameControl : YViewControl
 		return lastCard != null && lastCard == cardControl;
 	}
 
+	public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
+	{
+		
+			m_GamePhaseControl.UpdateBadMonkeyAttack(cardControl);
+		
+	}
+
 	public bool IsPlayerHalfHealth()
 	{
 		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;

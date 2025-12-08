@@ -20,6 +20,7 @@ public enum ECardType
 public enum EBuffType
 {
 	Counter,
+	UpdateAttack,
 
 	Upper
 }

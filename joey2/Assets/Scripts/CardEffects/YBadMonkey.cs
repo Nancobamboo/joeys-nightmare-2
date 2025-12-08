@@ -12,12 +12,39 @@ public class YBadMonkey : YDefaultEffect
         this.baseExtra = Mathf.Max(0, baseExtra);
         Id = ECardEffectId.BadMonkey;
     }
+
+    public override void SetData(UICardSimpleControl cardControl)
+    {
+        base.SetData(cardControl);
+        if (CardControl != null)
+        {
+            CardControl.AddBuff(EBuffType.UpdateAttack, 1);
+        }
+    }
+
+    public override int OnBuffValueChange(EBuffType buffType, int value)
+    {
+        if (buffType == EBuffType.UpdateAttack)
+        {
+            int envIndex = CardControl.EnvIndex;
+            if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
+            {
+                JoeyGameControl.Instance.UpdateBadMonkeyAttack(CardControl);
+            }
+        }
+        return value;
+    }
 }
 
 public partial class UIGamePhaseControl
 {
-    private void UpdateBadMonkeyAttack()
+    public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
     {
+        if (cardControl == null || cardControl.CardEffect == null || cardControl.CardEffect.Id != ECardEffectId.BadMonkey)
+        {
+            return;
+        }
+
         int monsterCount = 0;
         for (int i = 0; i < m_EnvPanels.Count; i++)
         {
@@ -28,23 +55,16 @@ public partial class UIGamePhaseControl
             }
         }
 
-        for (int i = 0; i < m_EnvPanels.Count; i++)
+        YBadMonkey badMonkeyEffect = cardControl.CardEffect as YBadMonkey;
+        if (badMonkeyEffect != null)
         {
-            UICardSimpleControl lastCard = GetLastEnvCard(i);
-            if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardEffect != null && lastCard.CardEffect.Id == ECardEffectId.BadMonkey)
+            if (badMonkeyEffect.InitialAttack == 0 && cardControl.CardData != null)
             {
-                YBadMonkey badMonkeyEffect = lastCard.CardEffect as YBadMonkey;
-                if (badMonkeyEffect != null)
-                {
-                    if (badMonkeyEffect.InitialAttack == 0 && lastCard.CardData != null)
-                    {
-                        badMonkeyEffect.InitialAttack = lastCard.CardData.attack;
-                    }
-                    Card cardData = lastCard.CardData;
-                    cardData.currentAttack = monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack;
-                    lastCard.RefreshCard();
-                }
+                badMonkeyEffect.InitialAttack = cardControl.CardData.attack;
             }
+            Card cardData = cardControl.CardData;
+            cardData.currentAttack = monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack;
+            cardControl.RefreshCard();
         }
     }
 }
