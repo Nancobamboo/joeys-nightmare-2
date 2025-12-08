@@ -37,6 +37,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private UICardSimpleControl m_FistCardCache;
+	private UICardSimpleControl m_KeyPathCardCache;
 	private const string EXIT_CARD_ID = "6001";
 	private bool m_KeyPathSpawned = false;
 	private int m_CurrentAttackTargetEnvIndex = -1;
@@ -219,6 +220,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
+		CreateKeyPathCardCache();
 		m_KeyPathSpawned = false;
 	}
 
@@ -284,6 +286,24 @@ public partial class UIGamePhaseControl : YViewControl
 		m_FistCardCache = cardControl;
 	}
 
+	private void CreateKeyPathCardCache()
+	{
+		if (m_KeyPathCardCache != null)
+		{
+			return;
+		}
+		Card card = CreateCard(EXIT_CARD_ID);
+		Transform effectRoot2 = GetEffectRoot(2);
+		UICardSimpleControl cardControl = Asset.OpenUI<UICardSimpleControl>(effectRoot2);
+		cardControl.CacheTrans.localPosition = Vector3.zero;
+		cardControl.CacheTrans.localScale = Vector3.one;
+		cardControl.CacheTrans.localEulerAngles = Vector3.zero;
+		cardControl.IsEnv = true;
+		cardControl.SetData(card, isEnv: true, envIndex: 2);
+		cardControl.gameObject.SetActive(false);
+		m_KeyPathCardCache = cardControl;
+	}
+
 	public void ClearEnvCardList()
 	{
 		for (int i = 0; i < m_EnvPanels.Count; i++)
@@ -334,6 +354,7 @@ public partial class UIGamePhaseControl : YViewControl
 		UsedCardList.Clear();
 		ClearGrimReaperData();
 		CreateFistCardCache();
+		CreateKeyPathCardCache();
 		m_KeyPathSpawned = false;
 	}
 
@@ -1595,16 +1616,13 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_KeyPathSpawned = true;
 
-		int exitColumn = 2;
-
-		Card card = CreateCard(EXIT_CARD_ID);
-		VerticalLayoutGroup parent = m_EnvPanels[exitColumn];
-		UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
-		cardControl.SetData(card, isEnv: true, envIndex: exitColumn);
-		AddEnvCard(exitColumn, cardControl);
-		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-
-		Debug.Log($"KeyPath spawned at column {exitColumn} - all monsters cleared!");
+		if (m_KeyPathCardCache != null)
+		{
+			m_KeyPathCardCache.gameObject.SetActive(true);
+			m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
+			m_KeyPathCardCache.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+			Debug.Log($"KeyPath spawned at column 2 - all monsters cleared!");
+		}
 	}
 
 	public void ClearCardQueue()
@@ -1912,5 +1930,6 @@ public partial class UIGamePhaseControl : YViewControl
 		m_DataJoeyPlayer = null;
 		m_EffectRoots = null;
 		m_FistCardCache = null;
+		m_KeyPathCardCache = null;
 	}
 }

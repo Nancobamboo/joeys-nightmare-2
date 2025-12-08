@@ -220,9 +220,6 @@ public class UICardSimpleControl : YViewControl
 
 	public void RefreshCard()
 	{
-		m_View.CardName.text = cachedCard.cardName;
-		m_View.Description.text = cachedCard.description;
-
 		switch (cachedCardType)
 		{
 			case ECardType.attack:
