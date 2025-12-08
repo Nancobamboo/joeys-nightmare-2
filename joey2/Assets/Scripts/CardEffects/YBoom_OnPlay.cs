@@ -1,8 +1,8 @@
 // Scripts/CardEffects/Effects/YBoom_OnPlay.cs
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YBoom_OnPlay : YCardEffect
 {
@@ -18,7 +18,13 @@ public class YBoom_OnPlay : YCardEffect
 
 	public override float OnRemoveCard()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra);
+		if (CardControl != null && JoeyGameControl.Instance.HasEnemy())
+		{
+			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+			{
+				YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, false, CardControl);
+			}, 0.1f);
+		}
 		return 0f;
 	}
 
