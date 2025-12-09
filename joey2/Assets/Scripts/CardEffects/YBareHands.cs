@@ -17,7 +17,7 @@ public class YBareHands : YCardEffect
             var vfxNames = new List<EVFXName> { };
             ECardAnimName animName = ECardAnimName.UI_Carditem_gongji;
             float maxDelayTime = CardControl.PlayVFX(vfxNames, animName, EVFXLife.CardLife);
-            return 0.2f;
+            return 0.3f;
         }
         return base.OnDealDamage();
     }
