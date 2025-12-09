@@ -735,14 +735,12 @@ public partial class UIGamePhaseControl : YViewControl
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 			RemoveCardCts(cardControl);
-			CheckAndSpawnKeyPath();
 
 			if (dropCards != null && dropCards.Count > 0)
 			{
 				AddEnvDropCard(dropCards, envIndex);
 			}
 
-			// Check if all monsters are cleared and spawn KeyPath
 			CheckAndSpawnKeyPath();
 
 			return true;
@@ -843,25 +841,16 @@ public partial class UIGamePhaseControl : YViewControl
 		bool excludeSelf = paraArray.Length > 2 && paraArray[2] is bool && (bool)paraArray[2];
 		UICardSimpleControl boomCard = (UICardSimpleControl)paraArray[3];
 
-		Debug.Log($"[BoomEnvCard] Start - envIndex:{envIndex}, damage:{damage}, boomCard:{boomCard?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
-
 		if (envIndex == -1)
 		{
-			Debug.Log($"[BoomEnvCard] Calling BoomEnvCardRandom");
 			await BoomEnvCardRandom(damage);
-			Debug.Log($"[BoomEnvCard] BoomEnvCardRandom finished");
 		}
 		else
 		{
-			Debug.Log($"[BoomEnvCard] Calling BoomEnvCardAtPosition");
 			await BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
-			Debug.Log($"[BoomEnvCard] BoomEnvCardAtPosition finished");
 		}
 
-		Debug.Log($"[BoomEnvCard] Before RemoveCardCts - boomCard:{boomCard?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 		RemoveCardCts(boomCard);
-		Debug.Log($"[BoomEnvCard] After RemoveCardCts - boomCard:{boomCard?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
-		Debug.Log($"[BoomEnvCard] End");
 	}
 
 	private int FindRandomEnemy()

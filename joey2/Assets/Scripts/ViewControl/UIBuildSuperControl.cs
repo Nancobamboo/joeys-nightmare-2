@@ -135,6 +135,9 @@ public class UIBuildSuperControl : YViewControl
             EquipedCardList.Add(cardControl);
         }
 
+        m_View.TxtCoin.text = "0";
+        m_View.ImgSell.SetActive(false);
+        m_View.ImgDel.SetActive(true);
         RefreshEquipedCardsByType(ECardType.attack);
         UpdateTxtCoin();
     }
@@ -148,7 +151,7 @@ public class UIBuildSuperControl : YViewControl
     void UpdateTxtCoin()
     {
         int sellCost = GetSellCardCost();
-        m_View.TxtCoin.text = sellCost.ToString();
+        m_View.TxtCoin.text = "-" + sellCost.ToString();
     }
 
     public void SaveBuild(ECardType cardType)
