@@ -409,47 +409,8 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
-
-			if (currentStage != null && currentStage.type == EStageType.final)
-			{
-				DataSystem.Instance.isFinishGame = true;
-				ClearAllUniTasks();
-				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
-				return;
-			}
-			else if (currentStage != null && currentStage.type == EStageType.boss)
-			{
-				if (m_GamePhaseControl != null)
-				{
-					m_GamePhaseControl.ClearBagCardList();
-				}
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetRelicData();
-				selectControl.OnSelectComplete = () => Asset.OpenUI<UILobbyControl>();
-			}
-			else if (currentStage != null && currentStage.type == EStageType.elite)
-			{
-				if (m_GamePhaseControl != null)
-				{
-					m_GamePhaseControl.ClearBagCardList();
-				}
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetRelicData();
-				selectControl.OnSelectComplete = () => LoadNextLevel();
-			}
-			else
-			{
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetData();
-				selectControl.OnSelectComplete = () => LoadNextLevel();
-			}
-
-			m_DataJoeyPlayer.StageId++;
-		}
-		else if (GameMode == EGameMode.Env)
-		{
-			int envLevelId = m_DataJoeyPlayer.StageId;
-			EStageType stageType = GetEnvStageType(envLevelId);
+			EStageType stageType = currentStage != null ? currentStage.type : EStageType.normal;
+			StageReward stageReward = GData.Instance.GetStageReward(stageType);
 
 			if (stageType == EStageType.final)
 			{
@@ -458,33 +419,37 @@ public class JoeyGameControl : YViewControl
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
-			else if (stageType == EStageType.boss)
+
+			// Clear bag cards for boss and elite stages
+			if (stageType == EStageType.boss || stageType == EStageType.elite)
 			{
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetRelicData();
-				selectControl.OnSelectComplete = () =>
+				if (m_GamePhaseControl != null)
 				{
-					var ctrl = Asset.OpenUI<UIShopSuperControl>();
-					ctrl.SetData();
-
-				};
+					m_GamePhaseControl.ClearBagCardList();
+				}
 			}
-			else if (stageType == EStageType.elite)
+
+			// Handle rewards based on stage_reward.csv configuration
+			HandleStageReward(stageReward, stageType);
+
+			m_DataJoeyPlayer.StageId++;
+		}
+		else if (GameMode == EGameMode.Env)
+		{
+			int envLevelId = m_DataJoeyPlayer.StageId;
+			EStageType stageType = GetEnvStageType(envLevelId);
+			StageReward stageReward = GData.Instance.GetStageReward(stageType);
+
+			if (stageType == EStageType.final)
 			{
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetRelicData();
-				selectControl.OnSelectComplete = () => LoadNextLevel();
+				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
 			}
-			else
-			{
 
-				UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
-				selectControl.SetData();
-				selectControl.OnSelectComplete = () => LoadNextLevel();
-
-				m_GamePhaseControl.MoveBagCardsToCoinAndShowReward();
-
-			}
+			// Handle rewards based on stage_reward.csv configuration
+			HandleStageRewardEnv(stageReward, stageType);
 
 			m_DataJoeyPlayer.StageId++;
 		}
@@ -503,6 +468,146 @@ public class JoeyGameControl : YViewControl
 		else
 		{
 			LoadNextLevel();
+		}
+	}
+
+	private void HandleStageReward(StageReward stageReward, EStageType stageType)
+	{
+		if (stageReward == null)
+		{
+			// Fallback to default behavior if no config found
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetData();
+			selectControl.OnSelectComplete = () => LoadNextLevel();
+			return;
+		}
+
+		System.Action afterCardSelect = null;
+		System.Action afterRelicSelect = null;
+		System.Action finalAction = null;
+
+		// Determine final action based on hasShop
+		if (stageReward.hasShop)
+		{
+			finalAction = () => Asset.OpenUI<UILobbyControl>();
+		}
+		else
+		{
+			finalAction = () => LoadNextLevel();
+		}
+
+		// Build chain of actions based on configuration
+		if (stageReward.hasRelicSelect)
+		{
+			afterRelicSelect = finalAction;
+		}
+
+		if (stageReward.hasCardSelect)
+		{
+			if (stageReward.hasRelicSelect)
+			{
+				afterCardSelect = () =>
+				{
+					UISelectControl relicControl = Asset.OpenUI<UISelectControl>();
+					relicControl.SetRelicData();
+					relicControl.OnSelectComplete = afterRelicSelect;
+				};
+			}
+			else
+			{
+				afterCardSelect = finalAction;
+			}
+		}
+
+		// Execute the chain
+		if (stageReward.hasCardSelect)
+		{
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetData(stageReward);
+			selectControl.OnSelectComplete = afterCardSelect;
+		}
+		else if (stageReward.hasRelicSelect)
+		{
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetRelicData();
+			selectControl.OnSelectComplete = afterRelicSelect;
+		}
+		else
+		{
+			finalAction?.Invoke();
+		}
+	}
+
+	private void HandleStageRewardEnv(StageReward stageReward, EStageType stageType)
+	{
+		if (stageReward == null)
+		{
+			// Fallback to default behavior if no config found
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetData();
+			selectControl.OnSelectComplete = () => LoadNextLevel();
+			m_GamePhaseControl.MoveBagCardsToCoinAndShowReward();
+			return;
+		}
+
+		System.Action afterCardSelect = null;
+		System.Action afterRelicSelect = null;
+		System.Action finalAction = null;
+
+		// Determine final action based on hasShop
+		if (stageReward.hasShop)
+		{
+			finalAction = () =>
+			{
+				var ctrl = Asset.OpenUI<UIShopSuperControl>();
+				ctrl.SetData();
+			};
+		}
+		else
+		{
+			finalAction = () => LoadNextLevel();
+		}
+
+		// Build chain of actions based on configuration
+		if (stageReward.hasRelicSelect)
+		{
+			afterRelicSelect = finalAction;
+		}
+
+		if (stageReward.hasCardSelect)
+		{
+			if (stageReward.hasRelicSelect)
+			{
+				afterCardSelect = () =>
+				{
+					UISelectControl relicControl = Asset.OpenUI<UISelectControl>();
+					relicControl.SetRelicData();
+					relicControl.OnSelectComplete = afterRelicSelect;
+				};
+			}
+			else
+			{
+				afterCardSelect = finalAction;
+			}
+		}
+
+		// Execute the chain
+		if (stageReward.hasCardSelect)
+		{
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetData(stageReward);
+			selectControl.OnSelectComplete = afterCardSelect;
+			m_GamePhaseControl.MoveBagCardsToCoinAndShowReward();
+		}
+		else if (stageReward.hasRelicSelect)
+		{
+			UISelectControl selectControl = Asset.OpenUI<UISelectControl>();
+			selectControl.SetRelicData();
+			selectControl.OnSelectComplete = afterRelicSelect;
+		}
+		else
+		{
+			finalAction?.Invoke();
 		}
 	}
 
