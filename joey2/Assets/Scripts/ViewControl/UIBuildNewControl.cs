@@ -136,6 +136,9 @@ public class UIBuildNewControl : YViewControl
 			EquipedCardList.Add(cardControl);
 		}
 
+		m_View.TxtCoin.text = "0";
+		m_View.ImgSell.SetActive(true);
+		m_View.ImgDel.SetActive(false);
 		RefreshEquipedCardsByType(ECardType.attack);
 	}
 

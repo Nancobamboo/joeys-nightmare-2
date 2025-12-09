@@ -23,6 +23,8 @@ public class UIBuildNewView : YBaseView
 	public GameObject SelectItem;
 	public GameObject SelectSkill;
 	public Text TxtCoin;
+	public GameObject ImgSell;
+	public GameObject ImgDel;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -48,5 +50,7 @@ public class UIBuildNewView : YBaseView
 		SelectItem = viewItemList[16].Target.gameObject;
 		SelectSkill = viewItemList[17].Target.gameObject;
 		TxtCoin = viewItemList[18].Target.GetComponent<Text>();
+		ImgSell = viewItemList[19].Target.gameObject;
+		ImgDel = viewItemList[20].Target.gameObject;
 	}
 }
