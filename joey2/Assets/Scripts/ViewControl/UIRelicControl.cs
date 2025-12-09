@@ -73,8 +73,10 @@ public class UIRelicControl : YViewControl
 		m_RelicInfo = relicInfo;
 		if (m_RelicInfo != null)
 		{
-			m_View.ImgRelic.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.RelicImage.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.IconImage.sprite = LoadSprite(m_RelicInfo.iconImage);
 			m_View.TxtName.text = m_RelicInfo.name;
+			m_View.Tombstone.sprite = LoadSprite(m_RelicInfo.tombstoneImage);
 		}
 	}
 

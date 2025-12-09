@@ -940,6 +940,8 @@ public sealed class GData : PureSingleton<GData>
 		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
 		int CardImageIdx = idx.ContainsKey("cardImage") ? idx["cardImage"] : -1;
 		int NameIdx = idx.ContainsKey("name") ? idx["name"] : -1;
+		int iconImageIdx = idx.ContainsKey("iconImage") ? idx["iconImage"] : -1;
+		int starsIdx = idx.ContainsKey("stars") ? idx["stars"] : -1;
 		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
@@ -968,10 +970,11 @@ public sealed class GData : PureSingleton<GData>
 			if (id == 0) continue;
 
 			string cardImage = Get(CardImageIdx);
+			string iconImage = Get(iconImageIdx);
 			string name = Get(NameIdx);
 			string description = Get(DescriptionIdx);
-
-			RelicInfo relicInfo = new RelicInfo(id, cardImage, name, description);
+			int stars = GetInt(starsIdx, 0);
+			RelicInfo relicInfo = new RelicInfo(id, cardImage, iconImage, name, description, stars);
 			RelicInfoDict[id] = relicInfo;
 		}
 

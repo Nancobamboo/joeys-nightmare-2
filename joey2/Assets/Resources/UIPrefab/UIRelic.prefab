@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4106428091564158415}
   - component: {fileID: 5078805491233775614}
   m_Layer: 5
-  m_Name: Relic
+  m_Name: RelicImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -244,6 +244,14 @@ MonoBehaviour:
     Components:
     - {fileID: 5554635374360067061}
     VarNameArray: []
+  - Target: {fileID: 2088782900263316101}
+    Components:
+    - {fileID: 3245880658304509604}
+    VarNameArray: []
+  - Target: {fileID: 9201592860930358944}
+    Components:
+    - {fileID: 5078805491233775614}
+    VarNameArray: []
 --- !u!1 &2029241214267709006
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,7 +339,7 @@ GameObject:
   - component: {fileID: 8999821920836105085}
   - component: {fileID: 8106014444681935327}
   m_Layer: 5
-  m_Name: ImgRelic
+  m_Name: IconImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
