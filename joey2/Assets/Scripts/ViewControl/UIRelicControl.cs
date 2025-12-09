@@ -11,7 +11,7 @@ public class UIRelicControl : YViewControl
 
 	public RelicInfo RelicData => m_RelicInfo;
 	public System.Action<UIRelicControl> SelectClickHandler;
-	public Transform ImgRelicTransform => m_View.ImgRelic.transform;
+	public Transform ImgRelicTransform => m_View.RelicImage.transform;
 
 	public static EResType GetResType()
 	{
@@ -73,8 +73,10 @@ public class UIRelicControl : YViewControl
 		m_RelicInfo = relicInfo;
 		if (m_RelicInfo != null)
 		{
-			m_View.ImgRelic.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.RelicImage.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.IconImage.sprite = LoadSprite(m_RelicInfo.iconImage);
 			m_View.TxtName.text = m_RelicInfo.name;
+			m_View.Tombstone.sprite = LoadSprite(m_RelicInfo.tombstoneImage);
 		}
 	}
 
@@ -83,7 +85,7 @@ public class UIRelicControl : YViewControl
 		m_RelicInfo = relicInfo;
 		if (m_RelicInfo != null)
 		{
-			m_View.ImgRelic.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.RelicImage.sprite = LoadSprite(m_RelicInfo.cardImage);
 			m_View.CardItem.SetActive(false);
 			m_View.TxtName.gameObject.SetActive(false);
 		}

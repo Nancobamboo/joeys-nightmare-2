@@ -4,21 +4,25 @@ using UnityEngine.UI;
 
 public class UIRelicView : YBaseView
 {
-	public Image ImgRelic;
+	public Image IconImage;
 	public Text TxtName;
 	public Button BtnRelic;
 	public EventTriggerListener Trigger;
 	public GameObject CardItem;
+	public Image Tombstone;
+	public Image RelicImage;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
 		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
 		if(viewItemList == null || viewItemList.Count == 0) return;
-		ImgRelic = viewItemList[0].Target.GetComponent<Image>();
+		IconImage = viewItemList[0].Target.GetComponent<Image>();
 		TxtName = viewItemList[1].Target.GetComponent<Text>();
 		BtnRelic = viewItemList[2].Target.GetComponent<Button>();
 		Trigger = viewItemList[2].Target.GetComponent<EventTriggerListener>();
 		CardItem = viewItemList[3].Target.gameObject;
+		Tombstone = viewItemList[4].Target.GetComponent<Image>();
+		RelicImage = viewItemList[5].Target.GetComponent<Image>();
 	}
 }
