@@ -168,10 +168,12 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			if (isHeal)
 			{
+				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_HuiXue, transform, DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_HuiXue));
 				m_View.JoeyAnim.Play("happy");
 			}
 			else
 			{
+				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_joey_souji, transform, DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_joey_souji));
 				m_View.JoeyAnim.Play("fear");
 			}
 		}
@@ -839,7 +841,7 @@ public partial class UIGamePhaseControl : YViewControl
 		int envIndex = (int)paraArray[0];
 		int damage = (int)paraArray[1];
 		bool excludeSelf = paraArray.Length > 2 && paraArray[2] is bool && (bool)paraArray[2];
-		UICardSimpleControl boomCard = (UICardSimpleControl)paraArray[3];
+		//UICardSimpleControl boomCard = (UICardSimpleControl)paraArray[3];
 
 		if (envIndex == -1)
 		{
@@ -850,7 +852,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
 		}
 
-		RemoveCardCts(boomCard);
+		//RemoveCardCts(boomCard);
 	}
 
 	private int FindRandomEnemy()
@@ -1601,7 +1603,7 @@ public partial class UIGamePhaseControl : YViewControl
 			CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
 			if (CurrentEffectCard != null)
 			{
-				Debug.Log($"[Update] New CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
+				//Debug.Log($"[Update] New CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 				GetOrCreateCardToken(CurrentEffectCard);
 				CurrentEffectCard.OnBtnRealClick();
 			}
@@ -1609,11 +1611,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
 		{
-			Debug.Log($"[Update] Clearing CurrentEffectCard - card:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
-			
-			// 行动完成后触发血量存储效果的回合恢复
+			//Debug.Log($"[Update] Clearing CurrentEffectCard - card:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
+
+
 			TryBloodStorageHeal();
-			
+
 			CurrentEffectCard = null;
 		}
 		else if (CurrentEffectCard != null)

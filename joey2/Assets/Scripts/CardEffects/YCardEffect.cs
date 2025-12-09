@@ -91,6 +91,9 @@ public enum EVFXName
     VFX_LeiDan,
     VFX_Shouji,
     VFX_Fanjia, //仞甲
+    VFX_joey_souji,
+    VFX_HuiXue,
+    VFX_FanJia_shouji
 }
 
 public enum ECardAnimName
