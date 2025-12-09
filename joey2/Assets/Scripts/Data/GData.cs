@@ -17,6 +17,7 @@ public sealed class GData : PureSingleton<GData>
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
 	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
 	public Dictionary<int, RelicInfo> RelicInfoDict { get; private set; } = new Dictionary<int, RelicInfo>();
+	public Dictionary<EStageType, StageReward> StageRewardDict { get; private set; } = new Dictionary<EStageType, StageReward>();
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
@@ -26,6 +27,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_KeywordCsvPath = "Data/keyword";
 	private string m_RelicInfoCsvPath = "Data/relic_info";
 	private string m_EnvStageCsvPath = "Data/env_stage";
+	private string m_StageRewardCsvPath = "Data/stage_reward";
 
 	// Separated equipment deck config files
 	private static readonly string[] m_EquipmentDeckCsvPaths = new string[]
@@ -60,6 +62,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadKeyword();
 		LoadRelicInfo();
 		LoadEnvStage();
+		LoadStageReward();
 	}
 
 	public void SaveAll()
@@ -1019,6 +1022,109 @@ public sealed class GData : PureSingleton<GData>
 			Debug.Log("CheckKeywordInDescription result: " + r);
 		}
 		return result;
+	}
+
+	public void LoadStageReward(bool force = false)
+	{
+		if (!force && StageRewardDict.Count > 0) return;
+
+		StageRewardDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_StageRewardCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Stage reward CSV not found: {m_StageRewardCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
+		int HasCardSelectIdx = idx.ContainsKey("has_card_select") ? idx["has_card_select"] : -1;
+		int CardStarRatesIdx = idx.ContainsKey("card_star_rates") ? idx["card_star_rates"] : -1;
+		int HasRelicSelectIdx = idx.ContainsKey("has_relic_select") ? idx["has_relic_select"] : -1;
+		int HasShopIdx = idx.ContainsKey("has_shop") ? idx["has_shop"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			bool GetBool(int index, bool defaultValue = false)
+			{
+				string value = Get(index).ToLower();
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				return value == "true" || value == "1" || value == "yes";
+			}
+
+			string typeStr = Get(TypeIdx);
+			if (string.IsNullOrEmpty(typeStr)) continue;
+
+			if (!System.Enum.TryParse<EStageType>(typeStr, true, out EStageType stageType))
+			{
+				Debug.LogWarning($"Invalid stage type: {typeStr}");
+				continue;
+			}
+
+			StageReward stageReward = new StageReward();
+			stageReward.type = stageType;
+			stageReward.hasCardSelect = GetBool(HasCardSelectIdx, false);
+			stageReward.hasRelicSelect = GetBool(HasRelicSelectIdx, false);
+			stageReward.hasShop = GetBool(HasShopIdx, false);
+
+			// Parse card star rates (format: "1:60;2:30;3:10")
+			string cardStarRatesStr = Get(CardStarRatesIdx);
+			if (!string.IsNullOrWhiteSpace(cardStarRatesStr))
+			{
+				string[] ratePairs = cardStarRatesStr.Split(new char[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries);
+				foreach (string ratePair in ratePairs)
+				{
+					string[] parts = ratePair.Split(':');
+					if (parts.Length == 2)
+					{
+						if (int.TryParse(parts[0].Trim(), out int star) && int.TryParse(parts[1].Trim(), out int rate))
+						{
+							stageReward.cardStarRates[star] = rate;
+						}
+					}
+				}
+			}
+
+			StageRewardDict[stageType] = stageReward;
+		}
+
+		Debug.Log($"Stage reward loaded: {StageRewardDict.Count} stage types");
+	}
+
+	public StageReward GetStageReward(EStageType stageType)
+	{
+		LoadStageReward();
+		if (StageRewardDict.TryGetValue(stageType, out StageReward stageReward))
+		{
+			return stageReward;
+		}
+		Debug.LogWarning($"Stage reward not found for type: {stageType}");
+		return null;
 	}
 
 }

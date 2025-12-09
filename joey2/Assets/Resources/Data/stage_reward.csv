@@ -1,0 +1,5 @@
+type,has_card_select,card_star_rates,has_relic_select,has_shop
+normal,true,1:60;2:30;3:10,false,false
+elite,true,2:80;3:20,false,true
+boss,true,3:100,true,true
+final,false,,false,false

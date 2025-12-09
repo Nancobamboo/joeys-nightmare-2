@@ -13,6 +13,7 @@ public class UISelectControl : YViewControl
 	private DataJoeyPlayer m_PlayerData;
 	private const int SELECT_CARD_COUNT = 3;
 	public System.Action OnSelectComplete;
+	private StageReward m_CurrentStageReward;
 
 	public static EResType GetResType()
 	{
@@ -29,6 +30,14 @@ public class UISelectControl : YViewControl
 
 	public void SetData()
 	{
+		m_CurrentStageReward = null;
+		GenerateSelectCards();
+		RefreshSelectDisplay();
+	}
+
+	public void SetData(StageReward stageReward)
+	{
+		m_CurrentStageReward = stageReward;
 		GenerateSelectCards();
 		RefreshSelectDisplay();
 	}
@@ -58,12 +67,40 @@ public class UISelectControl : YViewControl
 
 		}).ToList();
 
-		List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
-
-		for (int i = 0; i < SELECT_CARD_COUNT && i < shuffledCards.Count; i++)
+		// If stage reward has star rates configured, filter cards by star level
+		if (m_CurrentStageReward != null && m_CurrentStageReward.cardStarRates.Count > 0)
 		{
-			Card card = shuffledCards[i];
-			m_CurrentSelectCards.Add(card);
+			for (int i = 0; i < SELECT_CARD_COUNT; i++)
+			{
+				int targetStar = m_CurrentStageReward.GetRandomStarLevel();
+				List<Card> starFilteredCards = availableCards.Where(c => c.stars == targetStar).ToList();
+				
+				// If no cards available for this star level, fallback to any available card
+				if (starFilteredCards.Count == 0)
+				{
+					starFilteredCards = availableCards;
+				}
+
+				// Remove already selected cards
+				starFilteredCards = starFilteredCards.Where(c => !m_CurrentSelectCards.Contains(c)).ToList();
+				
+				if (starFilteredCards.Count > 0)
+				{
+					Card selectedCard = starFilteredCards[Random.Range(0, starFilteredCards.Count)];
+					m_CurrentSelectCards.Add(selectedCard);
+				}
+			}
+		}
+		else
+		{
+			// Default behavior: random selection without star rate filtering
+			List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
+
+			for (int i = 0; i < SELECT_CARD_COUNT && i < shuffledCards.Count; i++)
+			{
+				Card card = shuffledCards[i];
+				m_CurrentSelectCards.Add(card);
+			}
 		}
 	}
 
