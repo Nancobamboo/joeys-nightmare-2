@@ -36,6 +36,7 @@ public enum ERelicType
 	GetSpecialCardByDefence = 9006,
 	LifeSteal = 9007,
 	HealOnKill = 9008,
+	CardLimitDebuff = 9999,
 }
 
 public class UICardSimpleControl : YViewControl

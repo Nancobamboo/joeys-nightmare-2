@@ -65,8 +65,15 @@ public partial class DataSystem
 
     public Card CreateCard(string cardId)
     {
-        Card card = GData.Instance.GetCardConfigById(cardId).Clone();
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        Card card = dataJoeyPlayer.GetEnvCardDictData(cardId);
+        if (card != null)
+        {
+            return card;
+        }
+
+        card = GData.Instance.GetCardConfigById(cardId).Clone();
         dataJoeyPlayer.UniqueIdGen++;
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
         return card;
@@ -187,42 +194,7 @@ public partial class DataSystem
 
         //dataJoeyPlayer.ClearEnvCardPool();
 
-        for (int i = 0; i < characterData.equipmentAttack.Count; i++)
-        {
-            string cardId = characterData.equipmentAttack[i];
-            if (!string.IsNullOrEmpty(cardId))
-            {
-                dataJoeyPlayer.AddEnvCardPoolData(cardId);
-            }
-        }
-
-        for (int i = 0; i < characterData.equipmentDefence.Count; i++)
-        {
-            string cardId = characterData.equipmentDefence[i];
-            if (!string.IsNullOrEmpty(cardId))
-            {
-                dataJoeyPlayer.AddEnvCardPoolData(cardId);
-            }
-        }
-
-        for (int i = 0; i < characterData.equipmentItem.Count; i++)
-        {
-            string cardId = characterData.equipmentItem[i];
-            if (!string.IsNullOrEmpty(cardId))
-            {
-                dataJoeyPlayer.AddEnvCardPoolData(cardId);
-            }
-        }
-
-        for (int i = 0; i < characterData.equipmentSkill.Count; i++)
-        {
-            string cardId = characterData.equipmentSkill[i];
-            if (!string.IsNullOrEmpty(cardId))
-            {
-                dataJoeyPlayer.AddEnvCardPoolData(cardId);
-            }
-        }
-
+        // Env mode only uses card_deck, not equipment fields
         for (int i = 0; i < characterData.cardDeck.Count; i++)
         {
             string cardId = characterData.cardDeck[i];

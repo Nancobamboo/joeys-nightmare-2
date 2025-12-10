@@ -162,15 +162,25 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     /// </summary>
     /// <param name="level">Current level</param>
     /// <param name="playerCardPool">Player's accumulated card pool (card IDs)</param>
+    /// <param name="cardLimit">Maximum number of cards to select from pool (0 = no limit)</param>
     /// <returns>List of 5 columns, each containing card IDs (first=top, last=bottom due to reverse iteration in AddEnvCardList)</returns>
-    public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool)
+    public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool, int cardLimit = 0)
     {
         List<string> monsters = GetEnvStageMonsters(level);
         List<string> nonMonsterCards = new List<string>(playerCardPool);
 
-        // Shuffle both lists
-        ShuffleList(monsters);
+        // Shuffle player cards first
         ShuffleList(nonMonsterCards);
+
+        // Apply card limit if specified (limit > 0 means take at most 'limit' cards)
+        if (cardLimit > 0 && nonMonsterCards.Count > cardLimit)
+        {
+            nonMonsterCards = nonMonsterCards.Take(cardLimit).ToList();
+            Debug.Log($"Env mode: Limited player cards from pool to {cardLimit} cards (from {playerCardPool.Count} total)");
+        }
+
+        // Shuffle monsters
+        ShuffleList(monsters);
 
         // Initialize 5 columns
         List<List<string>> columns = new List<List<string>>();
