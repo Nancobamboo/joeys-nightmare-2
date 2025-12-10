@@ -729,7 +729,7 @@ public partial class UIGamePhaseControl : YViewControl
 			string monsterId = cardControl.CardData.id;
 			List<Card> dropCards = GetMonsterDropCard(monsterId);
 
-			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0.5f;
+			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 
 			Card configCard = GData.Instance.GetCardConfigById(monsterId);

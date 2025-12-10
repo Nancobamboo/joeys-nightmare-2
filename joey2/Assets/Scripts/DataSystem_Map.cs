@@ -38,7 +38,7 @@ public partial class DataSystem
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_dunpai] = 0.3f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_gongji] = 0.5f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_shouji] = 0.25f;
-        AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_feitian] = 0.5f;
+        AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_feitian] = 0.3f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_pailai] = 0.5f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_xiaoshi] = 0.3f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_guaiwugongji] = 0.5f;
