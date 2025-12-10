@@ -11,7 +11,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1010,Art/Img/Attack/img_card_Claymore,Art/Img/Attack/img_bg_Attack,手刀,,attack,亡语:从弃牌堆抽取一张防御卡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
 1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,,attack,永不消耗,3,0,0,0,1,BareHands
 1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,噬魂剑,,attack,击杀:永久攻击+1,7,0,0,150,2,PermanentAttackBoost:1
-1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,噬魂手里剑,,attack,击杀:永久攻击+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
+1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,噬魂手里剑,,attack,主动攻击击杀:永久攻击+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
 1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,重弩,,attack,,16,0,0,300,3,
 1015,Art/Img/Attack/img_card_BattleFury,Art/Img/Attack/img_bg_Attack,狂战斧,,attack,,10,0,0,300,3,BattleFury:50
 1016,Art/Img/Attack/img_card_KingSword,Art/Img/Attack/img_bg_Attack,王者盾牌(剑),,attack,攻击后变为王者盾牌（盾），剩余切换次数：2,5,0,0,300,2,KingShield_OnAttack
