@@ -54,6 +54,7 @@ public enum EActionId
 	KingShieldSwitchToSword,
 	BloodStorageActivate,
 	BloodStorageDeduct,
+	RefreshCardLimitDebuff,
 	Upper,
 
 }

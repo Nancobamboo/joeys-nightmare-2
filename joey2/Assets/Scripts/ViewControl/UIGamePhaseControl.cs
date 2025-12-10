@@ -42,6 +42,9 @@ public partial class UIGamePhaseControl : YViewControl
 	private bool m_KeyPathSpawned = false;
 	private int m_CurrentAttackTargetEnvIndex = -1;
 
+	// Card limit debuff display for Env mode
+	private UIRelicControl m_CardLimitDebuffControl;
+
 	public static EResType GetResType()
 	{
 		return EResType.UIGamePhase;
@@ -98,6 +101,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.KingShieldSwitchToShield, KingShieldSwitchToShield);
 		RegistAction(EActionId.KingShieldSwitchToSword, KingShieldSwitchToSword);
 		RegistAction(EActionId.BloodStorageActivate, BloodStorageActivate);
+		RegistAction(EActionId.RefreshCardLimitDebuff, OnRefreshCardLimitDebuff);
 		RegistAction(EActionId.BloodStorageDeduct, BloodStorageDeduct);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
@@ -400,6 +404,7 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 		RefreshRelicDisplay();
+		RefreshCardLimitDebuff();
 	}
 
 	private void OnCoinChanged(int coin)
@@ -1904,6 +1909,89 @@ public partial class UIGamePhaseControl : YViewControl
 			else
 			{
 				m_RelicList[i].gameObject.SetActive(false);
+			}
+		}
+	}
+
+	void OnRefreshCardLimitDebuff(object[] paraArray)
+	{
+		RefreshCardLimitDebuff();
+	}
+
+	/// <summary>
+	/// Check and display card limit debuff in Env mode
+	/// </summary>
+	private void RefreshCardLimitDebuff()
+	{
+		// Only apply in Env mode
+		if (JoeyGameControl.Instance == null || JoeyGameControl.Instance.GameMode != EGameMode.Env)
+		{
+			if (m_CardLimitDebuffControl != null)
+			{
+				m_CardLimitDebuffControl.gameObject.SetActive(false);
+			}
+			return;
+		}
+
+		// Get card limit from character config
+		RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+		int cardLimit = characterData != null ? characterData.envCardLimit : 0;
+
+		// If no limit set, hide debuff
+		if (cardLimit <= 0)
+		{
+			if (m_CardLimitDebuffControl != null)
+			{
+				m_CardLimitDebuffControl.gameObject.SetActive(false);
+			}
+			return;
+		}
+
+		// Check if player's card pool exceeds the limit
+		int currentCardCount = m_DataJoeyPlayer != null ? m_DataJoeyPlayer.EnvCardPool.Count : 0;
+		bool isOverLimit = currentCardCount > cardLimit;
+
+		if (isOverLimit)
+		{
+			// Create debuff control if not exists
+			if (m_CardLimitDebuffControl == null)
+			{
+				m_CardLimitDebuffControl = Asset.OpenUI<UIRelicControl>(m_View.RelicContent);
+				m_CardLimitDebuffControl.CacheTrans.localScale = Vector3.one;
+				m_CardLimitDebuffControl.CacheTrans.localPosition = Vector3.zero;
+				m_CardLimitDebuffControl.CacheTrans.localEulerAngles = Vector3.zero;
+			}
+
+			// Get base debuff info from config and parse template placeholders
+			RelicInfo baseInfo = GData.Instance.GetRelicInfo(ERelicType.CardLimitDebuff);
+			if (baseInfo != null)
+			{
+				// Parse template placeholders: {cardLimit}, {currentCount}
+				string dynamicDescription = baseInfo.description
+					.Replace("{cardLimit}", cardLimit.ToString())
+					.Replace("{currentCount}", currentCardCount.ToString());
+
+				// Create a new RelicInfo with parsed description
+				RelicInfo dynamicDebuffInfo = new RelicInfo(
+					id: baseInfo.id,
+					cardImage: baseInfo.cardImage,
+					iconImage: baseInfo.iconImage,
+					name: baseInfo.name,
+					description: dynamicDescription,
+					stars: baseInfo.stars
+				);
+
+				m_CardLimitDebuffControl.gameObject.SetActive(true);
+				m_CardLimitDebuffControl.SetGameData(dynamicDebuffInfo);
+				m_CardLimitDebuffControl.ImgRelicTransform.localScale = Vector3.one * 2f;
+			}
+		}
+		else
+		{
+			// Hide debuff when under limit
+			if (m_CardLimitDebuffControl != null)
+			{
+				m_CardLimitDebuffControl.gameObject.SetActive(false);
 			}
 		}
 	}

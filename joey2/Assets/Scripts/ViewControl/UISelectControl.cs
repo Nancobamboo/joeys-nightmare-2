@@ -153,6 +153,7 @@ public class UISelectControl : YViewControl
 		{
 			m_PlayerData.AddEnvCardPoolData(selectedCard.id);
 			DataSystem.Instance.SaveDataJoeyPlayer();
+			YActionSystem.Instance.DispatchAction(EActionId.RefreshCardLimitDebuff);
 			Debug.Log($"Env mode: Added card {selectedCard.id} to EnvCardPool");
 		}
 		else

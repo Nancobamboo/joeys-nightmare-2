@@ -476,6 +476,7 @@ public sealed class GData : PureSingleton<GData>
 		int EquipmentRelicIdx = idx.ContainsKey("equipment_relic") ? idx["equipment_relic"] : -1;
 		int CoinsIdx = idx.ContainsKey("coins") ? idx["coins"] : -1;
 		int CardDeckIdx = idx.ContainsKey("card_deck") ? idx["card_deck"] : -1;
+		int EnvCardLimitIdx = idx.ContainsKey("env_card_limit") ? idx["env_card_limit"] : -1;
 
 		for (int i = 1; i < lines.Length; i++)
 		{
@@ -528,6 +529,7 @@ public sealed class GData : PureSingleton<GData>
 			roguelikeCharacter.equipmentRelic = ParseList(EquipmentRelicIdx);
 			roguelikeCharacter.coins = GetInt(CoinsIdx, 0);
 			roguelikeCharacter.cardDeck = ParseList(CardDeckIdx);
+			roguelikeCharacter.envCardLimit = GetInt(EnvCardLimitIdx, 0); // 0 means no limit
 
 			RoguelikeCharacterList.Add(roguelikeCharacter);
 		}

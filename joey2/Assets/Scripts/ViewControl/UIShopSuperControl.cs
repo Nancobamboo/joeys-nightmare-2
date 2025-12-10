@@ -224,6 +224,7 @@ public class UIShopSuperControl : YViewControl
         m_CurrentShopCards.Remove(shopCardData);
         DataSystem.Instance.SaveDataJoeyPlayer();
         RefreshShopDisplay();
+        YActionSystem.Instance.DispatchAction(EActionId.RefreshCardLimitDebuff);
 
         ECardType cardType = shopCardData.card.GetCardType();
         if (m_BuildControl != null)
