@@ -172,7 +172,7 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			if (isHeal)
 			{
-				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_HuiXue, transform, DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_HuiXue));
+				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_HuiXue, transform, 1f);
 				m_View.JoeyAnim.Play("happy");
 			}
 			else
