@@ -65,8 +65,15 @@ public partial class DataSystem
 
     public Card CreateCard(string cardId)
     {
-        Card card = GData.Instance.GetCardConfigById(cardId).Clone();
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        Card card = dataJoeyPlayer.GetEnvCardDictData(cardId);
+        if (card != null)
+        {
+            return card;
+        }
+
+        card = GData.Instance.GetCardConfigById(cardId).Clone();
         dataJoeyPlayer.UniqueIdGen++;
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
         return card;

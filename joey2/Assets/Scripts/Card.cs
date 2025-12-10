@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 public class Card : IData
 {
@@ -14,9 +14,33 @@ public class Card : IData
     public string cardName;
     public string description;
     public int attack;
-    public int currentAttack;
+    private int m_CurrentAttack;
+    public int currentAttack
+    {
+        get { return m_CurrentAttack; }
+        set
+        {
+            if (m_CurrentAttack != value)
+            {
+                m_CurrentAttack = value;
+                UpdateEnvCardDict();
+            }
+        }
+    }
     public int defence;
-    public int currentDefence;
+    private int m_CurrentDefence;
+    public int currentDefence
+    {
+        get { return m_CurrentDefence; }
+        set
+        {
+            if (m_CurrentDefence != value)
+            {
+                m_CurrentDefence = value;
+                UpdateEnvCardDict();
+            }
+        }
+    }
     public int health;
     public int currentHealth;
     public int price;
@@ -64,9 +88,9 @@ public class Card : IData
         }
         this.description = _description;
         this.attack = _attack;
-        this.currentAttack = _attack;
+        this.m_CurrentAttack = _attack;
         this.defence = _defence;
-        this.currentDefence = _defence;
+        this.m_CurrentDefence = _defence;
         this.health = _health;
         this.currentHealth = _health;
         this.price = _price;
@@ -91,6 +115,9 @@ public class Card : IData
     public Card Clone()
     {
         var c = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
+        c.m_CurrentAttack = m_CurrentAttack;
+        c.m_CurrentDefence = m_CurrentDefence;
+        c.UniqueId = UniqueId;
         return c;
     }
 
@@ -143,9 +170,9 @@ public class Card : IData
         cardName = (string)jobject["cardName"];
         description = (string)jobject["description"];
         attack = (int)jobject["attack"];
-        currentAttack = (int)jobject["currentAttack"];
+        m_CurrentAttack = (int)jobject["currentAttack"];
         defence = (int)jobject["defence"];
-        currentDefence = (int)jobject["currentDefence"];
+        m_CurrentDefence = (int)jobject["currentDefence"];
         health = (int)jobject["health"];
         currentHealth = (int)jobject["currentHealth"];
         price = (int)jobject["price"];
@@ -153,6 +180,16 @@ public class Card : IData
         stars = (int)jobject["stars"];
         effectId = (string)jobject["effectId"];
         UniqueId = (int)jobject["UniqueId"];
+    }
+
+    private void UpdateEnvCardDict()
+    {
+        ECardType cardType = GetCardType();
+        if (cardType == ECardType.attack || cardType == ECardType.defence)
+        {
+            DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+            dataJoeyPlayer.AddEnvCardDictData(id, this);
+        }
     }
 
     public void SaveToJson(JObject jobject)
