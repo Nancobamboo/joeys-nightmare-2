@@ -187,6 +187,11 @@ public class UISelectControl : YViewControl
 		List<RelicInfo> allRelics = GData.Instance.RelicInfoDict.Values.ToList();
 		List<RelicInfo> availableRelics = allRelics.Where(r =>
 		{
+			// Exclude CardLimitDebuff from selection pool
+			if (r.id == (int)ERelicType.CardLimitDebuff)
+			{
+				return false;
+			}
 			return m_PlayerData != null && m_PlayerData.RelicList != null && !m_PlayerData.RelicList.Contains(r.id);
 		}).ToList();
 
