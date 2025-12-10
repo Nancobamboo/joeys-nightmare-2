@@ -1302,10 +1302,7 @@ public partial class UIGamePhaseControl : YViewControl
 			attackCardControl = GetFistCard();
 		}
 		bool useFistCard = attackCardControl == m_FistCardCache;
-		if (useFistCard)
-		{
-			await UniTask.WaitForSeconds(1f, cancellationToken: GetOrCreateCardToken(attackCardControl));
-		}
+
 
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
