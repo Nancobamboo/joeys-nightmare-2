@@ -11,6 +11,7 @@ public class RoguelikeCharacter
 	public List<string> equipmentRelic = new List<string>();
 	public int coins;
 	public List<string> cardDeck = new List<string>();
+	public int envCardLimit; // Maximum number of cards to randomly select from pool in Env mode (0 = no limit)
 
 	public RoguelikeCharacter()
 	{
