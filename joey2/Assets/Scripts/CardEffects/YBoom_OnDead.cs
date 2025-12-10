@@ -50,7 +50,7 @@ public class YBoom_OnDead : YCardEffect
 
 public partial class UIGamePhaseControl
 {
-	public async UniTask BoomEnvCardAtPosition(int envIndex, int boomDamage, bool isExcludeSelf)
+	public void BoomEnvCardAtPosition(int envIndex, int boomDamage, bool isExcludeSelf)
 	{
 		int[] indices;
 		if (isExcludeSelf)
@@ -70,11 +70,9 @@ public partial class UIGamePhaseControl
 				continue;
 			}
 			UICardSimpleControl lastCard = GetLastEnvCard(index);
-			if (lastCard != null && lastCard.gameObject.activeSelf)
+			if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
 			{
-				CancellationToken token = GetOrCreateCardToken(lastCard);
-				await DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom, token);
-				RemoveCardCts(lastCard);
+				DealDamageToEnvCard(lastCard, boomDamage, index, EEffectType.Boom, CancellationToken.None).Forget();
 			}
 		}
 	}
