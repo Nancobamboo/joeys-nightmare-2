@@ -194,7 +194,12 @@ public class JoeyGameControl : YViewControl
 
 			int envLevelId = m_DataJoeyPlayer.StageId;
 			List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
-			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool);
+
+			// Get card limit from character config
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			int cardLimit = characterData != null ? characterData.envCardLimit : 0;
+
+			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit);
 			for (int i = 0; i < envModeCardList.Count; i++)
 			{
 				List<string> cardIdList = envModeCardList[i];
