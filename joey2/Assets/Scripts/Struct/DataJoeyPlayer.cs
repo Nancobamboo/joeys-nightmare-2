@@ -29,6 +29,7 @@ public class DataJoeyPlayer : IData
 	public int MaxEquipedSkillNum;
 	public int StageId;
 	public List<string> EnvCardPool = new List<string>();
+	public Dictionary<string, Card> EnvCardDict = new Dictionary<string, Card>();
 	public void LoadFromJson(JObject jobject)
 	{
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
@@ -41,7 +42,7 @@ public class DataJoeyPlayer : IData
 		JsonUtil.ToList(jobject, "RelicList", ref RelicList);
 		var SelfCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "SelfCardList", ref SelfCardList);
-		foreach (var item in SelfCardList)
+		foreach(var item in SelfCardList)
 		{
 			SelfCardDict[item.UniqueId] = item;
 		}
@@ -60,6 +61,12 @@ public class DataJoeyPlayer : IData
 		MaxEquipedSkillNum = (int)jobject["MaxEquipedSkillNum"];
 		StageId = (int)jobject["StageId"];
 		JsonUtil.ToList(jobject, "EnvCardPool", ref EnvCardPool);
+		var EnvCardList = new List<Card>();
+		JsonUtil.ToList(jobject, "EnvCardList", ref EnvCardList);
+		foreach(var item in EnvCardList)
+		{
+			EnvCardDict[item.id] = item;
+		}
 	}
 	public void SaveToJson(JObject jobject)
 	{
@@ -88,6 +95,8 @@ public class DataJoeyPlayer : IData
 		jobject.Add("MaxEquipedSkillNum", MaxEquipedSkillNum);
 		jobject.Add("StageId", StageId);
 		jobject.Add("EnvCardPool", JsonUtil.ToJArray(EnvCardPool));
+		var EnvCardList = EnvCardDict.Values.ToList();
+		jobject.Add("EnvCardList", JsonUtil.ToJArray(EnvCardList));
 	}
 	public void AddRelicListData(int data)
 	{
@@ -222,6 +231,20 @@ public class DataJoeyPlayer : IData
 	public string GetEnvCardPoolData(int dataIndex)
 	{
 		return EnvCardPool[dataIndex];
+	}
+	public void AddEnvCardDictData(string id,Card item)
+	{
+		EnvCardDict[id] = item;
+	}
+	public void RemoveEnvCardDictData(string id)
+	{
+		EnvCardDict.Remove(id);
+	}
+	public Card GetEnvCardDictData(string dataId)
+	{
+		Card result = null;
+		EnvCardDict.TryGetValue(dataId, out result);
+		return result;
 	}
 }
 public partial class DataSystem
