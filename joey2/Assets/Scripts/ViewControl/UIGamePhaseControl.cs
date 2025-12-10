@@ -845,11 +845,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (envIndex == -1)
 		{
-			await BoomEnvCardRandom(damage);
+			BoomEnvCardRandom(damage);
 		}
 		else
 		{
-			await BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
+			BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
 		}
 
 		//RemoveCardCts(boomCard);
