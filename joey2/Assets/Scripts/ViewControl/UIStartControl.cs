@@ -1,8 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public enum ESceneName
@@ -23,13 +21,11 @@ public enum ESceneName
 public class UIStartControl : YViewControl
 {
 	private UIStartView m_View;
-	private float m_ShakeTimer = 0f;
-	private const float ShakeInterval = 2f;
 	private const float HoverScale = 1.1f;
 	private const float AnimationDuration = 0.2f;
 	private const float ClickDelay = 0.3f;
 	private Dictionary<Button, Vector3> m_ButtonOriginalScales = new Dictionary<Button, Vector3>();
-	private Dictionary<Button, Tween> m_ButtonTweens = new Dictionary<Button, Tween>();
+	private Dictionary<Button, Coroutine> m_ButtonCoroutines = new Dictionary<Button, Coroutine>();
 	private bool m_IsProcessingClick = false;
 
 	public static EResType GetResType()
@@ -65,69 +61,48 @@ public class UIStartControl : YViewControl
 	{
 		if (button == null || !m_ButtonOriginalScales.ContainsKey(button)) return;
 
-		if (m_ButtonTweens.ContainsKey(button) && m_ButtonTweens[button] != null)
+		if (m_ButtonCoroutines.ContainsKey(button) && m_ButtonCoroutines[button] != null)
 		{
-			m_ButtonTweens[button].Kill();
+			StopCoroutine(m_ButtonCoroutines[button]);
 		}
 
 		Vector3 targetScale = m_ButtonOriginalScales[button] * HoverScale;
-		Tween tween = button.transform.DOScale(targetScale, AnimationDuration)
-			.SetEase(Ease.OutQuad);
-
-		m_ButtonTweens[button] = tween;
+		Coroutine coroutine = StartCoroutine(ScaleButtonCoroutine(button, targetScale, AnimationDuration));
+		m_ButtonCoroutines[button] = coroutine;
 	}
 
 	private void OnButtonPointerExit(Button button)
 	{
 		if (button == null || !m_ButtonOriginalScales.ContainsKey(button)) return;
 
-		if (m_ButtonTweens.ContainsKey(button) && m_ButtonTweens[button] != null)
+		if (m_ButtonCoroutines.ContainsKey(button) && m_ButtonCoroutines[button] != null)
 		{
-			m_ButtonTweens[button].Kill();
+			StopCoroutine(m_ButtonCoroutines[button]);
 		}
 
 		Vector3 originalScale = m_ButtonOriginalScales[button];
-		Tween tween = button.transform.DOScale(originalScale, AnimationDuration)
-			.SetEase(Ease.OutQuad);
-
-		m_ButtonTweens[button] = tween;
+		Coroutine coroutine = StartCoroutine(ScaleButtonCoroutine(button, originalScale, AnimationDuration));
+		m_ButtonCoroutines[button] = coroutine;
 	}
 
-	private void Update()
+	private IEnumerator ScaleButtonCoroutine(Button button, Vector3 targetScale, float duration)
 	{
-		if (DataSystem.Instance.isFinishGame)
-		{
-			m_ShakeTimer += Time.deltaTime;
-			if (m_ShakeTimer >= ShakeInterval)
-			{
-				m_ShakeTimer = 0f;
-				ShakeTransform().Forget();
-			}
-		}
-	}
+		if (button == null) yield break;
 
-	private async UniTaskVoid ShakeTransform()
-	{
-		RectTransform rectTransform = transform as RectTransform;
-		Vector2 originalPosition = rectTransform.anchoredPosition;
-		float duration = 0.2f;
-		float intensity = 20f;
+		Vector3 startScale = button.transform.localScale;
 		float elapsed = 0f;
 
 		while (elapsed < duration)
 		{
-			float progress = elapsed / duration;
-			float currentIntensity = intensity * (1f - progress);
-			Vector2 randomOffset = Random.insideUnitCircle * currentIntensity;
-			rectTransform.anchoredPosition = originalPosition + randomOffset;
-
 			elapsed += Time.deltaTime;
-			await UniTask.Yield();
+			float t = elapsed / duration;
+			t = t * t * (3f - 2f * t);
+			button.transform.localScale = Vector3.Lerp(startScale, targetScale, t);
+			yield return null;
 		}
 
-		rectTransform.anchoredPosition = originalPosition;
+		button.transform.localScale = targetScale;
 	}
-
 
 	private void OnBtnRoguelikeClick()
 	{
@@ -169,35 +144,33 @@ public class UIStartControl : YViewControl
 
 		m_IsProcessingClick = true;
 
-		if (m_ButtonTweens.ContainsKey(button) && m_ButtonTweens[button] != null)
+		if (m_ButtonCoroutines.ContainsKey(button) && m_ButtonCoroutines[button] != null)
 		{
-			m_ButtonTweens[button].Kill();
+			StopCoroutine(m_ButtonCoroutines[button]);
 		}
 
 		Vector3 originalScale = m_ButtonOriginalScales[button];
-
-		Sequence clickSequence = DOTween.Sequence();
-
-		clickSequence.Append(button.transform.DOScale(originalScale * 0.9f, 0.1f)
-			.SetEase(Ease.OutQuad));
-
-		clickSequence.Append(button.transform.DOScale(originalScale * 1.15f, 0.15f)
-			.SetEase(Ease.OutBack));
-
-		clickSequence.Append(button.transform.DOScale(originalScale, 0.15f)
-			.SetEase(Ease.InQuad));
-
-		clickSequence.AppendCallback(() =>
-		{
-			DelayExecuteAction(onComplete).Forget();
-		});
-
-		m_ButtonTweens[button] = clickSequence;
+		Coroutine coroutine = StartCoroutine(ButtonClickEffectCoroutine(button, originalScale, onComplete));
+		m_ButtonCoroutines[button] = coroutine;
 	}
 
-	private async UniTaskVoid DelayExecuteAction(System.Action action)
+	private IEnumerator ButtonClickEffectCoroutine(Button button, Vector3 originalScale, System.Action onComplete)
 	{
-		await UniTask.Delay(System.TimeSpan.FromSeconds(ClickDelay));
+		if (button == null) yield break;
+
+		Vector3 scale1 = originalScale * 0.9f;
+		Vector3 scale2 = originalScale * 1.15f;
+
+		yield return StartCoroutine(ScaleButtonCoroutine(button, scale1, 0.1f));
+		yield return StartCoroutine(ScaleButtonCoroutine(button, scale2, 0.15f));
+		yield return StartCoroutine(ScaleButtonCoroutine(button, originalScale, 0.15f));
+
+		yield return StartCoroutine(DelayExecuteActionCoroutine(onComplete));
+	}
+
+	private IEnumerator DelayExecuteActionCoroutine(System.Action action)
+	{
+		yield return new WaitForSeconds(ClickDelay);
 		m_IsProcessingClick = false;
 		action?.Invoke();
 	}
@@ -216,16 +189,14 @@ public class UIStartControl : YViewControl
 	{
 		base.OnReturn();
 
-		List<Tween> tweenList = new List<Tween>(m_ButtonTweens.Values);
-		for (int i = 0; i < tweenList.Count; i++)
+		foreach (var kvp in m_ButtonCoroutines)
 		{
-			Tween tween = tweenList[i];
-			if (tween != null && tween.IsActive())
+			if (kvp.Value != null)
 			{
-				tween.Kill();
+				StopCoroutine(kvp.Value);
 			}
 		}
-		m_ButtonTweens.Clear();
+		m_ButtonCoroutines.Clear();
 		m_ButtonOriginalScales.Clear();
 	}
 }
