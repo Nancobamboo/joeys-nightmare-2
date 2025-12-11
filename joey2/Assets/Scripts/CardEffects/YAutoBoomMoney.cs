@@ -32,7 +32,8 @@ public class YAutoBoomMoney : YDefaultEffect
                 value--;
                 if (value == 0)
                 {
-                    YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, baseExtra);
+                    YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, baseExtra, EVFXName.VFX_boom);
+                    CardControl.Return();
                 }
             }
         }

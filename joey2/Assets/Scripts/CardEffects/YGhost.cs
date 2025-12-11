@@ -32,7 +32,7 @@ public class YGhost : YDefaultEffect
                     {
                         value = 5;
                         int attack = CardControl.CardData.currentAttack;
-                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
+                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, attack, EVFXName.VFX_Shouji);
                     }
                 }
             }

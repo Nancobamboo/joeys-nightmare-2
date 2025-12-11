@@ -947,7 +947,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			lastAttackCard = GetFistCard();
 
-        }
+		}
 
 		if (lastAttackCard != null)
 		{
@@ -1372,6 +1372,10 @@ public partial class UIGamePhaseControl : YViewControl
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 			}
 		}
+		else
+		{
+			attackCardControl.CardEffect?.ClearAllEffectValues();
+		}
 		RemoveCardCts(attackCardControl);
 
 
@@ -1451,9 +1455,10 @@ public partial class UIGamePhaseControl : YViewControl
 	void TakePlayerBoomDamage(object[] paraArray)
 	{
 		int damage = (int)paraArray[0];
+		EVFXName vfxName = paraArray.Length > 1 && paraArray[1] is EVFXName ? (EVFXName)paraArray[1] : EVFXName.VFX_boom;
 		if (damage > 0)
 		{
-			JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_boom, m_View.Joey, 0f);
+			JoeyGameControl.Instance.PlayVFX(vfxName, m_View.Joey, 0.4f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
 		ApplyPlayerHealthChange(-damage);
@@ -1464,8 +1469,6 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		ECardType cardType = cardControl.CardType;
 		float delayTime = 0f;
-
-		Debug.Log($"[UseBagCard] Start - card:{cardControl?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		if (cardType == ECardType.skill)
 		{
@@ -1490,41 +1493,28 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		Debug.Log($"[UseBagCard] After UseSkill/UseItem - delayTime:{delayTime}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-		Debug.Log($"[UseBagCard] After delayTime wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		float finishDelayTime = cardControl.CardEffect?.OnUseFinished(false) ?? 0f;
 		if (finishDelayTime > 0f)
 		{
-			Debug.Log($"[UseBagCard] Before OnUseFinished wait - finishDelayTime:{finishDelayTime}");
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-			Debug.Log($"[UseBagCard] After OnUseFinished wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		}
 
-		Debug.Log($"[UseBagCard] Before RemoveBagCard - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		await RemoveBagCard(cardType, cardControl);
-		Debug.Log($"[UseBagCard] After RemoveBagCard - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
-		Debug.Log($"[UseBagCard] After OnRemoveCard - removeDelayTime:{removeDelayTime}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		if (removeDelayTime > 0f)
 		{
-			Debug.Log($"[UseBagCard] Before removeDelayTime wait");
 			await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-			Debug.Log($"[UseBagCard] After removeDelayTime wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 		}
 
-		Debug.Log($"[UseBagCard] Before RemoveCardCts - cardControl:{cardControl?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 		RemoveCardCts(cardControl);
-		Debug.Log($"[UseBagCard] After RemoveCardCts - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 
 		if (CurrentEffectCard != null)
 		{
-			Debug.Log($"[UseBagCard] Setting IsEffecting = false - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}");
 			CurrentEffectCard.IsEffecting = false;
 		}
-		Debug.Log($"[UseBagCard] End - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 	}
 
 	void AddCardFromDiscard(object[] paraArray)
@@ -1675,12 +1665,27 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_KeyPathSpawned = true;
 
+		foreach (var kvp in m_EnvCardDict)
+		{
+			List<UICardSimpleControl> envCardList = kvp.Value;
+			if (envCardList != null)
+			{
+				for (int i = 0; i < envCardList.Count; i++)
+				{
+					UICardSimpleControl cardControl = envCardList[i];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						cardControl.OnBtnRealClick();
+					}
+				}
+			}
+		}
+
 		if (m_KeyPathCardCache != null)
 		{
 			m_KeyPathCardCache.gameObject.SetActive(true);
 			m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
 			m_KeyPathCardCache.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-			Debug.Log($"KeyPath spawned at column 2 - all monsters cleared!");
 		}
 	}
 

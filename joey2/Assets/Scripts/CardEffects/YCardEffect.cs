@@ -222,6 +222,14 @@ public class YCardEffect
         }
     }
 
+    public virtual void ClearAllEffectValues()
+    {
+        for (int i = 0; i < m_EffectValues.Length; i++)
+        {
+            m_EffectValues[i] = 0;
+        }
+    }
+
     public virtual int OnBuffValueChange(EBuffType buffType, int value)
     {
         return value;
