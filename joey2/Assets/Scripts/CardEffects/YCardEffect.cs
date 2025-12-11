@@ -64,7 +64,8 @@ public enum ECardEffectId
     KingShield_OnDefense,
     MimicChest,
     CullingBlade,
-    BloodStorage_UseSkill
+    BloodStorage_UseSkill,
+    ShamanDonkey
 }
 
 public enum EEffectType

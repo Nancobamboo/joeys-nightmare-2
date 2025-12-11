@@ -593,6 +593,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BloodStorage_UseSkill:
 				effect = new YBloodStorage_UseSkill();
 				break;
+			case ECardEffectId.ShamanDonkey:
+				effect = new YShamanDonkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
