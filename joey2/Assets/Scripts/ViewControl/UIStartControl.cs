@@ -156,7 +156,11 @@ public class UIStartControl : YViewControl
 
 	private IEnumerator ButtonClickEffectCoroutine(Button button, Vector3 originalScale, System.Action onComplete)
 	{
-		if (button == null) yield break;
+		if (button == null)
+		{
+			m_IsProcessingClick = false;
+			yield break;
+		}
 
 		Vector3 scale1 = originalScale * 0.9f;
 		Vector3 scale2 = originalScale * 1.15f;
@@ -198,5 +202,6 @@ public class UIStartControl : YViewControl
 		}
 		m_ButtonCoroutines.Clear();
 		m_ButtonOriginalScales.Clear();
+		m_IsProcessingClick = false;
 	}
 }
