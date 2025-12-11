@@ -4,9 +4,12 @@ using UnityEngine.UI;
 
 public class UIStartView : YBaseView
 {
-	public Button BtnRoguelike;
+	public Button BtnEnv;
+	public EventTriggerListener EnvTrigger;
 	public Button BtnOver;
+	public EventTriggerListener OverTrigger;
 	public Button BtnGuide;
+	public EventTriggerListener GuideTrigger;
 	public Button BtnStart;
 	public override void OnInit(Transform holder)
 	{
@@ -14,9 +17,12 @@ public class UIStartView : YBaseView
 		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
 		if(viewItemList == null || viewItemList.Count == 0) return;
-		BtnRoguelike = viewItemList[0].Target.GetComponent<Button>();
+		BtnEnv = viewItemList[0].Target.GetComponent<Button>();
+		EnvTrigger = viewItemList[0].Target.GetComponent<EventTriggerListener>();
 		BtnOver = viewItemList[1].Target.GetComponent<Button>();
+		OverTrigger = viewItemList[1].Target.GetComponent<EventTriggerListener>();
 		BtnGuide = viewItemList[2].Target.GetComponent<Button>();
+		GuideTrigger = viewItemList[2].Target.GetComponent<EventTriggerListener>();
 		BtnStart = viewItemList[3].Target.GetComponent<Button>();
 	}
 }

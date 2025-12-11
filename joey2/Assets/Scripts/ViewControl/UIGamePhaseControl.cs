@@ -1851,7 +1851,6 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardControl != null && cardControl.CardData != null)
 		{
 			Card cardData = cardControl.CardData;
-			cardData.attack += 1;
 			cardData.currentAttack += 1;
 			cardControl.RefreshCard();
 		}
@@ -1863,7 +1862,6 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardControl != null && cardControl.CardData != null)
 		{
 			Card cardData = cardControl.CardData;
-			cardData.defence += 1;
 			cardData.currentDefence += 1;
 			cardControl.RefreshCard();
 		}

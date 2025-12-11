@@ -60,10 +60,10 @@ public partial class UIGamePhaseControl
         {
             if (badMonkeyEffect.InitialAttack == 0 && cardControl.CardData != null)
             {
-                badMonkeyEffect.InitialAttack = cardControl.CardData.attack;
+                badMonkeyEffect.InitialAttack = cardControl.CardData.currentAttack;
             }
             Card cardData = cardControl.CardData;
-            cardData.currentAttack = monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack;
+            cardData.SetAttack( monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack);
             cardControl.RefreshCard();
         }
     }
