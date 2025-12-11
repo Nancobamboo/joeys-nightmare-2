@@ -27,7 +27,7 @@ public class UIStartControl : YViewControl
 	private const float ShakeInterval = 2f;
 	private const float HoverScale = 1.1f;
 	private const float AnimationDuration = 0.2f;
-	private const float ClickDelay = 0.5f;
+	private const float ClickDelay = 0.3f;
 	private Dictionary<Button, Vector3> m_ButtonOriginalScales = new Dictionary<Button, Vector3>();
 	private Dictionary<Button, Tween> m_ButtonTweens = new Dictionary<Button, Tween>();
 	private bool m_IsProcessingClick = false;
