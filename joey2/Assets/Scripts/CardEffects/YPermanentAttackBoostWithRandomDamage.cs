@@ -19,7 +19,6 @@ public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 		if (CardControl != null && CardControl.CardData != null)
 		{
 			Card cardData = CardControl.CardData;
-			cardData.attack += deltaPara;
 			cardData.currentAttack += deltaPara;
 			CardControl.RefreshCard();
 		}

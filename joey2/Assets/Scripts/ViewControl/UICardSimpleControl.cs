@@ -368,16 +368,14 @@ public class UICardSimpleControl : YViewControl
 			case ERelicType.EnvAttack:
 				if (IsEnv && cachedCardType == ECardType.attack)
 				{
-					cachedCard.attack += 1;
-					cachedCard.currentAttack += 1;
+					cachedCard.SetAttack(cachedCard.currentAttack);
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
 			case ERelicType.EnvDefence:
 				if (IsEnv && cachedCardType == ECardType.defence)
 				{
-					cachedCard.defence += 1;
-					cachedCard.currentDefence += 1;
+					cachedCard.SetDefence(cachedCard.currentDefence + 1);
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
@@ -658,19 +656,19 @@ public class UICardSimpleControl : YViewControl
 		{
 			case ECardType.attack:
 				m_View.Attack.SetActive(true);
-				m_View.TxtAttack.text = card.attack.ToString();
+				m_View.TxtAttack.text = card.currentAttack.ToString();
 				m_View.TxtAttack.color = Color.black;
 				break;
 
 			case ECardType.defence:
 				m_View.Defence.SetActive(true);
-				m_View.TxtDefence.text = card.defence.ToString();
+				m_View.TxtDefence.text = card.currentDefence.ToString();
 				m_View.TxtDefence.color = Color.black;
 				break;
 
 			case ECardType.monster:
 				m_View.Attack.SetActive(true);
-				m_View.TxtAttack.text = card.attack.ToString();
+				m_View.TxtAttack.text = card.currentAttack.ToString();
 				m_View.TxtAttack.color = Color.black;
 				m_View.Moster.SetActive(true);
 				m_View.TextHeart.text = card.currentHealth.ToString();

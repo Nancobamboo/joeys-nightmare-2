@@ -22,7 +22,7 @@ public class YBoom_OnPlay : YCardEffect
 		{
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 			{
-				YActionSystem.Instance.DispatchAction(EActionId.BoomEnvCard, -1, baseExtra, false, CardControl);
+				JoeyGameControl.Instance.QueueAction(EActionId.BoomEnvCard, -1, baseExtra, false, CardControl);
 			}, 0.1f);
 		}
 		return 0f;

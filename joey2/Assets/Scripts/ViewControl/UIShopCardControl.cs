@@ -141,17 +141,17 @@ public class UIShopCardControl : YViewControl
         {
             case ECardType.attack:
                 m_View.Attack.SetActive(true);
-                m_View.TxtAttack.text = card.attack.ToString();
+                m_View.TxtAttack.text = card.currentAttack.ToString();
                 break;
 
             case ECardType.defence:
                 m_View.Defence.SetActive(true);
-                m_View.TxtDefence.text = card.defence.ToString();
+                m_View.TxtDefence.text = card.currentDefence.ToString();
                 break;
 
             case ECardType.monster:
                 m_View.Attack.SetActive(true);
-                m_View.TxtAttack.text = card.attack.ToString();
+                m_View.TxtAttack.text = card.currentAttack.ToString();
                 m_View.Moster.SetActive(true);
                 m_View.TextHeart.text = card.currentHealth.ToString();
                 break;

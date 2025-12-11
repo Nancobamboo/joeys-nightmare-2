@@ -69,9 +69,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
 		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
-		RegistAction(EActionId.StealCoin, StealCoin);
-		RegistAction(EActionId.ReturnCoin, ReturnCoin);
-		RegistAction(EActionId.EscapeMonkey, EscapeMonkey);
 		RegistAction(EActionId.SwapEnvCard, SwapEnvCard);
 		RegistAction(EActionId.RomeoMonkeyDead, RomeoMonkeyDead);
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
@@ -942,6 +939,13 @@ public partial class UIGamePhaseControl : YViewControl
 			return;
 		}
 		UICardSimpleControl lastAttackCard = GetLastBagCard(ECardType.attack);
+
+		if (lastAttackCard == null)
+		{
+			lastAttackCard = GetFistCard();
+
+		}
+
 		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
@@ -1306,7 +1310,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
-		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+		int damage = attackCard.currentAttack + attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1364,6 +1368,10 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 			}
+		}
+		else
+		{
+			attackCardControl.CardEffect?.ClearAllEffectValues();
 		}
 		RemoveCardCts(attackCardControl);
 
@@ -1444,9 +1452,10 @@ public partial class UIGamePhaseControl : YViewControl
 	void TakePlayerBoomDamage(object[] paraArray)
 	{
 		int damage = (int)paraArray[0];
+		EVFXName vfxName = paraArray.Length > 1 && paraArray[1] is EVFXName ? (EVFXName)paraArray[1] : EVFXName.VFX_boom;
 		if (damage > 0)
 		{
-			JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_boom, m_View.Joey, 0f);
+			JoeyGameControl.Instance.PlayVFX(vfxName, m_View.Joey, 0.4f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
 		ApplyPlayerHealthChange(-damage);
@@ -1457,8 +1466,6 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		ECardType cardType = cardControl.CardType;
 		float delayTime = 0f;
-
-		Debug.Log($"[UseBagCard] Start - card:{cardControl?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		if (cardType == ECardType.skill)
 		{
@@ -1483,41 +1490,28 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		Debug.Log($"[UseBagCard] After UseSkill/UseItem - delayTime:{delayTime}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-		Debug.Log($"[UseBagCard] After delayTime wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		float finishDelayTime = cardControl.CardEffect?.OnUseFinished(false) ?? 0f;
 		if (finishDelayTime > 0f)
 		{
-			Debug.Log($"[UseBagCard] Before OnUseFinished wait - finishDelayTime:{finishDelayTime}");
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-			Debug.Log($"[UseBagCard] After OnUseFinished wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		}
 
-		Debug.Log($"[UseBagCard] Before RemoveBagCard - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		await RemoveBagCard(cardType, cardControl);
-		Debug.Log($"[UseBagCard] After RemoveBagCard - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 
 		float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
-		Debug.Log($"[UseBagCard] After OnRemoveCard - removeDelayTime:{removeDelayTime}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}");
 		if (removeDelayTime > 0f)
 		{
-			Debug.Log($"[UseBagCard] Before removeDelayTime wait");
 			await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
-			Debug.Log($"[UseBagCard] After removeDelayTime wait - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 		}
 
-		Debug.Log($"[UseBagCard] Before RemoveCardCts - cardControl:{cardControl?.CardData?.cardName}, CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 		RemoveCardCts(cardControl);
-		Debug.Log($"[UseBagCard] After RemoveCardCts - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 
 		if (CurrentEffectCard != null)
 		{
-			Debug.Log($"[UseBagCard] Setting IsEffecting = false - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}");
 			CurrentEffectCard.IsEffecting = false;
 		}
-		Debug.Log($"[UseBagCard] End - CurrentEffectCard:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
 	}
 
 	void AddCardFromDiscard(object[] paraArray)
@@ -1668,12 +1662,27 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		m_KeyPathSpawned = true;
 
+		foreach (var kvp in m_EnvCardDict)
+		{
+			List<UICardSimpleControl> envCardList = kvp.Value;
+			if (envCardList != null)
+			{
+				for (int i = 0; i < envCardList.Count; i++)
+				{
+					UICardSimpleControl cardControl = envCardList[i];
+					if (cardControl != null && cardControl.gameObject.activeSelf)
+					{
+						cardControl.OnBtnRealClick();
+					}
+				}
+			}
+		}
+
 		if (m_KeyPathCardCache != null)
 		{
 			m_KeyPathCardCache.gameObject.SetActive(true);
 			m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
 			m_KeyPathCardCache.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-			Debug.Log($"KeyPath spawned at column 2 - all monsters cleared!");
 		}
 	}
 
@@ -1719,30 +1728,6 @@ public partial class UIGamePhaseControl : YViewControl
 		m_RealGrimReaperEnvIndex = -1;
 	}
 
-	void StealCoin(object[] paraArray)
-	{
-		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
-		int amount = (int)paraArray[1];
-		m_DataJoeyPlayer.Coin -= amount;
-		if (m_DataJoeyPlayer.Coin < 0)
-		{
-			m_DataJoeyPlayer.Coin = 0;
-		}
-		stealMoneyEffect.AddStolenCoin(amount);
-		OnCoinChanged(m_DataJoeyPlayer.Coin);
-	}
-
-	void ReturnCoin(object[] paraArray)
-	{
-		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
-		int stolenAmount = stealMoneyEffect.GetStolenCoinAmount();
-		if (stolenAmount > 0)
-		{
-			m_DataJoeyPlayer.Coin += stolenAmount;
-			OnCoinChanged(m_DataJoeyPlayer.Coin);
-		}
-	}
-
 	void OnCoinChange(object[] paraArray)
 	{
 		int coin = (int)paraArray[0];
@@ -1753,17 +1738,6 @@ public partial class UIGamePhaseControl : YViewControl
 			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
 			damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
 			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
-		}
-	}
-
-	void EscapeMonkey(object[] paraArray)
-	{
-		UICardSimpleControl monkeyCard = (UICardSimpleControl)paraArray[0];
-		if (monkeyCard != null && monkeyCard.IsEnv)
-		{
-			int envIndex = monkeyCard.EnvIndex;
-			RemoveEnvCard(envIndex, monkeyCard);
-			RemoveCardCts(monkeyCard);
 		}
 	}
 
@@ -1851,7 +1825,6 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardControl != null && cardControl.CardData != null)
 		{
 			Card cardData = cardControl.CardData;
-			cardData.attack += 1;
 			cardData.currentAttack += 1;
 			cardControl.RefreshCard();
 		}
@@ -1863,7 +1836,6 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardControl != null && cardControl.CardData != null)
 		{
 			Card cardData = cardControl.CardData;
-			cardData.defence += 1;
 			cardData.currentDefence += 1;
 			cardControl.RefreshCard();
 		}

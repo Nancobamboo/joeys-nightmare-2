@@ -44,6 +44,8 @@ public class UISelectControl : YViewControl
 
 	void OnBtnSkipClick()
 	{
+		DataSystem.Instance.AddCoin(10);
+		DataSystem.Instance.SaveDataJoeyPlayer();
 		Close();
 		if (OnSelectComplete != null)
 		{

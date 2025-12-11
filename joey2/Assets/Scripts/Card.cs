@@ -13,30 +13,28 @@ public class Card : IData
     public string cardFrame;
     public string cardName;
     public string description;
-    public int attack;
-    private int m_CurrentAttack;
+    private int attack;
     public int currentAttack
     {
-        get { return m_CurrentAttack; }
+        get { return attack; }
         set
         {
-            if (m_CurrentAttack != value)
+            if (attack != value)
             {
-                m_CurrentAttack = value;
+                attack = value;
                 UpdateEnvCardDict();
             }
         }
     }
-    public int defence;
-    private int m_CurrentDefence;
+    private int defence;
     public int currentDefence
     {
-        get { return m_CurrentDefence; }
+        get { return defence; }
         set
         {
-            if (m_CurrentDefence != value)
+            if (defence != value)
             {
-                m_CurrentDefence = value;
+                defence = value;
                 UpdateEnvCardDict();
             }
         }
@@ -44,7 +42,6 @@ public class Card : IData
     public int health;
     public int currentHealth;
     public int price;
-    public int currentPrice;
     public int stars;
     public string effectId;
     public int UniqueId;
@@ -88,13 +85,12 @@ public class Card : IData
         }
         this.description = _description;
         this.attack = _attack;
-        this.m_CurrentAttack = _attack;
+        this.attack = _attack;
         this.defence = _defence;
-        this.m_CurrentDefence = _defence;
+        this.defence = _defence;
         this.health = _health;
         this.currentHealth = _health;
         this.price = _price;
-        this.currentPrice = _price;
         this.stars = _stars;
         if (_stars == 3 & _type == "monster")
         {
@@ -115,10 +111,20 @@ public class Card : IData
     public Card Clone()
     {
         var c = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
-        c.m_CurrentAttack = m_CurrentAttack;
-        c.m_CurrentDefence = m_CurrentDefence;
+        c.attack = attack;
+        c.defence = defence;
         c.UniqueId = UniqueId;
         return c;
+    }
+
+    public void SetAttack(int value)
+    {
+        attack = value;
+    }
+
+    public void SetDefence(int value)
+    {
+        defence = value;
     }
 
     public ECardType GetCardType()
@@ -170,13 +176,10 @@ public class Card : IData
         cardName = (string)jobject["cardName"];
         description = (string)jobject["description"];
         attack = (int)jobject["attack"];
-        m_CurrentAttack = (int)jobject["currentAttack"];
         defence = (int)jobject["defence"];
-        m_CurrentDefence = (int)jobject["currentDefence"];
         health = (int)jobject["health"];
         currentHealth = (int)jobject["currentHealth"];
         price = (int)jobject["price"];
-        currentPrice = (int)jobject["currentPrice"];
         stars = (int)jobject["stars"];
         effectId = (string)jobject["effectId"];
         UniqueId = (int)jobject["UniqueId"];
@@ -203,13 +206,10 @@ public class Card : IData
         jobject.Add("cardName", cardName);
         jobject.Add("description", description);
         jobject.Add("attack", attack);
-        jobject.Add("currentAttack", currentAttack);
         jobject.Add("defence", defence);
-        jobject.Add("currentDefence", currentDefence);
         jobject.Add("health", health);
         jobject.Add("currentHealth", currentHealth);
         jobject.Add("price", price);
-        jobject.Add("currentPrice", currentPrice);
         jobject.Add("stars", stars);
         jobject.Add("effectId", effectId);
         jobject.Add("UniqueId", UniqueId);

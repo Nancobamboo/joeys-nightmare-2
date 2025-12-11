@@ -1,9 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Cysharp.Threading.Tasks;
 using System.Threading;
-using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public enum EGamePhase
 {
@@ -35,6 +35,11 @@ public class JoeyGameControl : YViewControl
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 	private bool m_IsLobbyEnter = false;
+	private Queue<object[]> actionParaQueue = new Queue<object[]>();
+	private Queue<int> ActionIdQueue = new Queue<int>();
+	private float m_ActionQueueTimer = 0f;
+	private const float ACTION_QUEUE_INTERVAL = 0.5f;
+	private bool m_IsProcessingAction = false;
 
 	private class GameStateCache
 	{
@@ -126,6 +131,13 @@ public class JoeyGameControl : YViewControl
 				default:
 					break;
 			}
+		}
+
+		m_ActionQueueTimer += Time.deltaTime;
+		if (m_ActionQueueTimer >= ACTION_QUEUE_INTERVAL)
+		{
+			m_ActionQueueTimer = 0f;
+			ProcessActionQueue();
 		}
 	}
 
@@ -755,9 +767,9 @@ public class JoeyGameControl : YViewControl
 
 	public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
 	{
-		
-			m_GamePhaseControl.UpdateBadMonkeyAttack(cardControl);
-		
+
+		m_GamePhaseControl.UpdateBadMonkeyAttack(cardControl);
+
 	}
 
 	public bool IsPlayerHalfHealth()
@@ -789,6 +801,49 @@ public class JoeyGameControl : YViewControl
 		}
 	}
 
+	public void QueueAction(EActionId actionId, params object[] paraArray)
+	{
+		bool wasEmpty = ActionIdQueue.Count == 0;
+		ActionIdQueue.Enqueue((int)actionId);
+		actionParaQueue.Enqueue(paraArray);
+
+		if (wasEmpty && !m_IsProcessingAction)
+		{
+			ProcessActionQueue();
+		}
+	}
+
+	private void ProcessActionQueue()
+	{
+		if (m_IsProcessingAction || ActionIdQueue.Count == 0 || actionParaQueue.Count == 0)
+		{
+			return;
+		}
+
+		m_IsProcessingAction = true;
+		int actionId = ActionIdQueue.Peek();
+		object[] paraArray = actionParaQueue.Peek();
+		YActionSystem.Instance.DispatchAction((EActionId)actionId, paraArray);
+
+		DelayDequeueAction().Forget();
+	}
+
+	private async UniTaskVoid DelayDequeueAction()
+	{
+		await UniTask.WaitForSeconds(ACTION_QUEUE_INTERVAL);
+		if (ActionIdQueue.Count > 0 && actionParaQueue.Count > 0)
+		{
+			ActionIdQueue.Dequeue();
+			actionParaQueue.Dequeue();
+		}
+		m_IsProcessingAction = false;
+
+		if (ActionIdQueue.Count > 0 && actionParaQueue.Count > 0)
+		{
+			ProcessActionQueue();
+		}
+	}
+
 	public void ClearAllUniTasks()
 	{
 		m_GamePhaseControl.Close();
@@ -804,6 +859,9 @@ public class JoeyGameControl : YViewControl
 			}
 		}
 		CancelTokenDict.Clear();
+
+		actionParaQueue.Clear();
+		ActionIdQueue.Clear();
 	}
 
 	private void OnDestroy()
