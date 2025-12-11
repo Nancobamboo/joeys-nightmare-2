@@ -17,7 +17,6 @@ public class YPermanentDefenceBoost : YDefaultEffect
 		if (CardControl != null && CardControl.CardData != null)
 		{
 			Card cardData = CardControl.CardData;
-			cardData.defence += deltaPara;
 			cardData.currentDefence += deltaPara;
 			CardControl.RefreshCard();
 		}
@@ -29,7 +28,6 @@ public class YPermanentDefenceBoost : YDefaultEffect
 		if (CardControl != null && CardControl.CardData != null)
 		{
 			Card cardData = CardControl.CardData;
-			cardData.defence += deltaPara;
 			cardData.currentDefence += deltaPara;
 			CardControl.RefreshCard();
 		}

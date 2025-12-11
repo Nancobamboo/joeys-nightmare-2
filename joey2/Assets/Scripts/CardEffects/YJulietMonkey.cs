@@ -29,7 +29,7 @@ public partial class UIGamePhaseControl
             if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardEffect != null && lastCard.CardEffect.Id == ECardEffectId.RomeoMonkey)
             {
                 Card cardData = lastCard.CardData;
-                cardData.currentAttack += 5;
+                cardData.SetAttack(cardData.currentAttack + 5);
                 cardData.currentHealth += 10;
                 lastCard.RefreshCard();
             }
