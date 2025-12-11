@@ -23,7 +23,7 @@ public class UIStartControl : YViewControl
 	private UIStartView m_View;
 	private const float HoverScale = 1.1f;
 	private const float AnimationDuration = 0.2f;
-	private const float ClickDelay = 0.5f;
+	private const float ClickDelay = 0.3f;
 	private Dictionary<Button, Vector3> m_ButtonOriginalScales = new Dictionary<Button, Vector3>();
 	private Dictionary<Button, Coroutine> m_ButtonCoroutines = new Dictionary<Button, Coroutine>();
 	private bool m_IsProcessingClick = false;
