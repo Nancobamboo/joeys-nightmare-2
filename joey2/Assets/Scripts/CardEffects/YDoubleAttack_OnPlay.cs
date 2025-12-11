@@ -23,6 +23,14 @@ public partial class UIGamePhaseControl
 	public void AddEffectValueToBagCard(ECardType targetCardType, EEffectType effectType, int value)
 	{
 		UICardSimpleControl lastBagCard = GetLastBagCard(targetCardType);
+
+		if (lastBagCard == null && targetCardType == ECardType.attack)
+		{
+			lastBagCard = GetFistCard();
+
+        }
+
+
 		if (lastBagCard != null)
 		{
 			lastBagCard.AddEffectValue(effectType, value);

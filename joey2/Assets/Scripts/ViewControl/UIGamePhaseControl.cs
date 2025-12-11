@@ -942,6 +942,13 @@ public partial class UIGamePhaseControl : YViewControl
 			return;
 		}
 		UICardSimpleControl lastAttackCard = GetLastBagCard(ECardType.attack);
+
+		if (lastAttackCard == null)
+		{
+			lastAttackCard = GetFistCard();
+
+        }
+
 		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
@@ -1306,7 +1313,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
-		int damage = attackCard.currentAttack + attackCardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+		int damage = attackCard.currentAttack + attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
