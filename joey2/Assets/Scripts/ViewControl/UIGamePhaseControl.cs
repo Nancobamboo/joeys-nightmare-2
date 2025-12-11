@@ -69,9 +69,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
 		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
-		RegistAction(EActionId.StealCoin, StealCoin);
-		RegistAction(EActionId.ReturnCoin, ReturnCoin);
-		RegistAction(EActionId.EscapeMonkey, EscapeMonkey);
 		RegistAction(EActionId.SwapEnvCard, SwapEnvCard);
 		RegistAction(EActionId.RomeoMonkeyDead, RomeoMonkeyDead);
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
@@ -1731,30 +1728,6 @@ public partial class UIGamePhaseControl : YViewControl
 		m_RealGrimReaperEnvIndex = -1;
 	}
 
-	void StealCoin(object[] paraArray)
-	{
-		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
-		int amount = (int)paraArray[1];
-		m_DataJoeyPlayer.Coin -= amount;
-		if (m_DataJoeyPlayer.Coin < 0)
-		{
-			m_DataJoeyPlayer.Coin = 0;
-		}
-		stealMoneyEffect.AddStolenCoin(amount);
-		OnCoinChanged(m_DataJoeyPlayer.Coin);
-	}
-
-	void ReturnCoin(object[] paraArray)
-	{
-		YStealMoney stealMoneyEffect = (YStealMoney)paraArray[0];
-		int stolenAmount = stealMoneyEffect.GetStolenCoinAmount();
-		if (stolenAmount > 0)
-		{
-			m_DataJoeyPlayer.Coin += stolenAmount;
-			OnCoinChanged(m_DataJoeyPlayer.Coin);
-		}
-	}
-
 	void OnCoinChange(object[] paraArray)
 	{
 		int coin = (int)paraArray[0];
@@ -1765,17 +1738,6 @@ public partial class UIGamePhaseControl : YViewControl
 			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
 			damageTextControl.SetCoinData(delta, Asset.UIRoot, Vector3.zero);
 			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
-		}
-	}
-
-	void EscapeMonkey(object[] paraArray)
-	{
-		UICardSimpleControl monkeyCard = (UICardSimpleControl)paraArray[0];
-		if (monkeyCard != null && monkeyCard.IsEnv)
-		{
-			int envIndex = monkeyCard.EnvIndex;
-			RemoveEnvCard(envIndex, monkeyCard);
-			RemoveCardCts(monkeyCard);
 		}
 	}
 

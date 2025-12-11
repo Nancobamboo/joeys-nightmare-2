@@ -29,12 +29,12 @@ public class YAutoBoomMoney : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                value--;
                 if (value == 0)
                 {
                     YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, baseExtra, EVFXName.VFX_boom);
                     CardControl.Return();
                 }
+                value--;
             }
         }
         return value;
