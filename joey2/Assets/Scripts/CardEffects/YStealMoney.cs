@@ -23,14 +23,6 @@ public class YStealMoney : YDefaultEffect
         }
     }
 
-    public override float OnDealDamage()
-    {
-        if (CardControl != null)
-        {
-            YActionSystem.Instance.DispatchAction(EActionId.StealCoin, this, baseExtra);
-        }
-        return base.OnDealDamage();
-    }
 
     public override int OnBuffValueChange(EBuffType buffType, int value)
     {
@@ -39,33 +31,29 @@ public class YStealMoney : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                value--;
                 if (value == 0)
                 {
-                    YActionSystem.Instance.DispatchAction(EActionId.EscapeMonkey, CardControl);
+                    if (CardControl.CardData != null)
+                    {
+                        // 对玩家造成伤害，参考 YGhost
+                        int damage = CardControl.CardData.currentAttack;
+                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, damage, EVFXName.VFX_Shouji);
+
+                        // 玩家扣 baseExtra 的钱
+                        DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+                        int currentCoin = playerData.Coin;
+                        int newCoin = Mathf.Max(0, currentCoin - baseExtra);
+                        DataSystem.Instance.AddCoin(-baseExtra);
+                        
+                        CardControl.Return();
+                    }
                 }
+                value--;
             }
         }
         return value;
     }
 
-    public override float OnDead()
-    {
-        if (CardControl != null && m_StolenCoinAmount > 0)
-        {
-            YActionSystem.Instance.DispatchAction(EActionId.ReturnCoin, this);
-        }
-        return base.OnDead();
-    }
 
-    public void AddStolenCoin(int amount)
-    {
-        m_StolenCoinAmount += amount;
-    }
-
-    public int GetStolenCoinAmount()
-    {
-        return m_StolenCoinAmount;
-    }
 }
 

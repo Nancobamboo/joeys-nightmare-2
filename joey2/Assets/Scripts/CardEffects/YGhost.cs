@@ -25,7 +25,6 @@ public class YGhost : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
-                value--;
                 if (value == 0)
                 {
                     if (CardControl.CardData != null)
@@ -35,6 +34,7 @@ public class YGhost : YDefaultEffect
                         YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, attack, EVFXName.VFX_Shouji);
                     }
                 }
+                value--;
             }
         }
         return value;
