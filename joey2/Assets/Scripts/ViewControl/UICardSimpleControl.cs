@@ -255,6 +255,11 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
 				m_View.TxtAttack.color = Color.black;
 				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
+				if (cachedCard.health > 0)
+				{
+					float ratio = (float)cachedCard.currentHealth / cachedCard.health;
+					m_View.MosterHeart.fillAmount = ratio;
+				}
 				break;
 
 			case ECardType.skill:
@@ -295,9 +300,12 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtAttack.color = Color.black;
 			}
 
-			if (m_View.TextHeart != null)
+			m_View.TextHeart.text = card.currentHealth.ToString();
+
+			if (card.health > 0)
 			{
-				m_View.TextHeart.text = card.currentHealth.ToString();
+				float ratio = (float)card.currentHealth / card.health;
+				m_View.MosterHeart.fillAmount = ratio;
 			}
 		}
 	}
@@ -612,6 +620,7 @@ public class UICardSimpleControl : YViewControl
 
 	public void SetData(Card card, bool isEnv = false, int envIndex = -1)
 	{
+		m_View.Counter.SetActive(false);
 		this.name = card.cardName;
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)
@@ -674,6 +683,11 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtAttack.color = Color.black;
 				m_View.Moster.SetActive(true);
 				m_View.TextHeart.text = card.currentHealth.ToString();
+				if (card.health > 0)
+				{
+					float ratio = (float)card.currentHealth / card.health;
+					m_View.MosterHeart.fillAmount = ratio;
+				}
 				break;
 
 			case ECardType.skill:
