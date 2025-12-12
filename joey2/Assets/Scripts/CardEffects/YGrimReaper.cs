@@ -12,13 +12,19 @@ public class YGrimReaper : YDefaultEffect
         Id = ECardEffectId.GrimReaper;
     }
 
+    private static bool s_HasCreatedGrimReaper = false;
+
     public override void SetData(UICardSimpleControl cardControl)
     {
         base.SetData(cardControl);
         if (CardControl != null)
         {
             CardControl.AddBuff(EBuffType.Counter, 5);
-            YActionSystem.Instance.DispatchAction(EActionId.CreateGrimReaperClone, CardControl);
+            if (!s_HasCreatedGrimReaper)
+            {
+                s_HasCreatedGrimReaper = true;
+                YActionSystem.Instance.DispatchAction(EActionId.CreateGrimReaperClone, CardControl);
+            }
         }
     }
 
