@@ -12,19 +12,13 @@ public class YGrimReaper : YDefaultEffect
         Id = ECardEffectId.GrimReaper;
     }
 
-    private static bool s_HasCreatedGrimReaper = false;
-
     public override void SetData(UICardSimpleControl cardControl)
     {
         base.SetData(cardControl);
         if (CardControl != null)
         {
             CardControl.AddBuff(EBuffType.Counter, 5);
-            if (!s_HasCreatedGrimReaper)
-            {
-                s_HasCreatedGrimReaper = true;
-                YActionSystem.Instance.DispatchAction(EActionId.CreateGrimReaperClone, CardControl);
-            }
+            YActionSystem.Instance.DispatchAction(EActionId.CreateGrimReaperClone, CardControl);
         }
     }
 
@@ -36,6 +30,11 @@ public class YGrimReaper : YDefaultEffect
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
                 value--;
+                if (value == 0)
+                {
+                    YActionSystem.Instance.DispatchAction(EActionId.GrimReaperEatClones, CardControl);
+                    return 5;
+                }
             }
         }
         return value;
@@ -50,7 +49,6 @@ public class YGrimReaper : YDefaultEffect
 
         if (effectType == EEffectType.ReflectDamage)
         {
-            Debug.LogWarning("GrimReaperTakeDamage ReflectDamage");
             return base.OnTakeDamage(effectType, damage);
         }
 
@@ -72,6 +70,12 @@ public partial class UIGamePhaseControl
         {
             return;
         }
+        if (m_HasCreatedGrimReaper)
+        {
+            return;
+        }
+
+        m_HasCreatedGrimReaper = true;
 
         if (m_YGrimReaperList.Count == 0)
         {
@@ -94,13 +98,70 @@ public partial class UIGamePhaseControl
             VerticalLayoutGroup parent = m_EnvPanels[envIndex];
             Card newCard = cardControl.CardData.Clone();
             newCard.effectId = ECardEffectId.GrimReaper.ToString();
+            newCard.health = cardControl.CardData.health;
+            newCard.currentHealth = cardControl.CardData.currentHealth;
             m_CardDict[newCard.UniqueId] = newCard;
             UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);
             newCardControl.SetData(newCard, isEnv: true, envIndex: envIndex);
+
             AddEnvCard(envIndex, newCardControl);
             m_YGrimReaperList.Add(newCardControl);
             newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
         }
+
+        RandomRealGrimReaperEnvIndex();
+    }
+
+    public void GrimReaperEatClones(UICardSimpleControl cardControl)
+    {
+        if (cardControl == null || cardControl.CardData == null)
+        {
+            return;
+        }
+        if (m_YGrimReaperList.Count == 0)
+        {
+            return;
+        }
+
+        UICardSimpleControl realGrimReaper = m_YGrimReaperList.FirstOrDefault(g => g != null && g.EnvIndex == m_RealGrimReaperEnvIndex);
+        if (realGrimReaper == null && m_YGrimReaperList.Count > 0)
+        {
+            realGrimReaper = m_YGrimReaperList[0];
+            m_RealGrimReaperEnvIndex = realGrimReaper.EnvIndex;
+        }
+        if (realGrimReaper == null)
+        {
+            return;
+        }
+
+        int healAmount = 0;
+        for (int i = m_YGrimReaperList.Count - 1; i >= 0; i--)
+        {
+            UICardSimpleControl cloneCard = m_YGrimReaperList[i];
+            if (cloneCard != null && cloneCard != realGrimReaper)
+            {
+                healAmount += 10;
+                int envIndex = cloneCard.EnvIndex;
+                RemoveCardCts(cloneCard);
+                RemoveEnvCard(envIndex, cloneCard);
+                //m_YGrimReaperList.RemoveAt(i);
+            }
+        }
+        m_YGrimReaperList.Clear();
+
+        if (healAmount > 0)
+        {
+            Card cardData = realGrimReaper.CardData;
+            cardData.currentHealth += healAmount;
+            if (cardData.currentHealth > cardData.health)
+            {
+                cardData.currentHealth = cardData.health;
+            }
+            realGrimReaper.RefreshCard();
+        }
+
+        m_HasCreatedGrimReaper = false;
+        CreateGrimReaperClone(realGrimReaper);
     }
 
     public void GrimReaperTakeDamage(UICardSimpleControl grimReaperCard, bool isSuccess, int damage)
@@ -115,12 +176,11 @@ public partial class UIGamePhaseControl
 
         if (isRealGrimReaper)
         {
-            Debug.Log($"GrimReaperTakeDamage isRealGrimReaper = true");
+            RandomRealGrimReaperEnvIndex();
             DealDamageToOtherGrimReapers(grimReaperCard, damage);
         }
         else
         {
-            Debug.Log($"GrimReaperTakeDamage isRealGrimReaper = false");
             RemoveCardCts(grimReaperCard);
             RemoveEnvCard(envIndex, grimReaperCard);
             m_YGrimReaperList.Remove(grimReaperCard);
@@ -129,7 +189,7 @@ public partial class UIGamePhaseControl
             int realEnvIndex = realGrimReaper.EnvIndex;
             GetOrCreateCardToken(realGrimReaper);
             TakePlayerDamageAsync(attack, realGrimReaper, realEnvIndex).Forget();
-            SetRealGrimReaperAndAnimate();
+
         }
     }
 
@@ -177,7 +237,7 @@ public partial class UIGamePhaseControl
         return realGrimReaper;
     }
 
-    private void SetRealGrimReaperAndAnimate()
+    private void RandomRealGrimReaperEnvIndex()
     {
         if (m_YGrimReaperList.Count == 0)
         {

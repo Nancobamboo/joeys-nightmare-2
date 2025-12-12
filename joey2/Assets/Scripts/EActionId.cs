@@ -25,6 +25,7 @@ public enum EActionId
 	JulietMonkeyDead,
 	AddEnvCardFromBag,
 	CreateGrimReaperClone,
+	GrimReaperEatClones,
 	GrimReaperCloneTakeDamage,
 	GrimReaperTakeDamage,
 	ThrowWeaponToEnv,

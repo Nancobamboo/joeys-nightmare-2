@@ -31,6 +31,7 @@ public class YStealMoney : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
+                value--;
                 if (value == 0)
                 {
                     if (CardControl.CardData != null)
@@ -44,11 +45,10 @@ public class YStealMoney : YDefaultEffect
                         int currentCoin = playerData.Coin;
                         int newCoin = Mathf.Max(0, currentCoin - baseExtra);
                         DataSystem.Instance.AddCoin(-baseExtra);
-                        
+
                         CardControl.Return();
                     }
                 }
-                value--;
             }
         }
         return value;

@@ -27,11 +27,11 @@ public class YWalkingChickenEgg : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
+                value--;
                 if (value == 0)
                 {
                     YActionSystem.Instance.DispatchAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
                 }
-                value--;
             }
         }
         return value;
