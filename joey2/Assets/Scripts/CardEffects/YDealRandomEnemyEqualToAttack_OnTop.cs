@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 {
@@ -80,16 +80,19 @@ public partial class UIGamePhaseControl
 			CancellationToken token = GetOrCreateCardToken(enemyCardControl);
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token);
 
-
 			RemoveCardCts(enemyCardControl);
 
 			if (isKilled)
 			{
 				break;
 			}
-
+			else if (enemyCardControl.CardEffect?.GetEffectValue(EEffectType.QuickAttack) > 0)
+			{
+				int enemyAttack = enemyCardControl.CardData.currentAttack;
+				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, null);
+			}
 		}
-
 	}
 }
 

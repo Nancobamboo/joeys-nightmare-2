@@ -44,8 +44,11 @@ public class UIDescExtControl : YViewControl
 
 		Camera uiCamera = Camera.main;
 
+		Vector3[] worldCorners = new Vector3[4];
+		targetRect.GetWorldCorners(worldCorners);
+		Vector3 targetWorldPosition = (worldCorners[0] + worldCorners[2]) * 0.5f;
 
-		Vector2 targetScreenPos = RectTransformUtility.WorldToScreenPoint(uiCamera, targetRect.position);
+		Vector2 targetScreenPos = RectTransformUtility.WorldToScreenPoint(uiCamera, targetWorldPosition);
 		float screenCenterX = Screen.width * 0.5f;
 		bool isTargetOnLeft = targetScreenPos.x < screenCenterX;
 
