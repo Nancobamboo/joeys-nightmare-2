@@ -180,7 +180,6 @@ public class UICardSimpleControl : YViewControl
 			JoeyGameControl.Instance.EndGamePhase();
 			return;
 		}
-		IsEffecting = true;
 		YActionSystem.Instance.DispatchAction(EActionId.AddCardToQueue, this);
 	}
 
