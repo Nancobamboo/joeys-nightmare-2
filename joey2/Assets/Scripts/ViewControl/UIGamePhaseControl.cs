@@ -626,8 +626,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (newLastBagCard != null)
 			{
 				float delayTime = newLastBagCard.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
-				await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(newLastBagCard));
-				RemoveCardCts(newLastBagCard);
+				await UniTask.WaitForSeconds(delayTime);
 			}
 		}
 	}
@@ -1508,12 +1507,12 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(cardControl));
+		await UniTask.WaitForSeconds(delayTime);
 
 		float finishDelayTime = cardControl.CardEffect?.OnUseFinished(false) ?? 0f;
 		if (finishDelayTime > 0f)
 		{
-			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
+			await UniTask.WaitForSeconds(finishDelayTime);
 		}
 
 		await RemoveBagCard(cardType, cardControl);
@@ -1521,7 +1520,7 @@ public partial class UIGamePhaseControl : YViewControl
 		float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
 		if (removeDelayTime > 0f)
 		{
-			await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(cardControl));
+			await UniTask.WaitForSeconds(removeDelayTime);
 		}
 
 		RemoveCardCts(cardControl);
@@ -1580,7 +1579,7 @@ public partial class UIGamePhaseControl : YViewControl
 	void AddCardToQueue(object[] paraArray)
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		if (cardControl != null && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
+		if (cardControl != null && !cardControl.IsEffecting && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
 			for (int i = 0; i < m_EnvPanels.Count; i++)
 			{

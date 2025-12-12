@@ -13,7 +13,7 @@ public class YDoubleAttack_OnDealDamage : YCardEffect
 	public override void SetData(UICardSimpleControl cardControl)
 	{
 		base.SetData(cardControl);
-		AddEffectValue(EEffectType.ExtraAttackCnt, 1);
+		CardControl.AddEffectValue(EEffectType.ExtraAttackCnt, 1);
 	}
 
 

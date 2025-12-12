@@ -27,7 +27,7 @@ public class YCullingBlade : YDefaultEffect
 				int extraDamage = Mathf.Max(0, currentHealth - totalDamage);
 				if (extraDamage > 0)
 				{
-					AddEffectValue(EEffectType.Damage, extraDamage);
+					CardControl.AddEffectValue(EEffectType.Damage, extraDamage);
 				}
 			}
 		}

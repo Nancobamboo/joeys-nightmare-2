@@ -45,8 +45,11 @@ public class JoeyGameControl : YViewControl
 	{
 		public Dictionary<int, List<string>> EnvCardDict = new Dictionary<int, List<string>>();
 		public Dictionary<ECardType, List<string>> BagCardDict = new Dictionary<ECardType, List<string>>();
+		public List<string> EnvCardPool = new List<string>();
+		public Dictionary<string, Card> EnvCardDictData = new Dictionary<string, Card>();
 		public int PlayerHealth;
 		public int PlayerMaxHealth;
+		public int Coin;
 	}
 
 	private GameStateCache m_GameStateCache;
@@ -320,6 +323,15 @@ public class JoeyGameControl : YViewControl
 		m_GameStateCache = new GameStateCache();
 		m_GameStateCache.PlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_GameStateCache.PlayerMaxHealth = m_DataJoeyPlayer.playerMaxHealth;
+		m_GameStateCache.Coin = m_DataJoeyPlayer.Coin;
+
+		m_GameStateCache.EnvCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
+
+		m_GameStateCache.EnvCardDictData = new Dictionary<string, Card>();
+		foreach (var kvp in m_DataJoeyPlayer.EnvCardDict)
+		{
+			m_GameStateCache.EnvCardDictData[kvp.Key] = kvp.Value;
+		}
 
 		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
 		foreach (var kvp in envCardDict)
@@ -362,6 +374,16 @@ public class JoeyGameControl : YViewControl
 
 		m_DataJoeyPlayer.playerHealth = m_GameStateCache.PlayerHealth;
 		m_DataJoeyPlayer.playerMaxHealth = m_GameStateCache.PlayerMaxHealth;
+		m_DataJoeyPlayer.Coin = m_GameStateCache.Coin;
+
+		m_DataJoeyPlayer.EnvCardPool.Clear();
+		m_DataJoeyPlayer.EnvCardPool.AddRange(m_GameStateCache.EnvCardPool);
+
+		m_DataJoeyPlayer.EnvCardDict.Clear();
+		foreach (var kvp in m_GameStateCache.EnvCardDictData)
+		{
+			m_DataJoeyPlayer.EnvCardDict[kvp.Key] = kvp.Value;
+		}
 
 		m_GamePhaseControl.SetData();
 
