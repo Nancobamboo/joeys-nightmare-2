@@ -192,6 +192,10 @@ public partial class UIGamePhaseControl
             RemoveEnvCard(grimReaperCard.EnvIndex, grimReaperCard);
             m_YGrimReaperList.Remove(grimReaperCard);
             UICardSimpleControl realGrimReaper = GetRealGrimReaper();
+            if (realGrimReaper == null || realGrimReaper.CardData == null)
+            {
+                return;
+            }
             int attack = realGrimReaper.CardData.currentAttack;
             int realEnvIndex = realGrimReaper.EnvIndex;
             GetOrCreateCardToken(realGrimReaper);
