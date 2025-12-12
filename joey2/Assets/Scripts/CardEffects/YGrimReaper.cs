@@ -76,6 +76,17 @@ public partial class UIGamePhaseControl
 
         m_HasCreatedGrimReaper = true;
 
+        for (int i = m_YGrimReaperList.Count - 1; i >= 0; i--)
+        {
+            UICardSimpleControl clone = m_YGrimReaperList[i];
+            if (clone != null && clone != cardControl)
+            {
+                RemoveCardCts(clone);
+                RemoveEnvCard(clone.EnvIndex, clone);
+                m_YGrimReaperList.RemoveAt(i);
+            }
+        }
+
         if (m_YGrimReaperList.Count == 0)
         {
             m_YGrimReaperList.Add(cardControl);
@@ -135,7 +146,16 @@ public partial class UIGamePhaseControl
 
         int healAmount = (m_YGrimReaperList.Count - 1) * 5;
 
-        m_YGrimReaperList.Clear();
+        for (int i = m_YGrimReaperList.Count - 1; i >= 0; i--)
+        {
+            UICardSimpleControl clone = m_YGrimReaperList[i];
+            if (clone != null && clone != realGrimReaper)
+            {
+                RemoveCardCts(clone);
+                RemoveEnvCard(clone.EnvIndex, clone);
+                m_YGrimReaperList.RemoveAt(i);
+            }
+        }
 
         if (healAmount > 0)
         {
