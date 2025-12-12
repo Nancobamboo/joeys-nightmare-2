@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class YDoubleAttack_OnPlay : YCardEffect
 {
+	int m_ExtraAttackCnt = 1;
 	public YDoubleAttack_OnPlay()
 	{
 		Id = ECardEffectId.DoubleAttack_OnPlay;
-		AddEffectValue(EEffectType.ExtraAttackCnt, 1);
+
 	}
 
 	public override float OnRemoveCard()
 	{
-		int extraAttackCnt = GetEffectValue(EEffectType.ExtraAttackCnt);
-		YActionSystem.Instance.DispatchAction(EActionId.AddEffectValueToBagCard, ECardType.attack, EEffectType.ExtraAttackCnt, extraAttackCnt);
+		YActionSystem.Instance.DispatchAction(EActionId.AddEffectValueToBagCard, ECardType.attack, EEffectType.ExtraAttackCnt, m_ExtraAttackCnt);
 		return 0f;
 	}
 }
@@ -28,13 +28,14 @@ public partial class UIGamePhaseControl
 		{
 			lastBagCard = GetFistCard();
 
-        }
+		}
 
 
 		if (lastBagCard != null)
 		{
 			lastBagCard.AddEffectValue(effectType, value);
 		}
+
 	}
 }
 
