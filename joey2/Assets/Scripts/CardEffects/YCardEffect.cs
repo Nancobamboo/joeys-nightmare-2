@@ -203,7 +203,7 @@ public class YCardEffect
         return 0f;
     }
 
-    public virtual int GetEffectValue(EEffectType effectType)
+    public int GetEffectValue(EEffectType effectType)
     {
         int index = (int)effectType;
         if (index >= 0 && index < m_EffectValues.Length)
@@ -213,7 +213,7 @@ public class YCardEffect
         return 0;
     }
 
-    public virtual void AddEffectValue(EEffectType effectType, int value)
+    public void AddEffectValue(EEffectType effectType, int value)
     {
         int index = (int)effectType;
         if (index >= 0 && index < m_EffectValues.Length)
@@ -222,7 +222,7 @@ public class YCardEffect
         }
     }
 
-    public virtual void ClearAllEffectValues()
+    public void ClearAllEffectValues()
     {
         for (int i = 0; i < m_EffectValues.Length; i++)
         {

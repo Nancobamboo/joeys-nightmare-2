@@ -16,14 +16,5 @@ public class YExtraDamage_OnDealDamage : YCardEffect
 	{
 		return base.OnDealDamage();
 	}
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.Damage)
-		{
-			return baseExtra;
-		}
-		return base.GetEffectValue(effectType);
-	}
 }
 

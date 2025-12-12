@@ -35,17 +35,6 @@ public class YBoom_OnDead : YCardEffect
 		JoeyGameControl.Instance.QueueAction(EActionId.BoomEnvCard, m_EnvIndex, baseExtra, true, CardControl);
 		return 0f;
 	}
-
-
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.Damage)
-		{
-			return baseExtra;
-		}
-		return base.GetEffectValue(effectType);
-	}
 }
 
 public partial class UIGamePhaseControl

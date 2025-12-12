@@ -28,18 +28,8 @@ public class YElectric : YCardEffect
 
 	public override float OnRemoveCard()
 	{
-		int damage = GetEffectValue(EEffectType.Damage);
-		JoeyGameControl.Instance.QueueAction(EActionId.TakeAllEnemyDamage, damage);
+		JoeyGameControl.Instance.QueueAction(EActionId.TakeAllEnemyDamage, baseExtra);
 		return 0f;
-	}
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.Damage)
-		{
-			return baseExtra;
-		}
-		return base.GetEffectValue(effectType);
 	}
 }
 

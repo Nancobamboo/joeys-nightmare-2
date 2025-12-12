@@ -11,29 +11,27 @@ public class YCullingBlade : YDefaultEffect
 		Id = ECardEffectId.CullingBlade;
 	}
 
-	public override int GetEffectValue(EEffectType effectType)
+	public override float OnDealDamage()
 	{
-		if (effectType == EEffectType.Damage)
+		UICardSimpleControl targetCard = JoeyGameControl.Instance?.GetCurrentAttackTarget();
+		if (targetCard != null && targetCard.CardData != null)
 		{
-			// 获取当前攻击目标
-			UICardSimpleControl targetCard = JoeyGameControl.Instance?.GetCurrentAttackTarget();
-			if (targetCard != null && targetCard.CardData != null)
-			{
-				int currentHealth = targetCard.CardData.currentHealth;
-				int maxHealth = targetCard.CardData.health;
+			int currentHealth = targetCard.CardData.currentHealth;
+			int maxHealth = targetCard.CardData.health;
 
-				// 如果目标当前HP小于最大HP的一半，触发斩杀
-				if (currentHealth < maxHealth / 2.0f)
+			if (currentHealth < maxHealth / 2.0f)
+			{
+				int weaponDamage = CardControl?.CardData?.currentAttack ?? 0;
+				int currentEffectDamage = GetEffectValue(EEffectType.Damage);
+				int totalDamage = weaponDamage + currentEffectDamage;
+				int extraDamage = Mathf.Max(0, currentHealth - totalDamage);
+				if (extraDamage > 0)
 				{
-					// 计算需要的额外伤害，使得总伤害等于目标当前HP
-					int weaponDamage = CardControl?.CardData?.currentAttack ?? 0;
-					int extraDamage = Mathf.Max(0, currentHealth - weaponDamage);
-					return extraDamage;
+					AddEffectValue(EEffectType.Damage, extraDamage);
 				}
 			}
-			return 0;
 		}
-		return base.GetEffectValue(effectType);
+		return base.OnDealDamage();
 	}
 }
 
