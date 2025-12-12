@@ -36,6 +36,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private int currentMonsterAttack = 0;
 	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
+	private bool m_HasCreatedGrimReaper = false;
 	private UICardSimpleControl m_FistCardCache;
 	private UICardSimpleControl m_KeyPathCardCache;
 	private const string EXIT_CARD_ID = "6001";
@@ -75,6 +76,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.BananaMonkeyDead, BananaMonkeyDead);
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
+		RegistAction(EActionId.GrimReaperEatClones, GrimReaperEatClones);
 		RegistAction(EActionId.GrimReaperTakeDamage, GrimReaperTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
 		RegistAction(EActionId.ThrowWeaponDefenceToEnv, ThrowWeaponDefenceToEnv);
@@ -708,7 +710,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage, CancellationToken? cancellationToken = null)
 	{
-		CancellationToken token = cancellationToken ?? GetOrCreateCardToken(CurrentEffectCard);
+		CancellationToken token = cancellationToken ?? CancellationToken.None;
 
 		if (cardControl.CardType == ECardType.monster)
 		{
@@ -849,12 +851,11 @@ public partial class UIGamePhaseControl : YViewControl
 		return Mathf.Clamp(centerIndex, 0, panelCount - 1);
 	}
 
-	async void BoomEnvCard(object[] paraArray)
+	void BoomEnvCard(object[] paraArray)
 	{
 		int envIndex = (int)paraArray[0];
 		int damage = (int)paraArray[1];
 		bool excludeSelf = paraArray.Length > 2 && paraArray[2] is bool && (bool)paraArray[2];
-		//UICardSimpleControl boomCard = (UICardSimpleControl)paraArray[3];
 
 		if (envIndex == -1)
 		{
@@ -865,7 +866,6 @@ public partial class UIGamePhaseControl : YViewControl
 			BoomEnvCardAtPosition(envIndex, damage, excludeSelf);
 		}
 
-		//RemoveCardCts(boomCard);
 	}
 
 	private int FindRandomEnemy()
@@ -1108,6 +1108,8 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return;
 		}
+
+
 
 		if (!m_CardCtsDict.TryGetValue(cardControl, out CancellationTokenSource cts))
 		{
@@ -1730,6 +1732,12 @@ public partial class UIGamePhaseControl : YViewControl
 		CreateGrimReaperClone(cardControl);
 	}
 
+	void GrimReaperEatClones(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		GrimReaperEatClones(cardControl);
+	}
+
 	void GrimReaperTakeDamage(object[] paraArray)
 	{
 		UICardSimpleControl grimReaperCard = (UICardSimpleControl)paraArray[0];
@@ -1738,10 +1746,15 @@ public partial class UIGamePhaseControl : YViewControl
 		GrimReaperTakeDamage(grimReaperCard, isSuccess, damage);
 	}
 
-	private void ClearGrimReaperData()
+	public void ClearGrimReaperData()
 	{
+		for (int i = 0; i < m_YGrimReaperList.Count; i++)
+		{
+			m_YGrimReaperList[i].Return();
+		}
 		m_YGrimReaperList.Clear();
 		m_RealGrimReaperEnvIndex = -1;
+		m_HasCreatedGrimReaper = false;
 	}
 
 	void OnCoinChange(object[] paraArray)

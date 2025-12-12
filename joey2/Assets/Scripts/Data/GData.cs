@@ -1018,7 +1018,7 @@ public sealed class GData : PureSingleton<GData>
 			string keyword = kvp.Key;
 			if (description.Contains(keyword))
 			{
-				result.Add(kvp.Value);
+				result.Add(keyword + "：" + kvp.Value);
 			}
 		}
 

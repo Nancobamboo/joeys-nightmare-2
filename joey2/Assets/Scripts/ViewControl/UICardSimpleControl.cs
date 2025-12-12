@@ -97,7 +97,7 @@ public class UICardSimpleControl : YViewControl
 		m_OriginalScale = CacheTrans.localScale;
 		CacheTrans.localScale = m_OriginalScale * 1.1f;
 
-		if (cachedCard != null && !IsEnv)
+		if (cachedCard != null)
 		{
 			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
 			if (keywordDescriptions != null && keywordDescriptions.Count > 0)
@@ -337,7 +337,7 @@ public class UICardSimpleControl : YViewControl
 		if (counter > 0)
 		{
 			m_View.Counter.SetActive(true);
-			m_View.TxtCnt.text = counter.ToString();
+			m_View.TxtCnt.text = (counter - 1).ToString();
 		}
 		else
 		{
@@ -837,6 +837,8 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_BuffValueArray[i] = 0;
 		}
+
+		CardEffect?.ClearAllEffectValues();
 
 		m_View.TxtAttack.color = Color.black;
 		m_View.TxtDefence.color = Color.black;

@@ -25,12 +25,12 @@ public class YWalkingChicken : YDefaultEffect
             int envIndex = CardControl.EnvIndex;
             if (JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
             {
+                value--;
                 if (value == 0)
                 {
                     YActionSystem.Instance.DispatchAction(EActionId.MoveEnvCardLeft, CardControl);
                     value = 2;
                 }
-                value--;
             }
         }
         return value;

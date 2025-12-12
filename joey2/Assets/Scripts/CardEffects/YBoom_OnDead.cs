@@ -32,7 +32,7 @@ public class YBoom_OnDead : YCardEffect
 
 	public override float OnDead()
 	{
-		JoeyGameControl.Instance.QueueAction(EActionId.BoomEnvCard, m_EnvIndex, baseExtra, true, CardControl);
+		JoeyGameControl.Instance.QueueAction(EActionId.BoomEnvCard, m_EnvIndex, baseExtra, true);
 		return 0f;
 	}
 }

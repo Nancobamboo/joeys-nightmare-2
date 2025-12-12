@@ -405,6 +405,8 @@ public class JoeyGameControl : YViewControl
 
 	public void EnterBattleStart()
 	{
+		m_GamePhaseControl.ClearGrimReaperData();
+
 		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_GameStateCache != null)
 		{
 			RestoreGameStateCache();
