@@ -101,6 +101,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.BloodStorageActivate, BloodStorageActivate);
 		RegistAction(EActionId.RefreshCardLimitDebuff, OnRefreshCardLimitDebuff);
 		RegistAction(EActionId.BloodStorageDeduct, BloodStorageDeduct);
+		RegistAction(EActionId.ShamanDonkeyBuff, ShamanDonkeyBuff);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -950,7 +951,9 @@ public partial class UIGamePhaseControl : YViewControl
 		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
+			Debug.Log($"Before DoubleLastWeaponAttack: {attackValue}");
 			lastAttackCard.AddEffectValue(EEffectType.Damage, attackValue);
+			Debug.Log($"After DoubleLastWeaponAttack: {lastAttackCard.CardData.currentAttack + lastAttackCard.CardEffect.GetEffectValue(EEffectType.Damage)}");
 		}
 	}
 
