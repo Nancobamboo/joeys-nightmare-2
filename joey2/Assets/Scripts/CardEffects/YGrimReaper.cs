@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
 
 public class YGrimReaper : YDefaultEffect
 {
@@ -48,23 +48,7 @@ public class YGrimReaper : YDefaultEffect
             return base.OnTakeDamage(effectType, damage);
         }
 
-        int counter = CardControl.GetBuffValue(EBuffType.Counter);
-
-        if (counter >= 3)
-        {
-            if (ControlUtil.IsRandomSucceed(20))
-            {
-                YActionSystem.Instance.DispatchAction(EActionId.GrimReaperTakeDamage, CardControl, true, damage);
-            }
-            else
-            {
-                YActionSystem.Instance.DispatchAction(EActionId.GrimReaperTakeDamage, CardControl, false, damage);
-            }
-        }
-        else if (counter < 3)
-        {
-            YActionSystem.Instance.DispatchAction(EActionId.GrimReaperTakeDamage, CardControl, false, damage);
-        }
+        YActionSystem.Instance.DispatchAction(EActionId.GrimReaperTakeDamage, CardControl, false, damage);
 
         return base.OnTakeDamage(effectType, damage);
     }
@@ -86,24 +70,30 @@ public partial class UIGamePhaseControl
         if (m_YGrimReaperList.Count == 0)
         {
             m_YGrimReaperList.Add(cardControl);
+        }
 
-            int currentEnvIndex = cardControl.EnvIndex;
+        int currentEnvIndex = cardControl.EnvIndex;
+        List<int> envIndices = new List<int>();
+        for (int i = 0; i < m_EnvPanels.Count; i++)
+        {
+            envIndices.Add(i);
+        }
+        envIndices.Remove(currentEnvIndex);
+        ControlUtil.ShuffleList(envIndices);
 
-            for (int i = 0; i < m_EnvPanels.Count; i++)
-            {
-                if (i != currentEnvIndex)
-                {
-                    VerticalLayoutGroup parent = m_EnvPanels[i];
-                    Card newCard = cardControl.CardData.Clone();
-                    newCard.effectId = ECardEffectId.GrimReaper.ToString();
-                    m_CardDict[newCard.UniqueId] = newCard;
-                    UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);
-                    newCardControl.SetData(newCard, isEnv: true, envIndex: i);
-                    AddEnvCard(i, newCardControl);
-                    m_YGrimReaperList.Add(newCardControl);
-                    newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
-                }
-            }
+        int createCount = 3;
+        for (int i = 0; i < createCount && i < envIndices.Count; i++)
+        {
+            int envIndex = envIndices[i];
+            VerticalLayoutGroup parent = m_EnvPanels[envIndex];
+            Card newCard = cardControl.CardData.Clone();
+            newCard.effectId = ECardEffectId.GrimReaper.ToString();
+            m_CardDict[newCard.UniqueId] = newCard;
+            UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);
+            newCardControl.SetData(newCard, isEnv: true, envIndex: envIndex);
+            AddEnvCard(envIndex, newCardControl);
+            m_YGrimReaperList.Add(newCardControl);
+            newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
         }
     }
 
@@ -114,51 +104,26 @@ public partial class UIGamePhaseControl
             return;
         }
 
-        int counter = grimReaperCard.GetBuffValue(EBuffType.Counter);
         int envIndex = grimReaperCard.EnvIndex;
+        bool isRealGrimReaper = (m_RealGrimReaperEnvIndex == envIndex);
 
-        if (counter >= 3)
+        if (isRealGrimReaper)
         {
-            if (isSuccess)
-            {
-                Debug.Log($"GrimReaperTakeDamage counter >= 3, isSuccess = true");
-                DealDamageToOtherGrimReapers(grimReaperCard, damage)    ;
-            }
-            else
-            {
-                Debug.Log($"GrimReaperTakeDamage counter >= 3, isSuccess = false");
-                RemoveCardCts(grimReaperCard);
-                RemoveEnvCard(envIndex, grimReaperCard);
-                m_YGrimReaperList.Remove(grimReaperCard);
-                UICardSimpleControl realGrimReaper = GetRealGrimReaper(grimReaperCard);
-                int attack = realGrimReaper.CardData.currentAttack;
-                int realEnvIndex = realGrimReaper.EnvIndex;
-                GetOrCreateCardToken(realGrimReaper);
-                TakePlayerDamageAsync(attack, realGrimReaper, realEnvIndex).Forget();
-            }
+            Debug.Log($"GrimReaperTakeDamage isRealGrimReaper = true");
+            DealDamageToOtherGrimReapers(grimReaperCard, damage);
         }
-        else if (counter < 3)
+        else
         {
-            bool isRealGrimReaper = (m_RealGrimReaperEnvIndex == envIndex);
-
-            if (isRealGrimReaper)
-            {
-                Debug.Log($"GrimReaperTakeDamage counter < 3, isRealGrimReaper = true");
-                DealDamageToOtherGrimReapers(grimReaperCard, damage);
-            }
-            else
-            {
-                Debug.Log($"GrimReaperTakeDamage counter < 3, isRealGrimReaper = false");
-                RemoveCardCts(grimReaperCard);
-                RemoveEnvCard(envIndex, grimReaperCard);
-                m_YGrimReaperList.Remove(grimReaperCard);
-                UICardSimpleControl realGrimReaper = GetRealGrimReaper(grimReaperCard);
-                int attack = realGrimReaper.CardData.currentAttack;
-                int realEnvIndex = realGrimReaper.EnvIndex;
-                GetOrCreateCardToken(realGrimReaper);
-                TakePlayerDamageAsync(attack, realGrimReaper, realEnvIndex).Forget();
-                SetRealGrimReaperAndAnimate();
-            }
+            Debug.Log($"GrimReaperTakeDamage isRealGrimReaper = false");
+            RemoveCardCts(grimReaperCard);
+            RemoveEnvCard(envIndex, grimReaperCard);
+            m_YGrimReaperList.Remove(grimReaperCard);
+            UICardSimpleControl realGrimReaper = GetRealGrimReaper(grimReaperCard);
+            int attack = realGrimReaper.CardData.currentAttack;
+            int realEnvIndex = realGrimReaper.EnvIndex;
+            GetOrCreateCardToken(realGrimReaper);
+            TakePlayerDamageAsync(attack, realGrimReaper, realEnvIndex).Forget();
+            SetRealGrimReaperAndAnimate();
         }
     }
 
