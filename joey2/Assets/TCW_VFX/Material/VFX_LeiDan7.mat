@@ -101,7 +101,7 @@ Material:
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
-    - _FixValue: {r: 0, g: 0, b: 0, a: 0}
+    - _FixValue: {r: 1, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
