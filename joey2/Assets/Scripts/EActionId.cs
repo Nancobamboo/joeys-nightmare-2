@@ -56,7 +56,7 @@ public enum EActionId
 	BloodStorageDeduct,
 	RefreshCardLimitDebuff,
 	BananaMonkeyDead,
-		ShamanDonkeyBuff,
+	ShamanDonkeyBuff,
 	Upper,
 
 }

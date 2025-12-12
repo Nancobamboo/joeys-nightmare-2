@@ -87,7 +87,7 @@ public partial class UIGamePhaseControl
         envIndices.Remove(currentEnvIndex);
         ControlUtil.ShuffleList(envIndices);
 
-        int createCount = 3;
+        int createCount = 2;
         for (int i = 0; i < createCount && i < envIndices.Count; i++)
         {
             int envIndex = envIndices[i];

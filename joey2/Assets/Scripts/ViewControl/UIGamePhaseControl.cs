@@ -237,7 +237,15 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public void SetBackgroundByStageId(int stageId)
 	{
-		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
+		{
+			m_View.MonkeyBg.SetActive(false);
+			m_View.TurkeyBg.SetActive(false);
+			m_View.DonkeyBg.SetActive(false);
+			m_View.DeadkeyBg.SetActive(false);
+			m_View.GuideBg.SetActive(true);
+		}
+		else if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
 		{
 			EnvStage envStage = GData.Instance.GetEnvStage(stageId);
 			if (envStage != null)
@@ -261,6 +269,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_View.TurkeyBg.SetActive(false);
 		m_View.DonkeyBg.SetActive(false);
 		m_View.DeadkeyBg.SetActive(false);
+		m_View.GuideBg.SetActive(false);
 
 		switch (theme)
 		{
