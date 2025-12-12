@@ -34,7 +34,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private CancellationTokenSource m_MoveBagCardsCts;
 	private bool IsEnvDirty = false;
 	private int currentMonsterAttack = 0;
-	private List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
+	public List<UICardSimpleControl> m_YGrimReaperList = new List<UICardSimpleControl>();
 	private int m_RealGrimReaperEnvIndex = -1;
 	private bool m_HasCreatedGrimReaper = false;
 	private UICardSimpleControl m_FistCardCache;
@@ -1389,7 +1389,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else
 		{
-			attackCardControl.CardEffect?.ClearAllEffectValues();
+			m_FistCardCache.CardEffect.ClearAllEffectValues();
 		}
 		RemoveCardCts(attackCardControl);
 
@@ -1602,9 +1602,9 @@ public partial class UIGamePhaseControl : YViewControl
 
 	void AddEffectValueToBagCard(object[] paraArray)
 	{
-		ECardType targetCardType = paraArray.Length > 0 && paraArray[0] is ECardType ? (ECardType)paraArray[0] : ECardType.attack;
-		EEffectType effectType = paraArray.Length > 1 && paraArray[1] is EEffectType ? (EEffectType)paraArray[1] : EEffectType.Other;
-		int value = paraArray.Length > 2 && paraArray[2] is int ? (int)paraArray[2] : 0;
+		ECardType targetCardType = (ECardType)paraArray[0];
+		EEffectType effectType = (EEffectType)paraArray[1];
+		int value = (int)paraArray[2];
 		AddEffectValueToBagCard(targetCardType, effectType, value);
 	}
 
