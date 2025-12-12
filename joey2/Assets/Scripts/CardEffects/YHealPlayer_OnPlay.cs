@@ -1,8 +1,8 @@
 // Scripts/CardEffects/Effects/YHealPlayer_OnPlay.cs
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class YHealPlayer_OnPlay : YCardEffect
 {
@@ -23,15 +23,6 @@ public class YHealPlayer_OnPlay : YCardEffect
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
 		return 0f;
-	}
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.Heal)
-		{
-			return healAmount;
-		}
-		return base.GetEffectValue(effectType);
 	}
 }
 

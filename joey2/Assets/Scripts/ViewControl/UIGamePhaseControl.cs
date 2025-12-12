@@ -1313,7 +1313,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
-		int damage = attackCard.currentAttack + attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
+		int damage = attackCard.currentAttack;
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1330,6 +1330,9 @@ public partial class UIGamePhaseControl : YViewControl
 		for (int i = 0; i < attackCount; i++)
 		{
 			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
+
+			damage += attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
+
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));

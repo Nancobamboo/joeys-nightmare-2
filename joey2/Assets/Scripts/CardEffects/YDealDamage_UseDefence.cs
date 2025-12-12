@@ -24,14 +24,5 @@ public class YDealDamage_UseDefence : YCardEffect
 		}
 		return base.UseDefence(isOverflow);
 	}
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.ReflectDamage)
-		{
-			return baseExtra;
-		}
-		return base.GetEffectValue(effectType);
-	}
 }
 

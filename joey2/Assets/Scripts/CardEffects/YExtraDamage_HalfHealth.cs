@@ -5,6 +5,7 @@ using UnityEngine;
 public class YExtraDamage_HalfHealth : YDefaultEffect
 {
     public int baseExtra;
+    private bool m_CachedHalfHealth = false;
 
     public YExtraDamage_HalfHealth(int baseExtra)
     {
@@ -12,18 +13,31 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
         Id = ECardEffectId.ExtraDamage_HalfHealth;
     }
 
-
-    public override int GetEffectValue(EEffectType effectType)
+    public override void SetData(UICardSimpleControl cardControl)
     {
-        if (effectType == EEffectType.Damage)
+        base.SetData(cardControl);
+        if (CardControl != null)
         {
-            if (JoeyGameControl.Instance.IsPlayerHalfHealth())
-            {
-                return baseExtra;
-            }
-            return 0;
+            CardControl.AddBuff(EBuffType.UpdateAttack, 1);
         }
-        return base.GetEffectValue(effectType);
+    }
+
+    public override int OnBuffValueChange(EBuffType buffType, int value)
+    {
+        if (buffType == EBuffType.UpdateAttack)
+        {
+            bool currentHalfHealth = JoeyGameControl.Instance.IsPlayerHalfHealth();
+            if (currentHalfHealth != m_CachedHalfHealth)
+            {
+                m_CachedHalfHealth = currentHalfHealth;
+                ClearAllEffectValues();
+                if (currentHalfHealth)
+                {
+                    AddEffectValue(EEffectType.Damage, baseExtra);
+                }
+            }
+        }
+        return value;
     }
 }
 

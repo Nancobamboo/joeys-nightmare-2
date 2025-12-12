@@ -28,15 +28,6 @@ public class YLifeSteal_OnDealDamage : YCardEffect
 		}
 		return base.OnDealDamage();
 	}
-
-	public override int GetEffectValue(EEffectType effectType)
-	{
-		if (effectType == EEffectType.Heal)
-		{
-			return baseExtra;
-		}
-		return base.GetEffectValue(effectType);
-	}
 }
 
 public partial class UIGamePhaseControl

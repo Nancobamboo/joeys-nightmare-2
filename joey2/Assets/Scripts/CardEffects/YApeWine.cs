@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class YApeWine : YCardEffect
 {
-    public YApeWine()
-    {
-        Id = ECardEffectId.ApeWine;
-    }
+  public YApeWine()
+  {
+    Id = ECardEffectId.ApeWine;
+  }
 
-    public override float UseItem()
-    {
-		YActionSystem.Instance.DispatchAction(EActionId.DoubleLastWeaponAttack, CardControl);
-		return 0f;
-    }
+  public override float UseItem()
+  {
+    YActionSystem.Instance.DispatchAction(EActionId.DoubleLastWeaponAttack, CardControl);
+    return 0f;
+  }
 }
