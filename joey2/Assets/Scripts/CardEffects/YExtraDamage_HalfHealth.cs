@@ -19,6 +19,12 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
         if (CardControl != null)
         {
             CardControl.AddBuff(EBuffType.UpdateAttack, 1);
+            bool currentHalfHealth = JoeyGameControl.Instance.IsPlayerHalfHealth();
+            m_CachedHalfHealth = currentHalfHealth;
+            if (currentHalfHealth)
+            {
+                CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
+            }
         }
     }
 
@@ -33,7 +39,7 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
                 ClearAllEffectValues();
                 if (currentHalfHealth)
                 {
-                    AddEffectValue(EEffectType.Damage, baseExtra);
+                    CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
                 }
             }
         }
