@@ -13,6 +13,15 @@ public class YDealDamage_UseDefence : YCardEffect
 		Id = ECardEffectId.DealDamage_UseDefence;
 	}
 
+	public override void SetData(UICardSimpleControl cardControl)
+	{
+		base.SetData(cardControl);
+		if (CardControl != null)
+		{
+			AddEffectValue(EEffectType.ReflectDamage, baseExtra);
+		}
+	}
+
 	public override float UseDefence(bool isOverflow = false)
 	{
 		if (CardControl != null && CardControl.gameObject != null)
