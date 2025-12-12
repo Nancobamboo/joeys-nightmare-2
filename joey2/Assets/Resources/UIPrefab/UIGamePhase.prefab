@@ -1946,7 +1946,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5560706308347410583
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3114,6 +3114,10 @@ MonoBehaviour:
   - Target: {fileID: 3009507447289322100}
     Components:
     - {fileID: 8572467223328006237}
+    VarNameArray: []
+  - Target: {fileID: 5560706308347410583}
+    Components:
+    - {fileID: 4119393420337074662}
     VarNameArray: []
 --- !u!1 &5811095425636920943
 GameObject:
