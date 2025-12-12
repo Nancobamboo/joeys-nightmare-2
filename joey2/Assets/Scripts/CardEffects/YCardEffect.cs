@@ -131,6 +131,7 @@ public class YCardEffect
     public virtual void SetData(UICardSimpleControl cardControl)
     {
         CardControl = cardControl;
+        cardControl.CardEffect = this;
     }
 
     public virtual float OnBecomeTopOfPile()
