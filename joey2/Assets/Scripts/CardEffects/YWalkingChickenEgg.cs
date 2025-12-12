@@ -31,6 +31,7 @@ public class YWalkingChickenEgg : YDefaultEffect
                 if (value == 0)
                 {
                     YActionSystem.Instance.DispatchAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
+                    CardControl.Return();
                 }
             }
         }
