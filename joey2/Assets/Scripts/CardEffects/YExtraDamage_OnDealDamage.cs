@@ -14,6 +14,7 @@ public class YExtraDamage_OnDealDamage : YCardEffect
 
 	public override float OnDealDamage()
 	{
+		CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
 		return base.OnDealDamage();
 	}
 }
