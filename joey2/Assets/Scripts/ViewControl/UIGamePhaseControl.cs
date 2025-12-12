@@ -1591,6 +1591,7 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			if (cardControl.gameObject.activeSelf)
 			{
+				cardControl.IsEffecting = true;
 				m_CardActionQueue.Enqueue(cardControl);
 				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
 				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
