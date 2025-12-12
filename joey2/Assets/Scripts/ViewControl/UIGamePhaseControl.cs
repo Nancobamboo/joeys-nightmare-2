@@ -72,6 +72,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.SwapEnvCard, SwapEnvCard);
 		RegistAction(EActionId.RomeoMonkeyDead, RomeoMonkeyDead);
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
+		RegistAction(EActionId.BananaMonkeyDead, BananaMonkeyDead);
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
 		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
 		RegistAction(EActionId.GrimReaperTakeDamage, GrimReaperTakeDamage);
@@ -1760,6 +1761,11 @@ public partial class UIGamePhaseControl : YViewControl
 	void JulietMonkeyDead(object[] paraArray)
 	{
 		this.OnJulietMonkeyDead();
+	}
+
+	void BananaMonkeyDead(object[] paraArray)
+	{
+		this.OnBananaMonkeyDead();
 	}
 
 	void UpdateRelic(object[] paraArray)

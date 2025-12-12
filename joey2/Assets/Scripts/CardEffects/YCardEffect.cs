@@ -64,8 +64,9 @@ public enum ECardEffectId
     KingShield_OnDefense,
     MimicChest,
     CullingBlade,
-    BloodStorage_UseSkill,
-    ShamanDonkey
+    BloodStorage_UseSkill
+    BananaMonkey,
+	ShamanDonkey
 }
 
 public enum EEffectType
@@ -78,6 +79,7 @@ public enum EEffectType
     Electric,
     Other,
     Defence,
+    QuickAttack,
     Upper
 }
 
