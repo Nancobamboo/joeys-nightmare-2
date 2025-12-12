@@ -58,6 +58,7 @@ public enum EActionId
 	RefreshCardLimitDebuff,
 	BananaMonkeyDead,
 	ShamanDonkeyBuff,
+	AddCardsToEnvByCardId,
 	Upper,
 
 }

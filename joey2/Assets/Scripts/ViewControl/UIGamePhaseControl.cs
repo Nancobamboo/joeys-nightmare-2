@@ -86,6 +86,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.AddCardToSpecifiedEnv, AddCardToSpecifiedEnv);
 		RegistAction(EActionId.DoubleLastWeaponAttack, DoubleLastWeaponAttack);
 		RegistAction(EActionId.AddCardsToEnv, AddCardsToEnv);
+		RegistAction(EActionId.AddCardsToEnvByCardId, AddCardsToEnvByCardId);
 		RegistAction(EActionId.OnCoinChange, OnCoinChange);
 		RegistAction(EActionId.MonsterHealOnDealDamage, MonsterHealOnDealDamage);
 		RegistAction(EActionId.AddCardToBagFromSelect, AddCardToBagFromSelect);
@@ -925,6 +926,14 @@ public partial class UIGamePhaseControl : YViewControl
 		List<Card> cards = (List<Card>)paraArray[1];
 		int envIndex = Random.Range(0, m_EnvPanels.Count - 1);
 		AddEnvDropCard(cards, envIndex);
+	}
+
+	void AddCardsToEnvByCardId(object[] paraArray)
+	{
+		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
+		string cardId = (string)paraArray[1];
+		int count = (int)paraArray[2];
+		AddCardsToEnvByCardId(cardControl, cardId, count);
 	}
 
 	void SwapTopTwoEnvCards(object[] paraArray)

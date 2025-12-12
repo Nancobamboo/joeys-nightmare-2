@@ -24,6 +24,7 @@ public class UICardSimpleView : YBaseView
 	public Image CardBackground;
 	public Text TxtCnt;
 	public GameObject Counter;
+	public Image MosterHeart;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -50,5 +51,6 @@ public class UICardSimpleView : YBaseView
 		CardBackground = viewItemList[16].Target.GetComponent<Image>();
 		TxtCnt = viewItemList[17].Target.GetComponent<Text>();
 		Counter = viewItemList[18].Target.gameObject;
+		MosterHeart = viewItemList[19].Target.GetComponent<Image>();
 	}
 }
