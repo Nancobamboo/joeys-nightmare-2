@@ -1,6 +1,6 @@
 ﻿id   ,cardImage ,iconImage,name,description,stars
-9001,Art/Img/Relic/环境攻击,Art/Img/Relic/环境攻击,环境攻击,环境卡中的攻击卡攻击+1,2
-9002,Art/Img/Relic/环境防御,Art/Img/Relic/环境防御,环境防御,环境卡中的防御卡防御+1,2
+9001,Art/Img/Relic/环境攻击,Art/Img/Relic/环境攻击,攻击强化,武器攻击+1,2
+9002,Art/Img/Relic/环境防御,Art/Img/Relic/环境防御,防御强化,防具防御+1,2
 9003,Art/Img/Relic/img_relic_monkey,Art/Img/Relic/icon_relic_monkey,monkey祝福,使用武器时有小概率获得一个猴子香蕉,1
 9004,Art/Img/Relic/img_relic_turkey,Art/Img/Relic/icon_relic_turkey,turkey祝福,使用道具时有小概率获得一个火鸡羽毛,1
 9005,Art/Img/Relic/img_relic_donkey,Art/Img/Relic/icon_relic_donkey,donkey祝福,使用技能时有小概率获得一个驴肉火烧,1
