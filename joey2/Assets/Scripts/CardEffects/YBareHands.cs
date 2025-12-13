@@ -28,5 +28,24 @@ public class YBareHands : YCardEffect
         // Don't play the drop animation
         return 0f;
     }
+
+    public override float OnBecomeTopOfPile()
+    {
+        // BrassKnuckles relic effect: when bare hands becomes equipped, deal damage to random enemy
+        if (DataSystem.Instance.HasRelic(ERelicType.BrassKnuckles))
+        {
+            if (CardControl != null && CardControl.CardData != null)
+            {
+                // Get bare hands attack damage
+                int damage = CardControl.CardData.currentAttack;
+                
+                // Dispatch action to attack random enemy
+                YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, 1);
+                
+                return 0.3f; // Delay time for effect
+            }
+        }
+        return base.OnBecomeTopOfPile();
+    }
 }
 
