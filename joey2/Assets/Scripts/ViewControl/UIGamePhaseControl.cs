@@ -767,7 +767,7 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			// 播放怪物离场音效
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterFly", 1.0f, 0.5f);
-			
+
 
 			RemoveEnvCard(envIndex, cardControl);
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
@@ -1361,7 +1361,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
 			{
-				damage += 3 ;
+				damage += 3;
 			}
 		}
 		float delayTime;
@@ -1423,6 +1423,17 @@ public partial class UIGamePhaseControl : YViewControl
 			if (removeDelayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+			}
+
+			// Check if attack bag is empty, if so trigger fist card's OnBecomeTopOfPile
+			UICardSimpleControl nextAttackCard = GetLastBagCard(ECardType.attack);
+			if (nextAttackCard == null && m_FistCardCache != null)
+			{
+				float fistDelayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0f;
+				if (fistDelayTime > 0f)
+				{
+					await UniTask.WaitForSeconds(fistDelayTime);
+				}
 			}
 		}
 		else
