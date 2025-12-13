@@ -1488,6 +1488,13 @@ public partial class UIGamePhaseControl : YViewControl
 		if (defenceCardControl != null)
 		{
 			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+
+			// 荆棘祝福效果：获得反伤:3
+			if (DataSystem.Instance.HasRelic(ERelicType.ThornBlessing))
+			{
+				reflectDamage += 3;
+			}
+
 			if (reflectDamage > 0)
 			{
 				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
