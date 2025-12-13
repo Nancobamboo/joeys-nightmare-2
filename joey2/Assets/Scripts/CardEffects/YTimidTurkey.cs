@@ -59,6 +59,15 @@ public class YTimidTurkey : YDefaultEffect
             return;
         }
 
+        // 检查下方是否有牌，如果没有则不触发交换
+        int envIndex = CardControl.EnvIndex;
+        int envCardCount = JoeyGameControl.Instance.GetEnvCardCount(envIndex);
+        if (envCardCount < 2)
+        {
+            _swapScheduled = false; // 重置标志
+            return;
+        }
+
         float maxDelayTime = CardControl.PlayVFX(new List<EVFXName> { EVFXName.VFX_disappear }, ECardAnimName.UI_Carditem_dunpai, EVFXLife.CardLife);
         await UniTask.WaitForSeconds(maxDelayTime);
 

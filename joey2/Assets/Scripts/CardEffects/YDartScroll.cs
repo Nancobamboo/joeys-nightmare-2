@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class YDartScroll : YCardEffect
 {
@@ -20,13 +21,75 @@ public partial class UIGamePhaseControl
 {
     public void AddCardsToEnvByCardId(UICardSimpleControl cardControl, string cardId, int count)
     {
-        List<Card> cards = new List<Card>();
-        for (int i = 0; i < count; i++)
+        if (m_EnvPanels == null || m_EnvPanels.Count == 0)
+        {
+            return;
+        }
+
+        // 选择不重复的 env index，优先选择没有牌的
+        List<int> selectedIndices = SelectUniqueEnvIndices(count);
+
+        for (int i = 0; i < selectedIndices.Count; i++)
         {
             Card card = GData.Instance.GetCardConfigById(cardId).Clone();
-            cards.Add(card);
+            int envIndex = selectedIndices[i];
+
+            VerticalLayoutGroup parent = m_EnvPanels[envIndex];
+            UICardSimpleControl newCardControl = GetCardSimple(parent.transform, true);
+            newCardControl.SetData(card, isEnv: true, envIndex: envIndex);
+            AddEnvCard(envIndex, newCardControl);
+            newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
         }
-        int envIndex = Random.Range(0, m_EnvPanels.Count);
-        AddEnvDropCard(cards, envIndex);
+    }
+
+    private List<int> SelectUniqueEnvIndices(int count)
+    {
+        List<int> result = new List<int>();
+        List<int> emptyIndices = new List<int>();
+        List<int> nonEmptyIndices = new List<int>();
+
+        // 分类 env index：空的和非空的
+        for (int i = 0; i < m_EnvPanels.Count; i++)
+        {
+            if (!m_EnvCardDict.TryGetValue(i, out List<UICardSimpleControl> cardList) || cardList == null || cardList.Count == 0)
+            {
+                emptyIndices.Add(i);
+            }
+            else
+            {
+                nonEmptyIndices.Add(i);
+            }
+        }
+
+        // 打乱顺序
+        ShuffleList(emptyIndices);
+        ShuffleList(nonEmptyIndices);
+
+        // 优先从空的 env 中选择
+        foreach (int index in emptyIndices)
+        {
+            if (result.Count >= count) break;
+            result.Add(index);
+        }
+
+        // 如果空的不够，再从非空的 env 中选择
+        foreach (int index in nonEmptyIndices)
+        {
+            if (result.Count >= count) break;
+            result.Add(index);
+        }
+
+        return result;
+    }
+
+    private void ShuffleList(List<int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            int temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
     }
 }
