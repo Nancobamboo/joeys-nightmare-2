@@ -76,9 +76,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.JulietMonkeyDead, JulietMonkeyDead);
 		RegistAction(EActionId.BananaMonkeyDead, BananaMonkeyDead);
 		RegistAction(EActionId.AddEnvCardFromBag, AddEnvCardFromBag);
-		RegistAction(EActionId.CreateGrimReaperClone, CreateGrimReaperClone);
-		RegistAction(EActionId.GrimReaperEatClones, GrimReaperEatClones);
-		RegistAction(EActionId.GrimReaperTakeDamage, GrimReaperTakeDamage);
 		RegistAction(EActionId.ThrowWeaponToEnv, ThrowWeaponToEnv);
 		RegistAction(EActionId.ThrowWeaponDefenceToEnv, ThrowWeaponDefenceToEnv);
 
@@ -376,7 +373,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearEnvCardList();
 		UsedCardList.Clear();
-		ClearGrimReaperData();
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
 		if (m_KeyPathCardCache != null)
@@ -1103,7 +1099,6 @@ public partial class UIGamePhaseControl : YViewControl
 		m_EnvCardDict.Clear();
 		m_BagCardDict.Clear();
 		UsedCardList.Clear();
-		ClearGrimReaperData();
 		ClearAllCardCts();
 	}
 
@@ -1814,36 +1809,6 @@ public partial class UIGamePhaseControl : YViewControl
 
 	}
 
-	void CreateGrimReaperClone(object[] paraArray)
-	{
-		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		CreateGrimReaperClone(cardControl);
-	}
-
-	void GrimReaperEatClones(object[] paraArray)
-	{
-		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
-		GrimReaperEatClones(cardControl);
-	}
-
-	void GrimReaperTakeDamage(object[] paraArray)
-	{
-		UICardSimpleControl grimReaperCard = (UICardSimpleControl)paraArray[0];
-		bool isSuccess = (bool)paraArray[1];
-		int damage = (int)paraArray[2];
-		GrimReaperTakeDamage(grimReaperCard, isSuccess, damage);
-	}
-
-	public void ClearGrimReaperData()
-	{
-		for (int i = 0; i < m_YGrimReaperList.Count; i++)
-		{
-			m_YGrimReaperList[i].Return();
-		}
-		m_YGrimReaperList.Clear();
-		m_RealGrimReaperEnvIndex = -1;
-		m_HasCreatedGrimReaper = false;
-	}
 
 	void OnCoinChange(object[] paraArray)
 	{
