@@ -56,6 +56,10 @@ public partial class UIGamePhaseControl
 {
 	public async UniTask AttackRandomEnemy(int damage, int attackTime)
 	{
+		if (DataSystem.Instance.HasRelic(ERelicType.ShurikenMastery))
+		{
+			damage += 2;
+		}
 
 		if (damage <= 0)
 		{

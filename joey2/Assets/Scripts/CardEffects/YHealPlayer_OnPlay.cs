@@ -21,6 +21,10 @@ public class YHealPlayer_OnPlay : YCardEffect
 
 	public override float OnRemoveCard()
 	{
+		if (DataSystem.Instance.HasRelic(ERelicType.HealEnhance))
+		{
+			healAmount += 5;
+		}
 		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
 		return 0f;
 	}
