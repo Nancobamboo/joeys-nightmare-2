@@ -251,6 +251,24 @@ public class UISelectControl : YViewControl
 
 		ERelicType relicType = (ERelicType)relicControl.RelicData.id;
 		DataSystem.Instance.AddRelic(relicType);
+
+		// 桃遗物效果：增加10生命上限
+		if (relicType == ERelicType.Peach)
+		{
+			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+			playerData.playerMaxHealth += 10;
+			playerData.playerHealth += 10; // 同时增加当前生命值
+			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 10);
+		}
+
+		// // 手牌上限+2
+		// if (relicType == ERelicType.HandLimitIncrease)
+		// {
+		// 	DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		// 	playerData.MaxEquipedSkillNum += 2;
+		// }
+
+
 		DataSystem.Instance.SaveDataJoeyPlayer();
 		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic, (int)relicType);
 		Close();
