@@ -257,7 +257,7 @@ public class UISelectControl : YViewControl
 		{
 			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
 			playerData.playerMaxHealth += 10;
-			playerData.playerHealth += 10; // 同时增加当前生命值
+			// playerData.playerHealth += 10; // 同时增加当前生命值
 			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 10);
 		}
 

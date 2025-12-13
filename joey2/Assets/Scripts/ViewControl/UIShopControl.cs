@@ -184,7 +184,7 @@ public class UIShopControl : YViewControl
 				shopPrice = Mathf.RoundToInt(card.price * discountRate);
 				if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
 				{
-					shopPrice = Mathf.RoundToInt(shopPrice * 0.01f);
+					shopPrice = Mathf.RoundToInt(shopPrice * 0.8f);
 				}
 			}
 
