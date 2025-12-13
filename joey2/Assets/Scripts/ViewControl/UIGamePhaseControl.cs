@@ -765,6 +765,9 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				DataSystem.Instance.AddCoin(configCard.price);
 			}
+			// 播放怪物离场音效
+			SFX.PlayAudio("Audio/SFX/Battle/MonsterFly", 1.0f, 0.5f);
+			
 
 			RemoveEnvCard(envIndex, cardControl);
 			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
