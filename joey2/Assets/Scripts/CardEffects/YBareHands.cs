@@ -36,13 +36,20 @@ public class YBareHands : YCardEffect
         {
             if (CardControl != null && CardControl.CardData != null)
             {
-                // Get bare hands attack damage
-                int damage = CardControl.CardData.currentAttack;
-                
-                // Dispatch action to attack random enemy
-                YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, 1);
-                
-                return 0.3f; // Delay time for effect
+                if (JoeyGameControl.Instance.HasEnemy())
+                {
+                    // Play attack animation
+                    CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
+
+                    // Get bare hands attack damage
+                    int damage = CardControl.CardData.currentAttack;
+                    
+                    // Dispatch action to attack random enemy with delay
+                    JoeyGameControl.Instance.AddGlobalDelayCall(() =>
+                    {
+                        YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, 1);
+                    }, 0.3f);
+                }
             }
         }
         return base.OnBecomeTopOfPile();
