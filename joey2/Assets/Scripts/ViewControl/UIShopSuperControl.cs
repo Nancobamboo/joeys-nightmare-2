@@ -151,6 +151,10 @@ public class UIShopSuperControl : YViewControl
             {
                 float discountRate = Random.Range(0.8f, 1.0f);
                 shopPrice = Mathf.RoundToInt(card.price * discountRate);
+                if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
+				{
+					shopPrice = Mathf.RoundToInt(shopPrice * 0.8f);
+				}
             }
 
             if (shopPrice < 1)

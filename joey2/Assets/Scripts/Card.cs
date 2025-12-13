@@ -98,7 +98,7 @@ public class Card : IData
         }
         else if (_id == "6001")
         {
-            this.cardFrame = "Art/UI/card_bg_boss";
+            this.cardFrame = "Art/UI/card_bg_end";
         }
         else
         {

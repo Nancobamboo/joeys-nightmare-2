@@ -95,6 +95,7 @@ public enum EVFXName
     VFX_glow,
     VFX_LeiDan,
     VFX_Shouji,
+    VFX_Shouji2,
     VFX_Fanjia, //仞甲
     VFX_joey_souji,
     VFX_HuiXue,
