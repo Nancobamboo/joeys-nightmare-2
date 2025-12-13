@@ -43,7 +43,13 @@ public partial class UIGamePhaseControl
         {
             return;
         }
-        int randomIndex = Random.Range(0, m_EnvPanels.Count);
+        // 优先选择空的 env index
+        List<int> selectedIndices = SelectUniqueEnvIndices(1);
+        if (selectedIndices == null || selectedIndices.Count == 0)
+        {
+            return;
+        }
+        int randomIndex = selectedIndices[0];
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
         Transform effectRoot = GetEffectRoot(randomIndex);
         if (effectRoot == null)

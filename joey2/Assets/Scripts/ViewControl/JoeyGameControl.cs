@@ -789,6 +789,15 @@ public class JoeyGameControl : YViewControl
 		return lastCard != null && lastCard == cardControl;
 	}
 
+	public int GetEnvCardCount(int envIndex)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.GetEnvCardCount(envIndex);
+		}
+		return 0;
+	}
+
 	public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
 	{
 
