@@ -545,6 +545,16 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
+
+			// 衰退光环效果：怪物进入环境时攻击和生命减少1点
+			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
+			{
+				if (card.currentAttack > 0) card.currentAttack = Mathf.Max(1, card.currentAttack - 1);
+				if (card.currentHealth > 0) card.currentHealth = Mathf.Max(1, card.currentHealth - 1);
+				card.SetAttack(card.currentAttack);
+				card.SetHealth(card.currentHealth);
+			}
+
 			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
 			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
@@ -1334,6 +1344,13 @@ public partial class UIGamePhaseControl : YViewControl
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
+		if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
+		{
+			if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
+			{
+				damage += 3 ;
+			}
+		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
@@ -1445,6 +1462,11 @@ public partial class UIGamePhaseControl : YViewControl
 		if (defenceValue < enemyAttack)
 		{
 			damage = enemyAttack - defenceValue;
+			// 老茧效果：抵抗小于3的伤害
+			if (DataSystem.Instance.HasRelic(ERelicType.Callus) && damage > 0 && damage < 3)
+			{
+				damage = 0;
+			}
 		}
 		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
