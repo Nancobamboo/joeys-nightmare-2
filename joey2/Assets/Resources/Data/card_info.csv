@@ -66,7 +66,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,骷髅骑士Monkey,4墓地,monster      ,离场:在环境中召唤铁剑和铁盾,15,,30,30,2,,
 5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,吸血鬼Monkey,4墓地,monster      ,每次攻击时回复3点血量,9,,20,20,1,VampireMonkey,
 5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,all,monster,离场:掉落宝物,,,1,5,1,,
-5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,all,monster,离场：对两侧敌人各造成10点伤害,,,1,15,3,Boom_OnDead:10,
+5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,未启用，有卡死bug,monster,离场：对两侧敌人各造成10点伤害,,,1,15,3,Boom_OnDead:10,
 5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey船长,未启用,monster      ,,5,,8,15,1,,
 5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林,monster,可能藏着好东西？,,,1,5,1,,
 5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,死灵Donkey,4墓地,monster      ,生命值降至一半以下时召唤两个骷髅Donkey,12,,25,30,2,NecDonkey,

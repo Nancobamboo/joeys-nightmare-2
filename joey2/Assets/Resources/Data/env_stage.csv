@@ -9,7 +9,7 @@ level,monster_ids,type,theme
 8,5034;5021;5015;5016,boss,donkey
 9,5023;5024;5016,normal,turkey
 10,5013;5025;5029;5016,elite,turkey
-11,5026;5024;5024;5007,normal,turkey
+11,5026;5024;5024,normal,turkey
 12,5027;5026;5023;5016,boss,turkey
 13,5003;5003;5011;5016,normal,deadkey
 14,5005;5004;5037;5016,elite,deadkey
