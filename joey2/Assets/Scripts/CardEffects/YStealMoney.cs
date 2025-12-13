@@ -19,7 +19,7 @@ public class YStealMoney : YDefaultEffect
         base.SetData(cardControl);
         if (CardControl != null)
         {
-            CardControl.AddBuff(EBuffType.Counter, 3);
+            CardControl.AddBuff(EBuffType.Counter, 5);
         }
     }
 
@@ -38,7 +38,7 @@ public class YStealMoney : YDefaultEffect
                     {
                         // 对玩家造成伤害，参考 YGhost
                         int damage = CardControl.CardData.currentAttack;
-                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, damage, EVFXName.VFX_Shouji);
+                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerNoDefenceDamage, damage, EVFXName.VFX_Shouji);
 
                         // 玩家扣 baseExtra 的钱
                         DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();

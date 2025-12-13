@@ -98,7 +98,8 @@ public enum EVFXName
     VFX_Fanjia, //仞甲
     VFX_joey_souji,
     VFX_HuiXue,
-    VFX_FanJia_shouji
+    VFX_FanJia_shouji,
+    VFX_Shihun,
 }
 
 public enum ECardAnimName

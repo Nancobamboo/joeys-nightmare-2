@@ -63,6 +63,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.TakeEnemyDamage, TakeEnemyDamage);
 		RegistAction(EActionId.TakePlayerDamage, TakePlayerDamage);
 		RegistAction(EActionId.TakePlayerBoomDamage, TakePlayerBoomDamage);
+		RegistAction(EActionId.TakePlayerNoDefenceDamage, TakePlayerNoDefenceDamage);
 		RegistAction(EActionId.BoomEnvCard, BoomEnvCard);
 		RegistAction(EActionId.UseBagCard, UseBagCard);
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
@@ -1184,6 +1185,8 @@ public partial class UIGamePhaseControl : YViewControl
 		cardControl.SetMoving(true);
 		if (isEnv)
 		{
+			// 播放拿牌音效
+			SFX.PlayAudio("Audio/SFX/deal_cards", 1.9f, 0.5f);
 			ECardType cardType = cardControl.CardType;
 
 			Vector3 startWorldPos = cardControl.CacheTrans.parent.position;
@@ -1506,6 +1509,19 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		ApplyPlayerHealthChange(-damage);
 	}
+
+	void TakePlayerNoDefenceDamage(object[] paraArray)
+	{
+		int damage = (int)paraArray[0];
+		EVFXName vfxName = paraArray.Length > 1 && paraArray[1] is EVFXName ? (EVFXName)paraArray[1] : EVFXName.VFX_boom;
+		if (damage > 0)
+		{
+			JoeyGameControl.Instance.PlayVFX(vfxName, m_View.Joey, 0.4f);
+			SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+		}
+		ApplyPlayerHealthChange(-damage);
+	}
+
 
 	async void UseBagCard(object[] paraArray)
 	{
