@@ -69,7 +69,7 @@ public class UIDescExtControl : YViewControl
 			x = -targetWidth * 0.5f - descWidth * 0.5f - m_Spacing;
 		}
 		float yOffset = 60f;
-		float xOffset = 20f;
+		float xOffset = 30f;
 		float y = targetRectLocal.yMax - descRect.yMax - yOffset;
 		x -= xOffset;
 		m_RectTransform.localPosition = new Vector2(x, y);
