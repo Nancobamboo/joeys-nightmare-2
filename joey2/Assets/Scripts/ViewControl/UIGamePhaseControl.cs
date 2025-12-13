@@ -561,6 +561,22 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	public void AddEnvCardList(List<Card> cards, int index)
+	{
+		VerticalLayoutGroup parent = m_EnvPanels[index];
+
+		for (int i = cards.Count - 1; i >= 0; i--)
+		{
+			Card card = cards[i];
+			m_CardDict[card.UniqueId] = card;
+
+			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
+			cardControl.SetData(card, isEnv: true, envIndex: index);
+			AddEnvCard(index, cardControl);
+			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		}
+	}
+
 	public Card GetCardDataById(int uniqueId)
 	{
 		return m_CardDict[uniqueId];
