@@ -36,7 +36,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,钩索,,item        ,从弃牌堆随机抽一张武器牌置入手牌,,,,200,2,HookEquipWeaponFromDiscard_OnPlay,
 3004,Art/Img/Item/img_card_MonkeyWine,Art/Img/Item/img_bg_Item,猿酒,,item   ,下次攻击伤害翻倍,,,,200,2,ApeWine,
 3005,Art/Img/Item/img_card_GiftBox,Art/Img/Item/img_bg_Item,礼物袋,,item   ,在环境卡中随机召唤3张牌,,,,300,3,GiftBox:3,
-3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,手里剑卷轴,,item   ,在环境中召唤3个锋利手里剑,,,,200,2,DartScroll,
+3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,手里剑卷轴,,item   ,在环境中召唤3个手里剑,,,,200,2,DartScroll,
 3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,火鸡羽毛,,item   ,当前装备的防御卡永久防御+1,,,,300,3,TurkeyFeather,
 3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,驴肉火烧,,item   ,生命上限永久+1,,,,300,3,DonkeyMeatFireBun,
 3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,猴子香蕉,,item   ,当前装备的攻击卡永久攻击+1,,,,300,3,MonkeyBanana,
