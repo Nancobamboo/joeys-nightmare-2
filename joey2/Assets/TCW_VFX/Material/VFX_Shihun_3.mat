@@ -50,11 +50,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: c040cfc14b23f9744b352006fa7eb3ce, type: 3}
+        m_Texture: {fileID: 2800000, guid: 969429026c9a05b4592186b9d730fded, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
-        m_Texture: {fileID: 2800000, guid: 71936db245a2ae848a8af522cf89d0bd, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask2:
@@ -103,7 +103,7 @@ Material:
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
     - _FixValue: {r: 1, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
-    - _Panner1: {r: 0, g: -1, b: 0, a: 0}
+    - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
     - _SoftParticleFadeParams: {r: -0.26, g: 1, b: 1, a: 0}
     - _ToggleAdvanced: {r: 0, g: 0, b: 0, a: 0}
