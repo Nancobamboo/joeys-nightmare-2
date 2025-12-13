@@ -386,7 +386,7 @@ public class UICardSimpleControl : YViewControl
 			case ERelicType.EnvAttack:
 				if (IsEnv && cachedCardType == ECardType.attack)
 				{
-					cachedCard.SetAttack(cachedCard.currentAttack);
+					cachedCard.SetAttack(cachedCard.currentAttack+1);
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
