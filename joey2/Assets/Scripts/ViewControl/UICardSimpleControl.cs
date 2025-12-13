@@ -41,6 +41,12 @@ public enum ERelicType
 	Callus = 9011,                  // 老茧
 	HealEnhance = 9012,             // 恢复增强
 	DecayAura = 9013,               // 衰退光环
+	ShopDiscount = 9014,            // 打折卡
+	HandLimitIncrease = 9015,      // 手牌上限
+	Peach = 9016,                   // 桃
+	BrassKnuckles = 9017,          // 指虎
+	ThornBlessing = 9018,           // 荆棘祝福
+
 	CardLimitDebuff = 9999,
 }
 

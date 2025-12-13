@@ -165,6 +165,8 @@ public class UIShopControl : YViewControl
 		// Randomly select one card for 50% discount
 		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, shuffledCards.Count));
 
+
+
 		for (int i = 0; i < shopCardCount && i < shuffledCards.Count; i++)
 		{
 			Card card = shuffledCards[i];
@@ -180,6 +182,10 @@ public class UIShopControl : YViewControl
 				// Other cards: 80%-100% smooth random
 				float discountRate = Random.Range(0.8f, 1.0f);
 				shopPrice = Mathf.RoundToInt(card.price * discountRate);
+				if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
+				{
+					shopPrice = Mathf.RoundToInt(shopPrice * 0.8f);
+				}
 			}
 
 			if (shopPrice < 1)
