@@ -551,8 +551,6 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				if (card.currentAttack > 0) card.currentAttack = Mathf.Max(1, card.currentAttack - 1);
 				if (card.currentHealth > 0) card.currentHealth = Mathf.Max(1, card.currentHealth - 1);
-				card.SetAttack(card.currentAttack);
-				card.SetHealth(card.currentHealth);
 			}
 
 			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
