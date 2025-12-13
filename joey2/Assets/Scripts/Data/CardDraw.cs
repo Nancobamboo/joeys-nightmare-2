@@ -179,8 +179,33 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             Debug.Log($"Env mode: Limited player cards from pool to {cardLimit} cards (from {playerCardPool.Count} total)");
         }
 
+        // Separate 3-star monsters from other monsters (3-star monsters should be placed at the bottom)
+        List<string> threeStarMonsters = new List<string>();
+        List<string> normalMonsters = new List<string>();
+        
+        foreach (string monsterId in monsters)
+        {
+            if (GData.Instance.CardDict.TryGetValue(monsterId, out Card card))
+            {
+                if (card.stars == 3)
+                {
+                    threeStarMonsters.Add(monsterId);
+                }
+                else
+                {
+                    normalMonsters.Add(monsterId);
+                }
+            }
+            else
+            {
+                // If card not found, treat as normal monster
+                normalMonsters.Add(monsterId);
+            }
+        }
+        
         // Shuffle monsters
-        ShuffleList(monsters);
+        ShuffleList(normalMonsters);
+        ShuffleList(threeStarMonsters);
 
         // Initialize 5 columns
         List<List<string>> columns = new List<List<string>>();
@@ -213,24 +238,59 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             columns[slotIndex].Add(topNonMonsterCards[i]);
         }
 
-        // Step 3: Combine remaining cards and shuffle
+        // Step 3: Combine remaining cards and shuffle (excluding 3-star monsters)
         List<string> remainingCards = new List<string>();
         remainingCards.AddRange(remainingNonMonsterCards);
-        remainingCards.AddRange(monsters);
+        remainingCards.AddRange(normalMonsters);
         ShuffleList(remainingCards);
 
-        // Step 4: Distribute remaining cards randomly to columns
-        foreach (string cardId in remainingCards)
+        // Step 4: Distribute remaining cards - FIRST fill each empty column, THEN distribute randomly
+        List<int> emptyColumnIndices = new List<int>();
+        for (int i = 0; i < ENV_SLOT_COUNT; i++)
+        {
+            if (columns[i].Count == 0)
+            {
+                emptyColumnIndices.Add(i);
+            }
+        }
+        
+        // Shuffle empty column indices to randomize which columns get filled first
+        ShuffleList(emptyColumnIndices);
+        
+        int cardIndex = 0;
+        
+        // First pass: Fill empty columns with one card each
+        foreach (int colIndex in emptyColumnIndices)
+        {
+            if (cardIndex < remainingCards.Count)
+            {
+                columns[colIndex].Add(remainingCards[cardIndex]);
+                cardIndex++;
+            }
+        }
+        
+        // Second pass: Distribute remaining cards randomly
+        while (cardIndex < remainingCards.Count)
         {
             int randomColumn = Random.Range(0, ENV_SLOT_COUNT);
-            columns[randomColumn].Add(cardId);
+            columns[randomColumn].Add(remainingCards[cardIndex]);
+            cardIndex++;
+        }
+
+        // Step 5: Add 3-star monsters to the BOTTOM of columns (last position to prevent blocking other cards)
+        foreach (string threeStarMonsterId in threeStarMonsters)
+        {
+            int randomColumn = Random.Range(0, ENV_SLOT_COUNT);
+            columns[randomColumn].Add(threeStarMonsterId);
         }
 
         // Note: Exit card (KeyPath) is no longer placed here.
         // It will automatically appear when no monsters remain in the environment.
 
         Debug.Log($"Env mode cards distributed: {ENV_SLOT_COUNT} columns, " +
-                  $"{nonMonsterTopCount} non-monster top cards guaranteed, exit will appear when all monsters cleared");
+                  $"{nonMonsterTopCount} non-monster top cards guaranteed, " +
+                  $"{threeStarMonsters.Count} 3-star monsters placed at bottom, " +
+                  $"exit will appear when all monsters cleared");
 
         return columns;
     }
