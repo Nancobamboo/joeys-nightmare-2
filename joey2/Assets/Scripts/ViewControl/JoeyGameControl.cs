@@ -47,7 +47,6 @@ public class JoeyGameControl : YViewControl
 		public Dictionary<ECardType, List<string>> BagCardDict = new Dictionary<ECardType, List<string>>();
 		public List<string> EnvCardPool = new List<string>();
 		public Dictionary<string, Card> EnvCardDictData = new Dictionary<string, Card>();
-		public Dictionary<int, List<Card>> EnvCardListCache = new Dictionary<int, List<Card>>();
 		public int PlayerHealth;
 		public int PlayerMaxHealth;
 		public int Coin;
@@ -208,33 +207,20 @@ public class JoeyGameControl : YViewControl
 		{
 			m_GamePhaseControl.SetData();
 
-			if (m_GameStateCache != null && m_GameStateCache.EnvCardListCache.Count > 0)
-			{
-				// 从缓存中读取完整的Card数据
-				foreach (var kvp in m_GameStateCache.EnvCardListCache)
-				{
-					int index = kvp.Key;
-					List<Card> cardList = kvp.Value;
-					m_GamePhaseControl.AddEnvCardList(cards: cardList, index: index);
-				}
-			}
-			else
-			{
-				int envLevelId = m_DataJoeyPlayer.StageId;
-				List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
+			int envLevelId = m_DataJoeyPlayer.StageId;
+			List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
-				// Get card limit from character config
-				RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
-				int cardLimit = characterData != null ? characterData.envCardLimit : 0;
+			// Get card limit from character config
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			int cardLimit = characterData != null ? characterData.envCardLimit : 0;
 
-				List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit);
-				for (int i = 0; i < envModeCardList.Count; i++)
-				{
-					List<string> cardIdList = envModeCardList[i];
-					m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
-				}
-				SaveGameStateCache();
+			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit);
+			for (int i = 0; i < envModeCardList.Count; i++)
+			{
+				List<string> cardIdList = envModeCardList[i];
+				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
+			SaveGameStateCache();
 			return;
 		}
 
@@ -351,18 +337,15 @@ public class JoeyGameControl : YViewControl
 		foreach (var kvp in envCardDict)
 		{
 			List<string> cardIds = new List<string>();
-			List<Card> cardList = new List<Card>();
 			for (int i = 0; i < kvp.Value.Count; i++)
 			{
 				UICardSimpleControl cardControl = kvp.Value[i];
 				if (cardControl != null && cardControl.CardData != null)
 				{
 					cardIds.Add(cardControl.CardData.id);
-					cardList.Add(cardControl.CardData.Clone());
 				}
 			}
 			m_GameStateCache.EnvCardDict[kvp.Key] = cardIds;
-			m_GameStateCache.EnvCardListCache[kvp.Key] = cardList;
 		}
 
 		Dictionary<int, List<UICardSimpleControl>> bagCardDict = m_GamePhaseControl.GetBagCardDict();
@@ -448,7 +431,6 @@ public class JoeyGameControl : YViewControl
 
 		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_GameStateCache != null)
 		{
-			Debug.Log("RestoreGameStateCache");
 			RestoreGameStateCache();
 			SetGamePhase(EGamePhase.PlayerStart);
 		}
