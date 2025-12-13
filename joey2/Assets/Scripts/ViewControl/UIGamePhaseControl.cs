@@ -1481,6 +1481,7 @@ public partial class UIGamePhaseControl : YViewControl
 				damage = 0;
 			}
 		}
+		SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
 		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
