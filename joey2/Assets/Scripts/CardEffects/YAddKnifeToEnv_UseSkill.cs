@@ -27,8 +27,8 @@ public class YAddKnifeToEnv_UseSkill : YCardEffect
 
 	public override float OnRemoveCard()
 	{
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1004");
-		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1004");
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1018");
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1018");
 		return 0f;
 	}
 

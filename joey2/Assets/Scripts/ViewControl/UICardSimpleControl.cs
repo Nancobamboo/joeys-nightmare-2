@@ -618,11 +618,14 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BananaMonkey:
 				effect = new YBananaMonkey();
 				break;
-			case ECardEffectId.IronHoofDonkey:
-				effect = new YIronHoofDonkey();
-				break;
-			default:
-				return GetDefaultEffect();
+		case ECardEffectId.IronHoofDonkey:
+			effect = new YIronHoofDonkey();
+			break;
+		case ECardEffectId.NoCounterAttack:
+			effect = new YNoCounterAttack();
+			break;
+		default:
+			return GetDefaultEffect();
 		}
 
 		effect.SetData(this);
