@@ -50,7 +50,23 @@ public partial class UIGamePhaseControl
 		UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
 		if (weaponCard != null && weaponCard.CardData.id != "1016")
 		{
+			// 先从背包移除原卡，避免异步操作期间重复获取同一张卡
+			int cardTypeInt = (int)ECardType.attack;
+			if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
+			{
+				cardList.Remove(weaponCard);
+			}
+			
+			// 然后执行添加到Env的异步动画
 			await AddEnvCardFromBagAsync(weaponCard);
+			
+			// 动画完成后归还原卡的CardControl
+			weaponCard.Return();
+			
+			// 注意：这里不触发新栈顶卡的OnBecomeTopOfPile
+			// 因为ThrowWeaponToEnv是从SingleDelayAction的回调中执行的，
+			// 如果在此触发OnBecomeTopOfPile，会导致AddGlobalDelayCall立即执行缓存的action，
+			// 造成连锁反应把多张卡都扔到Env
 		}
 	}
 
