@@ -46,6 +46,7 @@ public enum ERelicType
 	Peach = 9016,                   // 桃
 	BrassKnuckles = 9017,          // 指虎
 	ThornBlessing = 9018,           // 荆棘祝福
+	DoublePunch = 9019,             // 邦邦两拳
 
 	CardLimitDebuff = 9999,
 }
