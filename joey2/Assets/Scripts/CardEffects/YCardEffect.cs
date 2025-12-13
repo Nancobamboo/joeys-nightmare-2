@@ -67,7 +67,8 @@ public enum ECardEffectId
     BloodStorage_UseSkill,
     BananaMonkey,
 	ShamanDonkey,
-    IronHoofDonkey
+    IronHoofDonkey,
+    NoCounterAttack
 
 }
 
@@ -82,6 +83,7 @@ public enum EEffectType
     Other,
     Defence,
     QuickAttack,
+    NoCounterAttack,
     Upper
 }
 

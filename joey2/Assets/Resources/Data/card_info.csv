@@ -16,6 +16,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1015,Art/Img/Attack/img_card_BattleFury,Art/Img/Attack/img_bg_Attack,狂战斧,,attack,,10,0,0,300,3,BattleFury:50,
 1016,Art/Img/Attack/img_card_KingSword,Art/Img/Attack/img_bg_Attack,王者盾牌(剑),,attack,攻击后变为王者盾牌(盾)，剩余切换次数:2,8,0,0,300,3,KingShield_OnAttack,
 1017,Art/Img/Attack/img_card_CullingBlade,Art/Img/Attack/img_bg_Attack,淘汰之刃,,attack,斩杀HP小于一半的怪物,5,0,0,300,3,CullingBlade,
+1018,Art/Img/Attack/img_card_Dagger,Art/Img/Attack/img_bg_Attack,刺客匕首,,attack,攻击后敌人不会反击,4,0,0,175,2,NoCounterAttack,
 ,,,,,,,,,,,,,
 2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,防御牌,教学牌,defence,点击堆叠到手牌,0,3,0,0,1,,
 2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,破盾       ,,defence,,0,3,0,50,1,,

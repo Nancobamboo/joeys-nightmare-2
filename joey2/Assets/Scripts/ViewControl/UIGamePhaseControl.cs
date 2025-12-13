@@ -1419,7 +1419,10 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 		}
 
-		if (!enemyKilled && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+		// Check if weapon has NoCounterAttack effect
+		bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
+
+		if (!enemyKilled && !hasNoCounterAttack && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
