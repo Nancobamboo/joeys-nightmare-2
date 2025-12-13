@@ -807,7 +807,8 @@ public class JoeyGameControl : YViewControl
 
 	public bool IsPlayerHalfHealth()
 	{
-		return m_DataJoeyPlayer.playerHealth < m_DataJoeyPlayer.playerMaxHealth / 2;
+		Debug.Log("IsPlayerHalfHealth: " + m_DataJoeyPlayer.playerHealth + " " + m_DataJoeyPlayer.playerMaxHealth);
+		return m_DataJoeyPlayer.playerHealth <= m_DataJoeyPlayer.playerMaxHealth / 2;
 	}
 
 	/// <summary>
