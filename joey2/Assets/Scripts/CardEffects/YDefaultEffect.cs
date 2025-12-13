@@ -66,11 +66,11 @@ public class YDefaultEffect : YCardEffect
                 case EEffectType.Electric:
                     PlayElectricEffectAsync().Forget();
                     return 0f;
-                case EEffectType.ReflectDamage:
-                    var fanjiaVfxNames = new List<EVFXName> { EVFXName.VFX_FanJia_shouji };
-                    float fanjiaDelayTime = CardControl.PlayVFX(fanjiaVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
-                    SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
-                    return fanjiaDelayTime;
+                // case EEffectType.ReflectDamage:
+                //     var fanjiaVfxNames = new List<EVFXName> { EVFXName.VFX_FanJia_shouji };
+                //     float fanjiaDelayTime = CardControl.PlayVFX(fanjiaVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
+                //     SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+                //     return fanjiaDelayTime;
                 default:
                     var vfxNames = new List<EVFXName> { EVFXName.VFX_Shouji };
                     float shoujiDelayTime = CardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
