@@ -68,7 +68,8 @@ public enum ECardEffectId
     BananaMonkey,
 	ShamanDonkey,
     IronHoofDonkey,
-    NoCounterAttack
+    NoCounterAttack,
+    SlowAttack
 
 }
 
@@ -84,6 +85,7 @@ public enum EEffectType
     Defence,
     QuickAttack,
     NoCounterAttack,
+    SlowAttack,
     Upper
 }
 

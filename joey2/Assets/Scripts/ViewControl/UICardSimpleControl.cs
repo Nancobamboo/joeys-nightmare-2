@@ -624,6 +624,9 @@ public class UICardSimpleControl : YViewControl
 		case ECardEffectId.NoCounterAttack:
 			effect = new YNoCounterAttack();
 			break;
+		case ECardEffectId.SlowAttack:
+			effect = new YSlowAttack();
+			break;
 		default:
 			return GetDefaultEffect();
 		}
