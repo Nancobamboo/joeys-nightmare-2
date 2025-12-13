@@ -12,7 +12,7 @@ public class YDartScroll : YCardEffect
 
     public override float UseItem()
     {
-        YActionSystem.Instance.DispatchAction(EActionId.AddCardsToEnvByCardId, CardControl, "1003", 3);
+        YActionSystem.Instance.DispatchAction(EActionId.AddCardsToEnvByCardId, CardControl, "1003", 2);
         return 0f;
     }
 }
