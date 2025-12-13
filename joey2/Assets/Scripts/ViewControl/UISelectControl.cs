@@ -261,12 +261,16 @@ public class UISelectControl : YViewControl
 			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 10);
 		}
 
-		// // 手牌上限+2
-		// if (relicType == ERelicType.HandLimitIncrease)
-		// {
-		// 	DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-		// 	playerData.MaxEquipedSkillNum += 2;
-		// }
+		// 手牌上限+2
+		if (relicType == ERelicType.HandLimitIncrease)
+		{
+			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+			if (characterData != null)
+			{
+				characterData.envCardLimit += 2;
+				YActionSystem.Instance.DispatchAction(EActionId.RefreshCardLimitDebuff);
+			}
+		}
 
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
