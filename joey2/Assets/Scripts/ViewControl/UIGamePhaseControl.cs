@@ -1355,6 +1355,16 @@ public partial class UIGamePhaseControl : YViewControl
 
 
 		attackCount += attackCardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
+
+		// DoublePunch relic: bare hands can attack twice
+		if (DataSystem.Instance.HasRelic(ERelicType.DoublePunch))
+		{
+			if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
+			{
+				attackCount += 1;
+			}
+		}
+
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
 		if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))

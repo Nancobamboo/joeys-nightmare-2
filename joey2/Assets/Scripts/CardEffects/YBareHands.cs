@@ -44,6 +44,12 @@ public class YBareHands : YCardEffect
                     // Get bare hands attack damage
                     int damage = CardControl.CardData.currentAttack;
                     
+                    // BareHandsMaster relic bonus: double damage for bare hands
+                    if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
+                    {
+                        damage += 3;
+                    }
+                    
                     // Dispatch action to attack random enemy with delay
                     JoeyGameControl.Instance.AddGlobalDelayCall(() =>
                     {
