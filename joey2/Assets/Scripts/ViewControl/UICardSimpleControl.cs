@@ -36,6 +36,11 @@ public enum ERelicType
 	GetSpecialCardByDefence = 9006,
 	LifeSteal = 9007,
 	HealOnKill = 9008,
+	ShurikenMastery = 9009,        // 手里剑精通
+	BareHandsMaster = 9010,         // 腕豪
+	Callus = 9011,                  // 老茧
+	HealEnhance = 9012,             // 恢复增强
+	DecayAura = 9013,               // 衰退光环
 	CardLimitDebuff = 9999,
 }
 
