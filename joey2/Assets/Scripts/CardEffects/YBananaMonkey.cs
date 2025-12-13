@@ -29,8 +29,10 @@ public partial class UIGamePhaseControl
             if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
             {
                 Card cardData = lastCard.CardData;
+                Debug.Log($"BananaMonkeyDead Before: {cardData.cardName} currentHealth: {cardData.currentHealth}");
                 cardData.currentHealth += 3;
                 lastCard.RefreshCard();
+                Debug.Log($"BananaMonkeyDead After: {cardData.cardName} currentHealth: {cardData.currentHealth}");
             }
         }
     }

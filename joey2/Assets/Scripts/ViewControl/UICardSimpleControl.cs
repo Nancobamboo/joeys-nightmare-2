@@ -608,6 +608,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.ShamanDonkey:
 				effect = new YShamanDonkey();
 				break;
+			case ECardEffectId.BananaMonkey:
+				effect = new YBananaMonkey();
+				break;
+			case ECardEffectId.IronHoofDonkey:
+				effect = new YIronHoofDonkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
