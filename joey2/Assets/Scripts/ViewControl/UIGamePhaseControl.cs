@@ -673,6 +673,15 @@ public partial class UIGamePhaseControl : YViewControl
 		return null;
 	}
 
+	public int GetEnvCardCount(int envIndex)
+	{
+		if (m_EnvCardDict.TryGetValue(envIndex, out List<UICardSimpleControl> cardList))
+		{
+			return cardList?.Count ?? 0;
+		}
+		return 0;
+	}
+
 	public bool HasBagCard(ECardType cardType)
 	{
 		List<UICardSimpleControl> cardList = GetBagCardList(cardType);
