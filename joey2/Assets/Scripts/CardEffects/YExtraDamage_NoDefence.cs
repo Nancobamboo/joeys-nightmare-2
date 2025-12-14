@@ -18,7 +18,7 @@ public class YExtraDamage_NoDefence : YDefaultEffect
         base.SetData(cardControl);
         if (CardControl != null)
         {
-            CardControl.AddBuff(EBuffType.UpdateAttack, 1);
+            CardControl.AddBuff(EBuffType.UpdateByDefenceCardNum, 1);
             bool currentNoDefence = !JoeyGameControl.Instance.HasBagCard(ECardType.defence);
             m_CachedNoDefence = currentNoDefence;
             if (currentNoDefence)
@@ -30,7 +30,7 @@ public class YExtraDamage_NoDefence : YDefaultEffect
 
     public override int OnBuffValueChange(EBuffType buffType, int value)
     {
-        if (buffType == EBuffType.UpdateAttack)
+        if (buffType == EBuffType.UpdateByDefenceCardNum)
         {
             bool currentNoDefence = !JoeyGameControl.Instance.HasBagCard(ECardType.defence);
             if (currentNoDefence != m_CachedNoDefence)

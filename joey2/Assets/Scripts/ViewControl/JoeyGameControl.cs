@@ -31,6 +31,7 @@ public class JoeyGameControl : YViewControl
 	private DataJoeyPlayer m_DataJoeyPlayer;
 	private UIPauseControl m_PauseControl;
 	private UIGameOverControl m_GameOverControl;
+	private UIShopSuperControl m_ShopSuperControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
@@ -492,18 +493,18 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
-	else if (GameMode == EGameMode.Guide)
-	{
-		if (m_DataJoeyPlayer.currentLevel >= 3)
+		else if (GameMode == EGameMode.Guide)
 		{
-			ClearAllUniTasks();
-			SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
-			return;
+			if (m_DataJoeyPlayer.currentLevel >= 3)
+			{
+				ClearAllUniTasks();
+				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				return;
+			}
+
+			LoadNextLevel();
+
 		}
-
-		LoadNextLevel();
-
-	}
 		else
 		{
 			LoadNextLevel();
@@ -598,8 +599,8 @@ public class JoeyGameControl : YViewControl
 		{
 			finalAction = () =>
 			{
-				var ctrl = Asset.OpenUI<UIShopSuperControl>();
-				ctrl.SetData();
+				m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				m_ShopSuperControl.SetData();
 			};
 		}
 		else
@@ -898,6 +899,23 @@ public class JoeyGameControl : YViewControl
 
 	private void OnDestroy()
 	{
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.Close();
+		}
+		if (m_PauseControl != null)
+		{
+			m_PauseControl.Close();
+		}
+		if (m_GameOverControl != null)
+		{
+			m_GameOverControl.Close();
+		}
+		if (m_ShopSuperControl != null)
+		{
+			m_ShopSuperControl.Close();
+		}
+
 		m_GlobalDelayAction.Cancel();
 
 		foreach (KeyValuePair<Transform, CancellationTokenSource> kvp in CancelTokenDict)
