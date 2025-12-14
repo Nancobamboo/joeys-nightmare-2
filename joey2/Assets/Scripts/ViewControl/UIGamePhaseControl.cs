@@ -1506,6 +1506,11 @@ public partial class UIGamePhaseControl : YViewControl
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
+		if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+		}
+
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
 			if (ControlUtil.IsRandomSucceed(10))
@@ -1573,6 +1578,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
 		}
 
+
 		if (!useFistCard)
 		{
 			await RemoveBagCard(ECardType.attack, attackCardControl);
@@ -1595,9 +1601,14 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else
 		{
-			m_FistCardCache.CardEffect.ClearAllEffectValues();
-		}
-		RemoveCardCts(attackCardControl);
+            m_FistCardCache.ClearEffectVlaue();
+
+        }
+
+
+
+
+        RemoveCardCts(attackCardControl);
 
 		// Clean up enemy card's CTS if it wasn't already removed during counter-attack
 		if (m_CardCtsDict.ContainsKey(enemyCardControl))
