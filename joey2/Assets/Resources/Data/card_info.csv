@@ -4,7 +4,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑,,attack,,5,0,0,50,1,,
 1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,,attack,装备：触发1次自动攻击,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop,
 1004,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,木棒,,attack,,8,0,0,100,1,,
-1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,,attack,没有防具时攻击+8,9,0,0,100,2,ExtraDamage_NoDefence:8,
+1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,,attack,没有防具时攻击+5,9,0,0,100,2,ExtraDamage_NoDefence:5,
 1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,重锤        ,,attack,敌人先发起攻击,20,0,0,300,3,SlowAttack,
 1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,回旋镖       ,,attack,攻击时：随机对场上敌人发动3次攻击,5,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2,
 1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,染血长矛       ,,attack,生命值低于50%时，攻击+10,9,0,0,100,2,ExtraDamage_HalfHealth:10,

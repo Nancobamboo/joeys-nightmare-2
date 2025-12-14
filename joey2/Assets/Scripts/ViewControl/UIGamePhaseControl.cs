@@ -301,10 +301,20 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private void CreateFistCardCache()
 	{
+		// Only skip creation if fist card exists and is active, unless it needs to be replaced
 		if (m_FistCardCache != null && m_FistCardCache.gameObject.activeSelf)
 		{
-			return;
+			// Check if we need to replace bare hands with boxing gloves
+			bool hasGlovesRelic = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster);
+			bool isBareHands = m_FistCardCache.CardData != null && m_FistCardCache.CardData.id == "1011";
+			
+			// If we have the gloves relic but still using bare hands, need to replace
+			if (!hasGlovesRelic || !isBareHands)
+			{
+				return;
+			}
 		}
+		
 		// Check if player has BareHandsMaster relic, use Boxing Gloves instead
 		string cardId = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) ? "1019" : "1011";
 		Card card = DataSystem.Instance.CreateCard(cardId);
@@ -2032,7 +2042,20 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		m_FistCardCache.AddRelic(relicId);
+		// Special handling for BareHandsMaster relic: recreate fist card cache with boxing gloves
+		if (relicId == (int)ERelicType.BareHandsMaster)
+		{
+			if (m_FistCardCache != null)
+			{
+				m_FistCardCache.Return();
+				m_FistCardCache = null;
+			}
+			CreateFistCardCache();
+		}
+		else
+		{
+			m_FistCardCache.AddRelic(relicId);
+		}
 
 		foreach (var kvp in m_EnvCardDict)
 		{
