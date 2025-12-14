@@ -86,6 +86,7 @@ public class UIRelicControl : YViewControl
 		if (m_RelicInfo != null)
 		{
 			m_View.RelicImage.sprite = LoadSprite(m_RelicInfo.cardImage);
+			m_View.IconImage.sprite = LoadSprite(m_RelicInfo.iconImage);
 			m_View.CardItem.SetActive(false);
 			m_View.TxtName.gameObject.SetActive(false);
 		}
