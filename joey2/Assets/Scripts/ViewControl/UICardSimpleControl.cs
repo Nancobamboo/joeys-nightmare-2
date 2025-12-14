@@ -21,6 +21,8 @@ public enum EBuffType
 {
 	Counter,
 	UpdateAttack,
+	UpdateByHpChange,
+	UpdateByDefenceCardNum,
 
 	Upper
 }

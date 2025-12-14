@@ -142,6 +142,16 @@ public partial class UIGamePhaseControl : YViewControl
 			float ratio = (float)hp / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
 		}
+
+		RunActionForEachLastBagCard((x) =>
+		{
+			if (x.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+			{
+				x.UpdateBuffValue();
+			}
+
+		});
+
 	}
 
 	void OnAttackChanged(int attack)
@@ -421,7 +431,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (envStage != null)
 			{
 				m_View.TxtStage.text = envStage.level.ToString();
-				
+
 				// 根据 theme 设置 BattleEnv 模式的 Description
 				switch (envStage.theme)
 				{
@@ -446,7 +456,7 @@ public partial class UIGamePhaseControl : YViewControl
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
 		{
 			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
-			
+
 			// 教学关卡的三关文本
 			switch (m_DataJoeyPlayer.currentLevel)
 			{
@@ -471,7 +481,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				m_View.TxtStage.text = currentStage.stages;
 			}
-			
+
 			// 普通关卡默认文本
 			m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
 		}
@@ -697,6 +707,18 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
+
+		if(cardType == ECardType.defence)
+		{
+			RunActionForEachLastBagCard((x) =>
+			{
+				if(x.GetBuffValue(EBuffType.UpdateByDefenceCardNum) > 0 )
+				{
+					x.UpdateBuffValue();
+				}
+
+			});
+		}
 	}
 
 
@@ -748,6 +770,39 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 		return null;
+	}
+
+	public void RunActionForEachLastEnvCard(Action<UICardSimpleControl> action)
+	{
+		if (action == null || m_EnvPanels == null)
+		{
+			return;
+		}
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null)
+			{
+				action(lastCard);
+			}
+		}
+	}
+
+	public void RunActionForEachLastBagCard(Action<UICardSimpleControl> action)
+	{
+		if (action == null)
+		{
+			return;
+		}
+		ECardType[] bagCardTypes = { ECardType.attack, ECardType.defence, ECardType.skill, ECardType.item };
+		for (int i = 0; i < bagCardTypes.Length; i++)
+		{
+			UICardSimpleControl lastCard = GetLastBagCard(bagCardTypes[i]);
+			if (lastCard != null)
+			{
+				action(lastCard);
+			}
+		}
 	}
 
 	public int GetEnvCardCount(int envIndex)
@@ -2151,8 +2206,20 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private void OnDestroy()
+	protected override void OnClose()
 	{
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			if (m_RelicList[i] != null)
+			{
+				m_RelicList[i].Close();
+			}
+		}
+		if (m_CardLimitDebuffControl != null)
+		{
+			m_CardLimitDebuffControl.Close();
+		}
+
 		ClearAllUniTasks();
 		CurrentEffectCard = null;
 		m_CardActionQueue.Clear();
@@ -2224,5 +2291,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_EffectRoots = null;
 		m_FistCardCache = null;
 		m_KeyPathCardCache = null;
+
+		base.OnClose();
 	}
 }

@@ -18,7 +18,7 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
         base.SetData(cardControl);
         if (CardControl != null)
         {
-            CardControl.AddBuff(EBuffType.UpdateAttack, 1);
+            CardControl.AddBuff(EBuffType.UpdateByHpChange, 1);
             bool currentHalfHealth = JoeyGameControl.Instance.IsPlayerHalfHealth();
             m_CachedHalfHealth = currentHalfHealth;
             if (currentHalfHealth)
@@ -30,7 +30,7 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
 
     public override int OnBuffValueChange(EBuffType buffType, int value)
     {
-        if (buffType == EBuffType.UpdateAttack)
+        if (buffType == EBuffType.UpdateByHpChange)
         {
             bool currentHalfHealth = JoeyGameControl.Instance.IsPlayerHalfHealth();
             if (currentHalfHealth != m_CachedHalfHealth)

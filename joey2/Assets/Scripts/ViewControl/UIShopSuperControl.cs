@@ -152,9 +152,9 @@ public class UIShopSuperControl : YViewControl
                 float discountRate = Random.Range(0.8f, 1.0f);
                 shopPrice = Mathf.RoundToInt(card.price * discountRate);
                 if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
-				{
-					shopPrice = Mathf.RoundToInt(shopPrice * 0.8f);
-				}
+                {
+                    shopPrice = Mathf.RoundToInt(shopPrice * 0.8f);
+                }
             }
 
             if (shopPrice < 1)
@@ -261,6 +261,17 @@ public class UIShopSuperControl : YViewControl
 
     protected override void OnClose()
     {
+        if (m_BuildControl != null)
+        {
+            m_BuildControl.Close();
+        }
+        for (int i = 0; i < m_ShopCardList.Count; i++)
+        {
+            if (m_ShopCardList[i] != null)
+            {
+                m_ShopCardList[i].Close();
+            }
+        }
         m_ShopCardList.Clear();
         m_CurrentShopCards.Clear();
         if (m_DamageTextPool != null)
