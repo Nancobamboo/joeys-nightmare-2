@@ -32,6 +32,16 @@ public partial class UIGamePhaseControl
         for (int i = 0; i < selectedIndices.Count; i++)
         {
             Card card = GData.Instance.GetCardConfigById(cardId).Clone();
+            
+            // 从 EnvCardDict 获取已增强的属性值（如 PermanentBoostAttack 增加的攻击力）
+            DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+            Card enhancedCard = dataJoeyPlayer.GetEnvCardDictData(cardId);
+            if (enhancedCard != null)
+            {
+                card.SetAttack(enhancedCard.currentAttack);
+                card.SetDefence(enhancedCard.currentDefence);
+            }
+            
             int envIndex = selectedIndices[i];
 
             VerticalLayoutGroup parent = m_EnvPanels[envIndex];

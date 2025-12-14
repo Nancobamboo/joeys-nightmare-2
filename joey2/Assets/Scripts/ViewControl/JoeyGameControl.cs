@@ -330,7 +330,7 @@ public class JoeyGameControl : YViewControl
 		m_GameStateCache.EnvCardDictData = new Dictionary<string, Card>();
 		foreach (var kvp in m_DataJoeyPlayer.EnvCardDict)
 		{
-			m_GameStateCache.EnvCardDictData[kvp.Key] = kvp.Value;
+			m_GameStateCache.EnvCardDictData[kvp.Key] = kvp.Value.Clone();
 		}
 
 		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
@@ -382,7 +382,7 @@ public class JoeyGameControl : YViewControl
 		m_DataJoeyPlayer.EnvCardDict.Clear();
 		foreach (var kvp in m_GameStateCache.EnvCardDictData)
 		{
-			m_DataJoeyPlayer.EnvCardDict[kvp.Key] = kvp.Value;
+			m_DataJoeyPlayer.EnvCardDict[kvp.Key] = kvp.Value.Clone();
 		}
 
 		m_GamePhaseControl.SetData();
