@@ -69,7 +69,8 @@ public enum ECardEffectId
 	ShamanDonkey,
     IronHoofDonkey,
     NoCounterAttack,
-    SlowAttack
+    SlowAttack,
+    DonkeyMajor,
 
 }
 

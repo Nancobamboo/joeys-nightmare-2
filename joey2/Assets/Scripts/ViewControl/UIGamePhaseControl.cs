@@ -1947,7 +1947,12 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_KeyPathCardCache != null)
 		{
 			m_KeyPathCardCache.gameObject.SetActive(true);
-			m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
+			int envIndex = m_KeyPathCardCache.EnvIndex;
+			if (envIndex >= 0 && envIndex < m_EnvPanels.Count)
+			{
+				m_KeyPathCardCache.CacheTrans.SetParent(m_EnvPanels[envIndex].transform, false);
+			}
+			//m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
 			m_KeyPathCardCache.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 		}
 	}
