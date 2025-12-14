@@ -29,6 +29,7 @@ public class UIGamePhaseView : YBaseView
 	public GameObject DonkeyBg;
 	public GameObject DeadkeyBg;
 	public GameObject GuideBg;
+	public Text Description;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -60,5 +61,6 @@ public class UIGamePhaseView : YBaseView
 		DonkeyBg = viewItemList[21].Target.gameObject;
 		DeadkeyBg = viewItemList[22].Target.gameObject;
 		GuideBg = viewItemList[23].Target.gameObject;
+		Description = viewItemList[24].Target.GetComponent<Text>();
 	}
 }
