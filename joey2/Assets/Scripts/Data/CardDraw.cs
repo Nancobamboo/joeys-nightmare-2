@@ -168,6 +168,9 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     /// <returns>List of 5 columns, each containing card IDs (first=top, last=bottom due to reverse iteration in AddEnvCardList)</returns>
     public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool, int cardLimit = 0)
     {
+        // Set deterministic seed for this level to ensure consistent card distribution when restarting
+        Random.InitState(level * 100);
+
         List<string> monsters = GetEnvStageMonsters(level);
         List<string> nonMonsterCards = new List<string>(playerCardPool);
 

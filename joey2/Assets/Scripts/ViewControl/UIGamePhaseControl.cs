@@ -832,7 +832,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			Debug.Log("Monster dead: " + cardControl.CardData.id);
 			string monsterId = cardControl.CardData.id;
-			List<Card> dropCards = GetMonsterDropCard(monsterId);
+			List<Card> dropCards = GetMonsterDropCard(monsterId, envIndex);
 
 			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
@@ -864,14 +864,18 @@ public partial class UIGamePhaseControl : YViewControl
 		return false;
 	}
 
-	private List<Card> GetMonsterDropCard(string monsterId)
+	private List<Card> GetMonsterDropCard(string monsterId, int envIndex)
 	{
 		if (string.IsNullOrEmpty(monsterId))
 		{
 			return null;
 		}
 
-		if (!LootDropManager.Instance.TryGetDropCards(monsterId, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
+		// Get current level ID for deterministic seed
+		int levelId = DataSystem.Instance.GetDataJoeyPlayer().currentLevel;
+
+		// Use deterministic drop with seed based on level and position
+		if (!LootDropManager.Instance.TryGetDropCardsWithSeed(monsterId, levelId, envIndex, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
 		{
 			return null;
 		}
