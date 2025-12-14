@@ -9,6 +9,16 @@ public class YBareHands : YCardEffect
         Id = ECardEffectId.BareHands;
     }
 
+
+    public override float UseAttack()
+    {
+        if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+        {
+            YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+        }
+        return base.UseAttack();
+    }
+
     public override float OnDealDamage()
     {
         // Play attack animation for Barehanded card
