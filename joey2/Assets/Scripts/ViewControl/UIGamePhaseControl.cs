@@ -1530,6 +1530,11 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		RemoveCardCts(attackCardControl);
 
+		// Clean up enemy card's CTS if it wasn't already removed during counter-attack
+		if (m_CardCtsDict.ContainsKey(enemyCardControl))
+		{
+			RemoveCardCts(enemyCardControl);
+		}
 
 		enemyCardControl.IsEffecting = false;
 	}
