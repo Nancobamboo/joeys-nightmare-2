@@ -1,6 +1,6 @@
 id   ,cardImage ,cardBackground,cardName            ,comment,type,description,attack ,defence ,health ,price ,stars,effectIds,
-1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,武器牌1,教学牌,attack,点击堆叠到手牌,5,0,0,0,1,,
-1001,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,武器牌2,教学牌,attack,点击堆叠到手牌,8,0,0,0,1,,
+1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,5,0,0,0,1,,
+1001,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,8,0,0,0,1,,
 1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑,,attack,,5,0,0,50,1,,
 1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,,attack,装备：触发1次自动攻击,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop,
 1004,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,木棒,,attack,,8,0,0,100,1,,
