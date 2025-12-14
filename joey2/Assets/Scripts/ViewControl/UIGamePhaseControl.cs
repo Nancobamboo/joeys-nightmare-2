@@ -411,6 +411,70 @@ public partial class UIGamePhaseControl : YViewControl
 				m_View.TxtStage.text = currentStage.stages;
 			}
 		}
+
+		// 设置 Description 文本
+		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		{
+			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
+			if (envStage != null)
+			{
+				m_View.TxtStage.text = envStage.level.ToString();
+				
+				// 根据 theme 设置 BattleEnv 模式的 Description
+				switch (envStage.theme)
+				{
+					case ETheme.monkey:
+						m_View.Description.text = "加油,打败坏monkey";
+						break;
+					case ETheme.donkey:
+						m_View.Description.text = "努力,战胜坏donkey";
+						break;
+					case ETheme.turkey:
+						m_View.Description.text = "冲鸭,击溃坏turkey";
+						break;
+					case ETheme.deadkey:
+						m_View.Description.text = "打败死神!";
+						break;
+					default:
+						m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
+						break;
+				}
+			}
+		}
+		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
+		{
+			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
+			
+			// 教学关卡的三关文本
+			switch (m_DataJoeyPlayer.currentLevel)
+			{
+				case 1:
+					m_View.Description.text = "点击堆叠卡牌/攻击敌人";
+					break;
+				case 2:
+					m_View.Description.text = "喝药回血,用技能打败敌人";
+					break;
+				case 3:
+					m_View.Description.text = "多次触发手里剑获胜哟";
+					break;
+				default:
+					m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
+					break;
+			}
+		}
+		else
+		{
+			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);
+			if (currentStage != null && !string.IsNullOrEmpty(currentStage.stages))
+			{
+				m_View.TxtStage.text = currentStage.stages;
+			}
+			
+			// 普通关卡默认文本
+			m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
+		}
+
+
 		RefreshRelicDisplay();
 		RefreshCardLimitDebuff();
 	}
