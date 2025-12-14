@@ -282,17 +282,17 @@ public class UISelectControl : YViewControl
 			foreach (var kvp in playerData.SelfCardDict)
 			{
 				Card card = kvp.Value;
-				if (card != null && card.id == "1011")
-				{
-					// Replace card data while keeping the unique ID
-					card.cardImage = boxingGlovesTemplate.cardImage;
-					card.cardBackground = boxingGlovesTemplate.cardBackground;
-					card.cardName = boxingGlovesTemplate.cardName;
-					card.description = boxingGlovesTemplate.description;
-					card.id = boxingGlovesTemplate.id;
-					card.SetAttack(boxingGlovesTemplate.attack);
-					card.effectId = boxingGlovesTemplate.effectId;
-				}
+			if (card != null && card.id == "1011")
+			{
+				// Replace card data while keeping the unique ID
+				card.cardImage = boxingGlovesTemplate.cardImage;
+				card.cardBackground = boxingGlovesTemplate.cardBackground;
+				card.cardName = boxingGlovesTemplate.cardName;
+				card.description = boxingGlovesTemplate.description;
+				card.id = boxingGlovesTemplate.id;
+				card.SetAttack(boxingGlovesTemplate.currentAttack);
+				card.effectId = boxingGlovesTemplate.effectId;
+			}
 			}
 		}
 

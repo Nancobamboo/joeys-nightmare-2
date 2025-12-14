@@ -134,6 +134,17 @@ public partial class DataSystem
             dataJoeyPlayer.AddEquipedSkillListData(card.UniqueId);
         }
 
+        // Initialize equipment relics
+        for (int i = 0; i < characterData.equipmentRelic.Count; i++)
+        {
+            string relicIdStr = characterData.equipmentRelic[i];
+            if (string.IsNullOrEmpty(relicIdStr)) continue;
+            if (int.TryParse(relicIdStr, out int relicId))
+            {
+                dataJoeyPlayer.AddRelicListData(relicId);
+            }
+        }
+
         dataJoeyPlayer.Coin = characterData.coins;
 
         if (isNew)
@@ -202,6 +213,17 @@ public partial class DataSystem
             if (!string.IsNullOrEmpty(cardId))
             {
                 dataJoeyPlayer.AddEnvCardPoolData(cardId);
+            }
+        }
+
+        // Initialize equipment relics for Env mode
+        for (int i = 0; i < characterData.equipmentRelic.Count; i++)
+        {
+            string relicIdStr = characterData.equipmentRelic[i];
+            if (string.IsNullOrEmpty(relicIdStr)) continue;
+            if (int.TryParse(relicIdStr, out int relicId))
+            {
+                dataJoeyPlayer.AddRelicListData(relicId);
             }
         }
 

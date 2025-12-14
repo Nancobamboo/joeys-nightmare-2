@@ -17,7 +17,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1016,Art/Img/Attack/王者剑,Art/Img/Attack/img_bg_Attack,王者剑盾（剑）,,attack,攻击后切换为盾形态，剩余切换次数:2,8,0,0,300,3,KingShield_OnAttack,
 1017,Art/Img/Attack/死神之镰,Art/Img/Attack/img_bg_Attack,死神之镰,,attack,斩杀生命值小于一半的怪物,5,0,0,300,3,CullingBlade,
 1018,Art/Img/Attack/img_card_Dagger,Art/Img/Attack/img_bg_Attack,刺客匕首,,attack,敌人不会反击,4,0,0,175,2,NoCounterAttack,
-1019,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,拳击手套,,attack,永不消耗,6,0,0,0,2,BareHands,
+1019,Art/Img/Attack/赤手空拳加拳套,Art/Img/Attack/img_bg_Attack,拳击手套,,attack,永不消耗,6,0,0,0,2,BareHands,
 ,,,,,,,,,,,,,
 ,,,,,,,,,,,,,
 2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,防御牌,教学牌,defence,点击堆叠到手牌,0,3,0,0,1,,

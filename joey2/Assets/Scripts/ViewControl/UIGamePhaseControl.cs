@@ -657,16 +657,16 @@ public partial class UIGamePhaseControl : YViewControl
 			// Replace Bare Hands with Boxing Gloves if player has BareHandsMaster relic
 			if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) && card.id == "1011")
 			{
-				// Get the boxing gloves card template
-				Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
-				// Replace card data while keeping the unique ID
-				card.cardImage = boxingGlovesTemplate.cardImage;
-				card.cardBackground = boxingGlovesTemplate.cardBackground;
-				card.cardName = boxingGlovesTemplate.cardName;
-				card.description = boxingGlovesTemplate.description;
-				card.id = boxingGlovesTemplate.id;
-				card.SetAttack(boxingGlovesTemplate.attack);
-				card.effectId = boxingGlovesTemplate.effectId;
+			// Get the boxing gloves card template
+			Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
+			// Replace card data while keeping the unique ID
+			card.cardImage = boxingGlovesTemplate.cardImage;
+			card.cardBackground = boxingGlovesTemplate.cardBackground;
+			card.cardName = boxingGlovesTemplate.cardName;
+			card.description = boxingGlovesTemplate.description;
+			card.id = boxingGlovesTemplate.id;
+			card.SetAttack(boxingGlovesTemplate.currentAttack);
+			card.effectId = boxingGlovesTemplate.effectId;
 			}
 
 			ECardType cardType = card.GetCardType();
