@@ -19,6 +19,8 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     private const int ENV_SLOT_COUNT = 5;
     private const int MIN_NON_MONSTER_TOP_CARDS = 3;
     private const string EXIT_CARD_ID = "6001";
+    private const string ROMEO_MONKEY_ID = "5017";
+    private const string JULIET_MONKEY_ID = "5018";
 
     private void LoadEnvDeck()
     {
@@ -183,6 +185,10 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         List<string> threeStarMonsters = new List<string>();
         List<string> normalMonsters = new List<string>();
         
+        // Check if both Romeo and Juliet are present in the monster list
+        bool hasRomeo = monsters.Contains(ROMEO_MONKEY_ID);
+        bool hasJuliet = monsters.Contains(JULIET_MONKEY_ID);
+        
         foreach (string monsterId in monsters)
         {
             if (GData.Instance.CardDict.TryGetValue(monsterId, out Card card))
@@ -282,6 +288,53 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         {
             int randomColumn = Random.Range(0, ENV_SLOT_COUNT);
             columns[randomColumn].Add(threeStarMonsterId);
+        }
+
+        // Step 6: Ensure Romeo is always placed to the left of Juliet (if both are present)
+        if (hasRomeo && hasJuliet)
+        {
+            int romeoColumn = -1;
+            int romeoIndex = -1;
+            int julietColumn = -1;
+            int julietIndex = -1;
+            
+            // Find Romeo and Juliet positions
+            for (int col = 0; col < columns.Count; col++)
+            {
+                for (int idx = 0; idx < columns[col].Count; idx++)
+                {
+                    if (columns[col][idx] == ROMEO_MONKEY_ID)
+                    {
+                        romeoColumn = col;
+                        romeoIndex = idx;
+                    }
+                    if (columns[col][idx] == JULIET_MONKEY_ID)
+                    {
+                        julietColumn = col;
+                        julietIndex = idx;
+                    }
+                }
+            }
+            
+            // Ensure Romeo is to the left of Juliet, or above Juliet if in the same column
+            if (romeoColumn > julietColumn)
+            {
+                // Romeo is to the right of Juliet, swap their positions
+                columns[romeoColumn][romeoIndex] = JULIET_MONKEY_ID;
+                columns[julietColumn][julietIndex] = ROMEO_MONKEY_ID;
+                Debug.Log($"Swapped Romeo and Juliet columns: Romeo moved from column {romeoColumn} to {julietColumn}, Juliet moved from column {julietColumn} to {romeoColumn}");
+            }
+            else if (romeoColumn == julietColumn && romeoIndex > julietIndex)
+            {
+                // Romeo and Juliet are in the same column, but Romeo is below Juliet, swap their positions
+                columns[romeoColumn][romeoIndex] = JULIET_MONKEY_ID;
+                columns[romeoColumn][julietIndex] = ROMEO_MONKEY_ID;
+                Debug.Log($"Swapped Romeo and Juliet in same column {romeoColumn}: Romeo moved from index {romeoIndex} to {julietIndex}, Juliet moved from index {julietIndex} to {romeoIndex}");
+            }
+            else
+            {
+                Debug.Log($"Romeo and Juliet positions correct: Romeo in column {romeoColumn} index {romeoIndex}, Juliet in column {julietColumn} index {julietIndex}");
+            }
         }
 
         // Note: Exit card (KeyPath) is no longer placed here.
