@@ -12,10 +12,6 @@ public class YBareHands : YCardEffect
 
     public override float UseAttack()
     {
-        if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
-        {
-            YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
-        }
         return base.UseAttack();
     }
 
@@ -53,7 +49,7 @@ public class YBareHands : YCardEffect
 
                     // Get bare hands attack damage
                     int damage = CardControl.CardData.currentAttack;
-                    
+
                     // Dispatch action to attack random enemy with delay
                     JoeyGameControl.Instance.AddGlobalDelayCall(() =>
                     {
