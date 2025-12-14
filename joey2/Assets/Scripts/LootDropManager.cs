@@ -206,6 +206,36 @@ public class LootDropManager : MonoSingleton<LootDropManager>
         return cardIds != null && cardIds.Count > 0;
     }
 
+    /// <summary>
+    /// Get drop cards with deterministic seed based on level and environment position
+    /// This ensures that the same chest/barrel at the same position always drops the same items when the level is restarted
+    /// </summary>
+    /// <param name="monsterId">Monster/chest ID</param>
+    /// <param name="levelId">Current level ID</param>
+    /// <param name="envIndex">Environment slot index</param>
+    /// <param name="cardIds">Output list of dropped card IDs</param>
+    /// <returns>True if drops were generated successfully</returns>
+    public bool TryGetDropCardsWithSeed(string monsterId, int levelId, int envIndex, out List<string> cardIds)
+    {
+        // Calculate deterministic seed based on level and position
+        // Using a large multiplier to avoid seed collisions between different levels
+        int seed = levelId * 1000 + envIndex;
+        
+        // Save current random state
+        Random.State oldState = Random.state;
+        
+        // Set deterministic seed for this drop
+        Random.InitState(seed);
+        
+        // Use existing drop logic with now-deterministic random
+        bool result = TryGetDropCards(monsterId, out cardIds);
+        
+        // Restore previous random state to avoid affecting other systems
+        Random.state = oldState;
+        
+        return result;
+    }
+
 
 
     private List<int> BuildOffsetPattern(int panelCount)
