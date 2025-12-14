@@ -19,6 +19,8 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     private const int ENV_SLOT_COUNT = 5;
     private const int MIN_NON_MONSTER_TOP_CARDS = 3;
     private const string EXIT_CARD_ID = "6001";
+    private const string ROMEO_MONKEY_ID = "5017";
+    private const string JULIET_MONKEY_ID = "5018";
 
     private void LoadEnvDeck()
     {
@@ -183,6 +185,10 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         List<string> threeStarMonsters = new List<string>();
         List<string> normalMonsters = new List<string>();
         
+        // Check if both Romeo and Juliet are present in the monster list
+        bool hasRomeo = monsters.Contains(ROMEO_MONKEY_ID);
+        bool hasJuliet = monsters.Contains(JULIET_MONKEY_ID);
+        
         foreach (string monsterId in monsters)
         {
             if (GData.Instance.CardDict.TryGetValue(monsterId, out Card card))
@@ -282,6 +288,24 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         {
             int randomColumn = Random.Range(0, ENV_SLOT_COUNT);
             columns[randomColumn].Add(threeStarMonsterId);
+        }
+
+        // Step 6: Fix Romeo at column 1 and Juliet at column 3 (if both are present)
+        if (hasRomeo && hasJuliet)
+        {
+            // Find and remove Romeo and Juliet from their current positions
+            for (int col = 0; col < columns.Count; col++)
+            {
+                columns[col].RemoveAll(cardId => cardId == ROMEO_MONKEY_ID || cardId == JULIET_MONKEY_ID);
+            }
+            
+            // Place Romeo at column 1 (index 1)
+            columns[1].Add(ROMEO_MONKEY_ID);
+            
+            // Place Juliet at column 3 (index 3)
+            columns[3].Add(JULIET_MONKEY_ID);
+            
+            Debug.Log($"Fixed positions: Romeo placed at column 1, Juliet placed at column 3");
         }
 
         // Note: Exit card (KeyPath) is no longer placed here.
