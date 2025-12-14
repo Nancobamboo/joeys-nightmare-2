@@ -295,7 +295,9 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return;
 		}
-		Card card = DataSystem.Instance.CreateCard("1011");
+		// Check if player has BareHandsMaster relic, use Boxing Gloves instead
+		string cardId = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) ? "1019" : "1011";
+		Card card = DataSystem.Instance.CreateCard(cardId);
 		Transform attackPanelTransform = m_View.AttackPanel.transform;
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
 		cardControl.CacheTrans.SetParent(m_View.EmptyAttack);
@@ -651,6 +653,21 @@ public partial class UIGamePhaseControl : YViewControl
 			int uniqueId = equipList[i];
 			Card card = m_DataJoeyPlayer.GetSelfCardDictData(uniqueId);
 			if (card == null) continue;
+
+			// Replace Bare Hands with Boxing Gloves if player has BareHandsMaster relic
+			if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) && card.id == "1011")
+			{
+				// Get the boxing gloves card template
+				Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
+				// Replace card data while keeping the unique ID
+				card.cardImage = boxingGlovesTemplate.cardImage;
+				card.cardBackground = boxingGlovesTemplate.cardBackground;
+				card.cardName = boxingGlovesTemplate.cardName;
+				card.description = boxingGlovesTemplate.description;
+				card.id = boxingGlovesTemplate.id;
+				card.SetAttack(boxingGlovesTemplate.attack);
+				card.effectId = boxingGlovesTemplate.effectId;
+			}
 
 			ECardType cardType = card.GetCardType();
 			Transform parent = GetParentByCardType(cardType);
@@ -1426,13 +1443,6 @@ public partial class UIGamePhaseControl : YViewControl
 
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
-		if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
-		{
-			if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
-			{
-				damage += 3;
-			}
-		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
