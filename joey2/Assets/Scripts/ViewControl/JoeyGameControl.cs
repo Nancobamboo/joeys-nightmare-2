@@ -492,18 +492,18 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
-		else if (GameMode == EGameMode.Guide)
+	else if (GameMode == EGameMode.Guide)
+	{
+		if (m_DataJoeyPlayer.currentLevel >= 3)
 		{
-			if (m_DataJoeyPlayer.currentLevel == 5)
-			{
-				ClearAllUniTasks();
-				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
-				return;
-			}
-
-			LoadNextLevel();
-
+			ClearAllUniTasks();
+			SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+			return;
 		}
+
+		LoadNextLevel();
+
+	}
 		else
 		{
 			LoadNextLevel();
