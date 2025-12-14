@@ -290,51 +290,22 @@ public sealed class CardDraw : PureSingleton<CardDraw>
             columns[randomColumn].Add(threeStarMonsterId);
         }
 
-        // Step 6: Ensure Romeo is always placed to the left of Juliet (if both are present)
+        // Step 6: Fix Romeo at column 1 and Juliet at column 3 (if both are present)
         if (hasRomeo && hasJuliet)
         {
-            int romeoColumn = -1;
-            int romeoIndex = -1;
-            int julietColumn = -1;
-            int julietIndex = -1;
-            
-            // Find Romeo and Juliet positions
+            // Find and remove Romeo and Juliet from their current positions
             for (int col = 0; col < columns.Count; col++)
             {
-                for (int idx = 0; idx < columns[col].Count; idx++)
-                {
-                    if (columns[col][idx] == ROMEO_MONKEY_ID)
-                    {
-                        romeoColumn = col;
-                        romeoIndex = idx;
-                    }
-                    if (columns[col][idx] == JULIET_MONKEY_ID)
-                    {
-                        julietColumn = col;
-                        julietIndex = idx;
-                    }
-                }
+                columns[col].RemoveAll(cardId => cardId == ROMEO_MONKEY_ID || cardId == JULIET_MONKEY_ID);
             }
             
-            // Ensure Romeo is to the left of Juliet, or above Juliet if in the same column
-            if (romeoColumn > julietColumn)
-            {
-                // Romeo is to the right of Juliet, swap their positions
-                columns[romeoColumn][romeoIndex] = JULIET_MONKEY_ID;
-                columns[julietColumn][julietIndex] = ROMEO_MONKEY_ID;
-                Debug.Log($"Swapped Romeo and Juliet columns: Romeo moved from column {romeoColumn} to {julietColumn}, Juliet moved from column {julietColumn} to {romeoColumn}");
-            }
-            else if (romeoColumn == julietColumn && romeoIndex > julietIndex)
-            {
-                // Romeo and Juliet are in the same column, but Romeo is below Juliet, swap their positions
-                columns[romeoColumn][romeoIndex] = JULIET_MONKEY_ID;
-                columns[romeoColumn][julietIndex] = ROMEO_MONKEY_ID;
-                Debug.Log($"Swapped Romeo and Juliet in same column {romeoColumn}: Romeo moved from index {romeoIndex} to {julietIndex}, Juliet moved from index {julietIndex} to {romeoIndex}");
-            }
-            else
-            {
-                Debug.Log($"Romeo and Juliet positions correct: Romeo in column {romeoColumn} index {romeoIndex}, Juliet in column {julietColumn} index {julietIndex}");
-            }
+            // Place Romeo at column 1 (index 1)
+            columns[1].Add(ROMEO_MONKEY_ID);
+            
+            // Place Juliet at column 3 (index 3)
+            columns[3].Add(JULIET_MONKEY_ID);
+            
+            Debug.Log($"Fixed positions: Romeo placed at column 1, Juliet placed at column 3");
         }
 
         // Note: Exit card (KeyPath) is no longer placed here.
