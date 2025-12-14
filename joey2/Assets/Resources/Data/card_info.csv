@@ -50,7 +50,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,双持武器       ,未启用,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,,
 4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,堡垒       ,未启用,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,,
 4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,肉盾冲击,未启用,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,0,1,,
-4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,,skill     ,全体伤害:8,0,0,0,200,2,Electric:8,
+4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,,skill     ,全体伤害:5,0,0,0,200,2,Electric:5,
 4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤2个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill,
 4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的武器牌和防具牌丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill,
 4009,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,驱魂圣光,未启用,skill     ,直接消灭一个骷髅型怪物，若当前场上没有骷髅型怪物则使用失败,0,0,0,0,2,HolyLight_UseSkill,
