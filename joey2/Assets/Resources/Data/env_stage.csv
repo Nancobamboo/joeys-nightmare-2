@@ -2,7 +2,7 @@ level,monster_ids,type,theme
 1,5002;5009,normal,monkey
 2,5002;5035;5006,elite,monkey
 3,5017;5018;5006;5009,normal,monkey
-4,5019;5014;5009;5009,boss,monkey
+4,5019;5014;5006;5006,boss,monkey
 5,5032;5022;5006,normal,donkey
 6,5021;5032;5015;5036;5016,elite,donkey
 7,5033;5022;5032;5009,normal,donkey
