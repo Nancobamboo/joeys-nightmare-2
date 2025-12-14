@@ -2047,7 +2047,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			if (m_FistCardCache != null)
 			{
-				m_FistCardCache.Close();
+				m_FistCardCache.Return();
 				m_FistCardCache = null;
 			}
 			CreateFistCardCache();
