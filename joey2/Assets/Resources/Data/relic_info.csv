@@ -17,5 +17,5 @@ id   ,cardImage ,iconImage,name,description,stars
 9016,Art\Img\Relic\img_relic_peach,Art\Img\Relic\icon_relic_peach,桃,增加10生命上限,1
 9017,Art\Img\Relic\img_relic_tiger,Art\Img\Relic\icon_relic_tiger,指虎,赤手空拳装备时造成一次伤害,2
 9018,Art\Img\Relic\img_relic_brambles,Art\Img\Relic\icon_relic_brambles,荆棘祝福,获得反伤:3,2
-9019,Art\Img\Relic\img_relic_doublefist,Art\Img\Relic\icon_relic_doublefist,赤手双拳,赤手空拳可以攻击两次,2
+9019,Art\Img\Relic\img_relic_doublefist,Art\Img\Relic\icon_relic_doublefist,邦邦两拳,赤手空拳可以攻击两次,2
 9999,Art/Img/Relic/卡牌超载,Art/Img/Relic/卡牌超载,卡牌超载,卡牌超过{cardLimit}张上限（当前{currentCount}张），多出的卡牌无法加入关卡,1
