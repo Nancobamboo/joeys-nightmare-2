@@ -937,11 +937,11 @@ public partial class UIGamePhaseControl : YViewControl
 			return null;
 		}
 
-		// Get current level ID for deterministic seed
-		int levelId = DataSystem.Instance.GetDataJoeyPlayer().currentLevel;
+		// Get current level random seed for deterministic drop
+		int levelRandomSeed = DataSystem.Instance.GetDataJoeyPlayer().levelRandomSeed;
 
-		// Use deterministic drop with seed based on level and position
-		if (!LootDropManager.Instance.TryGetDropCardsWithSeed(monsterId, levelId, envIndex, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
+		// Use deterministic drop with seed based on random seed and position
+		if (!LootDropManager.Instance.TryGetDropCardsWithSeed(monsterId, levelRandomSeed, envIndex, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
 		{
 			return null;
 		}

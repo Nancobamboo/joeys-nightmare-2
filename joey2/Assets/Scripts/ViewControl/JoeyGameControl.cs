@@ -188,6 +188,11 @@ public class JoeyGameControl : YViewControl
 	{
 		StartCoroutine(SFX.PlayAudioCoroutine(audioPath: "Audio/SFX/shuffle_cards", startTime: 0f));
 
+		// Generate random seed for this level (for loot drops and gift boxes)
+		m_DataJoeyPlayer.levelRandomSeed = UnityEngine.Random.Range(0, int.MaxValue);
+		// Reset gift box counter at the start of each level
+		m_DataJoeyPlayer.giftBoxUseCounter = 0;
+
 		int stageId = m_DataJoeyPlayer.StageId;
 		m_GamePhaseControl.SetBackgroundByStageId(stageId);
 
