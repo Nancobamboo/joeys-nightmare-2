@@ -87,7 +87,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,波兰蠢Donkey,2戈壁,monster,离场:玩家获得10金币,10,,18,30,1,PolishStupidDonkey,
 5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,3感恩节,monster,,9,,16,25,1,,
 5024,Art/Img/Monster/img_card_WalkingChicken,Art/Img/Monster/img_bg_Monster,走地Turkey,3感恩节,monster,2回合后:随机平移1格,8,,17,25,1,WalkingChicken,
-5025,Art/Img/Monster/魔术turkey,Art/Img/Monster/img_bg_Monster,魔术Turkey,3感恩节,monster,受击时：与环境中随机1张卡牌交换位置,7,,18,30,1,DodgeChicken,
+5025,Art/Img/Monster/img_card_runtturkey,Art/Img/Monster/img_bg_Monster,包租Turkey,3感恩节,monster,受击时：与环境中随机1张卡牌交换位置,7,,18,30,1,DodgeChicken,
 5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,感恩节Turkey,3感恩节,monster,抵挡一次致命伤害,9,,19,40,2,GratefulReleaseChicken,
 5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,下蛋Turkey,3感恩节,monster,受击时:小概率召唤1只走地鸡蛋,16,,50,80,3,BigChickenBoss:5028,
 5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,走地Turkey蛋,3感恩节,monster,2回合后:召唤1只走地鸡,0,,13,15,1,WalkingChickenEgg:5024,
