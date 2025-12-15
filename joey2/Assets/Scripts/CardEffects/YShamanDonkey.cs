@@ -4,14 +4,18 @@ using UnityEngine;
 
 public class YShamanDonkey : YDefaultEffect
 {
-    // Donkey类怪物的card id列表
     private static readonly HashSet<string> DonkeyCardIds = new HashSet<string>
     {
-        "5010", // 普通驴
-        "5011", // 骷髅驴
-        "5012", // 萨满驴(自己)
-        "5013", // 笨驴
-        "5014"  // 死灵驴
+        "5010", // 死灵Donkey
+        "5011", // 骷髅Donkey
+        "5015", // 怪盗Donkey
+        "5021", // 大春Donkey
+        "5022", // 波兰蠢Donkey
+        "5032", // 坏Donkey
+        "5033", // 榴莲Donkey
+        "5034", // Donkey市长
+        "5036", // 萨满Donkey
+        "5039"  // 坏Donkey
     };
 
     public const int ATTACK_BOOST = 3;
@@ -51,8 +55,8 @@ public partial class UIGamePhaseControl
         for (int i = 0; i < m_EnvPanels.Count; i++)
         {
             UICardSimpleControl lastCard = GetLastEnvCard(i);
-            if (lastCard != null && lastCard.gameObject.activeSelf && 
-                lastCard.CardType == ECardType.monster && 
+            if (lastCard != null && lastCard.gameObject.activeSelf &&
+                lastCard.CardType == ECardType.monster &&
                 lastCard.CardData != null &&
                 YShamanDonkey.IsDonkeyCard(lastCard.CardData.id))
             {

@@ -307,14 +307,14 @@ public partial class UIGamePhaseControl : YViewControl
 			// Check if we need to replace bare hands with boxing gloves
 			bool hasGlovesRelic = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster);
 			bool isBareHands = m_FistCardCache.CardData != null && m_FistCardCache.CardData.id == "1011";
-			
+
 			// If we have the gloves relic but still using bare hands, need to replace
 			if (!hasGlovesRelic || !isBareHands)
 			{
 				return;
 			}
 		}
-		
+
 		// Check if player has BareHandsMaster relic, use Boxing Gloves instead
 		string cardId = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) ? "1019" : "1011";
 		Card card = DataSystem.Instance.CreateCard(cardId);
@@ -874,6 +874,10 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardType == ECardType.monster)
 		{
+			if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+			{
+				YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+			}
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
 			{
@@ -1516,10 +1520,7 @@ public partial class UIGamePhaseControl : YViewControl
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
-		if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
-		{
-			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
-		}
+
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
@@ -1611,14 +1612,14 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else
 		{
-            m_FistCardCache.ClearEffectVlaue();
+			m_FistCardCache.ClearEffectVlaue();
 
-        }
-
-
+		}
 
 
-        RemoveCardCts(attackCardControl);
+
+
+		RemoveCardCts(attackCardControl);
 
 		// Clean up enemy card's CTS if it wasn't already removed during counter-attack
 		if (m_CardCtsDict.ContainsKey(enemyCardControl))
