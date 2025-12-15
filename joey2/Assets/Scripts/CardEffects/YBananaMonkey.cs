@@ -31,6 +31,10 @@ public partial class UIGamePhaseControl
                 Card cardData = lastCard.CardData;
                 Debug.Log($"BananaMonkeyDead Before: {cardData.cardName} currentHealth: {cardData.currentHealth}");
                 cardData.currentHealth += 3;
+                if (cardData.currentHealth > cardData.health)
+                {
+                    cardData.currentHealth = cardData.health;
+                }
                 lastCard.RefreshCard();
                 Debug.Log($"BananaMonkeyDead After: {cardData.cardName} currentHealth: {cardData.currentHealth}");
             }
