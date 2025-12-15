@@ -159,7 +159,7 @@ public class UISelectControl : YViewControl
 		}
 		else
 		{
-			m_View.TxtCardNum.color = Color.black;
+			m_View.TxtCardNum.color = Color.white;
 		}
 	}
 
