@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 2991062095272026688}
   - component: {fileID: 6731108335411202397}
   m_Layer: 5
-  m_Name: SelectItem
+  m_Name: SelectSkill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4942,7 +4942,7 @@ GameObject:
   - component: {fileID: 3297595790583119162}
   - component: {fileID: 2692501229973967545}
   m_Layer: 5
-  m_Name: SelectSkill
+  m_Name: SelectItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

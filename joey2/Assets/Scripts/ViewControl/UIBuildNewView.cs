@@ -20,8 +20,8 @@ public class UIBuildNewView : YBaseView
 	public Button BtnClose;
 	public GameObject SelectAttack;
 	public GameObject SelectDefence;
-	public GameObject SelectItem;
 	public GameObject SelectSkill;
+	public GameObject SelectItem;
 	public Text TxtCoin;
 	public GameObject ImgSell;
 	public GameObject ImgDel;
@@ -48,8 +48,8 @@ public class UIBuildNewView : YBaseView
 		BtnClose = viewItemList[13].Target.GetComponent<Button>();
 		SelectAttack = viewItemList[14].Target.gameObject;
 		SelectDefence = viewItemList[15].Target.gameObject;
-		SelectItem = viewItemList[16].Target.gameObject;
-		SelectSkill = viewItemList[17].Target.gameObject;
+		SelectSkill = viewItemList[16].Target.gameObject;
+		SelectItem = viewItemList[17].Target.gameObject;
 		TxtCoin = viewItemList[18].Target.GetComponent<Text>();
 		ImgSell = viewItemList[19].Target.gameObject;
 		ImgDel = viewItemList[20].Target.gameObject;

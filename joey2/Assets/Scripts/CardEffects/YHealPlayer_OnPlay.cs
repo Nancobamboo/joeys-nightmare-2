@@ -25,7 +25,7 @@ public class YHealPlayer_OnPlay : YCardEffect
 		{
 			healAmount += 5;
 		}
-		YActionSystem.Instance.DispatchAction(EActionId.AppHp, healAmount);
+		YActionSystem.Instance.DispatchAction(EActionId.AddHp, healAmount);
 		return 0f;
 	}
 }

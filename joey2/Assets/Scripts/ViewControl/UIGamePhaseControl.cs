@@ -56,7 +56,7 @@ public partial class UIGamePhaseControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<UIGamePhaseView>();
 		m_DataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
-		RegistAction(EActionId.AppHp, AppHp);
+		RegistAction(EActionId.AddHp, AddHp);
 		RegistAction(EActionId.AppAttack, AppAttack);
 		RegistAction(EActionId.AppDefence, AppDefence);
 		RegistAction(EActionId.MoveCard, MoveCard);
@@ -180,7 +180,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
 			}
-			if (isHeal)
+			if (isHeal && m_DataJoeyPlayer.playerHealth != m_DataJoeyPlayer.playerMaxHealth)
 			{
 				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_HuiXue, transform, 2f);
 				m_View.JoeyAnim.Play("happy");
@@ -213,10 +213,10 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	void AppHp(object[] paraArray)
+	void AddHp(object[] paraArray)
 	{
 		int delta = (int)paraArray[0];
-		AppHp(delta);
+		AddHp(delta);
 	}
 
 	void AppAttack(object[] paraArray)
@@ -874,10 +874,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardType == ECardType.monster)
 		{
-			if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
-			{
-				YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
-			}
+			
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
 			{
@@ -1548,7 +1545,11 @@ public partial class UIGamePhaseControl : YViewControl
 		bool enemyKilled = false;
 		for (int i = 0; i < attackCount; i++)
 		{
-			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
+            if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+            {
+                YActionSystem.Instance.DispatchAction(EActionId.AddHp, 1);
+            }
+            delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 
 			damage += attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
 
@@ -1564,7 +1565,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 				if (DataSystem.Instance.HasRelic(ERelicType.HealOnKill))
 				{
-					AppHp(3);
+					AddHp(3);
 				}
 
 				break;
