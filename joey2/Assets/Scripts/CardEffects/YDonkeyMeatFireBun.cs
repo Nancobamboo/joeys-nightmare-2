@@ -21,7 +21,7 @@ public class YDonkeyMeatFireBun : YCardEffect
         int oldMaxHealth = playerData.playerMaxHealth;
         playerData.playerMaxHealth += 2;
 
-        YActionSystem.Instance.DispatchAction(EActionId.AppHp, 2);
+        YActionSystem.Instance.DispatchAction(EActionId.AddHp, 2);
 
 
         return 0.3f;

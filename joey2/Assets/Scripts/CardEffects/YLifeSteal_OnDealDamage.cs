@@ -18,7 +18,7 @@ public class YLifeSteal_OnDealDamage : YCardEffect
 	{
 		if (baseExtra > 0 && CardControl != null)
 		{
-			YActionSystem.Instance.DispatchAction(EActionId.AppHp, baseExtra);
+			YActionSystem.Instance.DispatchAction(EActionId.AddHp, baseExtra);
 
 			// if (CardControl.gameObject != null)
 			// {
@@ -32,7 +32,7 @@ public class YLifeSteal_OnDealDamage : YCardEffect
 
 public partial class UIGamePhaseControl
 {
-	public void AppHp(int delta)
+	public void AddHp(int delta)
 	{
 		ApplyPlayerHealthChange(delta, true);
 	}

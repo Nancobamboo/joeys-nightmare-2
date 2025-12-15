@@ -2,7 +2,7 @@
 
 public enum EActionId
 {
-	AppHp,
+	AddHp,
 	AppAttack,
 	AppDefence,
 	MoveCard,
