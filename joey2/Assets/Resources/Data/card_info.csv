@@ -1,106 +1,106 @@
-id   ,cardImage ,cardBackground,cardName            ,comment,type,description,attack ,defence ,health ,price ,stars,effectIds,
-1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,5,0,0,0,1,,
-1001,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,8,0,0,0,1,,
-1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑,,attack,,5,0,0,50,1,,
-1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,,attack,装备：触发1次自动攻击,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop,
-1004,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,木棒,,attack,,8,0,0,100,1,,
-1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,,attack,没有防具时攻击+5,9,0,0,100,2,ExtraDamage_NoDefence:5,
-1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,重锤        ,,attack,敌人先发起攻击,20,0,0,300,3,SlowAttack,
-1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,回旋镖       ,,attack,攻击时：随机对场上敌人发动3次攻击,5,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2,
-1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,染血长矛       ,,attack,生命值低于50%时，攻击+10,9,0,0,100,2,ExtraDamage_HalfHealth:10,
-1010,Art/Img/Attack/渴甲刃,Art/Img/Attack/img_bg_Attack,渴甲刃,,attack,离场:从弃牌堆抽取一张防御卡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard,
-1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,,attack,永不消耗,3,0,0,0,1,BareHands,
-1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,噬魂剑,,attack,击杀:永久攻击+1,7,0,0,150,2,PermanentAttackBoost:1,
-1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,噬魂手里剑,,attack,装备：触发1次自动攻击 主动击杀:永久攻击+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1,
-1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,重弩,,attack,,16,0,0,300,3,,
-1015,Art/Img/Attack/img_card_BattleFury,Art/Img/Attack/img_bg_Attack,狂战斧,,attack,攻击时，向周围怪物溅射50%伤害,10,0,0,300,3,BattleFury:50,
-1016,Art/Img/Attack/王者剑,Art/Img/Attack/img_bg_Attack,王者剑盾（剑）,,attack,攻击后切换为盾形态  剩余切换次数:2,8,0,0,300,3,KingShield_OnAttack,
-1017,Art/Img/Attack/死神之镰,Art/Img/Attack/img_bg_Attack,死神之镰,,attack,斩杀生命值小于一半的怪物,5,0,0,300,3,CullingBlade,
-1018,Art/Img/Attack/img_card_Dagger,Art/Img/Attack/img_bg_Attack,刺客匕首,,attack,敌人不会反击,4,0,0,175,2,NoCounterAttack,
-1019,Art/Img/Attack/赤手空拳加拳套,Art/Img/Attack/img_bg_Attack,拳击手套,,attack,永不消耗,6,0,0,0,2,BareHands,
-,,,,,,,,,,,,,
-,,,,,,,,,,,,,
-2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,防御牌,教学牌,defence,点击堆叠到手牌,0,3,0,0,1,,
-2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,破盾       ,,defence,,0,3,0,50,1,,
-2002,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,铁盾       ,,defence,,0,9,0,200,2,,
-2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,刃甲,,defence,反伤:5,0,6,0,200,2,DealDamage_UseDefence:5,
-2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,护手,,defence,离场:从弃牌堆随机抽取1张武器回到手牌,0,6,0,200,2,HookEquipWeaponFromDiscard_OnDefence,
-2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,手滑盾,,defence,离场:将当前手上的武器牌丢到环境中,0,8,0,200,2,ThrowWeaponToStack_OnDefence,
-2006,Art/Img/Defence/img_card_BloodDemonShield,Art/Img/Defence/img_bg_Defence,吸血盔甲,,defence,离场:回复等同于所抵挡伤害的生命值,0,7,0,300,3,HealPlayer_OnDefense,
-2007,Art/Img/Defence/img_card_DaggerShield,Art/Img/Defence/img_bg_Defence,匕首护盾,,defence,离场:在环境中召唤一把匕首,0,7,0,200,2,AddKnifeToEnv_OnDefense,
-2008,Art/Img/Defence/img_card_InfiniteDefensc,Art/Img/Defence/img_bg_Defence,骑士铠甲,,defence,装备:骑士铠甲的护甲值永久+1,0,6,0,300,3,PermanentDefenceBoost:1,
-2009,Art/Img/Defence/img_card_WoodenShield,Art/Img/Defence/img_bg_Defence,木盾,,defence,,0,6,0,100,1,,
-2010,Art/Img/Defence/钢盾,Art/Img/Defence/img_bg_Defence,钢盾,,defence,,,12,0,300,3,,
-2011,Art/Img/Defence/img_card_KingShield,Art/Img/Defence/img_bg_Defence,王者剑盾（盾）,,defence,攻击后切换为剑形态  剩余切换次数:2,0,12,0,300,3,KingShield_OnDefense,
-,,,,,,,,,,,,,
-3000,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,道具牌,教学牌,item   ,恢复5点生命值,0,0,0,0,2,HealPlayer_OnPlay:5,
-3001,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,小血瓶  ,,item   ,恢复5点生命值,0,0,0,200,2,HealPlayer_OnPlay:5,
-3002,Art/Img/Item/img_card_Boom,Art/Img/Item/img_bg_Item,炸弹,,item   ,对随机敌人及两侧目标造成10点伤害,,,,300,3,Boom_OnPlay:10,
-3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,钩索,,item        ,从弃牌堆随机抽一张武器牌置入手牌,,,,200,2,HookEquipWeaponFromDiscard_OnPlay,
-3004,Art/Img/Item/img_card_MonkeyWine,Art/Img/Item/img_bg_Item,猿酒,,item   ,下次攻击伤害翻倍,,,,200,2,ApeWine,
-3005,Art/Img/Item/img_card_GiftBox,Art/Img/Item/img_bg_Item,礼物袋,,item   ,在环境中随机召唤2张牌,,,,300,3,GiftBox:2,
-3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,手里剑卷轴,,item   ,在环境中召唤2个手里剑,,,,200,2,DartScroll,
-3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,火鸡羽毛,,item   ,当前装备的防御卡永久防御+1,,,,300,3,TurkeyFeather,
-3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,驴肉火烧,,item   ,生命上限永久+2,,,,300,3,DonkeyMeatFireBun,
-3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,猴子香蕉,,item   ,当前装备的攻击卡永久攻击+1(赤手空拳除外),,,,300,3,MonkeyBanana,
-3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,骷髅骸骨,,item   ,随机获得火鸡羽毛/驴肉火烧/猴子香蕉的效果,,,,300,3,Bone,
-3011,Art/Img/Item/img_card_GravityShoes,Art/Img/Item/img_bg_Item,重力鞋,1丛林,item   ,将环境卡中全部卡牌和它下方的卡牌交换位置,,,,200,2,GravityShoes,
-,,,,,,,,,,,,,
-4000,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,技能牌,教学牌,skill     ,下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay,
-4001,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,连续攻击,,skill     ,下次使用攻击牌时会攻击两次,0,0,0,200,2,DoubleAttack_OnPlay,
-4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,痛击       ,未启用,skill     ,下次攻击使怪物处于两层易伤效果,0,0,0,0,1,,
-4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,双持武器       ,未启用,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,,
-4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,堡垒       ,未启用,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,,
-4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,肉盾冲击,未启用,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,0,1,,
-4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,,skill     ,全体伤害:5,0,0,0,200,2,Electric:5,
-4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤2个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill,
-4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的武器牌和防具牌丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill,
-4009,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,驱魂圣光,未启用,skill     ,直接消灭一个骷髅型怪物，若当前场上没有骷髅型怪物则使用失败,0,0,0,0,2,HolyLight_UseSkill,
-4010,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,鲜血寄存,,skill     ,扣除自身一半的生命值，并在接下来五个回合逐步回复,0,0,0,180,2,BloodStorage_UseSkill,
-,,,,,,,,,,,,,
-,,,,,,,,,,,,,
-,,,,,,,,,,,,,
-,,,,,,,,,,,,,
-,,,,,,,,,,,,,
-5000,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,10,10,1,,
-5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,5,10,1,,
-5002,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,1丛林,monster      ,,6,,12,10,1,,
-5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Monkey,4墓地,monster      ,,12,,20,20,1,,
-5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,骷髅骑士Monkey,4墓地,monster      ,离场:在环境中召唤铁剑×1、铁盾×1,14,,27,30,2,,
-5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,吸血鬼Monkey,4墓地,monster      ,每次攻击时，吸血:3,9,,20,20,1,VampireMonkey,
-5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林,monster,离场:掉落宝物,,,1,5,1,,
-5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,未启用，有卡死bug,monster,离场：对两侧敌人各造成10点伤害,,,1,15,3,Boom_OnDead:10,
-5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey船长,未启用,monster      ,,5,,8,15,1,,
-5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林 空木桶,monster,可能藏着好东西？,,,1,5,1,,
-5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,死灵Donkey,4墓地,monster      ,生命值降至一半以下时召唤两个骷髅Donkey,12,,25,30,2,NecDonkey,
-5011,Art/Img/Monster/骷髅donkey,Art/Img/Monster/img_bg_Monster,骷髅Donkey,4墓地,monster      ,,7,,25,15,1,,
-5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,死神,4墓地,monster      ,吸血:5 离场:召唤随机关卡的boss,18,,60,100,3,GrimReaper,
-5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,胆小Turkey,3感恩节,monster      ,离场:获得20金币 受击:躲到下一张牌后,9,,25,100,2,TimidTurkey,
-5014,Art/Img/Monster/img_card_BoomMonkey,Art/Img/Monster/img_bg_Monster,自爆monkey,1丛林,monster,7回合后:自爆造成20点伤害,4,,10,30,1,AutoBoomMoney:20,
-5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,怪盗Donkey,2戈壁,monster,5回合后：发动攻击，窃取20金币并逃跑,7,,11,30,1,StealMoney:20,
-5016,Art/Img/Monster/img_card_TreasureChest,Art/Img/Monster/img_bg_Monster,宝箱,all,monster,离场:掉落宝物,0,,1,20,1,,
-5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,罗密欧Monkey,1丛林,monster,离场:使朱丽叶Monkey获得+5攻击、+10生命,5,,10,40,2,RomeoMonkey,
-5018,Art/Img/Monster/img_card_Juliet_Monkey,Art/Img/Monster/img_bg_Monster,朱丽叶Monkey,1丛林,monster,离场:使罗密欧Monkey获得+5攻击、+10生命,5,,10,40,2,JulietMonkey,
-5019,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,兄贵Monkey,1丛林,monster,场上每有1个怪物，攻击+3,8,,36,80,3,BadMonkey:3,
-5020,Art/Img/Monster/img_card_ghost,Art/Img/Monster/img_bg_Monster,死灵Monkey,4墓地,monster,5回合后:主动攻击1次,12,,24,50,2,Ghost,
-5021,Art/Img/Monster/img_card_BigDumbDonkey,Art/Img/Monster/img_card_IronHoofDonkey,大春Donkey,2戈壁,monster,受击:将玩家的武器踢到环境里,11,,22,40,2,AnswerSpringGreen,
-5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,波兰蠢Donkey,2戈壁,monster,离场:玩家获得10金币,10,,18,30,1,PolishStupidDonkey,
-5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,3感恩节,monster,,9,,16,25,1,,
-5024,Art/Img/Monster/img_card_WalkingChicken,Art/Img/Monster/img_bg_Monster,走地Turkey,3感恩节,monster,2回合后:随机平移1格,8,,17,25,1,WalkingChicken,
-5025,Art/Img/Monster/魔术turkey,Art/Img/Monster/img_bg_Monster,魔术Turkey,3感恩节,monster,受击时：与环境中随机1张卡牌交换位置,7,,18,30,1,DodgeChicken,
-5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,感恩节Turkey,3感恩节,monster,抵挡一次致命伤害,9,,19,40,2,GratefulReleaseChicken,
-5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,下蛋Turkey,3感恩节,monster,受击时:小概率召唤1只走地鸡蛋,16,,50,80,3,BigChickenBoss:5028,
-5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,走地Turkey蛋,3感恩节,monster,2回合后:召唤1只走地鸡,0,,13,15,1,WalkingChickenEgg:5024,
-5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,伪装宝箱,3感恩节,monster,离场:掉落宝物,10,,20,60,2,MimicChest:5016,
-5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,小丑Monkey,未启用,monster,,6,,20,30,1,,
-5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,滑板Monkey,未启用,monster,,7,,18,25,1,,
-5032,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,2戈壁,monster,,8,,14,25,1,,
-5033,Art/Img/Monster/img_card_IronHoofDonkey,Art/Img/Monster/img_bg_Monster,榴莲Donkey,2戈壁,monster,受击时：反伤5点伤害,8,,19,40,2,IronHoofDonkey,
-5034,Art/Img/Monster/img_card_GuolaoDonkey,Art/Img/Monster/img_bg_Monster,Donkey市长,2戈壁,monster,每次受到攻击时，增加2点攻击力,8,,50,80,3,DonkeyMajor:2,
-5035,Art/Img/Monster/img_card_doctorMonkey,Art/Img/Monster/img_bg_Monster,医生monkey,1丛林,monster      ,离场：所有怪物回复3点生命,3,,11,15,1,BananaMonkey,
-5036,Art/Img/Monster/img_card_ShamanDonkey,Art/Img/Monster/img_bg_Monster,萨满Donkey,2戈壁,monster,受击时:场上每只Donkey攻击+3,1,,30,40,2,ShamanDonkey,
-5037,Art/Img/Monster/img_card_MimicChestking,Art/Img/Monster/img_bg_Monster,伪装宝箱王,4墓地,monster,离场:掉落大量宝物,15,,30,100,3,MimicChest:5016,
-5038,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,教学牌,monster,点击攻击,9,,16,25,1,,
-5039,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,,
-,,,,,,,,,,,,,
-6001,Art/Img/Other/img_card_door,Art/Img/Other/img_card_door_background,Key Path,,other,传送到下一关,,,,,3,,
+id   ,cardImage ,cardBackground,cardName            ,comment,type,description,attack ,defence ,health ,price ,stars,effectIds
+1000,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,5,0,0,0,1,
+1001,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,武器牌,教学牌,attack,点击堆叠到手牌,8,0,0,0,1,
+1002,Art/Img/Attack/img_card_BrokenSword,Art/Img/Attack/img_bg_Attack,断剑,,attack,,5,0,0,50,1,
+1003,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,手里剑        ,,attack,装备：触发1次自动攻击,4,0,0,150,2,DealRandomEnemyEqualToAttack_OnTop
+1004,Art/Img/Attack/木棍,Art/Img/Attack/img_bg_Attack,木棒,,attack,,8,0,0,100,1,
+1005,Art/Img/Attack/img_card_DoubleSwords,Art/Img/Attack/img_bg_Attack,对剑,,attack,没有防具时攻击+5,9,0,0,100,2,ExtraDamage_NoDefence:5
+1006,Art/Img/Attack/img_card_Hammer,Art/Img/Attack/img_bg_Attack,重锤        ,,attack,敌人先发起攻击,20,0,0,300,3,SlowAttack
+1007,Art/Img/Attack/img_card_Boomerang,Art/Img/Attack/img_bg_Attack,回旋镖       ,,attack,攻击时：随机对场上敌人发动3次攻击,5,0,0,300,3,BounceToRandomEnemy_OnDealDamage:2
+1008,Art/Img/Attack/img_card_Blood_Spear,Art/Img/Attack/img_bg_Attack,染血长矛       ,,attack,生命值低于50%时，攻击+10,9,0,0,100,2,ExtraDamage_HalfHealth:10
+1010,Art/Img/Attack/渴甲刃,Art/Img/Attack/img_bg_Attack,渴甲刃,,attack,离场:从弃牌堆抽取一张防御卡,8,0,0,150,2,HookDefenceFromDiscard_OnRemoveCard
+1011,Art/Img/Attack/img_card_barehanded,Art/Img/Attack/img_bg_Attack,赤手空拳,,attack,永不消耗,3,0,0,0,1,BareHands
+1012,Art/Img/Attack/img_card_Soul_Eating_Sword,Art/Img/Attack/img_bg_Attack,噬魂剑,,attack,击杀:永久攻击+1,7,0,0,150,2,PermanentAttackBoost:1
+1013,Art/Img/Attack/img_card_Soul_Eating_Dart,Art/Img/Attack/img_bg_Attack,噬魂手里剑,,attack,装备：触发1次自动攻击 主动击杀:永久攻击+1,4,0,0,300,3,PermanentAttackBoostWithRandomDamage:1
+1014,Art/Img/Attack/img_card_crossbow,Art/Img/Attack/img_bg_Attack,重弩,,attack,,16,0,0,300,3,
+1015,Art/Img/Attack/img_card_BattleFury,Art/Img/Attack/img_bg_Attack,狂战斧,,attack,攻击时，向周围怪物溅射50%伤害,10,0,0,300,3,BattleFury:50
+1016,Art/Img/Attack/王者剑,Art/Img/Attack/img_bg_Attack,王者剑盾（剑）,,attack,攻击后切换为盾形态  剩余切换次数:2,8,0,0,300,3,KingShield_OnAttack
+1017,Art/Img/Attack/死神之镰,Art/Img/Attack/img_bg_Attack,死神之镰,,attack,斩杀生命值小于一半的怪物,5,0,0,300,3,CullingBlade
+1018,Art/Img/Attack/img_card_Dagger,Art/Img/Attack/img_bg_Attack,刺客匕首,,attack,敌人不会反击,4,0,0,175,2,NoCounterAttack
+1019,Art/Img/Attack/赤手空拳加拳套,Art/Img/Attack/img_bg_Attack,拳击手套,,attack,永不消耗,6,0,0,0,2,BareHands
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+2000,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,防御牌,教学牌,defence,点击堆叠到手牌,0,3,0,0,1,
+2001,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,破盾       ,,defence,,0,3,0,50,1,
+2002,Art/Img/Defence/img_card_Shield,Art/Img/Defence/img_bg_Defence,铁盾       ,,defence,,0,9,0,200,2,
+2003,Art/Img/Defence/img_card_Koilonychia,Art/Img/Defence/img_bg_Defence,刃甲,,defence,反伤:5,0,6,0,200,2,DealDamage_UseDefence:5
+2004,Art/Img/Defence/img_card_HandGuard,Art/Img/Defence/img_bg_Defence,护手,,defence,离场:从弃牌堆随机抽取1张武器回到手牌,0,6,0,200,2,HookEquipWeaponFromDiscard_OnDefence
+2005,Art/Img/Defence/img_card_BreakTheShield,Art/Img/Defence/img_bg_Defence,手滑盾,,defence,离场:将当前手上的武器牌丢到环境中,0,8,0,200,2,ThrowWeaponToStack_OnDefence
+2006,Art/Img/Defence/img_card_BloodDemonShield,Art/Img/Defence/img_bg_Defence,吸血盔甲,,defence,离场:回复等同于所抵挡伤害的生命值,0,7,0,300,3,HealPlayer_OnDefense
+2007,Art/Img/Defence/img_card_DaggerShield,Art/Img/Defence/img_bg_Defence,匕首护盾,,defence,离场:在环境中召唤一把匕首,0,7,0,200,2,AddKnifeToEnv_OnDefense
+2008,Art/Img/Defence/img_card_InfiniteDefensc,Art/Img/Defence/img_bg_Defence,骑士铠甲,,defence,装备:骑士铠甲的护甲值永久+1,0,6,0,300,3,PermanentDefenceBoost:1
+2009,Art/Img/Defence/img_card_WoodenShield,Art/Img/Defence/img_bg_Defence,木盾,,defence,,0,6,0,100,1,
+2010,Art/Img/Defence/钢盾,Art/Img/Defence/img_bg_Defence,钢盾,,defence,,,12,0,300,3,
+2011,Art/Img/Defence/img_card_KingShield,Art/Img/Defence/img_bg_Defence,王者剑盾（盾）,,defence,攻击后切换为剑形态  剩余切换次数:2,0,12,0,300,3,KingShield_OnDefense
+,,,,,,,,,,,,
+3000,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,道具牌,教学牌,item   ,恢复5点生命值,0,0,0,0,2,HealPlayer_OnPlay:5
+3001,Art/Img/Item/img_card_Blood_bottle,Art/Img/Item/img_bg_Item,小血瓶  ,,item   ,恢复5点生命值,0,0,0,200,2,HealPlayer_OnPlay:5
+3002,Art/Img/Item/img_card_Boom,Art/Img/Item/img_bg_Item,炸弹,,item   ,对随机敌人及两侧目标造成10点伤害,,,,300,3,Boom_OnPlay:10
+3003,Art/Img/Item/img_card_HookLock,Art/Img/Item/img_bg_Item,钩索,,item        ,从弃牌堆随机抽一张武器牌置入手牌,,,,200,2,HookEquipWeaponFromDiscard_OnPlay
+3004,Art/Img/Item/img_card_MonkeyWine,Art/Img/Item/img_bg_Item,猿酒,,item   ,下次攻击伤害翻倍,,,,200,2,ApeWine
+3005,Art/Img/Item/img_card_GiftBox,Art/Img/Item/img_bg_Item,礼物袋,,item   ,在环境中随机召唤2张牌,,,,300,3,GiftBox:2
+3006,Art/Img/Item/img_card_ShurikenScroll,Art/Img/Item/img_bg_Item,手里剑卷轴,,item   ,在环境中召唤2个手里剑,,,,200,2,DartScroll
+3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,火鸡羽毛,,item   ,当前装备的防御卡永久防御+1,,,,300,3,TurkeyFeather
+3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,驴肉火烧,,item   ,生命上限永久+2,,,,300,3,DonkeyMeatFireBun
+3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,猴子香蕉,,item   ,当前装备的攻击卡永久攻击+1(赤手空拳除外),,,,300,3,MonkeyBanana
+3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,骷髅骸骨,,item   ,随机获得火鸡羽毛/驴肉火烧/猴子香蕉的效果,,,,300,3,Bone
+3011,Art/Img/Item/img_card_GravityShoes,Art/Img/Item/img_bg_Item,重力鞋,1丛林,item   ,将环境卡中全部卡牌和它下方的卡牌交换位置,,,,200,2,GravityShoes
+,,,,,,,,,,,,
+4000,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,技能牌,教学牌,skill     ,下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay
+4001,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,连续攻击,,skill     ,下次使用攻击牌时会攻击两次,0,0,0,200,2,DoubleAttack_OnPlay
+4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,痛击       ,未启用,skill     ,下次攻击使怪物处于两层易伤效果,0,0,0,0,1,
+4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,双持武器       ,未启用,skill     ,下次攻击造成双倍伤害，但是无法使用护盾,0,0,0,0,1,
+4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,堡垒       ,未启用,skill     ,下次格挡时，可以使用两个防具,0,0,0,0,1,
+4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,肉盾冲击,未启用,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,0,1,
+4006,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,连环闪电    ,,skill     ,全体伤害:5,0,0,0,200,2,Electric:5
+4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤2个匕首,0,0,0,200,2,AddKnifeToEnv_UseSkill
+4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的武器牌和防具牌丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
+4009,Art/Img/Skill/img_card_Lightning,Art/Img/Skill/img_bg_Skill,驱魂圣光,未启用,skill     ,直接消灭一个骷髅型怪物，若当前场上没有骷髅型怪物则使用失败,0,0,0,0,2,HolyLight_UseSkill
+4010,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,鲜血寄存,,skill     ,扣除自身一半的生命值，并在接下来五个回合逐步回复,0,0,0,180,2,BloodStorage_UseSkill
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+5000,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,10,10,1,
+5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,5,10,1,
+5002,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,1丛林,monster      ,,6,,12,10,1,
+5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Monkey,4墓地,monster      ,,12,,20,20,1,
+5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,骷髅骑士Monkey,4墓地,monster      ,离场:在环境中召唤铁剑×1、铁盾×1,14,,27,30,2,
+5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,吸血鬼Monkey,4墓地,monster      ,每次攻击时，吸血:3,9,,20,20,1,VampireMonkey
+5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林,monster,离场:掉落宝物,,,1,5,1,
+5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,未启用，有卡死bug,monster,离场：对两侧敌人各造成10点伤害,,,1,15,3,Boom_OnDead:10
+5008,Art/Img/Monster/img_card_Captain_Monkey,Art/Img/Monster/img_bg_Monster,Monkey船长,未启用,monster      ,,5,,8,15,1,
+5009,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林 空木桶,monster,可能藏着好东西？,,,1,5,1,
+5010,Art/Img/Monster/img_card_Necromancer_Donkey,Art/Img/Monster/img_bg_Monster,死灵Donkey,4墓地,monster      ,生命值降至一半以下时召唤两个骷髅Donkey,12,,25,30,2,NecDonkey
+5011,Art/Img/Monster/骷髅donkey,Art/Img/Monster/img_bg_Monster,骷髅Donkey,4墓地,monster      ,,7,,25,15,1,
+5012,Art/Img/Monster/img_card_Death,Art/Img/Monster/img_bg_Monster,死神,4墓地,monster      ,吸血:5 离场:召唤随机关卡的boss,18,,60,100,3,GrimReaper
+5013,Art/Img/Monster/img_card_TimidTurkey,Art/Img/Monster/img_bg_Monster,胆小Turkey,3感恩节,monster      ,离场:获得20金币 受击:躲到下一张牌后,9,,25,100,2,TimidTurkey
+5014,Art/Img/Monster/img_card_BoomMonkey,Art/Img/Monster/img_bg_Monster,自爆monkey,1丛林,monster,7回合后:自爆造成20点伤害,4,,10,30,1,AutoBoomMoney:20
+5015,Art/Img/Monster/img_card_Thief_Monkey,Art/Img/Monster/img_bg_Monster,怪盗Donkey,2戈壁,monster,5回合后：发动攻击，窃取20金币并逃跑,7,,11,30,1,StealMoney:20
+5016,Art/Img/Monster/img_card_TreasureChest,Art/Img/Monster/img_bg_Monster,宝箱,all,monster,离场:掉落宝物,0,,1,20,1,
+5017,Art/Img/Monster/img_card_Romeo_Monkey,Art/Img/Monster/img_bg_Monster,罗密欧Monkey,1丛林,monster,离场:使朱丽叶Monkey获得+5攻击、+10生命,5,,10,40,2,RomeoMonkey
+5018,Art/Img/Monster/img_card_Juliet_Monkey,Art/Img/Monster/img_bg_Monster,朱丽叶Monkey,1丛林,monster,离场:使罗密欧Monkey获得+5攻击、+10生命,5,,10,40,2,JulietMonkey
+5019,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,兄贵Monkey,1丛林,monster,场上每有1个怪物，攻击+3,6,,36,80,3,BadMonkey:3
+5020,Art/Img/Monster/img_card_ghost,Art/Img/Monster/img_bg_Monster,死灵Monkey,4墓地,monster,5回合后:主动攻击1次,12,,24,50,2,Ghost
+5021,Art/Img/Monster/img_card_BigDumbDonkey,Art/Img/Monster/img_bg_Monster,大春Donkey,2戈壁,monster,受击:将玩家的武器踢到环境里,11,,22,40,2,AnswerSpringGreen
+5022,Art/Img/Monster/img_card_PolanDonkey,Art/Img/Monster/img_bg_Monster,波兰蠢Donkey,2戈壁,monster,离场:玩家获得10金币,10,,18,30,1,PolishStupidDonkey
+5023,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,3感恩节,monster,,9,,16,25,1,
+5024,Art/Img/Monster/img_card_WalkingChicken,Art/Img/Monster/img_bg_Monster,走地Turkey,3感恩节,monster,2回合后:随机平移1格,8,,17,25,1,WalkingChicken
+5025,Art/Img/Monster/魔术turkey,Art/Img/Monster/img_bg_Monster,魔术Turkey,3感恩节,monster,受击时：与环境中随机1张卡牌交换位置,7,,18,30,1,DodgeChicken
+5026,Art/Img/Monster/img_card_ThanksgivingChicken,Art/Img/Monster/img_bg_Monster,感恩节Turkey,3感恩节,monster,抵挡一次致命伤害,9,,19,40,2,GratefulReleaseChicken
+5027,Art/Img/Monster/img_card_BigChicken,Art/Img/Monster/img_bg_Monster,下蛋Turkey,3感恩节,monster,受击时:小概率召唤1只走地鸡蛋,16,,50,80,3,BigChickenBoss:5028
+5028,Art/Img/Monster/img_card_ChickenEgg,Art/Img/Monster/img_bg_Monster,走地Turkey蛋,3感恩节,monster,2回合后:召唤1只走地鸡,0,,13,15,1,WalkingChickenEgg:5024
+5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,伪装宝箱,3感恩节,monster,离场:掉落宝物,10,,20,60,2,MimicChest:5016
+5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,小丑Monkey,未启用,monster,,6,,20,30,1,
+5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,滑板Monkey,未启用,monster,,7,,18,25,1,
+5032,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,2戈壁,monster,,8,,14,25,1,
+5033,Art/Img/Monster/img_card_IronHoofDonkey,Art/Img/Monster/img_bg_Monster,榴莲Donkey,2戈壁,monster,受击时：反伤5点伤害,8,,19,40,2,IronHoofDonkey
+5034,Art/Img/Monster/img_card_GuolaoDonkey,Art/Img/Monster/img_bg_Monster,Donkey市长,2戈壁,monster,每次受到攻击时，增加2点攻击力,8,,45,80,3,DonkeyMajor:2
+5035,Art/Img/Monster/img_card_doctorMonkey,Art/Img/Monster/img_bg_Monster,医生monkey,1丛林,monster      ,离场：所有怪物回复3点生命,3,,11,15,1,BananaMonkey
+5036,Art/Img/Monster/img_card_ShamanDonkey,Art/Img/Monster/img_bg_Monster,萨满Donkey,2戈壁,monster,受击时:场上每只Donkey攻击+3,1,,30,40,2,ShamanDonkey
+5037,Art/Img/Monster/img_card_MimicChestking,Art/Img/Monster/img_bg_Monster,伪装宝箱王,4墓地,monster,离场:掉落大量宝物,15,,30,100,3,MimicChest:5016
+5038,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,教学牌,monster,点击攻击,9,,16,25,1,
+5039,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,
+,,,,,,,,,,,,
+6001,Art/Img/Other/img_card_door,Art/Img/Other/img_card_door_background,Key Path,,other,传送到下一关,,,,,3,
