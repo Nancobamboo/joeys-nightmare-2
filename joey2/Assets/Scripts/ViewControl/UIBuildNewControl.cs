@@ -120,6 +120,8 @@ public class UIBuildNewControl : YViewControl
 			}
 		}
 
+		m_View.TxtCardNum.gameObject.SetActive(true);
+		UpdateCardNumText();
 	}
 
 	public void SetShopData()
@@ -140,6 +142,24 @@ public class UIBuildNewControl : YViewControl
 		m_View.ImgSell.SetActive(true);
 		m_View.ImgDel.SetActive(false);
 		RefreshEquipedCardsByType(ECardType.attack);
+	}
+
+	void UpdateCardNumText()
+	{
+		int envCardCount = m_PlayerData.EnvCardPool.Count;
+		RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+		int envCardLimit = characterData.envCardLimit;
+
+		m_View.TxtCardNum.text = $"{envCardCount} / {envCardLimit}";
+
+		if (envCardCount > envCardLimit)
+		{
+			m_View.TxtCardNum.color = Color.red;
+		}
+		else
+		{
+			m_View.TxtCardNum.color = Color.white;
+		}
 	}
 
 	public void SaveBuild(ECardType cardType)

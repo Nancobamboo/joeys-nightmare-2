@@ -76,7 +76,7 @@ public class UISelectControl : YViewControl
 			{
 				int targetStar = m_CurrentStageReward.GetRandomStarLevel();
 				List<Card> starFilteredCards = availableCards.Where(c => c.stars == targetStar).ToList();
-				
+
 				// If no cards available for this star level, fallback to any available card
 				if (starFilteredCards.Count == 0)
 				{
@@ -85,7 +85,7 @@ public class UISelectControl : YViewControl
 
 				// Remove already selected cards
 				starFilteredCards = starFilteredCards.Where(c => !m_CurrentSelectCards.Contains(c)).ToList();
-				
+
 				if (starFilteredCards.Count > 0)
 				{
 					Card selectedCard = starFilteredCards[Random.Range(0, starFilteredCards.Count)];
@@ -140,6 +140,27 @@ public class UISelectControl : YViewControl
 				control.SelectClickHandler = null;
 			}
 		}
+
+		m_View.TxtCardNum.gameObject.SetActive(true);
+		UpdateCardNumText();
+	}
+
+	void UpdateCardNumText()
+	{
+		int envCardCount = m_PlayerData.EnvCardPool.Count;
+		RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+		int envCardLimit = characterData.envCardLimit;
+
+		m_View.TxtCardNum.text = $"{envCardCount} / {envCardLimit}";
+
+		if (envCardCount > envCardLimit)
+		{
+			m_View.TxtCardNum.color = Color.red;
+		}
+		else
+		{
+			m_View.TxtCardNum.color = Color.black;
+		}
 	}
 
 	void OnSelectCardClick(UISelectCardControl cardControl)
@@ -157,6 +178,7 @@ public class UISelectControl : YViewControl
 			DataSystem.Instance.SaveDataJoeyPlayer();
 			YActionSystem.Instance.DispatchAction(EActionId.RefreshCardLimitDebuff);
 			Debug.Log($"Env mode: Added card {selectedCard.id} to EnvCardPool");
+			UpdateCardNumText();
 		}
 		else
 		{
@@ -240,6 +262,8 @@ public class UISelectControl : YViewControl
 				control.SelectClickHandler = null;
 			}
 		}
+
+		m_View.TxtCardNum.gameObject.SetActive(false);
 	}
 
 	void OnSelectRelicClick(UIRelicControl relicControl)
@@ -277,22 +301,22 @@ public class UISelectControl : YViewControl
 		{
 			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
 			Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
-			
+
 			// Replace all Bare Hands cards in player's card dictionary
 			foreach (var kvp in playerData.SelfCardDict)
 			{
 				Card card = kvp.Value;
-			if (card != null && card.id == "1011")
-			{
-				// Replace card data while keeping the unique ID
-				card.cardImage = boxingGlovesTemplate.cardImage;
-				card.cardBackground = boxingGlovesTemplate.cardBackground;
-				card.cardName = boxingGlovesTemplate.cardName;
-				card.description = boxingGlovesTemplate.description;
-				card.id = boxingGlovesTemplate.id;
-				card.SetAttack(boxingGlovesTemplate.currentAttack);
-				card.effectId = boxingGlovesTemplate.effectId;
-			}
+				if (card != null && card.id == "1011")
+				{
+					// Replace card data while keeping the unique ID
+					card.cardImage = boxingGlovesTemplate.cardImage;
+					card.cardBackground = boxingGlovesTemplate.cardBackground;
+					card.cardName = boxingGlovesTemplate.cardName;
+					card.description = boxingGlovesTemplate.description;
+					card.id = boxingGlovesTemplate.id;
+					card.SetAttack(boxingGlovesTemplate.currentAttack);
+					card.effectId = boxingGlovesTemplate.effectId;
+				}
 			}
 		}
 
