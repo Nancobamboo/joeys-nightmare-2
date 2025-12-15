@@ -8,7 +8,7 @@ id   ,cardImage ,iconImage,name,description,stars
 9007,Art\Img\Relic\img_relic_battooth,Art\Img\Relic\icon_relic_battooth,蝙蝠牙齿,主动攻击造成吸血:1,3
 9008,Art\Img\Relic\img_relic_bat,Art\Img\Relic\icon_relic_bat,蝙蝠祝福,击杀:回复3点生命,2
 9009,Art\Img\Relic\img_relic_dart,Art\Img\Relic\icon_relic_dart,手里剑强化,手里剑自动攻击+2,1
-9010,Art\Img\Relic\img_relic_glove,Art\Img\Relic\icon_relic_glove,拳套,赤手空拳伤害+3,3
+9010,Art\Img\Relic\img_relic_glove,Art\Img\Relic\icon_relic_glove,拳套,赤手空拳替换为拳击手套,3
 9011,Art\Img\Relic\img_relic_alldefence,Art\Img\Relic\icon_relic_alldefence,老茧,受到伤害小于3时抵抗该次伤害,2
 9012,Art\Img\Relic\img_relic_recover,Art\Img\Relic\icon_relic_recover,药水强化,药水的恢复效果+5,2
 9013,Art\Img\Relic\img_relic_purify,Art\Img\Relic\icon_relic_purify,圣光,怪物进入环境时攻击和生命减少1点,2

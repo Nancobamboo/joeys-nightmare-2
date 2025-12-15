@@ -15,16 +15,27 @@ public class YGiftBox : YCardEffect
     public override float UseItem()
     {
 		List<Card> cards = new List<Card>();
+        DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
         int count = baseExtra;
         while (count > 0)
         {
-            Card card = GData.Instance.RandomCard();
-            Debug.Log("GiftBox card: " + card.GetCardType());
+            Card originalCard = GData.Instance.RandomCard();
+            Debug.Log("GiftBox card: " + originalCard.GetCardType());
             // Filter out monster cards and cards with price = 0
-            if (card.GetCardType() == ECardType.monster || card.price == 0)
+            if (originalCard.GetCardType() == ECardType.monster || originalCard.price == 0)
             {
                 continue;
             }
+            
+            // 克隆卡牌并从 EnvCardDict 获取已增强的属性值
+            Card card = originalCard.Clone();
+            Card enhancedCard = dataJoeyPlayer.GetEnvCardDictData(card.id);
+            if (enhancedCard != null && (enhancedCard.GetCardType() == ECardType.attack || enhancedCard.GetCardType() == ECardType.defence))
+            {
+                card.SetAttack(enhancedCard.currentAttack);
+                card.SetDefence(enhancedCard.currentDefence);
+            }
+            
             cards.Add(card);
             count--;
         }

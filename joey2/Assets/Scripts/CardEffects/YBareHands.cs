@@ -9,6 +9,12 @@ public class YBareHands : YCardEffect
         Id = ECardEffectId.BareHands;
     }
 
+
+    public override float UseAttack()
+    {
+        return base.UseAttack();
+    }
+
     public override float OnDealDamage()
     {
         // Play attack animation for Barehanded card
@@ -43,13 +49,7 @@ public class YBareHands : YCardEffect
 
                     // Get bare hands attack damage
                     int damage = CardControl.CardData.currentAttack;
-                    
-                    // BareHandsMaster relic bonus: double damage for bare hands
-                    if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
-                    {
-                        damage += 3;
-                    }
-                    
+
                     // Dispatch action to attack random enemy with delay
                     JoeyGameControl.Instance.AddGlobalDelayCall(() =>
                     {

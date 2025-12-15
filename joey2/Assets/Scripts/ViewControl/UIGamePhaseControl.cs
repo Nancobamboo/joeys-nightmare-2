@@ -142,6 +142,16 @@ public partial class UIGamePhaseControl : YViewControl
 			float ratio = (float)hp / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
 		}
+
+		RunActionForEachLastBagCard((x) =>
+		{
+			if (x.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+			{
+				x.UpdateBuffValue();
+			}
+
+		});
+
 	}
 
 	void OnAttackChanged(int attack)
@@ -291,11 +301,23 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private void CreateFistCardCache()
 	{
+		// Only skip creation if fist card exists and is active, unless it needs to be replaced
 		if (m_FistCardCache != null && m_FistCardCache.gameObject.activeSelf)
 		{
-			return;
+			// Check if we need to replace bare hands with boxing gloves
+			bool hasGlovesRelic = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster);
+			bool isBareHands = m_FistCardCache.CardData != null && m_FistCardCache.CardData.id == "1011";
+			
+			// If we have the gloves relic but still using bare hands, need to replace
+			if (!hasGlovesRelic || !isBareHands)
+			{
+				return;
+			}
 		}
-		Card card = DataSystem.Instance.CreateCard("1011");
+		
+		// Check if player has BareHandsMaster relic, use Boxing Gloves instead
+		string cardId = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) ? "1019" : "1011";
+		Card card = DataSystem.Instance.CreateCard(cardId);
 		Transform attackPanelTransform = m_View.AttackPanel.transform;
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
 		cardControl.CacheTrans.SetParent(m_View.EmptyAttack);
@@ -419,7 +441,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (envStage != null)
 			{
 				m_View.TxtStage.text = envStage.level.ToString();
-				
+
 				// 根据 theme 设置 BattleEnv 模式的 Description
 				switch (envStage.theme)
 				{
@@ -444,7 +466,7 @@ public partial class UIGamePhaseControl : YViewControl
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
 		{
 			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
-			
+
 			// 教学关卡的三关文本
 			switch (m_DataJoeyPlayer.currentLevel)
 			{
@@ -469,7 +491,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				m_View.TxtStage.text = currentStage.stages;
 			}
-			
+
 			// 普通关卡默认文本
 			m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
 		}
@@ -652,6 +674,21 @@ public partial class UIGamePhaseControl : YViewControl
 			Card card = m_DataJoeyPlayer.GetSelfCardDictData(uniqueId);
 			if (card == null) continue;
 
+			// Replace Bare Hands with Boxing Gloves if player has BareHandsMaster relic
+			if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) && card.id == "1011")
+			{
+				// Get the boxing gloves card template
+				Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
+				// Replace card data while keeping the unique ID
+				card.cardImage = boxingGlovesTemplate.cardImage;
+				card.cardBackground = boxingGlovesTemplate.cardBackground;
+				card.cardName = boxingGlovesTemplate.cardName;
+				card.description = boxingGlovesTemplate.description;
+				card.id = boxingGlovesTemplate.id;
+				card.SetAttack(boxingGlovesTemplate.currentAttack);
+				card.effectId = boxingGlovesTemplate.effectId;
+			}
+
 			ECardType cardType = card.GetCardType();
 			Transform parent = GetParentByCardType(cardType);
 			if (parent == null)
@@ -679,6 +716,18 @@ public partial class UIGamePhaseControl : YViewControl
 		if (!isMoveCard)
 		{
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+		}
+
+		if (cardType == ECardType.defence)
+		{
+			RunActionForEachLastBagCard((x) =>
+			{
+				if (x.GetBuffValue(EBuffType.UpdateByDefenceCardNum) > 0)
+				{
+					x.UpdateBuffValue();
+				}
+
+			});
 		}
 	}
 
@@ -731,6 +780,39 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 		return null;
+	}
+
+	public void RunActionForEachLastEnvCard(Action<UICardSimpleControl> action)
+	{
+		if (action == null || m_EnvPanels == null)
+		{
+			return;
+		}
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null)
+			{
+				action(lastCard);
+			}
+		}
+	}
+
+	public void RunActionForEachLastBagCard(Action<UICardSimpleControl> action)
+	{
+		if (action == null)
+		{
+			return;
+		}
+		ECardType[] bagCardTypes = { ECardType.attack, ECardType.defence, ECardType.skill, ECardType.item };
+		for (int i = 0; i < bagCardTypes.Length; i++)
+		{
+			UICardSimpleControl lastCard = GetLastBagCard(bagCardTypes[i]);
+			if (lastCard != null)
+			{
+				action(lastCard);
+			}
+		}
 	}
 
 	public int GetEnvCardCount(int envIndex)
@@ -815,7 +897,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			Debug.Log("Monster dead: " + cardControl.CardData.id);
 			string monsterId = cardControl.CardData.id;
-			List<Card> dropCards = GetMonsterDropCard(monsterId);
+			List<Card> dropCards = GetMonsterDropCard(monsterId, envIndex);
 
 			float delayTime = cardControl.CardEffect?.OnBeDying() ?? 0f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
@@ -847,14 +929,18 @@ public partial class UIGamePhaseControl : YViewControl
 		return false;
 	}
 
-	private List<Card> GetMonsterDropCard(string monsterId)
+	private List<Card> GetMonsterDropCard(string monsterId, int envIndex)
 	{
 		if (string.IsNullOrEmpty(monsterId))
 		{
 			return null;
 		}
 
-		if (!LootDropManager.Instance.TryGetDropCards(monsterId, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
+		// Get current level ID for deterministic seed
+		int levelId = DataSystem.Instance.GetDataJoeyPlayer().currentLevel;
+
+		// Use deterministic drop with seed based on level and position
+		if (!LootDropManager.Instance.TryGetDropCardsWithSeed(monsterId, levelId, envIndex, out List<string> cardIds) || cardIds == null || cardIds.Count == 0)
 		{
 			return null;
 		}
@@ -1426,16 +1512,14 @@ public partial class UIGamePhaseControl : YViewControl
 
 		Card attackCard = attackCardControl.CardData;
 		int damage = attackCard.currentAttack;
-		if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
-		{
-			if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
-			{
-				damage += 3;
-			}
-		}
 		float delayTime;
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+
+		if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AppHp, 1);
+		}
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
@@ -1504,6 +1588,7 @@ public partial class UIGamePhaseControl : YViewControl
 			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
 		}
 
+
 		if (!useFistCard)
 		{
 			await RemoveBagCard(ECardType.attack, attackCardControl);
@@ -1526,9 +1611,14 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else
 		{
-			m_FistCardCache.CardEffect.ClearAllEffectValues();
-		}
-		RemoveCardCts(attackCardControl);
+            m_FistCardCache.ClearEffectVlaue();
+
+        }
+
+
+
+
+        RemoveCardCts(attackCardControl);
 
 		// Clean up enemy card's CTS if it wasn't already removed during counter-attack
 		if (m_CardCtsDict.ContainsKey(enemyCardControl))
@@ -1867,7 +1957,12 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_KeyPathCardCache != null)
 		{
 			m_KeyPathCardCache.gameObject.SetActive(true);
-			m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
+			int envIndex = m_KeyPathCardCache.EnvIndex;
+			if (envIndex >= 0 && envIndex < m_EnvPanels.Count)
+			{
+				m_KeyPathCardCache.CacheTrans.SetParent(m_EnvPanels[envIndex].transform, false);
+			}
+			//m_KeyPathCardCache.CacheTrans.SetAsLastSibling();
 			m_KeyPathCardCache.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 		}
 	}
@@ -1947,7 +2042,20 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		m_FistCardCache.AddRelic(relicId);
+		// Special handling for BareHandsMaster relic: recreate fist card cache with boxing gloves
+		if (relicId == (int)ERelicType.BareHandsMaster)
+		{
+			if (m_FistCardCache != null)
+			{
+				m_FistCardCache.Return();
+				m_FistCardCache = null;
+			}
+			CreateFistCardCache();
+		}
+		else
+		{
+			m_FistCardCache.AddRelic(relicId);
+		}
 
 		foreach (var kvp in m_EnvCardDict)
 		{
@@ -2137,8 +2245,20 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private void OnDestroy()
+	protected override void OnClose()
 	{
+		for (int i = 0; i < m_RelicList.Count; i++)
+		{
+			if (m_RelicList[i] != null)
+			{
+				m_RelicList[i].Close();
+			}
+		}
+		if (m_CardLimitDebuffControl != null)
+		{
+			m_CardLimitDebuffControl.Close();
+		}
+
 		ClearAllUniTasks();
 		CurrentEffectCard = null;
 		m_CardActionQueue.Clear();
@@ -2184,6 +2304,15 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
+		if (m_FistCardCache != null)
+		{
+			m_FistCardCache.Close();
+		}
+		if (m_KeyPathCardCache != null)
+		{
+			m_KeyPathCardCache.Close();
+		}
+
 		if (m_CardSimplePool != null)
 		{
 			m_CardSimplePool.DestroyAll();
@@ -2210,5 +2339,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_EffectRoots = null;
 		m_FistCardCache = null;
 		m_KeyPathCardCache = null;
+
+		base.OnClose();
 	}
 }

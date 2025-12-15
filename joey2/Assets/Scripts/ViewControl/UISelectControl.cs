@@ -272,6 +272,30 @@ public class UISelectControl : YViewControl
 			}
 		}
 
+		// Boxing Gloves relic: Replace all Bare Hands cards with Boxing Gloves
+		if (relicType == ERelicType.BareHandsMaster)
+		{
+			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+			Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
+			
+			// Replace all Bare Hands cards in player's card dictionary
+			foreach (var kvp in playerData.SelfCardDict)
+			{
+				Card card = kvp.Value;
+			if (card != null && card.id == "1011")
+			{
+				// Replace card data while keeping the unique ID
+				card.cardImage = boxingGlovesTemplate.cardImage;
+				card.cardBackground = boxingGlovesTemplate.cardBackground;
+				card.cardName = boxingGlovesTemplate.cardName;
+				card.description = boxingGlovesTemplate.description;
+				card.id = boxingGlovesTemplate.id;
+				card.SetAttack(boxingGlovesTemplate.currentAttack);
+				card.effectId = boxingGlovesTemplate.effectId;
+			}
+			}
+		}
+
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
 		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic, (int)relicType);
