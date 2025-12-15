@@ -7,6 +7,7 @@ public class UISelectView : YBaseView
 	public Button BtnSkip;
 	public RectTransform Content;
 	public RectTransform ContentRelic;
+	public Text TxtCardNum;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -16,5 +17,6 @@ public class UISelectView : YBaseView
 		BtnSkip = viewItemList[0].Target.GetComponent<Button>();
 		Content = viewItemList[1].Target.GetComponent<RectTransform>();
 		ContentRelic = viewItemList[2].Target.GetComponent<RectTransform>();
+		TxtCardNum = viewItemList[3].Target.GetComponent<Text>();
 	}
 }

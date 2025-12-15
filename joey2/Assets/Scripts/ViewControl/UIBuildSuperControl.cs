@@ -120,6 +120,9 @@ public class UIBuildSuperControl : YViewControl
                 cardControl.gameObject.SetActive(false);
             }
         }
+
+        m_View.TxtCardNum.gameObject.SetActive(true);
+        UpdateCardNumText();
     }
 
     public void SetShopData()
@@ -140,6 +143,24 @@ public class UIBuildSuperControl : YViewControl
         m_View.ImgDel.SetActive(true);
         RefreshEquipedCardsByType(ECardType.attack);
         UpdateTxtCoin();
+    }
+
+    void UpdateCardNumText()
+    {
+        int envCardCount = m_PlayerData.EnvCardPool.Count;
+        RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
+        int envCardLimit = characterData.envCardLimit;
+
+        m_View.TxtCardNum.text = $"{envCardCount} / {envCardLimit}";
+
+        if (envCardCount > envCardLimit)
+        {
+            m_View.TxtCardNum.color = Color.red;
+        }
+        else
+        {
+            m_View.TxtCardNum.color = Color.white;
+        }
     }
 
     void OnCoinChange(object[] paraArray)
@@ -254,6 +275,7 @@ public class UIBuildSuperControl : YViewControl
         Debug.Log($"卖卡成功！花费 {sellCost} 金币，当前卖卡次数: {m_SellCardCount}");
 
         UpdateTxtCoin();
+        UpdateCardNumText();
         DataSystem.Instance.SaveDataJoeyPlayer();
 
         RectTransform rectTransform2 = draggedCard.CacheTrans as RectTransform;
