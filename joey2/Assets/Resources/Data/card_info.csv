@@ -94,13 +94,13 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5029,Art/Img/Monster/img_card_MimicChest,Art/Img/Monster/img_bg_Monster,伪装宝箱,3感恩节,monster,离场:掉落宝物,10,,20,60,2,MimicChest:5016
 5030,Art/Img/Monster/img_card_ClownMonkey,Art/Img/Monster/img_bg_Monster,小丑Monkey,未启用,monster,,6,,20,30,1,
 5031,Art/Img/Monster/img_card_SkateMonkey,Art/Img/Monster/img_bg_Monster,滑板Monkey,未启用,monster,,7,,18,25,1,
-5032,Art/Img/Monster/img_card_badDonkey,Art/Img/Monster/img_bg_Monster,坏Donkey,2戈壁,monster,,8,,14,25,1,
+5032,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,2戈壁,monster,,8,,14,25,1,
 5033,Art/Img/Monster/img_card_IronHoofDonkey,Art/Img/Monster/img_bg_Monster,榴莲Donkey,2戈壁,monster,受击时：反伤5点伤害,8,,19,40,2,IronHoofDonkey
 5034,Art/Img/Monster/img_card_GuolaoDonkey,Art/Img/Monster/img_bg_Monster,Donkey市长,2戈壁,monster,每次受到攻击时，增加2点攻击力,8,,45,80,3,DonkeyMajor:2
 5035,Art/Img/Monster/img_card_doctorMonkey,Art/Img/Monster/img_bg_Monster,医生monkey,1丛林,monster      ,离场：所有怪物回复3点生命,3,,11,15,1,BananaMonkey
 5036,Art/Img/Monster/img_card_ShamanDonkey,Art/Img/Monster/img_bg_Monster,萨满Donkey,2戈壁,monster,受击时:场上每只Donkey攻击+3,1,,30,40,2,ShamanDonkey
 5037,Art/Img/Monster/img_card_MimicChestking,Art/Img/Monster/img_bg_Monster,伪装宝箱王,4墓地,monster,离场:掉落大量宝物,15,,30,100,3,MimicChest:5016
 5038,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,教学牌,monster,点击攻击,9,,16,25,1,
-5039,Art/Img/Monster/img_card_badDonkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,
+5039,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,
 ,,,,,,,,,,,,
 6001,Art/Img/Other/img_card_door,Art/Img/Other/img_card_door_background,Key Path,,other,传送到下一关,,,,,3,
