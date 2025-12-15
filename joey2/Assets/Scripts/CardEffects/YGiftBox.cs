@@ -17,9 +17,18 @@ public class YGiftBox : YCardEffect
 		List<Card> cards = new List<Card>();
         DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
         int count = baseExtra;
-        while (count > 0)
+        int attemptLimit = 100; // Prevent infinite loop
+        int attempts = 0;
+        
+        while (count > 0 && attempts < attemptLimit)
         {
-            Card originalCard = GData.Instance.RandomCard();
+            attempts++;
+            
+            // Use deterministic seed based on level seed and counter
+            int seed = dataJoeyPlayer.levelRandomSeed + dataJoeyPlayer.giftBoxUseCounter;
+            Card originalCard = GData.Instance.RandomCardWithSeed(seed);
+            dataJoeyPlayer.giftBoxUseCounter++;
+            
             Debug.Log("GiftBox card: " + originalCard.GetCardType());
             // Filter out monster cards and cards with price = 0
             if (originalCard.GetCardType() == ECardType.monster || originalCard.price == 0)
@@ -27,7 +36,7 @@ public class YGiftBox : YCardEffect
                 continue;
             }
             
-            // 克隆卡牌并从 EnvCardDict 获取已增强的属性值
+            // Clone card and get enhanced attributes from EnvCardDict
             Card card = originalCard.Clone();
             Card enhancedCard = dataJoeyPlayer.GetEnvCardDictData(card.id);
             if (enhancedCard != null && (enhancedCard.GetCardType() == ECardType.attack || enhancedCard.GetCardType() == ECardType.defence))

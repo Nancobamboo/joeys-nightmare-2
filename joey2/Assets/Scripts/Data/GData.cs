@@ -191,6 +191,34 @@ public sealed class GData : PureSingleton<GData>
 		return values[idx];
 	}
 
+	/// <summary>
+	/// Get a random card with deterministic seed
+	/// This ensures consistent random card selection when replaying the same level
+	/// </summary>
+	/// <param name="seed">Random seed for card selection</param>
+	/// <returns>Random card</returns>
+	public Card RandomCardWithSeed(int seed)
+	{
+		if (CardDict.Count == 0) LoadCards();
+		if (CardDict.Count == 0) return null;
+
+		// Save current random state
+		Random.State oldState = Random.state;
+
+		// Set deterministic seed
+		Random.InitState(seed);
+
+		// Get random card
+		List<Card> values = new List<Card>(CardDict.Values);
+		int idx = Random.Range(0, values.Count);
+		Card result = values[idx];
+
+		// Restore previous random state
+		Random.state = oldState;
+
+		return result;
+	}
+
 	public Card GetCardConfigById(string cardId)
 	{
 		return CardDict[cardId];
