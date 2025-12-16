@@ -32,6 +32,7 @@ public class JoeyGameControl : YViewControl
 	private UIPauseControl m_PauseControl;
 	private UIGameOverControl m_GameOverControl;
 	private UIShopSuperControl m_ShopSuperControl;
+	private UILobbyControl m_LobbyControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
@@ -213,9 +214,15 @@ public class JoeyGameControl : YViewControl
 		{
 			if (DataSystem.Instance.IsHardGame && m_DataJoeyPlayer.StageId == 0)
 			{
+				m_DataJoeyPlayer.RemoveEnvCardPoolData("2001");
+				m_DataJoeyPlayer.AddEnvCardPoolData("2009");
+
 				m_DataJoeyPlayer.StageId++;
 				DataSystem.Instance.AddCoin(1000);
-				m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				if (m_ShopSuperControl == null)
+				{
+					m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				}
 				m_ShopSuperControl.SetData();
 			}
 
@@ -470,6 +477,7 @@ public class JoeyGameControl : YViewControl
 			{
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
+				Close();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
@@ -501,8 +509,11 @@ public class JoeyGameControl : YViewControl
 				DataSystem.Instance.SaveDataAchievement();
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
-				UILobbyControl lobbyControl = Asset.OpenUI<UILobbyControl>();
-				lobbyControl.OnBtnBuildClick();
+				if (m_LobbyControl == null)
+				{
+					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+				}
+				m_LobbyControl.OnBtnBuildClick();
 				return;
 			}
 
@@ -516,6 +527,7 @@ public class JoeyGameControl : YViewControl
 			if (m_DataJoeyPlayer.currentLevel >= 3)
 			{
 				ClearAllUniTasks();
+				Close();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
 				return;
 			}
@@ -547,7 +559,14 @@ public class JoeyGameControl : YViewControl
 		// Determine final action based on hasShop
 		if (stageReward.hasShop)
 		{
-			finalAction = () => Asset.OpenUI<UILobbyControl>();
+			finalAction = () =>
+			{
+				if (m_LobbyControl == null)
+				{
+					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+				}
+				m_LobbyControl.SetData();
+			};
 		}
 		else
 		{
@@ -617,7 +636,10 @@ public class JoeyGameControl : YViewControl
 		{
 			finalAction = () =>
 			{
-				m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				if (m_ShopSuperControl == null)
+				{
+					m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				}
 				m_ShopSuperControl.SetData();
 			};
 		}
@@ -672,6 +694,7 @@ public class JoeyGameControl : YViewControl
 	public void ReturnToMainMenu()
 	{
 		ClearAllUniTasks();
+		Close();
 		SceneLoader.Instance.LoadScene("Start");
 	}
 
@@ -933,6 +956,10 @@ public class JoeyGameControl : YViewControl
 		{
 			m_ShopSuperControl.Close();
 		}
+		if (m_LobbyControl != null)
+		{
+			m_LobbyControl.Close();
+		}
 
 		m_GlobalDelayAction.Cancel();
 
@@ -961,6 +988,8 @@ public class JoeyGameControl : YViewControl
 		m_GamePhaseControl = null;
 		m_PauseControl = null;
 		m_GameOverControl = null;
+		m_ShopSuperControl = null;
+		m_LobbyControl = null;
 		m_View = null;
 		m_DataJoeyPlayer = null;
 

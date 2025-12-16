@@ -421,13 +421,13 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				int totalStages=16;
+				int totalStages = 16;
 				m_View.TxtStage.text = envStage.level.ToString() + "/" + totalStages.ToString();
 			}
 		}
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
 		{
-			int totalLevels=3;
+			int totalLevels = 3;
 			m_View.TxtStage.text = $"{m_DataJoeyPlayer.currentLevel}/{totalLevels}";
 		}
 		else
@@ -635,6 +635,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
 			{
 				card.currentHealth *= 2;
+				card.health *= 2;
 			}
 
 			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
