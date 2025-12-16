@@ -1,10 +1,12 @@
-using UnityEngine;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class UILobbyControl : YViewControl
 {
 	private UILobbyView m_View;
 	private UIShopControl m_ShopControl;
+	private UIAchievementControl m_AchievementControl;
+	private UICardProgressControl m_CardProgressControl;
 	public static EResType GetResType()
 	{
 		return EResType.UILobby;
@@ -15,13 +17,36 @@ public class UILobbyControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<UILobbyView>();
 		m_View.BtnBuild.onClick.AddListener(OnBtnBuildClick);
-		m_View.BtnShop.onClick.AddListener(OnBtnShopClick);
-		m_View.BtnGame.onClick.AddListener(OnBtnGameClick);
-		m_View.BtnMerge.onClick.AddListener(OnBtnMergeClick);
+		//m_View.BtnShop.onClick.AddListener(OnBtnShopClick);
+		//m_View.BtnGame.onClick.AddListener(OnBtnGameClick);
+		//m_View.BtnMerge.onClick.AddListener(OnBtnMergeClick);
+		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
+		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
 	}
 
-	void OnBtnBuildClick()
+	public void OnBtnBuildClick()
 	{
+		if (m_AchievementControl == null)
+		{
+			m_AchievementControl = Asset.OpenUI<UIAchievementControl>();
+		}
+		m_AchievementControl.SetData();
+	}
+
+	void OnBtnCardProgressClick()
+	{
+		if (m_CardProgressControl == null)
+		{
+			m_CardProgressControl = Asset.OpenUI<UICardProgressControl>();
+		}
+		m_CardProgressControl.SetData();
+	}
+
+	void OnBtnHardGameClick()
+	{
+		DataSystem.Instance.IsHardGame = true;
+		DataSystem.Instance.ResetDataJoeyPlayer();
+		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
 	}
 
 	void OnBtnShopClick()
@@ -64,5 +89,21 @@ public class UILobbyControl : YViewControl
 	protected override void OnReturn()
 	{
 		base.OnReturn();
+	}
+
+	private void OnDestroy()
+	{
+		if (m_ShopControl != null)
+		{
+			m_ShopControl.Close();
+		}
+		if (m_AchievementControl != null)
+		{
+			m_AchievementControl.Close();
+		}
+		if (m_CardProgressControl != null)
+		{
+			m_CardProgressControl.Close();
+		}
 	}
 }

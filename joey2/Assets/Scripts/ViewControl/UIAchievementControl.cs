@@ -27,12 +27,20 @@ public class UIAchievementControl : YViewControl
 		gameObject.SetActive(true);
 		DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
 
+		Color goldColor = new Color(1f, 0.84f, 0f, 1f);
+
 		m_View.TxtFistNum.text = achievement.FistUseNum.ToString();
 		m_View.TxtCoinNum.text = achievement.MaxCoinNum.ToString();
 		m_View.TxtDamage.text = achievement.MaxDamageNum.ToString();
 		m_View.TxtDeadNum.text = achievement.DeadNum.ToString();
 		m_View.TxtPassTime.text = achievement.PassGameNum.ToString();
 		m_View.TxtMonsterNum.text = achievement.KillMonsterNum.ToString();
+
+		// UnityEngine.UI.Text[] textComponents = GetComponentsInChildren<UnityEngine.UI.Text>();
+		// for (int i = 0; i < textComponents.Length; i++)
+		// {
+		// 	textComponents[i].color = goldColor;
+		// }
 	}
 
 	protected override void OnReturn()

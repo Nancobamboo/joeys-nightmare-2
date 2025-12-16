@@ -9,6 +9,7 @@ public partial class DataSystem
 {
     public Dictionary<int, float> VFXDelayTimeDict = new Dictionary<int, float>();
     public Dictionary<int, float> AnimDelayTimeDict = new Dictionary<int, float>();
+    public bool IsHardGame = false;
 
     public const bool isNew = true;
     public bool isFinishGame = false;
@@ -77,6 +78,11 @@ public partial class DataSystem
         card = GData.Instance.GetCardConfigById(cardId).Clone();
         dataJoeyPlayer.UniqueIdGen++;
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
+
+        DataCardProgress cardProgress = GetDataCardProgress();
+        cardProgress.AddCardIdDictData(cardId, 1);
+        SaveDataCardProgress();
+
         return card;
     }
 
