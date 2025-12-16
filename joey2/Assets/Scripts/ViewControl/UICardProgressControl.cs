@@ -30,8 +30,23 @@ public class UICardProgressControl : YViewControl
 		Dictionary<string, Card> cardDict = GData.Instance.CardDict;
 		DataCardProgress cardProgress = DataSystem.Instance.GetDataCardProgress();
 
+		// 需要过滤的卡牌ID集合
+		HashSet<string> filteredCardIds = new HashSet<string> 
+		{ 
+			"1000", "1001", "1011", "1019", "2000", "3000", 
+			"4000", "4002", "4003", "4004", "4005", "4009", 
+			"5000", "5001", "5007", "5008", "5030", "5031", "5038", "5039" 
+		};
+
+
+
 		foreach (Card card in cardDict.Values)
 		{
+			// 跳过需要过滤的卡牌
+			if (filteredCardIds.Contains(card.id))
+			{
+				continue;
+			}
 			UIPreviewCardControl cardControl = Asset.OpenUI<UIPreviewCardControl>(m_View.Content);
 			cardControl.CacheTrans.localScale = Vector3.one * 0.7f;
 			cardControl.CacheTrans.localPosition = Vector3.zero;
