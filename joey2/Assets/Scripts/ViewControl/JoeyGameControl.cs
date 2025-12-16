@@ -109,7 +109,7 @@ public class JoeyGameControl : YViewControl
 		}
 		else
 		{
-			Asset.OpenUI<UILobbyControl>();
+			//Asset.OpenUI<UILobbyControl>();
 			SetGamePhase(EGamePhase.Default);
 		}
 	}
@@ -211,6 +211,14 @@ public class JoeyGameControl : YViewControl
 
 		if (GameMode == EGameMode.Env)
 		{
+			if (DataSystem.Instance.IsHardGame && m_DataJoeyPlayer.StageId == 0)
+			{
+				m_DataJoeyPlayer.StageId++;
+				DataSystem.Instance.AddCoin(1000);
+				m_ShopSuperControl = Asset.OpenUI<UIShopSuperControl>();
+				m_ShopSuperControl.SetData();
+			}
+
 			m_GamePhaseControl.SetData();
 
 			int envLevelId = m_DataJoeyPlayer.StageId;
@@ -278,6 +286,7 @@ public class JoeyGameControl : YViewControl
 				m_GamePhaseControl.AddCardList(cardType: cardType, cardIds: cardIds);
 			}
 		}
+
 
 		if (GameMode == EGameMode.Debug)
 		{
@@ -492,7 +501,8 @@ public class JoeyGameControl : YViewControl
 				DataSystem.Instance.SaveDataAchievement();
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
-				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());
+				UILobbyControl lobbyControl = Asset.OpenUI<UILobbyControl>();
+				lobbyControl.OnBtnBuildClick();
 				return;
 			}
 

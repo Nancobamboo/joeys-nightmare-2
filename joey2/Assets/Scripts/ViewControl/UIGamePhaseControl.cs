@@ -632,7 +632,11 @@ public partial class UIGamePhaseControl : YViewControl
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
 
-			// 衰退光环效果：怪物进入环境时攻击和生命减少1点
+			if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
+			{
+				card.currentHealth *= 2;
+			}
+
 			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
 			{
 				if (card.currentAttack > 0) card.currentAttack = Mathf.Max(1, card.currentAttack - 1);

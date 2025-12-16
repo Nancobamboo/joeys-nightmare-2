@@ -19,7 +19,6 @@ public enum ESceneName
 public class UIStartControl : YViewControl
 {
 	private UIStartView m_View;
-	public UIAchievementControl AchievementControl;
 
 	public static EResType GetResType()
 	{
@@ -64,6 +63,7 @@ public class UIStartControl : YViewControl
 
 	private void OnBtnRoguelikeClick()
 	{
+		DataSystem.Instance.IsHardGame = false;
 		ClearPlayerData();
 		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
 	}
@@ -85,7 +85,8 @@ public class UIStartControl : YViewControl
 
 	void OnBtnAchievementClick()
 	{
-		AchievementControl.SetData();
+		var ctrl = Asset.OpenUI<UILobbyControl>();
+		ctrl.SetData();
 	}
 
 	private void ClearPlayerData()

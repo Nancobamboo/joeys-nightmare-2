@@ -20,6 +20,7 @@ public enum EResType
     UISelect,
     UIRelic,
 	UIAchievement,
+	UICardProgress,
     UIUpper,
     LevelEnemy,
     SoundEffect,
