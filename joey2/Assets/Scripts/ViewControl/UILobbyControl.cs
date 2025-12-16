@@ -22,6 +22,7 @@ public class UILobbyControl : YViewControl
 		//m_View.BtnMerge.onClick.AddListener(OnBtnMergeClick);
 		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
 		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
+		m_View.BtnSkip.onClick.AddListener(Close);
 	}
 
 	public void OnBtnBuildClick()
@@ -82,8 +83,9 @@ public class UILobbyControl : YViewControl
 	{
 	}
 
-	public void SetData()
+	public void SetData(bool isStartEnter = false)
 	{
+		m_View.BtnSkip.gameObject.SetActive(isStartEnter);
 	}
 
 	protected override void OnReturn()
