@@ -36,7 +36,7 @@ public class YExtraDamage_NoDefence : YDefaultEffect
             if (currentNoDefence != m_CachedNoDefence)
             {
                 m_CachedNoDefence = currentNoDefence;
-                ClearAllEffectValues();
+                CardControl.ClearEffectVlaue();
                 if (currentNoDefence)
                 {
                     CardControl.AddEffectValue(EEffectType.Damage, baseExtra);

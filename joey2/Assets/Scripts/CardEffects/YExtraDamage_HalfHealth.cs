@@ -36,7 +36,7 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
             if (currentHalfHealth != m_CachedHalfHealth)
             {
                 m_CachedHalfHealth = currentHalfHealth;
-                ClearAllEffectValues();
+                CardControl.ClearEffectVlaue();
                 if (currentHalfHealth)
                 {
                     CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
