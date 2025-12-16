@@ -18,6 +18,8 @@ public partial class DataSystem
         Debug.Log("LoadGameData called");
         LoadDataJoeyPlayer();
         LoadVFX();
+        LoadDataCardProgress();
+        LoadDataAchievement();
     }
 
     public void LoadVFX()

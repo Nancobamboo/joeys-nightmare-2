@@ -28,6 +28,7 @@ public class UICardProgressControl : YViewControl
 	{
 		GData.Instance.LoadCards();
 		Dictionary<string, Card> cardDict = GData.Instance.CardDict;
+		DataCardProgress cardProgress = DataSystem.Instance.GetDataCardProgress();
 
 		foreach (Card card in cardDict.Values)
 		{
@@ -37,6 +38,27 @@ public class UICardProgressControl : YViewControl
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 			cardControl.SetData(card);
 			m_PreviewCardList.Add(cardControl);
+		}
+
+		m_PreviewCardList.Sort((a, b) =>
+		{
+			bool aExists = cardProgress.GetCardIdDictData(a.CardData.id) > 0;
+			bool bExists = cardProgress.GetCardIdDictData(b.CardData.id) > 0;
+
+			if (aExists && !bExists)
+			{
+				return -1;
+			}
+			else if (!aExists && bExists)
+			{
+				return 1;
+			}
+			return 0;
+		});
+
+		for (int i = 0; i < m_PreviewCardList.Count; i++)
+		{
+			m_PreviewCardList[i].CacheTrans.SetSiblingIndex(i);
 		}
 	}
 
