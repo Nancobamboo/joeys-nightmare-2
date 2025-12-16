@@ -180,7 +180,7 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				ShowDamageText(actualChange, m_View.Joey, new Vector3(100f, 190f, 0), !isHeal);
 			}
-			if (isHeal && m_DataJoeyPlayer.playerHealth != m_DataJoeyPlayer.playerMaxHealth)
+			if (isHeal)
 			{
 				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_HuiXue, transform, 2f);
 				m_View.JoeyAnim.Play("happy");
@@ -421,12 +421,14 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				m_View.TxtStage.text = envStage.level.ToString();
+				int totalStages=16;
+				m_View.TxtStage.text = envStage.level.ToString() + "/" + totalStages.ToString();
 			}
 		}
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
 		{
-			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
+			int totalLevels=3;
+			m_View.TxtStage.text = $"{m_DataJoeyPlayer.currentLevel}/{totalLevels}";
 		}
 		else
 		{
@@ -443,7 +445,6 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				m_View.TxtStage.text = envStage.level.ToString();
 
 				// 根据 theme 设置 BattleEnv 模式的 Description
 				switch (envStage.theme)
@@ -468,7 +469,6 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
 		{
-			m_View.TxtStage.text = m_DataJoeyPlayer.currentLevel.ToString();
 
 			// 教学关卡的三关文本
 			switch (m_DataJoeyPlayer.currentLevel)
