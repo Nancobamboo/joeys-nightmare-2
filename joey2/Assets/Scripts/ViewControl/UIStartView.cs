@@ -11,6 +11,8 @@ public class UIStartView : YBaseView
 	public Button BtnGuide;
 	public EventTriggerListener GuideTrigger;
 	public Button BtnStart;
+	public Button BtnAchievement;
+	public EventTriggerListener TriggerAchieve;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -24,5 +26,7 @@ public class UIStartView : YBaseView
 		BtnGuide = viewItemList[2].Target.GetComponent<Button>();
 		GuideTrigger = viewItemList[2].Target.GetComponent<EventTriggerListener>();
 		BtnStart = viewItemList[3].Target.GetComponent<Button>();
+		BtnAchievement = viewItemList[4].Target.GetComponent<Button>();
+		TriggerAchieve = viewItemList[4].Target.GetComponent<EventTriggerListener>();
 	}
 }

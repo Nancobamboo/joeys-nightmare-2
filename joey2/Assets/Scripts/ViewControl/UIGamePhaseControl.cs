@@ -209,6 +209,9 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		if (m_DataJoeyPlayer.playerHealth <= 0)
 		{
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			achievement.DeadNum++;
+			DataSystem.Instance.SaveDataAchievement();
 			JoeyGameControl.Instance.ShowGameOver();
 		}
 	}
@@ -874,7 +877,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardType == ECardType.monster)
 		{
-			
+
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
 			{
@@ -904,10 +907,17 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 
 			Card configCard = GData.Instance.GetCardConfigById(monsterId);
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
 			if (configCard != null && configCard.price > 0)
 			{
 				DataSystem.Instance.AddCoin(configCard.price);
+				if (m_DataJoeyPlayer.Coin > achievement.MaxCoinNum)
+				{
+					achievement.MaxCoinNum = m_DataJoeyPlayer.Coin;
+				}
 			}
+			achievement.KillMonsterNum++;
+			DataSystem.Instance.SaveDataAchievement();
 			// 播放怪物离场音效
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterFly", 1.0f, 0.5f);
 
@@ -1480,6 +1490,12 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			DataSystem.Instance.AddCoin(coinReward);
 			OnCoinChanged(m_DataJoeyPlayer.Coin);
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			if (m_DataJoeyPlayer.Coin > achievement.MaxCoinNum)
+			{
+				achievement.MaxCoinNum = m_DataJoeyPlayer.Coin;
+				DataSystem.Instance.SaveDataAchievement();
+			}
 			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
 			damageTextControl.SetCoinData(coinReward, Asset.UIRoot, Vector3.zero);
 			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
@@ -1517,6 +1533,13 @@ public partial class UIGamePhaseControl : YViewControl
 		delayTime = attackCardControl.CardEffect?.UseAttack() ?? 0f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
+		if (useFistCard)
+		{
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			achievement.FistUseNum++;
+			DataSystem.Instance.SaveDataAchievement();
+		}
+
 
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
@@ -1545,17 +1568,27 @@ public partial class UIGamePhaseControl : YViewControl
 		bool enemyKilled = false;
 		for (int i = 0; i < attackCount; i++)
 		{
-            if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
-            {
-                YActionSystem.Instance.DispatchAction(EActionId.AddHp, 1);
-            }
-            delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
+			if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
+			{
+				YActionSystem.Instance.DispatchAction(EActionId.AddHp, 1);
+			}
+			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 
 			damage += attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
 
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));
+
+			if (damage > 0)
+			{
+				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+				if (damage > achievement.MaxDamageNum)
+				{
+					achievement.MaxDamageNum = damage;
+					DataSystem.Instance.SaveDataAchievement();
+				}
+			}
 			if (isKilled)
 			{
 				enemyKilled = true;
@@ -1681,6 +1714,16 @@ public partial class UIGamePhaseControl : YViewControl
 		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
+
+		if (damage > 0)
+		{
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			if (damage > achievement.MaxTakeDamageNum)
+			{
+				achievement.MaxTakeDamageNum = damage;
+				DataSystem.Instance.SaveDataAchievement();
+			}
+		}
 
 		if (defenceCardControl != null)
 		{

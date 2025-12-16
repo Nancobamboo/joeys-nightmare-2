@@ -487,6 +487,9 @@ public class JoeyGameControl : YViewControl
 
 			if (stageType == EStageType.final)
 			{
+				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+				achievement.PassGameNum++;
+				DataSystem.Instance.SaveDataAchievement();
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
 				SceneLoader.Instance.LoadScene(ESceneName.Start.ToString());

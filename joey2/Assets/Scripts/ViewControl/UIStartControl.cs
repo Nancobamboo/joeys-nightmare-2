@@ -19,6 +19,7 @@ public enum ESceneName
 public class UIStartControl : YViewControl
 {
 	private UIStartView m_View;
+	public UIAchievementControl AchievementControl;
 
 	public static EResType GetResType()
 	{
@@ -33,10 +34,12 @@ public class UIStartControl : YViewControl
 		m_View.BtnEnv.onClick.AddListener(OnBtnRoguelikeClick);
 		m_View.BtnGuide.onClick.AddListener(OnBtnGuideClick);
 		m_View.BtnOver.onClick.AddListener(OnBtnOverClick);
+		m_View.BtnAchievement.onClick.AddListener(OnBtnAchievementClick);
 
 		SetupButtonHoverEffect(m_View.BtnEnv, m_View.EnvTrigger);
 		SetupButtonHoverEffect(m_View.BtnGuide, m_View.GuideTrigger);
 		SetupButtonHoverEffect(m_View.BtnOver, m_View.OverTrigger);
+		SetupButtonHoverEffect(m_View.BtnAchievement, m_View.TriggerAchieve);
 	}
 
 	private void SetupButtonHoverEffect(Button button, EventTriggerListener trigger)
@@ -78,6 +81,11 @@ public class UIStartControl : YViewControl
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #endif
+	}
+
+	void OnBtnAchievementClick()
+	{
+		AchievementControl.SetData();
 	}
 
 	private void ClearPlayerData()
