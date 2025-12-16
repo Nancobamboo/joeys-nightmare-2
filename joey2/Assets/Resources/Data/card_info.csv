@@ -66,7 +66,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5001,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,教学牌,monster      ,点击攻击,3,,5,10,1,,
 5002,Art/Img/Monster/img_card_badmonkey,Art/Img/Monster/img_bg_Monster,坏Monkey,1丛林,monster      ,,6,,12,10,1,,
 5003,Art/Img/Monster/img_card_MediEvil,Art/Img/Monster/img_bg_Monster,骷髅Monkey,4墓地,monster      ,,12,,24,10,1,,
-5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,骷髅骑士Monkey,4墓地,monster      ,离场:在环境中召唤铁剑×1、铁盾×1,14,,28,10,2,,
+5004,Art/Img/Monster/img_card_SkeletonKnight,Art/Img/Monster/img_bg_Monster,盾骷髅Monkey,4墓地,monster      ,离场:在环境中召唤铁剑×1、铁盾×1,14,,28,10,2,,
 5005,Art/Img/Monster/img_card_vampiremonkey,Art/Img/Monster/img_bg_Monster,吸血鬼Monkey,4墓地,monster      ,每次攻击时，吸血:3,9,,23,10,1,VampireMonkey,
 5006,Art/Img/Monster/img_card_Barrel,Art/Img/Monster/img_bg_Monster,木桶,1丛林,monster,离场:掉落宝物,,,1,5,1,,
 5007,Art/Img/Monster/img_card_Bangalore,Art/Img/Monster/img_bg_Monster,炸药桶,未启用，有卡死bug,monster,离场：对两侧敌人各造成10点伤害,,,1,10,3,Boom_OnDead:10,
