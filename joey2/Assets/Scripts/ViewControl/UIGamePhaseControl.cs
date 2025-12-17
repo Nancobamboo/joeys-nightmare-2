@@ -1549,7 +1549,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			if (ControlUtil.IsRandomSucceed(10))
+			if (ControlUtil.IsRandomSucceed(5))
 			{
 				AddCardToBag("3009");
 			}
