@@ -1565,17 +1565,15 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		// Check if weapon has SlowAttack effect - enemy counter-attacks first
 		bool hasSlowAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.SlowAttack) > 0;
 		bool enemyCounteredFirst = false;
 		if (hasSlowAttack && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
-			// Only counter-attack if enemy has attack power > 0
 			if (enemyAttack > 0)
 			{
-				CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
-				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
+				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
 				enemyCounteredFirst = true;
 			}
 		}
@@ -1627,15 +1625,13 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 		}
 
-		// Check if weapon has NoCounterAttack effect
 		bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
 
-		// Enemy counter-attack (only if not already countered from SlowAttack)
 		if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
-			CancellationToken attackToken = GetOrCreateCardToken(attackCardControl);
-			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, attackToken, attackCardControl);
+			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
 		}
 
 

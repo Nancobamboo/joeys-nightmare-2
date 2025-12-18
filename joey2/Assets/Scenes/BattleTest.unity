@@ -734,7 +734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugLevelId
-      value: 5
+      value: 999
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.size
