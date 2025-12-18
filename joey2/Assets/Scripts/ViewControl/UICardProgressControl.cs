@@ -6,6 +6,8 @@ public class UICardProgressControl : YViewControl
 {
 	private UICardProgressView m_View;
 	private List<UIPreviewCardControl> m_PreviewCardList = new List<UIPreviewCardControl>();
+	private Dictionary<int, List<UIPreviewCardControl>> m_CardTypeDict = new Dictionary<int, List<UIPreviewCardControl>>();
+	private ECardType m_CurrentCardType = ECardType.attack;
 
 	public static EResType GetResType()
 	{
@@ -17,11 +19,42 @@ public class UICardProgressControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<UICardProgressView>();
 		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
+		m_View.BtnAttack.onClick.AddListener(() => OnTabClick(ECardType.attack));
+		m_View.BtnDefence.onClick.AddListener(() => OnTabClick(ECardType.defence));
+		m_View.BtnItem.onClick.AddListener(() => OnTabClick(ECardType.item));
+		m_View.BtnSkill.onClick.AddListener(() => OnTabClick(ECardType.skill));
 	}
 
 	void OnBtnCloseClick()
 	{
 		Close();
+	}
+
+	void OnTabClick(ECardType cardType)
+	{
+		m_CurrentCardType = cardType;
+		RefreshTabDisplay();
+	}
+
+	void RefreshTabDisplay()
+	{
+		m_View.SelectAttack.gameObject.SetActive(m_CurrentCardType == ECardType.attack);
+		m_View.SelectDefence.gameObject.SetActive(m_CurrentCardType == ECardType.defence);
+		m_View.SelectItem.gameObject.SetActive(m_CurrentCardType == ECardType.item);
+		m_View.SelectSkill.gameObject.SetActive(m_CurrentCardType == ECardType.skill);
+
+		foreach (var kvp in m_CardTypeDict)
+		{
+			ECardType cardType = (ECardType)kvp.Key;
+			bool shouldShow = cardType == m_CurrentCardType;
+			foreach (var cardControl in kvp.Value)
+			{
+				if (cardControl != null)
+				{
+					cardControl.gameObject.SetActive(shouldShow);
+				}
+			}
+		}
 	}
 
 	public void SetData()
@@ -37,29 +70,44 @@ public class UICardProgressControl : YViewControl
 			cardControl.CacheTrans.localPosition = Vector3.zero;
 			cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 			cardControl.SetData(card);
+
+			ECardType cardType = card.GetCardType();
+			int cardTypeInt = (int)cardType;
+			if (!m_CardTypeDict.ContainsKey(cardTypeInt))
+			{
+				m_CardTypeDict[cardTypeInt] = new List<UIPreviewCardControl>();
+			}
+			m_CardTypeDict[cardTypeInt].Add(cardControl);
 			m_PreviewCardList.Add(cardControl);
 		}
 
-		m_PreviewCardList.Sort((a, b) =>
+		foreach (var kvp in m_CardTypeDict)
 		{
-			bool aExists = cardProgress.GetCardIdDictData(a.CardData.id) > 0;
-			bool bExists = cardProgress.GetCardIdDictData(b.CardData.id) > 0;
-
-			if (aExists && !bExists)
+			DataCardProgress cardProgressData = DataSystem.Instance.GetDataCardProgress();
+			kvp.Value.Sort((a, b) =>
 			{
-				return -1;
-			}
-			else if (!aExists && bExists)
-			{
-				return 1;
-			}
-			return 0;
-		});
+				bool aExists = cardProgressData.GetCardIdDictData(a.CardData.id) > 0;
+				bool bExists = cardProgressData.GetCardIdDictData(b.CardData.id) > 0;
 
-		for (int i = 0; i < m_PreviewCardList.Count; i++)
-		{
-			m_PreviewCardList[i].CacheTrans.SetSiblingIndex(i);
+				if (aExists && !bExists)
+				{
+					return -1;
+				}
+				else if (!aExists && bExists)
+				{
+					return 1;
+				}
+				return 0;
+			});
+
+			for (int i = 0; i < kvp.Value.Count; i++)
+			{
+				kvp.Value[i].CacheTrans.SetSiblingIndex(i);
+			}
 		}
+
+		m_CurrentCardType = ECardType.attack;
+		RefreshTabDisplay();
 	}
 
 	protected override void OnClose()
@@ -73,6 +121,7 @@ public class UICardProgressControl : YViewControl
 			}
 		}
 		m_PreviewCardList.Clear();
+		m_CardTypeDict.Clear();
 		base.OnClose();
 	}
 
