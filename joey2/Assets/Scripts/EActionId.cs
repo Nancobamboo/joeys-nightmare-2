@@ -60,6 +60,12 @@ public enum EActionId
 	BananaMonkeyDead,
 	ShamanDonkeyBuff,
 	AddCardsToEnvByCardId,
+	UnyieldingActivate,
+	BeastBloodBoilingActivate,
+	FreshBloodGuardActivate,
+	BloodyBattleActivate,
+	VengeanceShieldActivate,
+	AddBlockDamagePhase,
 	Upper,
 
 }

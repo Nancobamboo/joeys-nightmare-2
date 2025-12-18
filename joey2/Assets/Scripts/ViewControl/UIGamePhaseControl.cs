@@ -42,6 +42,7 @@ public partial class UIGamePhaseControl : YViewControl
 	private const string EXIT_CARD_ID = "6001";
 	private bool m_KeyPathSpawned = false;
 	private int m_CurrentAttackTargetEnvIndex = -1;
+	private int PhaseCounter = 0;
 
 	// Card limit debuff display for Env mode
 	private UIRelicControl m_CardLimitDebuffControl;
@@ -103,6 +104,11 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.RefreshCardLimitDebuff, OnRefreshCardLimitDebuff);
 		RegistAction(EActionId.BloodStorageDeduct, BloodStorageDeduct);
 		RegistAction(EActionId.ShamanDonkeyBuff, ShamanDonkeyBuff);
+		RegistAction(EActionId.UnyieldingActivate, UnyieldingActivate);
+		RegistAction(EActionId.BeastBloodBoilingActivate, BeastBloodBoilingActivate);
+		RegistAction(EActionId.FreshBloodGuardActivate, FreshBloodGuardActivate);
+		RegistAction(EActionId.BloodyBattleActivate, BloodyBattleActivate);
+		RegistAction(EActionId.AddBlockDamagePhase, AddBlockDamagePhase);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -247,6 +253,8 @@ public partial class UIGamePhaseControl : YViewControl
 			m_KeyPathCardCache.gameObject.SetActive(false);
 		}
 		m_KeyPathSpawned = false;
+
+		ResetUnyieldingState();
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -405,6 +413,8 @@ public partial class UIGamePhaseControl : YViewControl
 			m_KeyPathCardCache.gameObject.SetActive(false);
 		}
 		m_KeyPathSpawned = false;
+
+		ResetUnyieldingState();
 	}
 
 	private void RefreshView()
@@ -1709,12 +1719,17 @@ public partial class UIGamePhaseControl : YViewControl
 		if (defenceValue < enemyAttack)
 		{
 			damage = enemyAttack - defenceValue;
-			// 老茧效果：抵抗小于3的伤害
 			if (DataSystem.Instance.HasRelic(ERelicType.Callus) && damage > 0 && damage < 3)
 			{
 				damage = 0;
 			}
 		}
+
+		if (damage > 0 && TryBlockFatalDamage(damage))
+		{
+			damage = 0;
+		}
+
 		SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
 		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
@@ -1734,6 +1749,16 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
 
+			if (DataSystem.Instance.HasRelic(ERelicType.ShieldReflect))
+			{
+				int shieldDefence = defenceValue;
+				int relicReflectDamage = shieldDefence / 2;
+				if (relicReflectDamage > 0)
+				{
+					reflectDamage += relicReflectDamage;
+				}
+			}
+
 			if (reflectDamage > 0)
 			{
 				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
@@ -1751,7 +1776,6 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			RemoveCardCts(defenceCardControl);
 		}
-		// 荆棘祝福效果：无论是否有防御卡牌，都获得反伤:3
 		if (DataSystem.Instance.HasRelic(ERelicType.ThornBlessing))
 		{
 			await AttackSpecialEnemy(enemyCardControl, 3, envIndex, cancellationToken);
@@ -1770,6 +1794,12 @@ public partial class UIGamePhaseControl : YViewControl
 			JoeyGameControl.Instance.PlayVFX(vfxName, m_View.Joey, 0.4f);
 			SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
 		}
+
+		if (damage > 0 && TryBlockFatalDamage(damage))
+		{
+			damage = 0;
+		}
+
 		ApplyPlayerHealthChange(-damage);
 	}
 
@@ -1782,6 +1812,12 @@ public partial class UIGamePhaseControl : YViewControl
 			JoeyGameControl.Instance.PlayVFX(vfxName, m_View.Joey, 0.4f);
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
 		}
+
+		if (damage > 0 && TryBlockFatalDamage(damage))
+		{
+			damage = 0;
+		}
+
 		ApplyPlayerHealthChange(-damage);
 	}
 
@@ -1904,6 +1940,7 @@ public partial class UIGamePhaseControl : YViewControl
 				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
 				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
 			}
+			PhaseCounter++;
 			CheckAndSpawnKeyPath();
 		}
 	}
@@ -1937,6 +1974,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 
 			TryBloodStorageHeal();
+			TryUnyieldingTurnUpdate();
 
 			CurrentEffectCard = null;
 		}
