@@ -255,6 +255,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_KeyPathSpawned = false;
 
 		ResetUnyieldingState();
+		ResetBloodStorageState();
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -415,6 +416,7 @@ public partial class UIGamePhaseControl : YViewControl
 		m_KeyPathSpawned = false;
 
 		ResetUnyieldingState();
+		ResetBloodStorageState();
 	}
 
 	private void RefreshView()
