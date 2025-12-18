@@ -98,9 +98,6 @@ public partial class UIGamePhaseControl
             return false;
         }
 
-
-        Debug.Log($"Blocked fatal damage: {damage}, total blocked: {m_BlockedDamage}");
-
         return true;
     }
 
@@ -109,7 +106,6 @@ public partial class UIGamePhaseControl
         if (m_RemainingTurnsPhaseEnd > 0 && PhaseCounter == m_RemainingTurnsPhaseEnd && m_BlockedDamage > 0)
         {
             AddHp(m_BlockedDamage);
-            Debug.Log($"Unyielding heal: {m_BlockedDamage} HP restored");
             m_BlockedDamage = 0;
             m_RemainingTurnsPhaseEnd = 0;
         }
