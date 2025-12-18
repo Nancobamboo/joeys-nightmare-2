@@ -66,11 +66,18 @@ public enum ECardEffectId
     CullingBlade,
     BloodStorage_UseSkill,
     BananaMonkey,
-	ShamanDonkey,
+    ShamanDonkey,
     IronHoofDonkey,
     NoCounterAttack,
     SlowAttack,
     DonkeyMajor,
+    Unyielding_UseSkill,
+    BeastBloodBoiling_UseItem,
+    FreshBloodGuard_UseItem,
+    NightmareLance,
+    BloodyBattle_UseSkill,
+    VengeanceShield,
+    BrokenShieldRedemption,
 
 }
 

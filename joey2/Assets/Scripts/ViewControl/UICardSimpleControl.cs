@@ -47,6 +47,7 @@ public enum ERelicType
 	BrassKnuckles = 9017,          // 指虎
 	ThornBlessing = 9018,           // 荆棘祝福
 	DoublePunch = 9019,             // 邦邦两拳
+	ShieldReflect = 9020,           // 护盾反伤
 
 	CardLimitDebuff = 9999,
 }
@@ -637,6 +638,27 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.DonkeyMajor:
 				effect = new YDonkeyMajor(effectValue);
+				break;
+			case ECardEffectId.Unyielding_UseSkill:
+				effect = new YUnyielding_UseSkill(effectValue);
+				break;
+			case ECardEffectId.BeastBloodBoiling_UseItem:
+				effect = new YBeastBloodBoiling_UseItem(effectValue);
+				break;
+			case ECardEffectId.FreshBloodGuard_UseItem:
+				effect = new YFreshBloodGuard_UseItem(effectValue);
+				break;
+			case ECardEffectId.NightmareLance:
+				effect = new YNightmareLance();
+				break;
+			case ECardEffectId.BloodyBattle_UseSkill:
+				effect = new YBloodyBattle_UseSkill(effectValue);
+				break;
+			case ECardEffectId.VengeanceShield:
+				effect = new YVengeanceShield();
+				break;
+			case ECardEffectId.BrokenShieldRedemption:
+				effect = new YBrokenShieldRedemption();
 				break;
 			default:
 				return GetDefaultEffect();
