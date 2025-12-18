@@ -88,8 +88,16 @@ public partial class UIGamePhaseControl
         {
             return false;
         }
-
         m_BlockedDamage += damage;
+
+        DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+        int currentHealth = playerData.playerHealth;
+
+        if (damage < currentHealth || currentHealth <= 0)
+        {
+            return false;
+        }
+
 
         Debug.Log($"Blocked fatal damage: {damage}, total blocked: {m_BlockedDamage}");
 
