@@ -45,6 +45,13 @@ public partial class UIGamePhaseControl
 	private int m_BloodStorageRemainingTurns = 0;
 	private bool m_BloodStorageSkipNextHeal = false;
 
+	private void ResetBloodStorageState()
+	{
+		m_BloodStorageMaxHealth = 0;
+		m_BloodStorageRemainingTurns = 0;
+		m_BloodStorageSkipNextHeal = false;
+	}
+
 	void BloodStorageActivate(object[] paraArray)
 	{
 		int maxHealth = paraArray.Length > 0 && paraArray[0] is int ? (int)paraArray[0] : 0;
