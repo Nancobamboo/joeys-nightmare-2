@@ -86,7 +86,7 @@ public class UIStartControl : YViewControl
 	void OnBtnAchievementClick()
 	{
 		var ctrl = Asset.OpenUI<UILobbyControl>();
-		ctrl.SetData();
+		ctrl.SetData(true);
 	}
 
 	private void ClearPlayerData()

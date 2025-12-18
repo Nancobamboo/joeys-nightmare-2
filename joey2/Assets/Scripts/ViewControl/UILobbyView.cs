@@ -10,6 +10,7 @@ public class UILobbyView : YBaseView
 	public Button BtnMerge;
 	public Button BtnCardProgress;
 	public Button BtnHardGame;
+	public Button BtnSkip;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -22,5 +23,6 @@ public class UILobbyView : YBaseView
 		BtnMerge = viewItemList[3].Target.GetComponent<Button>();
 		BtnCardProgress = viewItemList[4].Target.GetComponent<Button>();
 		BtnHardGame = viewItemList[5].Target.GetComponent<Button>();
+		BtnSkip = viewItemList[6].Target.GetComponent<Button>();
 	}
 }

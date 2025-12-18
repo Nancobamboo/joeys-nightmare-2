@@ -18,10 +18,11 @@ public class UILobbyControl : YViewControl
 		m_View = CreateView<UILobbyView>();
 		m_View.BtnBuild.onClick.AddListener(OnBtnBuildClick);
 		//m_View.BtnShop.onClick.AddListener(OnBtnShopClick);
-		//m_View.BtnGame.onClick.AddListener(OnBtnGameClick);
+		m_View.BtnGame.onClick.AddListener(OnBtnGameClick);
 		//m_View.BtnMerge.onClick.AddListener(OnBtnMergeClick);
 		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
 		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
+		m_View.BtnSkip.onClick.AddListener(Close);
 	}
 
 	public void OnBtnBuildClick()
@@ -82,8 +83,12 @@ public class UILobbyControl : YViewControl
 	{
 	}
 
-	public void SetData()
+	public void SetData(bool isUIStartEnter = false)
 	{
+		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
+		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
+		m_View.BtnGame.gameObject.SetActive(isDebug);
+		m_View.BtnHardGame.gameObject.SetActive(!isDebug);
 	}
 
 	protected override void OnReturn()

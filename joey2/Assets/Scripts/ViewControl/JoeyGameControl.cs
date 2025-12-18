@@ -110,7 +110,8 @@ public class JoeyGameControl : YViewControl
 		}
 		else
 		{
-			//Asset.OpenUI<UILobbyControl>();
+			var ctrl = Asset.OpenUI<UILobbyControl>();
+			ctrl.SetData(false);
 			SetGamePhase(EGamePhase.Default);
 		}
 	}
