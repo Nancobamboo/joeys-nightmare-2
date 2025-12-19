@@ -49,6 +49,8 @@ public enum ERelicType
 	DoublePunch = 9019,             // 邦邦两拳
 	ShieldReflect = 9020,           // 护盾反伤
 	RegenerationAmulet = 9021,      // 再生护符
+	BloodyGloves = 9022,             // 染血拳法
+	HalfHealthAmulet = 9023,         // 半血护符
 
 	CardLimitDebuff = 9999,
 }
