@@ -110,6 +110,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.FreshBloodGuardActivate, FreshBloodGuardActivate);
 		RegistAction(EActionId.BloodyBattleActivate, BloodyBattleActivate);
 		RegistAction(EActionId.AddBlockDamagePhase, AddBlockDamagePhase);
+		RegistAction(EActionId.LifeShareSetPlayerHealth, LifeShareSetPlayerHealth);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -1733,7 +1734,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (damage > 0 && TryBlockFatalDamage(damage))
 		{
-			damage = 0;
+			damage = m_DataJoeyPlayer.playerHealth - 1;
 		}
 
 		SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
@@ -1803,7 +1804,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (damage > 0 && TryBlockFatalDamage(damage))
 		{
-			damage = 0;
+			damage = m_DataJoeyPlayer.playerHealth - 1;
 		}
 
 		ApplyPlayerHealthChange(-damage);
@@ -1821,7 +1822,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (damage > 0 && TryBlockFatalDamage(damage))
 		{
-			damage = 0;
+			damage = m_DataJoeyPlayer.playerHealth - 1;
 		}
 
 		ApplyPlayerHealthChange(-damage);

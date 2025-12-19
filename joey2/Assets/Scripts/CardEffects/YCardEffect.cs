@@ -78,6 +78,7 @@ public enum ECardEffectId
     BloodyBattle_UseSkill,
     VengeanceShield,
     BrokenShieldRedemption,
+    LifeShareMonster,
 
 }
 
