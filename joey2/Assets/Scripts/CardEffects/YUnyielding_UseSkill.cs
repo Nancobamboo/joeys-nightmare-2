@@ -106,7 +106,8 @@ public partial class UIGamePhaseControl
     {
         if (m_RemainingTurnsPhaseEnd > 0 && PhaseCounter == m_RemainingTurnsPhaseEnd && m_BlockedDamage > 0)
         {
-            AddHp(m_BlockedDamage);
+            int healAmount = m_BlockedDamage / 2;
+            AddHp(healAmount);
             m_BlockedDamage = 0;
             m_RemainingTurnsPhaseEnd = 0;
         }

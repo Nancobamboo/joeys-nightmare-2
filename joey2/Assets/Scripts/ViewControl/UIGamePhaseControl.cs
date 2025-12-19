@@ -1979,6 +1979,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 			TryBloodStorageHeal();
 			TryUnyieldingTurnUpdate();
+			TryRegenerationHeal();
 
 			CurrentEffectCard = null;
 			PhaseCounter++;
@@ -2474,5 +2475,16 @@ public partial class UIGamePhaseControl : YViewControl
 		m_KeyPathCardCache = null;
 
 		base.OnClose();
+	}
+
+	private void TryRegenerationHeal()
+	{
+		if (DataSystem.Instance.HasRelic(ERelicType.RegenerationAmulet))
+		{
+			if (PhaseCounter > 0 && PhaseCounter % 3 == 0)
+			{
+				ApplyPlayerHealthChange(1, true);
+			}
+		}
 	}
 }
