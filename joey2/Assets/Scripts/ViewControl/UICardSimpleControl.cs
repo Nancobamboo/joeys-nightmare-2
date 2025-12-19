@@ -48,6 +48,7 @@ public enum ERelicType
 	ThornBlessing = 9018,           // 荆棘祝福
 	DoublePunch = 9019,             // 邦邦两拳
 	ShieldReflect = 9020,           // 护盾反伤
+	RegenerationAmulet = 9021,      // 再生护符
 
 	CardLimitDebuff = 9999,
 }
@@ -238,15 +239,8 @@ public class UICardSimpleControl : YViewControl
 			case ECardType.attack:
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
-				if (damageEffect > 0)
-				{
-					m_View.TxtAttack.text = cachedCard.currentAttack + "+" + damageEffect;
-				}
-				else
-				{
-					int attackValue = cachedCard.currentAttack + damageEffect;
-					m_View.TxtAttack.text = attackValue.ToString();
-				}
+				int attackValue = cachedCard.currentAttack + damageEffect;
+				m_View.TxtAttack.text = attackValue.ToString();
 				if (damageEffect != 0 || extraAttackCnt != 0)
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
@@ -259,15 +253,8 @@ public class UICardSimpleControl : YViewControl
 
 			case ECardType.defence:
 				int defenceEffect = CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0;
-				if (defenceEffect > 0)
-				{
-					m_View.TxtDefence.text = cachedCard.currentDefence + "+" + defenceEffect;
-				}
-				else
-				{
-					int defenceValue = cachedCard.currentDefence + defenceEffect;
-					m_View.TxtDefence.text = defenceValue.ToString();
-				}
+				int defenceValue = cachedCard.currentDefence + defenceEffect;
+				m_View.TxtDefence.text = defenceValue.ToString();
 				if (defenceEffect != 0)
 				{
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
