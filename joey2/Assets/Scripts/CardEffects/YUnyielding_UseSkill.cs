@@ -43,6 +43,7 @@ public partial class UIGamePhaseControl
         m_BlockedDamage = 0;
         m_RemainingTurnsPhaseEnd = 0;
         m_BlockDamagePhaseEnd = 0;
+        UpdateBlockFatalDisplay();
     }
 
     void UnyieldingActivate(object[] paraArray)
@@ -84,7 +85,7 @@ public partial class UIGamePhaseControl
             return false;
         }
 
-        if (PhaseCounter >= m_BlockDamagePhaseEnd)
+        if (PhaseCounter > m_BlockDamagePhaseEnd)
         {
             return false;
         }

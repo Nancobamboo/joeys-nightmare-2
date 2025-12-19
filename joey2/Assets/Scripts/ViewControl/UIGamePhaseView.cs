@@ -30,6 +30,10 @@ public class UIGamePhaseView : YBaseView
 	public GameObject DeadkeyBg;
 	public GameObject GuideBg;
 	public Text Description;
+	public Text TxtPhaseCnt;
+	public Text TxtPhaseBlock;
+	public EventTriggerListener TipBlickDamage;
+	public GameObject BlockFatal;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -62,5 +66,9 @@ public class UIGamePhaseView : YBaseView
 		DeadkeyBg = viewItemList[22].Target.gameObject;
 		GuideBg = viewItemList[23].Target.gameObject;
 		Description = viewItemList[24].Target.GetComponent<Text>();
+		TxtPhaseCnt = viewItemList[25].Target.GetComponent<Text>();
+		TxtPhaseBlock = viewItemList[26].Target.GetComponent<Text>();
+		TipBlickDamage = viewItemList[27].Target.GetComponent<EventTriggerListener>();
+		BlockFatal = viewItemList[28].Target.gameObject;
 	}
 }
