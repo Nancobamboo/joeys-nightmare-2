@@ -43,6 +43,7 @@ public partial class UIGamePhaseControl
         m_BlockedDamage = 0;
         m_RemainingTurnsPhaseEnd = 0;
         m_BlockDamagePhaseEnd = 0;
+        UpdateBlockFatalDisplay();
     }
 
     void UnyieldingActivate(object[] paraArray)
@@ -57,7 +58,6 @@ public partial class UIGamePhaseControl
         }
 
         AddBlockDamagePhaseEnd(baseExtra);
-        AddRemainingTurnsPhaseEnd(baseExtra);
     }
 
     void AddBlockDamagePhase(object[] paraArray)
@@ -84,11 +84,10 @@ public partial class UIGamePhaseControl
             return false;
         }
 
-        if (PhaseCounter >= m_BlockDamagePhaseEnd)
+        if (PhaseCounter > m_BlockDamagePhaseEnd)
         {
             return false;
         }
-        m_BlockedDamage += damage;
 
         DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
         int currentHealth = playerData.playerHealth;
@@ -98,6 +97,7 @@ public partial class UIGamePhaseControl
             return false;
         }
 
+        m_BlockedDamage += damage;
         return true;
     }
 
@@ -105,7 +105,8 @@ public partial class UIGamePhaseControl
     {
         if (m_RemainingTurnsPhaseEnd > 0 && PhaseCounter == m_RemainingTurnsPhaseEnd && m_BlockedDamage > 0)
         {
-            AddHp(m_BlockedDamage);
+            int healAmount = m_BlockedDamage / 2;
+            AddHp(healAmount);
             m_BlockedDamage = 0;
             m_RemainingTurnsPhaseEnd = 0;
         }

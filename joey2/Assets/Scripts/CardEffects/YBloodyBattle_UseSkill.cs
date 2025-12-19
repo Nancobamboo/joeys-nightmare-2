@@ -47,14 +47,14 @@ public partial class UIGamePhaseControl
 
         if (currentHealth > 1)
         {
-            int healthLost = currentHealth - 1;
+            int healthLost = currentHealth / 2;
             ApplyPlayerHealthChange(-healthLost);
             damageToDeal = healthLost;
         }
 
-        if (damageToDeal < 10)
+        if (damageToDeal < 5)
         {
-            damageToDeal = 10;
+            damageToDeal = 5;
         }
 
         JoeyGameControl.Instance.QueueAction(EActionId.TakeAllEnemyDamage, damageToDeal);

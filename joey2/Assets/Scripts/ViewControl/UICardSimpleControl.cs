@@ -48,7 +48,10 @@ public enum ERelicType
 	ThornBlessing = 9018,           // 荆棘祝福
 	DoublePunch = 9019,             // 邦邦两拳
 	ShieldReflect = 9020,           // 护盾反伤
-	BloodyGloves = 9023,             // 染血拳法
+	RegenerationAmulet = 9021,      // 再生护符
+	BloodyGloves = 9022,             // 染血拳法
+	HalfHealthAmulet = 9023,         // 半血护符
+
 	CardLimitDebuff = 9999,
 }
 
@@ -659,6 +662,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.BrokenShieldRedemption:
 				effect = new YBrokenShieldRedemption();
+				break;
+			case ECardEffectId.LifeShareMonster:
+				effect = new YLifeShareMonster();
 				break;
 			default:
 				return GetDefaultEffect();

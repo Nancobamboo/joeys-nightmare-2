@@ -46,7 +46,7 @@ public partial class UIGamePhaseControl
             ApplyPlayerHealthChange(-healthToDeduct);
         }
 
-        int effectValue = Mathf.Max(baseExtra, healthToDeduct);
+        int effectValue = Mathf.Max(baseExtra, healthToDeduct / 2);
 
         List<UICardSimpleControl> attackCardList = GetBagCardList(ECardType.attack);
         if (attackCardList != null)

@@ -66,6 +66,7 @@ public enum EActionId
 	BloodyBattleActivate,
 	VengeanceShieldActivate,
 	AddBlockDamagePhase,
+	LifeShareSetPlayerHealth,
 	Upper,
 
 }
