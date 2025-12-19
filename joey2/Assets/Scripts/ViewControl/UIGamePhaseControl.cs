@@ -1590,7 +1590,17 @@ public partial class UIGamePhaseControl : YViewControl
 			delayTime = attackCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 
 			damage += attackCardControl.CardEffect.GetEffectValue(EEffectType.Damage);
-
+			// 染血拳套relic效果：血量低于50%时，赤手空拳/拳套的伤害+5
+			if (DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+			{
+				if (attackCardControl.CardEffect != null && attackCardControl.CardEffect.Id == ECardEffectId.BareHands)
+				{
+					if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+					{
+						damage += 5;
+					}
+				}
+			}
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));

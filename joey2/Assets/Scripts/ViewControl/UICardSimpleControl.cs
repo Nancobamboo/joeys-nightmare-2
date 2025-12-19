@@ -48,7 +48,7 @@ public enum ERelicType
 	ThornBlessing = 9018,           // 荆棘祝福
 	DoublePunch = 9019,             // 邦邦两拳
 	ShieldReflect = 9020,           // 护盾反伤
-
+	BloodyGloves = 9023,             // 染血拳法
 	CardLimitDebuff = 9999,
 }
 
