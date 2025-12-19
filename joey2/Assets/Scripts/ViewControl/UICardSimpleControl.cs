@@ -661,6 +661,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BrokenShieldRedemption:
 				effect = new YBrokenShieldRedemption();
 				break;
+			case ECardEffectId.LifeShareMonster:
+				effect = new YLifeShareMonster();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

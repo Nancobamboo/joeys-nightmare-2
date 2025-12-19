@@ -58,7 +58,6 @@ public partial class UIGamePhaseControl
         }
 
         AddBlockDamagePhaseEnd(baseExtra);
-        AddRemainingTurnsPhaseEnd(baseExtra);
     }
 
     void AddBlockDamagePhase(object[] paraArray)
@@ -89,7 +88,6 @@ public partial class UIGamePhaseControl
         {
             return false;
         }
-        m_BlockedDamage += damage;
 
         DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
         int currentHealth = playerData.playerHealth;
@@ -99,6 +97,7 @@ public partial class UIGamePhaseControl
             return false;
         }
 
+        m_BlockedDamage += damage;
         return true;
     }
 
