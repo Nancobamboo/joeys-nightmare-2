@@ -8,8 +8,6 @@ using Random = UnityEngine.Random;
 
 public class YNightmareLance : YCardEffect
 {
-    private bool m_CachedIsOneHealth = false;
-
     public YNightmareLance()
     {
         Id = ECardEffectId.NightmareLance;
@@ -21,13 +19,7 @@ public class YNightmareLance : YCardEffect
         if (CardControl != null)
         {
             CardControl.AddBuff(EBuffType.UpdateByHpChange, 1);
-            DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-            bool currentIsOneHealth = playerData != null && playerData.playerHealth == 1;
-            m_CachedIsOneHealth = currentIsOneHealth;
-            if (currentIsOneHealth)
-            {
-                UpdateNightmareLanceDamage();
-            }
+            UpdateNightmareLanceDamage();
         }
     }
 
@@ -35,17 +27,8 @@ public class YNightmareLance : YCardEffect
     {
         if (buffType == EBuffType.UpdateByHpChange)
         {
-            DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-            bool currentIsOneHealth = playerData != null && playerData.playerHealth == 1;
-            if (currentIsOneHealth != m_CachedIsOneHealth)
-            {
-                m_CachedIsOneHealth = currentIsOneHealth;
-                CardControl.ClearEffectVlaue();
-                if (currentIsOneHealth)
-                {
-                    UpdateNightmareLanceDamage();
-                }
-            }
+            CardControl.ClearEffectVlaue();
+            UpdateNightmareLanceDamage();
         }
         return value;
     }
@@ -55,9 +38,10 @@ public class YNightmareLance : YCardEffect
         DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
         if (playerData != null && CardControl != null)
         {
-            int currentAttack = CardControl.CardData?.currentAttack ?? 0;
             int maxHealth = playerData.playerMaxHealth;
-            int extraDamage = maxHealth - currentAttack;
+            int currentHealth = playerData.playerHealth;
+            int healthLost = maxHealth - currentHealth;
+            int extraDamage = healthLost / 2;
 
             if (extraDamage > 0)
             {

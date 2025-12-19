@@ -18,4 +18,5 @@ id   ,cardImage ,iconImage,name,description,stars
 9017,Art\Img\Relic\img_relic_tiger,Art\Img\Relic\icon_relic_tiger,指虎,赤手空拳装备时造成一次伤害,2
 9018,Art\Img\Relic\img_relic_brambles,Art\Img\Relic\icon_relic_brambles,荆棘祝福,获得反伤:3,2
 9019,Art\Img\Relic\img_relic_doublefist,Art\Img\Relic\icon_relic_doublefist,邦邦两拳,赤手空拳可以攻击两次,2
+9020,Art\Img\Relic\img_relic_shieldreflect,Art\Img\Relic\icon_relic_shieldreflect,护盾反伤,使用防具时反伤护盾值的一半,2
 9999,Art/Img/Relic/卡牌超载,Art/Img/Relic/卡牌超载,卡牌超载,卡牌超过{cardLimit}张上限（当前{currentCount}张），多出的卡牌无法加入关卡,1

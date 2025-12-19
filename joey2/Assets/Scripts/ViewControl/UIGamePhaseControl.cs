@@ -43,8 +43,9 @@ public partial class UIGamePhaseControl : YViewControl
 	private bool m_KeyPathSpawned = false;
 	private int m_CurrentAttackTargetEnvIndex = -1;
 	private int PhaseCounter = 0;
+	private UIDescExtControl m_BlockFatalDescExtControl;
+	private bool m_IsBlockFatalActive = false;
 
-	// Card limit debuff display for Env mode
 	private UIRelicControl m_CardLimitDebuffControl;
 
 	public static EResType GetResType()
@@ -128,6 +129,11 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return this.Asset.OpenUI<UIDamageTextControl>(null);
 		});
+
+		m_View.TipBlickDamage.onEnter = OnBlockFatalPointerEnter;
+		m_View.TipBlickDamage.onExit = OnBlockFatalPointerExit;
+
+		m_View.BlockFatal.SetActive(false);
 	}
 
 	public Transform GetEffectRoot(int envIndex)
@@ -1173,9 +1179,11 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		Debug.Log($"currentMonsterAttack: {currentMonsterAttack}");
-		if (currentMonsterAttack > 0)
+		if (currentMonsterAttack > 0 && cardControl != null)
 		{
-			ApplyPlayerHealthChange(currentMonsterAttack, true);
+			int defenceValue = cardControl.CardData.currentDefence;
+			int healAmount = Mathf.Min(currentMonsterAttack, defenceValue);
+			ApplyPlayerHealthChange(healAmount, true);
 		}
 		currentMonsterAttack = 0;
 	}
@@ -1938,7 +1946,7 @@ public partial class UIGamePhaseControl : YViewControl
 				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
 				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
 			}
-			PhaseCounter++;
+			m_View.TxtPhaseCnt.text = PhaseCounter.ToString();
 			CheckAndSpawnKeyPath();
 		}
 	}
@@ -1951,7 +1959,7 @@ public partial class UIGamePhaseControl : YViewControl
 		AddEffectValueToBagCard(targetCardType, effectType, value);
 	}
 
-	void Update()
+	void FixedUpdate()
 	{
 		if (CurrentEffectCard == null && m_CardActionQueue.Count > 0)
 		{
@@ -1968,13 +1976,14 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
 		{
-			//Debug.Log($"[Update] Clearing CurrentEffectCard - card:{CurrentEffectCard?.CardData?.cardName}, IsEffecting:{CurrentEffectCard?.IsEffecting}, m_CardCtsDict.Count:{m_CardCtsDict.Count}");
-
 
 			TryBloodStorageHeal();
 			TryUnyieldingTurnUpdate();
 
 			CurrentEffectCard = null;
+			PhaseCounter++;
+			UpdateBlockFatalDisplay();
+
 		}
 		else if (CurrentEffectCard != null)
 		{
@@ -2182,6 +2191,44 @@ public partial class UIGamePhaseControl : YViewControl
 		if (shouldShow)
 		{
 			cardControl.ShowCardHoverEffect();
+		}
+	}
+
+	private void OnBlockFatalPointerEnter(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
+	{
+		if (m_BlockDamagePhaseEnd > 0 && PhaseCounter <= m_BlockDamagePhaseEnd)
+		{
+			int remainingTurns = m_BlockDamagePhaseEnd - PhaseCounter + 1;
+			m_BlockFatalDescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
+			m_BlockFatalDescExtControl.SetData("无敌剩余回合数: " + remainingTurns);
+			RectTransform blockFatalRect = m_View.BlockFatal.transform as RectTransform;
+			m_BlockFatalDescExtControl.SetPositionRelativeTo(blockFatalRect);
+		}
+	}
+
+	private void OnBlockFatalPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
+	{
+		if (m_BlockFatalDescExtControl != null)
+		{
+			m_BlockFatalDescExtControl.Close();
+			m_BlockFatalDescExtControl = null;
+		}
+	}
+
+	private void UpdateBlockFatalDisplay()
+	{
+		bool shouldShowBlockFatal = m_BlockDamagePhaseEnd > 0 && PhaseCounter <= m_BlockDamagePhaseEnd;
+
+		if (m_IsBlockFatalActive != shouldShowBlockFatal)
+		{
+			m_View.BlockFatal.SetActive(shouldShowBlockFatal);
+			m_IsBlockFatalActive = shouldShowBlockFatal;
+		}
+
+		if (shouldShowBlockFatal)
+		{
+			int remainingTurns = m_BlockDamagePhaseEnd - PhaseCounter;
+			m_View.TxtPhaseBlock.text = remainingTurns.ToString();
 		}
 	}
 

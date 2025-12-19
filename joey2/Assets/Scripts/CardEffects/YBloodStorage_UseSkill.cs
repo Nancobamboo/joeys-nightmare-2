@@ -88,7 +88,7 @@ public partial class UIGamePhaseControl
 
 			m_BloodStorageRemainingTurns--;
 
-			int healAmount = m_BloodStorageMaxHealth / 10;
+			int healAmount = m_BloodStorageMaxHealth / 20;
 
 			JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 			{
