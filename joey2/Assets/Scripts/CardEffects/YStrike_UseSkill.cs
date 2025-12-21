@@ -32,7 +32,7 @@ public class YStrike_UseSkill : YCardEffect
 public partial class UIGamePhaseControl
 {
     private bool m_StrikeActive = false;
-    private int m_StrikeVulnerableDuration = 2;
+    private int m_StrikeVulnerableDuration = 3;
 
     private void ResetStrikeState()
     {
@@ -46,14 +46,14 @@ public partial class UIGamePhaseControl
         // Set flag to apply vulnerable on next attack
         m_StrikeActive = true;
         
-        Debug.Log("Strike activated: Next attack will apply 2 turns of Vulnerable debuff");
+        Debug.Log("Strike activated: Next attack will apply 3 turns of Vulnerable debuff");
     }
 
     private void ApplyStrikeVulnerable(UICardSimpleControl enemyCard)
     {
         if (m_StrikeActive && enemyCard != null && enemyCard.CardType == ECardType.monster)
         {
-            // Add vulnerable debuff for 2 turns
+            // Add vulnerable debuff for 3 turns
             int currentVulnerable = enemyCard.GetBuffValue(EBuffType.Vulnerable);
             if (currentVulnerable < m_StrikeVulnerableDuration)
             {

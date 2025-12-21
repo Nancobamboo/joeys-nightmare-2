@@ -53,18 +53,14 @@ public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 
 	public override float OnEnterBag()
 	{
+		// OnBecomeTopOfPile will handle the auto-attack
 		if (CardControl != null && CardControl.CardData != null)
 		{
-			if (JoeyGameControl.Instance.HasEnemy())
-			{
-				CardControl.PlayVFX(null, ECardAnimName.UI_Carditem_gongji, EVFXLife.CardLife);
-				int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
-				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
-				{
-					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
-				}, 0.3f);
-			}
+			Debug.Log($"[Soul Eating Shuriken] OnEnterBag - Card: {CardControl.CardData.cardName}, UniqueId: {CardControl.CardData.UniqueId}");
+		}
+		else
+		{
+			Debug.LogWarning($"[Soul Eating Shuriken] OnEnterBag - CardControl or CardData is null!");
 		}
 		return base.OnEnterBag();
 	}

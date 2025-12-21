@@ -62,7 +62,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 ,,,,,,,,,,,,,
 4000,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,技能牌,教学牌,skill     ,下次使用攻击牌时会攻击两次,0,0,0,0,2,DoubleAttack_OnPlay,
 4001,Art/Img/Skill/img_card_double,Art/Img/Skill/img_bg_Skill,连续攻击,,skill     ,下次使用攻击牌时会攻击两次,0,0,0,200,2,DoubleAttack_OnPlay,
-4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,痛击,,skill     ,下次攻击使怪物处于两回合易伤效果,0,0,0,200,2,Strike_UseSkill,
+4002,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,痛击,,skill     ,下次攻击使怪物处于3回合易伤效果,0,0,0,200,2,Strike_UseSkill,
 4003,Art/Img/Skill/img_card_DualWield,Art/Img/Skill/img_bg_Skill,双持武器,,skill     ,下次攻击造成双倍伤害，但是无法使用防御牌,0,0,0,200,2,DualWield_UseSkill,
 4004,Art/Img/Skill/img_card_Fortress,Art/Img/Skill/img_bg_Skill,堡垒,,skill     ,消耗当前防御牌，为下一次装备的防御牌增加相同防御力,,,,200,2,Fortress_UseSkill,
 4005,Art/Img/Skill/img_card_ShieldBash,Art/Img/Skill/img_bg_Skill,肉盾冲击,,skill     ,下次攻击时，造成相当于防御值的额外伤害,,,,200,2,ShieldBash_UseSkill,
