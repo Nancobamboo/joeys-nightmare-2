@@ -25,4 +25,9 @@ id   ,cardImage ,iconImage,name,description,stars
 9024,Art\Img\Relic\img_relic_arcaneorb,Art\Img\Relic\icon_relic_arcaneorb,奥术宝珠,每施放五次技能获得一张魔力召唤,2
 9025,Art\Img\Relic\img_relic_magicswordsman,Art\Img\Relic\icon_relic_magicswordsman,魔剑士指环,加入手牌的武器牌变成魔力剑，加入手牌的防御牌变成魔力盾,3
 9026,Art\Img\Relic\img_relic_magicswordsman,Art\Img\Relic\icon_relic_magicswordsman,高等艺术,赤手空拳变成魔杖，攻击视作技能施放，且永不消耗,3
+9024,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,双持精通,没有装备防具时，所有伤害+5,2
+9026,Art\Img\Relic\img_relic_defence,Art\Img\Relic\icon_relic_defence,弹刀,可以用武器格挡(格挡值等于武器攻击力)，格挡后武器被消耗,3
+9027,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,看破,当被怪物攻击5次后，下次将躲闪并反击，没有装备防具时计数翻倍,3
+9028,Art\Img\Relic\img_relic_defence,Art\Img\Relic\icon_relic_defence,空手接白刃,当没有装备武器牌和防御牌时，格挡一半伤害,3
+9029,Art\Img\Relic\img_relic_recover,Art\Img\Relic\icon_relic_recover,烤肉香香,关卡结束时，回复6点生命值,2
 9999,Art/Img/Relic/卡牌超载,Art/Img/Relic/卡牌超载,卡牌超载,卡牌超过{cardLimit}张上限（当前{currentCount}张），多出的卡牌无法加入关卡,1

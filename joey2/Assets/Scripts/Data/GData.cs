@@ -147,6 +147,12 @@ public sealed class GData : PureSingleton<GData>
 
 			Card card = new Card(id, type, cardImage, cardBackground, cardName, description, attack, defence, health, price, stars, effectId);
 
+			// Initialize default durability for Knight Sword and Knight Shield
+			if (effectId == "KnightSword_OnTop" || effectId == "KnightShield_OnTop")
+			{
+				card.durability = 1;
+			}
+
 			CardDict[id] = card;
 		}
 		m_CardsLoaded = true;

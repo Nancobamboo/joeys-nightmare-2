@@ -46,7 +46,7 @@ public class UIPreviewCardControl : YViewControl
 
         if (cachedCard != null)
         {
-            List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+            List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.GetFormattedDescription());
             if (keywordDescriptions != null && keywordDescriptions.Count > 0)
             {
                 m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
@@ -117,7 +117,7 @@ public class UIPreviewCardControl : YViewControl
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
         m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
-        m_View.Description.text = card.description;
+        m_View.Description.text = card.GetFormattedDescription();
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
         m_View.Price.SetActive(false);

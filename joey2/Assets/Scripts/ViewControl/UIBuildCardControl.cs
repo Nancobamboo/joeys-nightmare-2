@@ -120,7 +120,7 @@ public class UIBuildCardControl : YViewControl
 
         m_View.CardName.text = card.cardName;
         m_View.CardImg.sprite = LoadSprite(card.cardImage);
-        m_View.Description.text = card.description;
+        m_View.Description.text = card.GetFormattedDescription();
         m_View.IconType.sprite = LoadSprite(card.iconType);
         m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
         m_View.CardBackground.sprite = LoadSprite(card.cardBackground);

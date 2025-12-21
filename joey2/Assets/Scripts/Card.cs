@@ -13,6 +13,7 @@ public class Card : IData
     public string cardFrame;
     public string cardName;
     public string description;
+    public string baseDescription; // Store original description with placeholders
     private int attack;
     public int currentAttack
     {
@@ -45,6 +46,7 @@ public class Card : IData
     public int stars;
     public string effectId;
     public int UniqueId;
+    public int durability; // Track durability for cards like Knight Shield
 
     public Card()
     {
@@ -84,6 +86,7 @@ public class Card : IData
             this.iconType = null;
         }
         this.description = _description;
+        this.baseDescription = _description; // Store original description
         this.attack = _attack;
         this.attack = _attack;
         this.defence = _defence;
@@ -114,7 +117,28 @@ public class Card : IData
         c.attack = attack;
         c.defence = defence;
         c.UniqueId = UniqueId;
+        c.durability = durability;
+        c.baseDescription = baseDescription;
         return c;
+    }
+
+    // Get description with placeholders replaced
+    public string GetFormattedDescription()
+    {
+        if (string.IsNullOrEmpty(baseDescription))
+        {
+            return description;
+        }
+        
+        string formattedDesc = baseDescription;
+        
+        // Replace durability placeholder
+        if (formattedDesc.Contains("{durability}"))
+        {
+            formattedDesc = formattedDesc.Replace("{durability}", durability.ToString());
+        }
+        
+        return formattedDesc;
     }
 
     public void SetAttack(int value)
@@ -175,6 +199,7 @@ public class Card : IData
         cardFrame = (string)jobject["cardFrame"];
         cardName = (string)jobject["cardName"];
         description = (string)jobject["description"];
+        baseDescription = jobject["baseDescription"] != null ? (string)jobject["baseDescription"] : description;
         attack = (int)jobject["attack"];
         defence = (int)jobject["defence"];
         health = (int)jobject["health"];
@@ -183,6 +208,7 @@ public class Card : IData
         stars = (int)jobject["stars"];
         effectId = (string)jobject["effectId"];
         UniqueId = (int)jobject["UniqueId"];
+        durability = jobject["durability"] != null ? (int)jobject["durability"] : 0;
     }
 
     private void UpdateEnvCardDict()
@@ -205,6 +231,7 @@ public class Card : IData
         jobject.Add("cardFrame", cardFrame);
         jobject.Add("cardName", cardName);
         jobject.Add("description", description);
+        jobject.Add("baseDescription", baseDescription);
         jobject.Add("attack", attack);
         jobject.Add("defence", defence);
         jobject.Add("health", health);
@@ -213,5 +240,6 @@ public class Card : IData
         jobject.Add("stars", stars);
         jobject.Add("effectId", effectId);
         jobject.Add("UniqueId", UniqueId);
+        jobject.Add("durability", durability);
     }
 }

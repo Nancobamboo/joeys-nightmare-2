@@ -22,6 +22,7 @@ public enum EBuffType
 	UpdateByHpChange,
 	UpdateByDefenceCardNum,
 	Frozen,
+	Vulnerable,
 
 	Upper
 }
@@ -55,6 +56,11 @@ public enum ERelicType
 	ArcaneOrb = 9024,                // 奥术宝珠
 	MagicSwordsmanRing = 9025,       // 魔剑士指环
 	HighArt = 9026,                  // 高等艺术（赤手空拳变魔杖）
+	DualWieldMastery = 9027,         // 双持精通
+	WeaponParry = 9028,              // 弹刀
+	CounterInsight = 9029,           // 看破
+	BareHandParry = 9030,            // 空手接白刃
+	BBQDelight = 9031,               // 烤肉香香
 
 	CardLimitDebuff = 9999,
 }
@@ -121,7 +127,7 @@ public class UICardSimpleControl : YViewControl
 
 		if (cachedCard != null)
 		{
-			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.GetFormattedDescription());
 			if (keywordDescriptions != null && keywordDescriptions.Count > 0)
 			{
 				m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
@@ -332,6 +338,16 @@ public class UICardSimpleControl : YViewControl
 		}
 	}
 
+	// Update card description to reflect current durability
+	public void UpdateDurabilityDescription()
+	{
+		if (cachedCard != null)
+		{
+			m_View.Description.text = cachedCard.GetFormattedDescription();
+			Debug.Log($"[UICardSimpleControl] UpdateDurabilityDescription - Card: {cachedCard.cardName}, durability: {cachedCard.durability}, description: {m_View.Description.text}");
+		}
+	}
+
 	public void UpdateBuffValue()
 	{
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
@@ -350,7 +366,7 @@ public class UICardSimpleControl : YViewControl
 	public void AddBuff(EBuffType buffType, int value)
 	{
 		Debug.Log(this.name + " AddBuff " + buffType + " " + value);
-		m_BuffValueArray[(int)buffType] += value;
+		m_BuffValueArray[(int)buffType] = value;
 
 		switch (buffType)
 		{
@@ -359,6 +375,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case EBuffType.Frozen:
 				UpdateFrozenUI();
+				break;
+			case EBuffType.Vulnerable:
+				UpdateVulnerableUI();
 				break;
 		}
 	}
@@ -370,6 +389,9 @@ public class UICardSimpleControl : YViewControl
 		{
 			case EBuffType.Frozen:
 				UpdateFrozenUI();
+				break;
+			case EBuffType.Vulnerable:
+				UpdateVulnerableUI();
 				break;
 		}
 	}
@@ -432,6 +454,18 @@ public class UICardSimpleControl : YViewControl
 		else
 		{
 			m_View.Counter.SetActive(false);
+		}
+	}
+
+	private void UpdateVulnerableUI()
+	{
+		int vulnerable = GetBuffValue(EBuffType.Vulnerable);
+		if (vulnerable > 0 && cachedCardType == ECardType.monster)
+		{
+			// Display vulnerable debuff indicator
+			// For now, we'll use debug log and potentially change attack color
+			Debug.Log($"{CardData.cardName} has Vulnerable debuff for {vulnerable} turns");
+			// You can add visual indicator here if UI element exists
 		}
 	}
 
@@ -757,6 +791,24 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.MagicWand:
 				effect = new YMagicWand();
 				break;
+			case ECardEffectId.DualWield_UseSkill:
+				effect = new YDualWield_UseSkill();
+				break;
+			case ECardEffectId.ShieldBash_UseSkill:
+				effect = new YShieldBash_UseSkill();
+				break;
+			case ECardEffectId.Fortress_UseSkill:
+				effect = new YFortress_UseSkill();
+				break;
+			case ECardEffectId.Strike_UseSkill:
+				effect = new YStrike_UseSkill();
+				break;
+			case ECardEffectId.KnightSword_OnTop:
+				effect = new YKnightSword_OnTop();
+				break;
+			case ECardEffectId.KnightShield_OnTop:
+				effect = new YKnightShield_OnTop();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -794,7 +846,7 @@ public class UICardSimpleControl : YViewControl
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
 		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
-		m_View.Description.text = card.description;
+		m_View.Description.text = card.GetFormattedDescription();
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
 

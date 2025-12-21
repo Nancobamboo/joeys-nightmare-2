@@ -483,6 +483,12 @@ public class JoeyGameControl : YViewControl
 			m_GamePhaseControl.ClearEnvCardList();
 		}
 
+		// BBQ Delight relic: heal 6 HP at stage end
+		if (DataSystem.Instance.HasRelic(ERelicType.BBQDelight))
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.AddHp, 6);
+		}
+
 		if (GameMode == EGameMode.Battle)
 		{
 			RoguelikeStage currentStage = GData.Instance.GetRoguelikeStage(m_DataJoeyPlayer.StageId);

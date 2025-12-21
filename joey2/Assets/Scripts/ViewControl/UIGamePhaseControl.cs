@@ -118,6 +118,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.IceMagicDamage, IceMagicDamage);
 		RegistAction(EActionId.SkillPowerUpActivate, SkillPowerUpActivate);
 		RegistAction(EActionId.OnSkillCast, OnSkillCast);
+		RegistAction(EActionId.DualWieldActivate, DualWieldActivate);
+		RegistAction(EActionId.ShieldBashActivate, ShieldBashActivate);
+		RegistAction(EActionId.FortressActivate, FortressActivate);
+		RegistAction(EActionId.StrikeActivate, StrikeActivate);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -270,6 +274,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 		ResetUnyieldingState();
 		ResetBloodStorageState();
+		ResetCounterInsightState();
+		ResetDualWieldState();
+		ResetShieldBashState();
+		ResetFortressState();
+		ResetStrikeState();
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -340,12 +349,12 @@ public partial class UIGamePhaseControl : YViewControl
 			// 1. 有 HighArt 遗物但当前不是魔杖 → 需要替换为魔杖
 			// 2. 有 BareHandsMaster 遗物但当前还是赤手空拳 → 需要替换为拳套
 			bool needReplace = (hasHighArtRelic && !isMagicWand) || (hasGlovesRelic && isBareHands);
-			
+
 			if (!needReplace)
 			{
 				return;
 			}
-			
+
 			// 需要替换时，先回收旧的卡片
 			m_FistCardCache.Return();
 			m_FistCardCache = null;
@@ -368,7 +377,7 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			cardId = "1011"; // Bare Hands
 		}
-		
+
 		Card card = DataSystem.Instance.CreateCard(cardId);
 		Transform attackPanelTransform = m_View.AttackPanel.transform;
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
@@ -784,6 +793,10 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
 		}
+
+		// Check if card will become top of pile (last in list)
+		bool willBecomeTop = (m_BagCardDict[cardTypeInt].Count == 0);
+
 		m_BagCardDict[cardTypeInt].Add(cardControl);
 		cardControl.IsEnv = false;
 		cardControl.EnvIndex = -1;
@@ -794,6 +807,9 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardType == ECardType.defence)
 		{
+			// Apply Fortress bonus if available
+			ApplyFortressBonus(cardControl);
+
 			RunActionForEachLastBagCard((x) =>
 			{
 				if (x.GetBuffValue(EBuffType.UpdateByDefenceCardNum) > 0)
@@ -803,6 +819,20 @@ public partial class UIGamePhaseControl : YViewControl
 
 			});
 		}
+
+		// Trigger OnEnterBag if not from move animation (which calls it separately)
+		if (!isMoveCard && cardControl.CardEffect != null)
+		{
+			Debug.Log($"[AddBagCard] Calling OnEnterBag for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
+			cardControl.CardEffect.OnEnterBag();
+		}
+
+		// Trigger OnBecomeTopOfPile if card becomes top of pile
+		if (willBecomeTop && cardControl.CardEffect != null)
+		{
+			Debug.Log($"[AddBagCard] Card becomes top of pile, calling OnBecomeTopOfPile for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
+			cardControl.CardEffect.OnBecomeTopOfPile();
+		}
 	}
 
 
@@ -811,6 +841,7 @@ public partial class UIGamePhaseControl : YViewControl
 		int cardTypeInt = (int)cardType;
 		if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
 		{
+			Debug.Log($"[RemoveBagCard] Removing {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
 			cardList.Remove(cardControl);
 			RemoveCardData(cardControl.CardData.UniqueId);
 			cardControl.Return();
@@ -818,8 +849,13 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl newLastBagCard = GetLastBagCard(cardType);
 			if (newLastBagCard != null)
 			{
+				Debug.Log($"[RemoveBagCard] New top card: {newLastBagCard.CardData.cardName} (UniqueId: {newLastBagCard.CardData.UniqueId}), calling OnBecomeTopOfPile");
 				float delayTime = newLastBagCard.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime);
+			}
+			else
+			{
+				Debug.Log($"[RemoveBagCard] No cards left in {cardType} pile");
 			}
 		}
 	}
@@ -951,6 +987,14 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (cardControl.CardType == ECardType.monster)
 		{
+			// Apply vulnerable damage bonus (50% extra damage)
+			int vulnerableTurns = cardControl.GetBuffValue(EBuffType.Vulnerable);
+			if (vulnerableTurns > 0 && effectType == EEffectType.Damage)
+			{
+				int bonusDamage = Mathf.RoundToInt(damage * 0.5f);
+				damage += bonusDamage;
+				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage ({vulnerableTurns} turns remaining)");
+			}
 
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
 			ShowDamageText(damage, cardControl.CacheTrans, new Vector3(0f, 180f, 0));
@@ -1438,10 +1482,10 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			// 播放拿牌音效
 			SFX.PlayAudio("Audio/SFX/deal_cards", 1.9f, 0.5f);
-			
+
 			// 魔剑士指环效果：加入手牌时转换武器牌/防御牌
 			TryApplyMagicSwordsmanRing(cardControl);
-			
+
 			ECardType cardType = cardControl.CardType;
 
 			Vector3 startWorldPos = cardControl.CacheTrans.parent.position;
@@ -1671,9 +1715,23 @@ public partial class UIGamePhaseControl : YViewControl
 					}
 				}
 			}
+			// 双持精通relic效果：没有装备防具时，所有伤害+5
+			if (DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+			{
+				if (!HasBagCard(ECardType.defence))
+				{
+					damage += 5;
+				}
+			}
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));
+
+			// Apply Strike vulnerable effect after damage is dealt (but before checking if killed)
+			if (!isKilled)
+			{
+				ApplyStrikeVulnerable(enemyCardControl);
+			}
 
 			if (damage > 0)
 			{
@@ -1700,13 +1758,6 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		bool isSkip = IsUseAttackFinishAnim();
-		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished(isSkip) ?? 0f;
-		if (finishDelayTime > 0f)
-		{
-			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-		}
-
 		bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
 
 		// 检查怪物是否被冰冻
@@ -1725,24 +1776,39 @@ public partial class UIGamePhaseControl : YViewControl
 			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
 		}
 
+		// Play card consumption animation after enemy counter-attack (if any)
+		// This ensures counter-insight parry/counter animations complete before the card disappears
+		bool isSkip = IsUseAttackFinishAnim();
+		float finishDelayTime = attackCardControl.CardEffect?.OnUseFinished(isSkip) ?? 0f;
+		if (finishDelayTime > 0f)
+		{
+			await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+		}
+
 
 		if (!useFistCard)
 		{
-			await RemoveBagCard(ECardType.attack, attackCardControl);
-			float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-			if (removeDelayTime > 0f)
-			{
-				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-			}
+			// Check if card should be kept in bag (durability mechanic)
+			bool shouldKeep = attackCardControl.CardEffect?.ShouldKeepInBag() ?? false;
 
-			// Check if attack bag is empty, if so trigger fist card's OnBecomeTopOfPile
-			UICardSimpleControl nextAttackCard = GetLastBagCard(ECardType.attack);
-			if (nextAttackCard == null && m_FistCardCache != null)
+			if (!shouldKeep)
 			{
-				float fistDelayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0f;
-				if (fistDelayTime > 0f)
+				await RemoveBagCard(ECardType.attack, attackCardControl);
+				float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+				if (removeDelayTime > 0f)
 				{
-					await UniTask.WaitForSeconds(fistDelayTime);
+					await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
+				}
+
+				// Check if attack bag is empty, if so trigger fist card's OnBecomeTopOfPile
+				UICardSimpleControl nextAttackCard = GetLastBagCard(ECardType.attack);
+				if (nextAttackCard == null && m_FistCardCache != null)
+				{
+					float fistDelayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0f;
+					if (fistDelayTime > 0f)
+					{
+						await UniTask.WaitForSeconds(fistDelayTime);
+					}
 				}
 			}
 		}
@@ -1756,6 +1822,11 @@ public partial class UIGamePhaseControl : YViewControl
 
 
 		RemoveCardCts(attackCardControl);
+
+		// Consume DualWield buff after attack
+		ConsumeDualWieldBuff();
+		// Consume ShieldBash buff after attack
+		ConsumeShieldBashBuff();
 
 		// Clean up enemy card's CTS if it wasn't already removed during counter-attack
 		if (m_CardCtsDict.ContainsKey(enemyCardControl))
@@ -1781,13 +1852,57 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			return;
 		}
+
+		// Play enemy attack animation first
 		currentMonsterAttack = enemyAttack;
 		float delayTime = enemyCardControl.CardEffect?.OnDealDamage() ?? 0.5f;
 		await UniTask.WaitForSeconds(delayTime, cancellationToken: cancellationToken);
 
+		// Check CounterInsight relic for dodge and counter-attack (after enemy animation)
+		bool dodgedWithCounterInsight = await TryCounterInsightDodge(enemyCardControl, enemyAttack, envIndex, cancellationToken);
+		if (dodgedWithCounterInsight)
+		{
+			// Attack was dodged and countered, skip damage processing
+			RemoveCardCts(enemyCardControl);
+			currentMonsterAttack = 0;
+			return;
+		}
+
+		// Increment CounterInsight counter (if relic is equipped)
+		IncrementCounterInsight();
+
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
-		if (defenceCardControl != null)
+		bool usedWeaponParry = false;
+
+		// Check if DualWield is active - if so, cannot use defence cards
+		if (m_DualWieldActive && defenceCardControl != null)
+		{
+			Debug.Log("DualWield active: Cannot use defence cards!");
+			defenceCardControl = null; // Disable defence card usage
+		}
+
+		// If no defence card, check for WeaponParry relic to use weapon as defence
+		if (defenceCardControl == null && DataSystem.Instance.HasRelic(ERelicType.WeaponParry))
+		{
+			UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
+			if (weaponCard != null && weaponCard != m_FistCardCache)
+			{
+				// Use weapon as defence (defence value = weapon attack)
+				defenceCardControl = weaponCard;
+				defenceValue = weaponCard.CardData.currentAttack;
+				usedWeaponParry = true;
+
+				bool isOverflow = defenceValue < enemyAttack;
+				// Play defence animation
+				var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
+				float vfxDelay = defenceCardControl.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+				SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
+				delayTime = vfxDelay > 0f ? vfxDelay : 0.5f;
+				await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+			}
+		}
+		else if (defenceCardControl != null)
 		{
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
 			bool isOverflow = defenceValue < enemyAttack;
@@ -1812,12 +1927,45 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
+		// BareHandParry relic: Block half damage when no weapon and no defence equipped
+		if (DataSystem.Instance.HasRelic(ERelicType.BareHandParry) && damage > 0)
+		{
+			bool hasNoWeapon = !HasBagCard(ECardType.attack);
+			bool hasNoDefence = !HasBagCard(ECardType.defence);
+
+			if (hasNoWeapon && hasNoDefence)
+			{
+				int blockedDamage = damage / 2;
+				damage = damage - blockedDamage;
+				Debug.Log($"BareHandParry: Blocked {blockedDamage} damage, remaining damage: {damage}");
+
+				// Play defence animation on fist card (bare hands weapon)
+				if (m_FistCardCache != null)
+				{
+					var vfxNames = new List<EVFXName> { EVFXName.VFX_Dun };
+					float vfxDelay = m_FistCardCache.PlayVFX(vfxNames, ECardAnimName.UI_Carditem_dunpai, EVFXLife.SelfLife);
+					SFX.PlayAudio("Audio/SFX/Battle/Defence", 1.0f, 0f);
+					delayTime = vfxDelay > 0f ? vfxDelay : 0.3f;
+					await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(m_FistCardCache));
+				}
+				else
+				{
+					// Fallback to player visual effect if fist card not available
+					JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Dun, m_View.Joey, 0.3f);
+				}
+			}
+		}
+
 		if (damage > 0 && TryBlockFatalDamage(damage))
 		{
 			damage = m_DataJoeyPlayer.playerHealth - 1;
 		}
 
-		SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+		// Only play hit sound if actually taking damage
+		if (damage > 0)
+		{
+			SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+		}
 		ApplyPlayerHealthChange(-damage);
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
@@ -1834,34 +1982,54 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (defenceCardControl != null)
 		{
-			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
-
-			if (DataSystem.Instance.HasRelic(ERelicType.ShieldReflect))
+			// Handle weapon parry consumption
+			if (usedWeaponParry)
 			{
-				int shieldDefence = defenceValue;
-				int relicReflectDamage = shieldDefence / 2;
-				if (relicReflectDamage > 0)
+				// Weapon was used as defence, consume it
+				await RemoveBagCard(ECardType.attack, defenceCardControl);
+				RemoveCardCts(defenceCardControl);
+			}
+			else
+			{
+				// Normal defence card handling
+				int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+
+				if (DataSystem.Instance.HasRelic(ERelicType.ShieldReflect))
 				{
-					reflectDamage += relicReflectDamage;
+					int shieldDefence = defenceValue;
+					int relicReflectDamage = shieldDefence / 2;
+					if (relicReflectDamage > 0)
+					{
+						reflectDamage += relicReflectDamage;
+					}
 				}
-			}
 
-			if (reflectDamage > 0)
-			{
-				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
+				if (reflectDamage > 0)
+				{
+					await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
+				}
+				float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished(false) ?? 0f;
+				if (finishDelayTime > 0f)
+				{
+					await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+				}
+
+				// Check if card should be kept in bag (durability mechanic)
+				bool shouldKeep = defenceCardControl.CardEffect?.ShouldKeepInBag() ?? false;
+
+				if (!shouldKeep)
+				{
+					await RemoveBagCard(ECardType.defence, defenceCardControl);
+					float removeDelayTime = defenceCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+					if (removeDelayTime > 0f)
+					{
+						await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+					}
+				}
+
+				// Always remove card token (cleanup) regardless of whether card is kept
+				RemoveCardCts(defenceCardControl);
 			}
-			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished(false) ?? 0f;
-			if (finishDelayTime > 0f)
-			{
-				await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-			}
-			await RemoveBagCard(ECardType.defence, defenceCardControl);
-			float removeDelayTime = defenceCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-			if (removeDelayTime > 0f)
-			{
-				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-			}
-			RemoveCardCts(defenceCardControl);
 		}
 		if (DataSystem.Instance.HasRelic(ERelicType.ThornBlessing))
 		{
@@ -1952,14 +2120,21 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(finishDelayTime);
 		}
 
-		await RemoveBagCard(cardType, cardControl);
+		// Check if card should be kept in bag (durability mechanic)
+		bool shouldKeep = cardControl.CardEffect?.ShouldKeepInBag() ?? false;
 
-		float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
-		if (removeDelayTime > 0f)
+		if (!shouldKeep)
 		{
-			await UniTask.WaitForSeconds(removeDelayTime);
+			await RemoveBagCard(cardType, cardControl);
+
+			float removeDelayTime = cardControl.CardEffect?.OnRemoveCard() ?? 0f;
+			if (removeDelayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(removeDelayTime);
+			}
 		}
 
+		// Always remove card token (cleanup) regardless of whether card is kept
 		RemoveCardCts(cardControl);
 
 		if (CurrentEffectCard != null)
@@ -2068,6 +2243,7 @@ public partial class UIGamePhaseControl : YViewControl
 			TryUnyieldingTurnUpdate();
 			TryRegenerationHeal();
 			TryHalfHealthAmulet();
+			UpdateVulnerableDebuffs();
 			CurrentEffectCard = null;
 			PhaseCounter++;
 			UpdateBlockFatalDisplay();
@@ -2370,6 +2546,12 @@ public partial class UIGamePhaseControl : YViewControl
 					m_RelicList[i].gameObject.SetActive(true);
 					m_RelicList[i].SetGameData(relicInfo);
 					m_RelicList[i].ImgRelicTransform.localScale = Vector3.one * 2f;
+
+					// Initialize counter display for CounterInsight relic
+					if (relicId == (int)ERelicType.CounterInsight)
+					{
+						UpdateCounterInsightDisplay();
+					}
 				}
 				else
 				{

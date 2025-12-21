@@ -87,6 +87,13 @@ public enum ECardEffectId
     MagicSword,
     MagicShield,
     MagicWand,
+    DualWield_UseSkill,
+    ShieldBash_UseSkill,
+    Fortress_UseSkill,
+    Strike_UseSkill,
+    KnightSword_OnTop,
+    KnightShield_OnTop,
+
 }
 
 public enum EEffectType
@@ -117,7 +124,7 @@ public enum EVFXName
     VFX_glow,
     VFX_LeiDan,
     VFX_Shouji,
-    VFX_Shouji2,
+    VFX_Shouji_2, // Changed from VFX_Shouji2 to match prefab filename
     VFX_Fanjia, //仞甲
     VFX_joey_souji,
     VFX_HuiXue,
@@ -231,6 +238,12 @@ public class YCardEffect
     public virtual float OnRemoveCard()
     {
         return 0f;
+    }
+
+    // Check if card should remain in bag after use (for durability mechanics)
+    public virtual bool ShouldKeepInBag()
+    {
+        return false;
     }
 
     public int GetEffectValue(EEffectType effectType)
