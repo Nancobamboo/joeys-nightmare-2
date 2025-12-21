@@ -320,6 +320,29 @@ public class UISelectControl : YViewControl
 			}
 		}
 
+		// HighArt relic: Replace all Bare Hands and Boxing Gloves cards with Magic Wand
+		if (relicType == ERelicType.HighArt)
+		{
+			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+			Card magicWandTemplate = GData.Instance.GetCardConfigById("1022");
+
+			// Replace all Bare Hands (1011) and Boxing Gloves (1019) cards with Magic Wand
+			foreach (var kvp in playerData.SelfCardDict)
+			{
+				Card card = kvp.Value;
+				if (card != null && (card.id == "1011" || card.id == "1019"))
+				{
+					// Replace card data while keeping the unique ID
+					card.cardImage = magicWandTemplate.cardImage;
+					card.cardBackground = magicWandTemplate.cardBackground;
+					card.cardName = magicWandTemplate.cardName;
+					card.description = magicWandTemplate.description;
+					card.id = magicWandTemplate.id;
+					card.SetAttack(magicWandTemplate.currentAttack);
+					card.effectId = magicWandTemplate.effectId;
+				}
+			}
+		}
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
 		YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic, (int)relicType);

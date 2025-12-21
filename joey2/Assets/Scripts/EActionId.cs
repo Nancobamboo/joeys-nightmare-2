@@ -67,6 +67,10 @@ public enum EActionId
 	VengeanceShieldActivate,
 	AddBlockDamagePhase,
 	LifeShareSetPlayerHealth,
+	FireBallDamage,
+	IceMagicDamage,
+	SkillPowerUpActivate,
+	OnSkillCast,
 	Upper,
 
 }

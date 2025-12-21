@@ -21,6 +21,7 @@ public enum EBuffType
 	UpdateAttack,
 	UpdateByHpChange,
 	UpdateByDefenceCardNum,
+	Frozen,
 
 	Upper
 }
@@ -51,6 +52,9 @@ public enum ERelicType
 	RegenerationAmulet = 9021,      // 再生护符
 	BloodyGloves = 9022,             // 染血拳法
 	HalfHealthAmulet = 9023,         // 半血护符
+	ArcaneOrb = 9024,                // 奥术宝珠
+	MagicSwordsmanRing = 9025,       // 魔剑士指环
+	HighArt = 9026,                  // 高等艺术（赤手空拳变魔杖）
 
 	CardLimitDebuff = 9999,
 }
@@ -77,8 +81,10 @@ public class UICardSimpleControl : YViewControl
 
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 	private UIDescExtControl m_DescExtControl;
+	private GameObject m_FrozenOverlay;
 
 	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
+	private static readonly Color FROZEN_OVERLAY_COLOR = new Color(0.4f, 0.7f, 1f, 0.4f);
 
 	public static EResType GetResType()
 	{
@@ -351,6 +357,67 @@ public class UICardSimpleControl : YViewControl
 			case EBuffType.Counter:
 				UpdateCounterUI();
 				break;
+			case EBuffType.Frozen:
+				UpdateFrozenUI();
+				break;
+		}
+	}
+
+	public void RemoveBuff(EBuffType buffType)
+	{
+		m_BuffValueArray[(int)buffType] = 0;
+		switch (buffType)
+		{
+			case EBuffType.Frozen:
+				UpdateFrozenUI();
+				break;
+		}
+	}
+
+	private void UpdateFrozenUI()
+	{
+		bool isFrozen = GetBuffValue(EBuffType.Frozen) > 0;
+		if (isFrozen)
+		{
+			if (m_FrozenOverlay == null)
+			{
+				m_FrozenOverlay = new GameObject("FrozenOverlay");
+				m_FrozenOverlay.transform.SetParent(m_View.CardImg.transform, false);
+				RectTransform rect = m_FrozenOverlay.AddComponent<RectTransform>();
+				rect.anchorMin = Vector2.zero;
+				rect.anchorMax = Vector2.one;
+				rect.offsetMin = Vector2.zero;
+				rect.offsetMax = Vector2.zero;
+				Image img = m_FrozenOverlay.AddComponent<Image>();
+				img.color = FROZEN_OVERLAY_COLOR;
+				img.raycastTarget = false;
+			}
+			m_FrozenOverlay.SetActive(true);
+		}
+		else
+		{
+			if (m_FrozenOverlay != null)
+			{
+				m_FrozenOverlay.SetActive(false);
+			}
+		}
+	}
+
+	public bool IsFrozen()
+	{
+		return GetBuffValue(EBuffType.Frozen) > 0;
+	}
+
+	private void ClearAllBuffs()
+	{
+		for (int i = 0; i < m_BuffValueArray.Length; i++)
+		{
+			m_BuffValueArray[i] = 0;
+		}
+		// 清理冰冻覆盖层
+		if (m_FrozenOverlay != null)
+		{
+			m_FrozenOverlay.SetActive(false);
 		}
 	}
 
@@ -666,6 +733,30 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.LifeShareMonster:
 				effect = new YLifeShareMonster();
 				break;
+			case ECardEffectId.MagicRecall_UseSkill:
+				effect = new YMagicRecall_UseSkill(effectValue);
+				break;
+			case ECardEffectId.FireBall:
+				effect = new YFireBall(effectValue);
+				break;
+			case ECardEffectId.IceMagic:
+				effect = new YIceMagic(effectValue);
+				break;
+			case ECardEffectId.MagicPotion:
+				effect = new YMagicPotion(effectValue);
+				break;
+			case ECardEffectId.SkillPowerUp:
+				effect = new YSkillPowerUp(effectValue);
+				break;
+			case ECardEffectId.MagicSword:
+				effect = new YMagicSword(effectValue);
+				break;
+			case ECardEffectId.MagicShield:
+				effect = new YMagicShield(effectValue);
+				break;
+			case ECardEffectId.MagicWand:
+				effect = new YMagicWand();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -683,6 +774,8 @@ public class UICardSimpleControl : YViewControl
 
 	public void SetData(Card card, bool isEnv = false, int envIndex = -1)
 	{
+		// 清理所有 buff 状态
+		ClearAllBuffs();
 		m_View.Counter.SetActive(false);
 		this.name = card.cardName;
 		RectTransform animRect = m_View.Anim.transform as RectTransform;

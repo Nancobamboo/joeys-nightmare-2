@@ -61,7 +61,13 @@ public class YDefaultEffect : YCardEffect
                     return 0;
                 case EEffectType.Electric:
                     PlayElectricEffectAsync().Forget();
-                    return 0f;
+                    return 0.5f;
+                case EEffectType.FireBall:
+                    PlayFireBallEffectAsync().Forget();
+                    return 0.5f;
+                case EEffectType.IceMagic:
+                    PlayIceMagicEffectAsync().Forget();
+                    return 0.5f;
                 // case EEffectType.ReflectDamage:
                 //     var fanjiaVfxNames = new List<EVFXName> { EVFXName.VFX_FanJia_shouji };
                 //     float fanjiaDelayTime = CardControl.PlayVFX(fanjiaVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.SelfLife);
@@ -84,6 +90,34 @@ public class YDefaultEffect : YCardEffect
             CardControl.PlayVFX(electricVfxNames, ECardAnimName.Idle, EVFXLife.CardLife);
             SFX.PlayAudio("Audio/SFX/Battle/electric", 1.0f, 0f);
             await UniTask.WaitForSeconds(0.65f);
+
+            SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+        }
+    }
+
+    private async UniTaskVoid PlayFireBallEffectAsync()
+    {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            // TODO: 替换为火球专用的VFX特效（需要在EVFXName中添加）
+            var fireBallVfxNames = new List<EVFXName> { EVFXName.VFX_boom };
+            CardControl.PlayVFX(fireBallVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
+            // TODO: 替换为火球专用的音效（需要添加音效文件）
+            SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
+            await UniTask.WaitForSeconds(0.5f);
+
+            SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+        }
+    }
+    private async UniTaskVoid PlayIceMagicEffectAsync()
+    {
+        if (CardControl != null && CardControl.gameObject != null)
+        {
+            // TODO: 替换为火球专用的VFX特效（需要在EVFXName中添加）
+            var iceMagicVfxNames = new List<EVFXName> { EVFXName.VFX_Shihun };
+            CardControl.PlayVFX(iceMagicVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
+            SFX.PlayAudio("Audio/SFX/Battle/iceMagic", 1.0f, 0f);
+            await UniTask.WaitForSeconds(0.5f);
 
             SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
         }

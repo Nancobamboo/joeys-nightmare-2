@@ -59,6 +59,7 @@ public class JoeyGameControl : YViewControl
 	public EGameMode GameMode = EGameMode.Battle;
 	public string[] DebugEnvCardIds = new string[0];
 	public string[] DebugBagCardIds = new string[0];
+	public int[] DebugRelicIds = new int[0];
 	public int DebugLevelId = 1;
 
 	public static EResType GetResType()
@@ -327,6 +328,20 @@ public class JoeyGameControl : YViewControl
 				{
 					m_GamePhaseControl.AddCardList(cardType: kv.Key, cardIds: kv.Value);
 				}
+			}
+
+			// Debug模式下添加测试Relic
+			if (DebugRelicIds != null && DebugRelicIds.Length > 0)
+			{
+				for (int i = 0; i < DebugRelicIds.Length; i++)
+				{
+					int relicId = DebugRelicIds[i];
+					if (relicId > 0)
+					{
+						m_DataJoeyPlayer.AddRelicListData(relicId);
+					}
+				}
+				YActionSystem.Instance.DispatchAction(EActionId.UpdateRelic, 0);
 			}
 		}
 

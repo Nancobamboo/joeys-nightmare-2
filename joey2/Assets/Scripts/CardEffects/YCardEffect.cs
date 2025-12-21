@@ -79,7 +79,14 @@ public enum ECardEffectId
     VengeanceShield,
     BrokenShieldRedemption,
     LifeShareMonster,
-
+    MagicRecall_UseSkill,
+    FireBall,
+    IceMagic,
+    MagicPotion,
+    SkillPowerUp,
+    MagicSword,
+    MagicShield,
+    MagicWand,
 }
 
 public enum EEffectType
@@ -90,6 +97,8 @@ public enum EEffectType
     Boom,
     ExtraAttackCnt,
     Electric,
+    FireBall,
+    IceMagic,
     Other,
     Defence,
     QuickAttack,

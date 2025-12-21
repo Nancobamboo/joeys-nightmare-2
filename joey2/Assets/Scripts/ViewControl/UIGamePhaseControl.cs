@@ -48,6 +48,9 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private UIRelicControl m_CardLimitDebuffControl;
 
+	// ArcaneOrb relic: 每施放三次技能获得一张技能牌
+	private int m_ArcaneOrbSkillCounter = 0;
+
 	public static EResType GetResType()
 	{
 		return EResType.UIGamePhase;
@@ -111,6 +114,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.BloodyBattleActivate, BloodyBattleActivate);
 		RegistAction(EActionId.AddBlockDamagePhase, AddBlockDamagePhase);
 		RegistAction(EActionId.LifeShareSetPlayerHealth, LifeShareSetPlayerHealth);
+		RegistAction(EActionId.FireBallDamage, FireBallDamage);
+		RegistAction(EActionId.IceMagicDamage, IceMagicDamage);
+		RegistAction(EActionId.SkillPowerUpActivate, SkillPowerUpActivate);
+		RegistAction(EActionId.OnSkillCast, OnSkillCast);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -323,19 +330,45 @@ public partial class UIGamePhaseControl : YViewControl
 		// Only skip creation if fist card exists and is active, unless it needs to be replaced
 		if (m_FistCardCache != null && m_FistCardCache.gameObject.activeSelf)
 		{
-			// Check if we need to replace bare hands with boxing gloves
+			// Check if we need to replace the current fist card
+			bool hasHighArtRelic = DataSystem.Instance.HasRelic(ERelicType.HighArt);
 			bool hasGlovesRelic = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster);
 			bool isBareHands = m_FistCardCache.CardData != null && m_FistCardCache.CardData.id == "1011";
+			bool isMagicWand = m_FistCardCache.CardData != null && m_FistCardCache.CardData.id == "1022";
 
-			// If we have the gloves relic but still using bare hands, need to replace
-			if (!hasGlovesRelic || !isBareHands)
+			// 判断是否需要替换当前的拳头卡:
+			// 1. 有 HighArt 遗物但当前不是魔杖 → 需要替换为魔杖
+			// 2. 有 BareHandsMaster 遗物但当前还是赤手空拳 → 需要替换为拳套
+			bool needReplace = (hasHighArtRelic && !isMagicWand) || (hasGlovesRelic && isBareHands);
+			
+			if (!needReplace)
 			{
 				return;
 			}
+			
+			// 需要替换时，先回收旧的卡片
+			m_FistCardCache.Return();
+			m_FistCardCache = null;
 		}
 
-		// Check if player has BareHandsMaster relic, use Boxing Gloves instead
-		string cardId = DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) ? "1019" : "1011";
+		// Determine which card to use:
+		// HighArt relic takes priority - use Magic Wand (1022)
+		// BareHandsMaster relic - use Boxing Gloves (1019)
+		// Default - use Bare Hands (1011)
+		string cardId;
+		if (DataSystem.Instance.HasRelic(ERelicType.HighArt))
+		{
+			cardId = "1022"; // Magic Wand
+		}
+		else if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster))
+		{
+			cardId = "1019"; // Boxing Gloves
+		}
+		else
+		{
+			cardId = "1011"; // Bare Hands
+		}
+		
 		Card card = DataSystem.Instance.CreateCard(cardId);
 		Transform attackPanelTransform = m_View.AttackPanel.transform;
 		UICardSimpleControl cardControl = m_CardSimplePool.Get();
@@ -701,8 +734,22 @@ public partial class UIGamePhaseControl : YViewControl
 			Card card = m_DataJoeyPlayer.GetSelfCardDictData(uniqueId);
 			if (card == null) continue;
 
-			// Replace Bare Hands with Boxing Gloves if player has BareHandsMaster relic
-			if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) && card.id == "1011")
+			// HighArt relic takes priority: Replace Bare Hands or Boxing Gloves with Magic Wand
+			if (DataSystem.Instance.HasRelic(ERelicType.HighArt) && (card.id == "1011" || card.id == "1019"))
+			{
+				// Get the magic wand card template
+				Card magicWandTemplate = GData.Instance.GetCardConfigById("1022");
+				// Replace card data while keeping the unique ID
+				card.cardImage = magicWandTemplate.cardImage;
+				card.cardBackground = magicWandTemplate.cardBackground;
+				card.cardName = magicWandTemplate.cardName;
+				card.description = magicWandTemplate.description;
+				card.id = magicWandTemplate.id;
+				card.SetAttack(magicWandTemplate.currentAttack);
+				card.effectId = magicWandTemplate.effectId;
+			}
+			// Replace Bare Hands with Boxing Gloves if player has BareHandsMaster relic (and not HighArt)
+			else if (DataSystem.Instance.HasRelic(ERelicType.BareHandsMaster) && card.id == "1011")
 			{
 				// Get the boxing gloves card template
 				Card boxingGlovesTemplate = GData.Instance.GetCardConfigById("1019");
@@ -899,6 +946,9 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		CancellationToken token = cancellationToken ?? CancellationToken.None;
 
+		// 应用技能伤害加成
+		damage = ApplySkillDamageBonus(damage, effectType);
+
 		if (cardControl.CardType == ECardType.monster)
 		{
 
@@ -916,6 +966,13 @@ public partial class UIGamePhaseControl : YViewControl
 			if (delayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+			}
+
+			// 火球攻击解除冰冻状态
+			if (effectType == EEffectType.FireBall && cardControl.IsFrozen())
+			{
+				cardControl.RemoveBuff(EBuffType.Frozen);
+				Debug.Log($"Monster at envIndex {envIndex} unfrozen by FireBall");
 			}
 		}
 
@@ -1381,6 +1438,10 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			// 播放拿牌音效
 			SFX.PlayAudio("Audio/SFX/deal_cards", 1.9f, 0.5f);
+			
+			// 魔剑士指环效果：加入手牌时转换武器牌/防御牌
+			TryApplyMagicSwordsmanRing(cardControl);
+			
 			ECardType cardType = cardControl.CardType;
 
 			Vector3 startWorldPos = cardControl.CacheTrans.parent.position;
@@ -1648,7 +1709,16 @@ public partial class UIGamePhaseControl : YViewControl
 
 		bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
 
-		if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+		// 检查怪物是否被冰冻
+		bool isEnemyFrozen = enemyCardControl != null && enemyCardControl.IsFrozen();
+		if (isEnemyFrozen)
+		{
+			// 被冰冻的怪物受到武器攻击后解冻，不进行反击
+			enemyCardControl.RemoveBuff(EBuffType.Frozen);
+			Debug.Log($"Monster at envIndex {envIndex} unfrozen after weapon attack");
+		}
+
+		if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 		{
 			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
@@ -1848,6 +1918,10 @@ public partial class UIGamePhaseControl : YViewControl
 		if (cardType == ECardType.skill)
 		{
 			delayTime = cardControl.CardEffect?.UseSkill() ?? 0.5f;
+			// 魔法剑效果：技能牌使用后增加手牌顶部武器牌攻击力
+			MagicSwordOnSkillUsed();
+			// 魔法盾效果：技能牌使用后增加手牌顶部防御牌防御力
+			MagicShieldOnSkillUsed();
 			if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardBySkill))
 			{
 				if (ControlUtil.IsRandomSucceed(10))
@@ -1855,6 +1929,8 @@ public partial class UIGamePhaseControl : YViewControl
 					AddCardToBag("3008");
 				}
 			}
+			// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+			TryArcaneOrbTrigger();
 		}
 		else if (cardType == ECardType.item)
 		{
@@ -2149,8 +2225,8 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		// Special handling for BareHandsMaster relic: recreate fist card cache with boxing gloves
-		if (relicId == (int)ERelicType.BareHandsMaster)
+		// Special handling for BareHandsMaster or HighArt relic: recreate fist card cache
+		if (relicId == (int)ERelicType.BareHandsMaster || relicId == (int)ERelicType.HighArt)
 		{
 			if (m_FistCardCache != null)
 			{
@@ -2518,6 +2594,84 @@ public partial class UIGamePhaseControl : YViewControl
 				}
 			}
 		}
+	}
+
+	/// <summary>
+	/// 处理技能施放事件（用于魔法杖等视作施放技能的效果）
+	/// </summary>
+	void OnSkillCast(object[] paraArray)
+	{
+		TryArcaneOrbTrigger();
+	}
+
+	/// <summary>
+	/// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+	/// </summary>
+	private void TryArcaneOrbTrigger()
+	{
+		if (DataSystem.Instance.HasRelic(ERelicType.ArcaneOrb))
+		{
+			m_ArcaneOrbSkillCounter++;
+			if (m_ArcaneOrbSkillCounter >= 5)
+			{
+				m_ArcaneOrbSkillCounter = 0;
+				AddCardToBag("4013");
+				Debug.Log("ArcaneOrb triggered: Added card 4013 to bag");
+			}
+		}
+	}
+
+	/// <summary>
+	/// 魔剑士指环效果：加入手牌的武器牌变成魔力剑(1021)，防御牌变成魔力盾(2014)
+	/// </summary>
+	/// <param name="cardControl">要转换的卡牌控制器</param>
+	/// <returns>转换后的卡牌类型</returns>
+	private ECardType TryApplyMagicSwordsmanRing(UICardSimpleControl cardControl)
+	{
+		if (!DataSystem.Instance.HasRelic(ERelicType.MagicSwordsmanRing))
+		{
+			return cardControl.CardType;
+		}
+
+		Card card = cardControl.CardData;
+		ECardType cardType = cardControl.CardType;
+
+		// 武器牌变成魔力剑(1021)
+		if (cardType == ECardType.attack && card.id != "1021" && card.id != "1011" && card.id != "1019")
+		{
+			Card magicSwordTemplate = GData.Instance.GetCardConfigById("1021");
+			if (magicSwordTemplate != null)
+			{
+				card.cardImage = magicSwordTemplate.cardImage;
+				card.cardBackground = magicSwordTemplate.cardBackground;
+				card.cardName = magicSwordTemplate.cardName;
+				card.description = magicSwordTemplate.description;
+				card.id = magicSwordTemplate.id;
+				card.SetAttack(magicSwordTemplate.currentAttack);
+				card.effectId = magicSwordTemplate.effectId;
+				cardControl.SetData(card);
+				Debug.Log($"MagicSwordsmanRing: Converted attack card to Magic Sword (1021)");
+			}
+		}
+		// 防御牌变成魔力盾(2014)
+		else if (cardType == ECardType.defence && card.id != "2014")
+		{
+			Card magicShieldTemplate = GData.Instance.GetCardConfigById("2014");
+			if (magicShieldTemplate != null)
+			{
+				card.cardImage = magicShieldTemplate.cardImage;
+				card.cardBackground = magicShieldTemplate.cardBackground;
+				card.cardName = magicShieldTemplate.cardName;
+				card.description = magicShieldTemplate.description;
+				card.id = magicShieldTemplate.id;
+				card.currentDefence = magicShieldTemplate.currentDefence;
+				card.effectId = magicShieldTemplate.effectId;
+				cardControl.SetData(card);
+				Debug.Log($"MagicSwordsmanRing: Converted defence card to Magic Shield (2014)");
+			}
+		}
+
+		return cardType;
 	}
 
 }
