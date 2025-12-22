@@ -828,7 +828,8 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		// Trigger OnBecomeTopOfPile if card becomes top of pile
-		if (willBecomeTop && cardControl.CardEffect != null)
+		// Skip if isMoveCard=true, as MoveCard callback will handle it
+		if (!isMoveCard && willBecomeTop && cardControl.CardEffect != null)
 		{
 			Debug.Log($"[AddBagCard] Card becomes top of pile, calling OnBecomeTopOfPile for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
 			cardControl.CardEffect.OnBecomeTopOfPile();
@@ -1526,6 +1527,23 @@ public partial class UIGamePhaseControl : YViewControl
 					cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 					layout.enabled = true;
 					cardControl.SetMoving(false);
+					
+					// Trigger OnEnterBag for the moved card
+					if (cardControl.CardEffect != null)
+					{
+						Debug.Log($"[MoveCard] Calling OnEnterBag for moved card: {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
+						cardControl.CardEffect.OnEnterBag();
+					}
+					
+					// Check if the moved card becomes top of pile
+					UICardSimpleControl lastBagCard = GetLastBagCard(cardType);
+					if (lastBagCard == cardControl && cardControl.CardEffect != null)
+					{
+						Debug.Log($"[MoveCard] Moved card becomes top of pile, calling OnBecomeTopOfPile for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
+						cardControl.CardEffect.OnBecomeTopOfPile();
+					}
+					
+					// Also trigger OnEnterBag for CurrentEffectCard (the item/skill that caused the move)
 					if (CurrentEffectCard != null)
 					{
 						CurrentEffectCard.CardEffect?.OnEnterBag();
