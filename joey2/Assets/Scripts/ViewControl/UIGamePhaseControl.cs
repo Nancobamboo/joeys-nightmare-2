@@ -808,20 +808,26 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.CacheTrans.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 		}
 
-		if (cardType == ECardType.defence)
+	if (cardType == ECardType.defence)
+	{
+		// Apply Fortress bonus if available
+		ApplyFortressBonus(cardControl);
+
+		RunActionForEachLastBagCard((x) =>
 		{
-			// Apply Fortress bonus if available
-			ApplyFortressBonus(cardControl);
-
-			RunActionForEachLastBagCard((x) =>
+			if (x.GetBuffValue(EBuffType.UpdateByDefenceCardNum) > 0)
 			{
-				if (x.GetBuffValue(EBuffType.UpdateByDefenceCardNum) > 0)
-				{
-					x.UpdateBuffValue();
-				}
+				x.UpdateBuffValue();
+			}
 
-			});
+		});
+		
+		// DualWieldMastery relic: Refresh attack cards when defence is equipped
+		if (DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+		{
+			RefreshAllAttackCards();
 		}
+	}
 
 		// 螺旋手里剑：当任意攻击卡进入手牌时，检查并移动螺旋手里剑到环境
 		// 注意：即使是从环境拿回来的卡（isMoveCard=true），也应该触发此逻辑
@@ -867,6 +873,12 @@ public partial class UIGamePhaseControl : YViewControl
 			else
 			{
 				Debug.Log($"[RemoveBagCard] No cards left in {cardType} pile");
+			}
+			
+			// DualWieldMastery relic: Refresh attack cards when defence is removed
+			if (cardType == ECardType.defence && DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+			{
+				RefreshAllAttackCards();
 			}
 		}
 	}
@@ -1709,22 +1721,28 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		bool hasSlowAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.SlowAttack) > 0;
-		bool enemyCounteredFirst = false;
-		if (hasSlowAttack && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	bool hasSlowAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.SlowAttack) > 0;
+	bool enemyCounteredFirst = false;
+	if (hasSlowAttack && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	{
+		int enemyAttack = enemyCardControl.CardData.currentAttack;
+		if (enemyAttack > 0)
 		{
-			int enemyAttack = enemyCardControl.CardData.currentAttack;
-			if (enemyAttack > 0)
-			{
-				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
-				enemyCounteredFirst = true;
-			}
+			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
+			enemyCounteredFirst = true;
 		}
+	}
 
-		bool enemyKilled = false;
+	// Cache NoCounterAttack flag before dealing damage, because enemy's OnTakeDamage may remove the weapon (e.g. BigDumbDonkey kicks weapon away)
+	bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
+
+	bool enemyKilled = false;
 		for (int i = 0; i < attackCount; i++)
 		{
+			// Reset damage to base attack for each attack iteration
+			damage = attackCard.currentAttack;
+			
 			if (DataSystem.Instance.HasRelic(ERelicType.LifeSteal))
 			{
 				YActionSystem.Instance.DispatchAction(EActionId.AddHp, 1);
@@ -1782,13 +1800,11 @@ public partial class UIGamePhaseControl : YViewControl
 					AddHp(3);
 				}
 
-				break;
-			}
+			break;
 		}
+	}
 
-		bool hasNoCounterAttack = attackCardControl.CardEffect?.GetEffectValue(EEffectType.NoCounterAttack) > 0;
-
-		// 检查怪物是否被冰冻
+	// 检查怪物是否被冰冻
 		bool isEnemyFrozen = enemyCardControl != null && enemyCardControl.IsFrozen();
 		if (isEnemyFrozen)
 		{
@@ -1916,9 +1932,34 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
 			if (weaponCard != null && weaponCard != m_FistCardCache)
 			{
-				// Use weapon as defence (defence value = 20% of weapon attack)
+				// Calculate current weapon attack including all bonuses
+				int currentWeaponAttack = weaponCard.CardData.currentAttack;
+				currentWeaponAttack += weaponCard.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+				
+				// Add BloodyGloves relic bonus if applicable
+				if (DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+				{
+					if (weaponCard.CardEffect != null && weaponCard.CardEffect.Id == ECardEffectId.BareHands)
+					{
+						if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+						{
+							currentWeaponAttack += 5;
+						}
+					}
+				}
+				
+				// Add DualWieldMastery relic bonus if applicable
+				if (DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+				{
+					if (!HasBagCard(ECardType.defence))
+					{
+						currentWeaponAttack += 5;
+					}
+				}
+				
+				// Use weapon as defence (defence value = 20% of current weapon attack)
 				defenceCardControl = weaponCard;
-				defenceValue = Mathf.RoundToInt(weaponCard.CardData.currentAttack * 0.2f);
+				defenceValue = Mathf.RoundToInt(currentWeaponAttack * 0.2f);
 				usedWeaponParry = true;
 
 				bool isOverflow = defenceValue < enemyAttack;
@@ -2410,6 +2451,12 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshRelicDisplay();
 		int relicId = (int)paraArray[0];
 		UpdateAllCardsRelic(relicId);
+		
+		// DualWieldMastery relic: Refresh attack cards to show bonus
+		if (relicId == (int)ERelicType.DualWieldMastery)
+		{
+			RefreshAllAttackCards();
+		}
 	}
 
 	private void UpdateAllCardsRelic(int relicId)
@@ -2450,6 +2497,25 @@ public partial class UIGamePhaseControl : YViewControl
 					cardControl.AddRelic(relicId);
 				}
 			}
+		}
+	}
+	
+	private void RefreshAllAttackCards()
+	{
+		// Refresh all attack cards in bag
+		List<UICardSimpleControl> attackCardList = GetBagCardList(ECardType.attack);
+		if (attackCardList != null)
+		{
+			for (int i = 0; i < attackCardList.Count; i++)
+			{
+				attackCardList[i].RefreshCard();
+			}
+		}
+		
+		// Refresh fist card (bare hands)
+		if (m_FistCardCache != null)
+		{
+			m_FistCardCache.RefreshCard();
 		}
 	}
 
