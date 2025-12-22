@@ -1888,9 +1888,9 @@ public partial class UIGamePhaseControl : YViewControl
 			UICardSimpleControl weaponCard = GetLastBagCard(ECardType.attack);
 			if (weaponCard != null && weaponCard != m_FistCardCache)
 			{
-				// Use weapon as defence (defence value = weapon attack)
+				// Use weapon as defence (defence value = 20% of weapon attack)
 				defenceCardControl = weaponCard;
-				defenceValue = weaponCard.CardData.currentAttack;
+				defenceValue = Mathf.RoundToInt(weaponCard.CardData.currentAttack * 0.2f);
 				usedWeaponParry = true;
 
 				bool isOverflow = defenceValue < enemyAttack;
@@ -1982,54 +1982,49 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (defenceCardControl != null)
 		{
-			// Handle weapon parry consumption
-			if (usedWeaponParry)
+			// Handle weapon parry or normal defence card
+			int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+
+			if (DataSystem.Instance.HasRelic(ERelicType.ShieldReflect) && !usedWeaponParry)
 			{
-				// Weapon was used as defence, consume it
-				await RemoveBagCard(ECardType.attack, defenceCardControl);
-				RemoveCardCts(defenceCardControl);
+				int shieldDefence = defenceValue;
+				int relicReflectDamage = shieldDefence / 2;
+				if (relicReflectDamage > 0)
+				{
+					reflectDamage += relicReflectDamage;
+				}
 			}
-			else
+
+			if (reflectDamage > 0)
 			{
-				// Normal defence card handling
-				int reflectDamage = defenceCardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
-
-				if (DataSystem.Instance.HasRelic(ERelicType.ShieldReflect))
-				{
-					int shieldDefence = defenceValue;
-					int relicReflectDamage = shieldDefence / 2;
-					if (relicReflectDamage > 0)
-					{
-						reflectDamage += relicReflectDamage;
-					}
-				}
-
-				if (reflectDamage > 0)
-				{
-					await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
-				}
-				float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished(false) ?? 0f;
-				if (finishDelayTime > 0f)
-				{
-					await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-				}
-
-				// Check if card should be kept in bag (durability mechanic)
-				bool shouldKeep = defenceCardControl.CardEffect?.ShouldKeepInBag() ?? false;
-
-				if (!shouldKeep)
-				{
-					await RemoveBagCard(ECardType.defence, defenceCardControl);
-					float removeDelayTime = defenceCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-					if (removeDelayTime > 0f)
-					{
-						await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
-					}
-				}
-
-				// Always remove card token (cleanup) regardless of whether card is kept
-				RemoveCardCts(defenceCardControl);
+				await AttackSpecialEnemy(enemyCardControl, reflectDamage, envIndex, GetOrCreateCardToken(defenceCardControl));
 			}
+			
+			// Call OnUseFinished for both weapon parry and normal defence cards
+			// This handles durability reduction for cards like Knight Sword
+			float finishDelayTime = defenceCardControl.CardEffect?.OnUseFinished(false) ?? 0f;
+			if (finishDelayTime > 0f)
+			{
+				await UniTask.WaitForSeconds(finishDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+			}
+
+			// Check if card should be kept in bag (durability mechanic)
+			bool shouldKeep = defenceCardControl.CardEffect?.ShouldKeepInBag() ?? false;
+
+			if (!shouldKeep)
+			{
+				// Remove from appropriate bag type (attack for weapon parry, defence for normal)
+				ECardType cardType = usedWeaponParry ? ECardType.attack : ECardType.defence;
+				await RemoveBagCard(cardType, defenceCardControl);
+				float removeDelayTime = defenceCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+				if (removeDelayTime > 0f)
+				{
+					await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
+				}
+			}
+
+			// Always remove card token (cleanup) regardless of whether card is kept
+			RemoveCardCts(defenceCardControl);
 		}
 		if (DataSystem.Instance.HasRelic(ERelicType.ThornBlessing))
 		{

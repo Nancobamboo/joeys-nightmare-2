@@ -17,6 +17,7 @@ public sealed class GData : PureSingleton<GData>
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
 	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
 	public Dictionary<int, RelicInfo> RelicInfoDict { get; private set; } = new Dictionary<int, RelicInfo>();
+	public Dictionary<string, ERelicType> RelicNameToTypeDict { get; private set; } = new Dictionary<string, ERelicType>();
 	public Dictionary<EStageType, StageReward> StageRewardDict { get; private set; } = new Dictionary<EStageType, StageReward>();
 
 	private string m_CardCsvPath = "Data/card_info";
@@ -952,6 +953,7 @@ public sealed class GData : PureSingleton<GData>
 		if (!force && RelicInfoDict.Count > 0) return;
 
 		RelicInfoDict.Clear();
+		RelicNameToTypeDict.Clear();
 		TextAsset ta = Resources.Load<TextAsset>(m_RelicInfoCsvPath);
 		if (ta == null)
 		{
@@ -1012,9 +1014,54 @@ public sealed class GData : PureSingleton<GData>
 			int stars = GetInt(starsIdx, 0);
 			RelicInfo relicInfo = new RelicInfo(id, cardImage, iconImage, name, description, stars);
 			RelicInfoDict[id] = relicInfo;
+			
+			// Build name to enum mapping and validate ID consistency
+			if (System.Enum.IsDefined(typeof(ERelicType), id))
+			{
+				ERelicType relicType = (ERelicType)id;
+				RelicNameToTypeDict[name] = relicType;
+			}
+			else
+			{
+				Debug.LogWarning($"Relic ID {id} ({name}) not found in ERelicType enum");
+			}
 		}
 
-		Debug.Log($"Relic info loaded: {RelicInfoDict.Count} relics");
+		// Validate enum vs CSV consistency
+		ValidateRelicEnumConsistency();
+
+		Debug.Log($"Relic info loaded: {RelicInfoDict.Count} relics, {RelicNameToTypeDict.Count} name mappings");
+	}
+
+	/// <summary>
+	/// Validate that all ERelicType enum values have corresponding CSV entries
+	/// </summary>
+	private void ValidateRelicEnumConsistency()
+	{
+		foreach (ERelicType relicType in System.Enum.GetValues(typeof(ERelicType)))
+		{
+			int id = (int)relicType;
+			// Skip the special CardLimitDebuff enum
+			if (id == 9999) continue;
+			
+			if (!RelicInfoDict.ContainsKey(id))
+			{
+				Debug.LogWarning($"ERelicType.{relicType} ({id}) is defined in code but missing in relic_info.csv");
+			}
+		}
+	}
+
+	/// <summary>
+	/// Get ERelicType by relic name from CSV
+	/// </summary>
+	public ERelicType? GetRelicTypeByName(string name)
+	{
+		LoadRelicInfo();
+		if (RelicNameToTypeDict.TryGetValue(name, out ERelicType relicType))
+		{
+			return relicType;
+		}
+		return null;
 	}
 
 	public RelicInfo GetRelicInfo(ERelicType relicType)

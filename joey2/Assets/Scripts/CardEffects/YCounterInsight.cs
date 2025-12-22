@@ -9,7 +9,7 @@ using UnityEngine;
 public partial class UIGamePhaseControl
 {
     private int m_CounterInsightCounter = 0;
-    private const int COUNTER_INSIGHT_THRESHOLD = 1;  // Changed to 1 for testing - triggers every time
+    private const int COUNTER_INSIGHT_THRESHOLD = 5;  // Triggers after being attacked 5 times
 
     private void ResetCounterInsightState()
     {

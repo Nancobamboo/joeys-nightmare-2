@@ -451,7 +451,17 @@ public class UICardSimpleControl : YViewControl
 	private void UpdateCounterUI()
 	{
 		int counter = GetBuffValue(EBuffType.Counter);
-		if (counter > 0)
+		int vulnerable = GetBuffValue(EBuffType.Vulnerable);
+		
+		// Counter priority: Vulnerable > Counter
+		// Show vulnerable counter if exists
+		if (vulnerable > 0 && cachedCardType == ECardType.monster)
+		{
+			m_View.Counter.SetActive(true);
+			m_View.TxtCnt.text = vulnerable.ToString();
+		}
+		// Otherwise show counter buff if exists
+		else if (counter > 0)
 		{
 			m_View.Counter.SetActive(true);
 			m_View.TxtCnt.text = (counter - 1).ToString();
@@ -476,6 +486,9 @@ public class UICardSimpleControl : YViewControl
 			// Restore original color when vulnerable is removed
 			m_View.CardImg.color = Color.white;
 		}
+		
+		// Update Counter display when vulnerable changes
+		UpdateCounterUI();
 	}
 
 	public int GetBuffValue(EBuffType buffType)
