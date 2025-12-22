@@ -13,6 +13,7 @@ public class UIStartView : YBaseView
 	public Button BtnStart;
 	public Button BtnAchievement;
 	public EventTriggerListener TriggerAchieve;
+	public Toggle ToggleScreen;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -28,5 +29,6 @@ public class UIStartView : YBaseView
 		BtnStart = viewItemList[3].Target.GetComponent<Button>();
 		BtnAchievement = viewItemList[4].Target.GetComponent<Button>();
 		TriggerAchieve = viewItemList[4].Target.GetComponent<EventTriggerListener>();
+		ToggleScreen = viewItemList[5].Target.GetComponent<Toggle>();
 	}
 }
