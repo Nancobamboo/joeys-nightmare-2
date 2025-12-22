@@ -5,7 +5,8 @@ public enum ETheme
 	monkey,
 	turkey,
 	donkey,
-	deadkey
+	deadkey,
+	tutorial
 }
 
 public class EnvStage

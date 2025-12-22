@@ -482,7 +482,7 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				int totalStages = 16;
+				int totalStages = 20;
 				m_View.TxtStage.text = envStage.level.ToString() + "/" + totalStages.ToString();
 			}
 		}
@@ -521,6 +521,9 @@ public partial class UIGamePhaseControl : YViewControl
 						break;
 					case ETheme.deadkey:
 						m_View.Description.text = "打败死神!";
+						break;
+					case ETheme.tutorial:
+						m_View.Description.text = "终极挑战,击败最强敌人!";
 						break;
 					default:
 						m_View.Description.text = "还是我们A*Studio，再Dream一次吧！";
