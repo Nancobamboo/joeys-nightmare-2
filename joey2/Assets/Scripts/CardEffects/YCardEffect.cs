@@ -93,6 +93,7 @@ public enum ECardEffectId
     Strike_UseSkill,
     KnightSword_OnTop,
     KnightShield_OnTop,
+    SpiralShuriken,
 
 }
 

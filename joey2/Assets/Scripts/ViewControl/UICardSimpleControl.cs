@@ -831,6 +831,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.KnightShield_OnTop:
 				effect = new YKnightShield_OnTop();
 				break;
+			case ECardEffectId.SpiralShuriken:
+				effect = new YSpiralShuriken();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

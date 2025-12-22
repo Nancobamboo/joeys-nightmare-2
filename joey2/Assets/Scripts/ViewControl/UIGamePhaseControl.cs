@@ -823,6 +823,13 @@ public partial class UIGamePhaseControl : YViewControl
 			});
 		}
 
+		// 螺旋手里剑：当任意攻击卡进入手牌时，检查并移动螺旋手里剑到环境
+		// 注意：即使是从环境拿回来的卡（isMoveCard=true），也应该触发此逻辑
+		if (cardType == ECardType.attack)
+		{
+			CheckAndMoveSpiralShurikenToEnv(cardControl);
+		}
+
 		// Trigger OnEnterBag if not from move animation (which calls it separately)
 		if (!isMoveCard && cardControl.CardEffect != null)
 		{
