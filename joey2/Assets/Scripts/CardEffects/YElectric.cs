@@ -42,6 +42,8 @@ public partial class UIGamePhaseControl
 			return;
 		}
 
+		Debug.Log($"Electric: TakeAllEnemyDamage called with damage = {damage}");
+
 		List<int> enemyIndices = new List<int>();
 		foreach (KeyValuePair<int, List<UICardSimpleControl>> kvp in m_EnvCardDict)
 		{
@@ -55,14 +57,57 @@ public partial class UIGamePhaseControl
 			}
 		}
 
+		Debug.Log($"Electric: Found {enemyIndices.Count} enemies to damage");
+
 		foreach (int envIndex in enemyIndices)
 		{
 			UICardSimpleControl enemyCardControl = GetLastEnvCard(envIndex);
 			if (enemyCardControl != null)
 			{
+				Debug.Log($"Electric: Damaging {enemyCardControl.CardData.cardName} at envIndex {envIndex}, HP before: {enemyCardControl.CardData.currentHealth}");
+				
 				CancellationToken token = GetOrCreateCardToken(enemyCardControl);
 				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric, token);
+				
+				// Check if enemy survived and apply vulnerable BEFORE RemoveCardCts
+				if (enemyCardControl != null && enemyCardControl.gameObject.activeSelf && 
+				    enemyCardControl.CardData.currentHealth > 0)
+				{
+					Debug.Log($"Electric: {enemyCardControl.CardData.cardName} survived with HP: {enemyCardControl.CardData.currentHealth}, applying vulnerable");
+					ApplyElectricVulnerable(enemyCardControl);
+				}
+				else
+				{
+					Debug.Log($"Electric: {enemyCardControl.CardData?.cardName ?? "null"} died or destroyed");
+				}
+				
 				RemoveCardCts(enemyCardControl);
+			}
+		}
+	}
+
+	private void ApplyElectricVulnerable(UICardSimpleControl enemyCard)
+	{
+		if (enemyCard != null && enemyCard.CardType == ECardType.monster)
+		{
+			// Add vulnerable debuff for 1 turn (set to 2 because it decreases at end of current turn)
+			// Turn flow: Apply buff (value=2) -> End of turn (-1, value=1) -> Next turn (effect active) -> End of next turn (-1, value=0)
+			int vulnerableDuration = 2;
+			int currentVulnerable = enemyCard.GetBuffValue(EBuffType.Vulnerable);
+			if (currentVulnerable < vulnerableDuration)
+			{
+				enemyCard.AddBuff(EBuffType.Vulnerable, vulnerableDuration);
+				Debug.Log($"Electric: Applied Vulnerable debuff to {enemyCard.CardData.cardName} for 1 turn (value={vulnerableDuration})");
+			}
+			else
+			{
+				Debug.Log($"Electric: {enemyCard.CardData.cardName} already has Vulnerable debuff for {currentVulnerable} turns");
+			}
+			
+			// Play debuff visual effect
+			if (enemyCard.CacheTrans != null)
+			{
+				JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Shouji_2, enemyCard.CacheTrans, 1f);
 			}
 		}
 	}

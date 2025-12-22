@@ -254,8 +254,20 @@ public class UICardSimpleControl : YViewControl
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 				int attackValue = cachedCard.currentAttack + damageEffect;
+				
+				// DualWieldMastery relic: +5 damage when no defence equipped
+				bool hasDualWieldBonus = false;
+				if (!IsEnv && DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+				{
+					if (!JoeyGameControl.Instance.HasBagCard(ECardType.defence))
+					{
+						attackValue += 5;
+						hasDualWieldBonus = true;
+					}
+				}
+				
 				m_View.TxtAttack.text = attackValue.ToString();
-				if (damageEffect != 0 || extraAttackCnt != 0)
+				if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
@@ -828,14 +840,17 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.KnightSword_OnTop:
 				effect = new YKnightSword_OnTop();
 				break;
-			case ECardEffectId.KnightShield_OnTop:
-				effect = new YKnightShield_OnTop();
-				break;
+		case ECardEffectId.KnightShield_OnTop:
+			effect = new YKnightShield_OnTop();
+			break;
 			case ECardEffectId.SpiralShuriken:
 				effect = new YSpiralShuriken();
 				break;
-			default:
-				return GetDefaultEffect();
+		case ECardEffectId.BlockFirstAttack:
+			effect = new YBlockFirstAttack();
+			break;
+		default:
+			return GetDefaultEffect();
 		}
 
 		effect.SetData(this);
@@ -881,15 +896,20 @@ public class UICardSimpleControl : YViewControl
 		CardEffect = GetCardEffect();
 		IsEffecting = false;
 
-		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
+	if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
+	{
+		DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+		if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
 		{
-			DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
-			if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
-			{
-				AddRelicList(dataJoeyPlayer.RelicList);
-			}
+			AddRelicList(dataJoeyPlayer.RelicList);
+		}
+		// Refresh card display after applying relics (for bag cards)
+		if (!isEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
+		{
+			RefreshCard();
 		}
 	}
+}
 
 	private void SetTypeUI(Card card)
 	{
