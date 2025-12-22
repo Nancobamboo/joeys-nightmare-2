@@ -71,6 +71,10 @@ public enum EActionId
 	IceMagicDamage,
 	SkillPowerUpActivate,
 	OnSkillCast,
+	DualWieldActivate,
+	ShieldBashActivate,
+	FortressActivate,
+	StrikeActivate,
 	Upper,
 
 }

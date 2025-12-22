@@ -77,6 +77,12 @@ public class UIRelicControl : YViewControl
 			m_View.IconImage.sprite = LoadSprite(m_RelicInfo.iconImage);
 			m_View.TxtName.text = m_RelicInfo.name;
 			m_View.Tombstone.sprite = LoadSprite(m_RelicInfo.tombstoneImage);
+			
+			// Hide counter in selection screen
+			if (m_View.TxtCounter != null)
+			{
+				m_View.TxtCounter.gameObject.SetActive(false);
+			}
 		}
 	}
 
@@ -89,6 +95,36 @@ public class UIRelicControl : YViewControl
 			m_View.IconImage.sprite = LoadSprite(m_RelicInfo.iconImage);
 			m_View.CardItem.SetActive(false);
 			m_View.TxtName.gameObject.SetActive(false);
+			
+			// Hide counter by default
+			if (m_View.TxtCounter != null)
+			{
+				m_View.TxtCounter.gameObject.SetActive(false);
+			}
+		}
+	}
+
+	public void UpdateCounter(int currentCount, int maxCount)
+	{
+		Debug.Log($"[UIRelicControl] UpdateCounter called: {currentCount}/{maxCount}, TxtCounter is null: {m_View.TxtCounter == null}");
+		
+		if (m_View.TxtCounter != null)
+		{
+			m_View.TxtCounter.gameObject.SetActive(true);
+			m_View.TxtCounter.text = currentCount.ToString() + "/" + maxCount.ToString();
+			Debug.Log($"[UIRelicControl] Counter text updated to: {m_View.TxtCounter.text}");
+		}
+		else
+		{
+			Debug.LogError("[UIRelicControl] TxtCounter is null! Counter not added to ViewItemList?");
+		}
+	}
+
+	public void HideCounter()
+	{
+		if (m_View.TxtCounter != null)
+		{
+			m_View.TxtCounter.gameObject.SetActive(false);
 		}
 	}
 

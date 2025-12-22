@@ -22,6 +22,7 @@ public enum EBuffType
 	UpdateByHpChange,
 	UpdateByDefenceCardNum,
 	Frozen,
+	Vulnerable,
 
 	Upper
 }
@@ -55,6 +56,11 @@ public enum ERelicType
 	ArcaneOrb = 9024,                // 奥术宝珠
 	MagicSwordsmanRing = 9025,       // 魔剑士指环
 	HighArt = 9026,                  // 高等艺术（赤手空拳变魔杖）
+	DualWieldMastery = 9027,         // 双持精通
+	WeaponParry = 9028,              // 弹刀
+	CounterInsight = 9029,           // 看破
+	BareHandParry = 9030,            // 空手接白刃
+	BBQDelight = 9031,               // 烤肉香香
 
 	CardLimitDebuff = 9999,
 }
@@ -121,7 +127,7 @@ public class UICardSimpleControl : YViewControl
 
 		if (cachedCard != null)
 		{
-			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.description);
+			List<string> keywordDescriptions = GData.Instance.CheckKeywordInDescription(cachedCard.GetFormattedDescription());
 			if (keywordDescriptions != null && keywordDescriptions.Count > 0)
 			{
 				m_DescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
@@ -273,16 +279,18 @@ public class UICardSimpleControl : YViewControl
 				}
 				break;
 
-			case ECardType.monster:
-				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
-				m_View.TxtAttack.color = Color.black;
-				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
-				if (cachedCard.health > 0)
-				{
-					float ratio = (float)cachedCard.currentHealth / cachedCard.health;
-					m_View.MosterHeart.fillAmount = ratio;
-				}
-				break;
+		case ECardType.monster:
+			m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+			m_View.TxtAttack.color = Color.black;
+			m_View.TextHeart.text = cachedCard.currentHealth.ToString();
+			if (cachedCard.health > 0)
+			{
+				float ratio = (float)cachedCard.currentHealth / cachedCard.health;
+				m_View.MosterHeart.fillAmount = ratio;
+			}
+			// Update vulnerable visual effect
+			UpdateVulnerableUI();
+			break;
 
 			case ECardType.skill:
 				break;
@@ -329,6 +337,19 @@ public class UICardSimpleControl : YViewControl
 				float ratio = (float)card.currentHealth / card.health;
 				m_View.MosterHeart.fillAmount = ratio;
 			}
+			
+			// Update vulnerable visual effect
+			UpdateVulnerableUI();
+		}
+	}
+
+	// Update card description to reflect current durability
+	public void UpdateDurabilityDescription()
+	{
+		if (cachedCard != null)
+		{
+			m_View.Description.text = cachedCard.GetFormattedDescription();
+			Debug.Log($"[UICardSimpleControl] UpdateDurabilityDescription - Card: {cachedCard.cardName}, durability: {cachedCard.durability}, description: {m_View.Description.text}");
 		}
 	}
 
@@ -350,7 +371,7 @@ public class UICardSimpleControl : YViewControl
 	public void AddBuff(EBuffType buffType, int value)
 	{
 		Debug.Log(this.name + " AddBuff " + buffType + " " + value);
-		m_BuffValueArray[(int)buffType] += value;
+		m_BuffValueArray[(int)buffType] = value;
 
 		switch (buffType)
 		{
@@ -359,6 +380,9 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case EBuffType.Frozen:
 				UpdateFrozenUI();
+				break;
+			case EBuffType.Vulnerable:
+				UpdateVulnerableUI();
 				break;
 		}
 	}
@@ -370,6 +394,9 @@ public class UICardSimpleControl : YViewControl
 		{
 			case EBuffType.Frozen:
 				UpdateFrozenUI();
+				break;
+			case EBuffType.Vulnerable:
+				UpdateVulnerableUI();
 				break;
 		}
 	}
@@ -424,7 +451,17 @@ public class UICardSimpleControl : YViewControl
 	private void UpdateCounterUI()
 	{
 		int counter = GetBuffValue(EBuffType.Counter);
-		if (counter > 0)
+		int vulnerable = GetBuffValue(EBuffType.Vulnerable);
+		
+		// Counter priority: Vulnerable > Counter
+		// Show vulnerable counter if exists
+		if (vulnerable > 0 && cachedCardType == ECardType.monster)
+		{
+			m_View.Counter.SetActive(true);
+			m_View.TxtCnt.text = vulnerable.ToString();
+		}
+		// Otherwise show counter buff if exists
+		else if (counter > 0)
 		{
 			m_View.Counter.SetActive(true);
 			m_View.TxtCnt.text = (counter - 1).ToString();
@@ -433,6 +470,25 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_View.Counter.SetActive(false);
 		}
+	}
+
+	private void UpdateVulnerableUI()
+	{
+		int vulnerable = GetBuffValue(EBuffType.Vulnerable);
+		if (vulnerable > 0 && cachedCardType == ECardType.monster)
+		{
+			// Display vulnerable debuff indicator by making card image pink
+			Debug.Log($"{CardData.cardName} has Vulnerable debuff for {vulnerable} turns");
+			m_View.CardImg.color = new Color(1f, 0.6f, 0.6f); // Pink color
+		}
+		else if (cachedCardType == ECardType.monster)
+		{
+			// Restore original color when vulnerable is removed
+			m_View.CardImg.color = Color.white;
+		}
+		
+		// Update Counter display when vulnerable changes
+		UpdateCounterUI();
 	}
 
 	public int GetBuffValue(EBuffType buffType)
@@ -757,6 +813,24 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.MagicWand:
 				effect = new YMagicWand();
 				break;
+			case ECardEffectId.DualWield_UseSkill:
+				effect = new YDualWield_UseSkill();
+				break;
+			case ECardEffectId.ShieldBash_UseSkill:
+				effect = new YShieldBash_UseSkill();
+				break;
+			case ECardEffectId.Fortress_UseSkill:
+				effect = new YFortress_UseSkill();
+				break;
+			case ECardEffectId.Strike_UseSkill:
+				effect = new YStrike_UseSkill();
+				break;
+			case ECardEffectId.KnightSword_OnTop:
+				effect = new YKnightSword_OnTop();
+				break;
+			case ECardEffectId.KnightShield_OnTop:
+				effect = new YKnightShield_OnTop();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -793,8 +867,9 @@ public class UICardSimpleControl : YViewControl
 
 		m_View.CardName.text = card.cardName;
 		m_View.CardImg.sprite = LoadSprite(card.cardImage);
+		m_View.CardImg.color = Color.white; // Initialize card image color
 		m_View.CardBackground.sprite = LoadSprite(card.cardBackground);
-		m_View.Description.text = card.description;
+		m_View.Description.text = card.GetFormattedDescription();
 		m_View.IconType.sprite = LoadSprite(card.iconType);
 		m_View.CardFrame.sprite = LoadSprite(card.cardFrame);
 
@@ -833,18 +908,20 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtDefence.color = Color.black;
 				break;
 
-			case ECardType.monster:
-				m_View.Attack.SetActive(true);
-				m_View.TxtAttack.text = card.currentAttack.ToString();
-				m_View.TxtAttack.color = Color.black;
-				m_View.Moster.SetActive(true);
-				m_View.TextHeart.text = card.currentHealth.ToString();
-				if (card.health > 0)
-				{
-					float ratio = (float)card.currentHealth / card.health;
-					m_View.MosterHeart.fillAmount = ratio;
-				}
-				break;
+		case ECardType.monster:
+			m_View.Attack.SetActive(true);
+			m_View.TxtAttack.text = card.currentAttack.ToString();
+			m_View.TxtAttack.color = Color.black;
+			m_View.Moster.SetActive(true);
+			m_View.TextHeart.text = card.currentHealth.ToString();
+			if (card.health > 0)
+			{
+				float ratio = (float)card.currentHealth / card.health;
+				m_View.MosterHeart.fillAmount = ratio;
+			}
+			// Update vulnerable visual effect for newly created monster cards
+			UpdateVulnerableUI();
+			break;
 
 			case ECardType.skill:
 				break;

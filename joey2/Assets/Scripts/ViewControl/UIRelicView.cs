@@ -11,6 +11,7 @@ public class UIRelicView : YBaseView
 	public GameObject CardItem;
 	public Image Tombstone;
 	public Image RelicImage;
+	public Text TxtCounter;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -24,5 +25,11 @@ public class UIRelicView : YBaseView
 		CardItem = viewItemList[3].Target.gameObject;
 		Tombstone = viewItemList[4].Target.GetComponent<Image>();
 		RelicImage = viewItemList[5].Target.GetComponent<Image>();
+		
+		// Counter display (optional for relics that need it)
+		if (viewItemList.Count > 6)
+		{
+			TxtCounter = viewItemList[6].Target.GetComponent<Text>();
+		}
 	}
 }
