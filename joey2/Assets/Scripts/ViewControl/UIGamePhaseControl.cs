@@ -1299,6 +1299,29 @@ public partial class UIGamePhaseControl : YViewControl
 		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
+			
+			// Add all bonuses that should be doubled by DualWield
+			// Include DualWieldMastery relic bonus if applicable
+			if (DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+			{
+				if (!HasBagCard(ECardType.defence))
+				{
+					attackValue += 5;
+				}
+			}
+			
+			// Include BloodyGloves relic bonus if applicable
+			if (DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+			{
+				if (lastAttackCard.CardEffect != null && lastAttackCard.CardEffect.Id == ECardEffectId.BareHands)
+				{
+					if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+					{
+						attackValue += 5;
+					}
+				}
+			}
+			
 			Debug.Log($"Before DoubleLastWeaponAttack: {attackValue}");
 			lastAttackCard.AddEffectValue(EEffectType.Damage, attackValue);
 			Debug.Log($"After DoubleLastWeaponAttack: {lastAttackCard.CardData.currentAttack + lastAttackCard.CardEffect.GetEffectValue(EEffectType.Damage)}");
