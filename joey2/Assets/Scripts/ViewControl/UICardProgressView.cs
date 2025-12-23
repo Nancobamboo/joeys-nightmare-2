@@ -7,13 +7,21 @@ public class UICardProgressView : YBaseView
 	public RectTransform Content;
 	public Button BtnClose;
 	public Button BtnAttack;
-	public Button BtnDefence;
 	public Button BtnItem;
 	public Button BtnSkill;
 	public RectTransform SelectAttack;
 	public RectTransform SelectDefence;
 	public RectTransform SelectItem;
 	public RectTransform SelectSkill;
+	public Button BtnAll;
+	public Button BtnCardShuriken;
+	public Button BtnCardMagic;
+	public Button BtnCardBlood;
+	public Button BtnCardFree;
+	public Button BtnCardKnight;
+	public Button BtnCardGrowth;
+	public GameObject SelectAll;
+	public Button BtnDefence;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -23,12 +31,20 @@ public class UICardProgressView : YBaseView
 		Content = viewItemList[0].Target.GetComponent<RectTransform>();
 		BtnClose = viewItemList[1].Target.GetComponent<Button>();
 		BtnAttack = viewItemList[2].Target.GetComponent<Button>();
-		BtnDefence = viewItemList[3].Target.GetComponent<Button>();
-		BtnItem = viewItemList[4].Target.GetComponent<Button>();
-		BtnSkill = viewItemList[5].Target.GetComponent<Button>();
-		SelectAttack = viewItemList[6].Target.GetComponent<RectTransform>();
-		SelectDefence = viewItemList[7].Target.GetComponent<RectTransform>();
-		SelectItem = viewItemList[8].Target.GetComponent<RectTransform>();
-		SelectSkill = viewItemList[9].Target.GetComponent<RectTransform>();
+		BtnItem = viewItemList[3].Target.GetComponent<Button>();
+		BtnSkill = viewItemList[4].Target.GetComponent<Button>();
+		SelectAttack = viewItemList[5].Target.GetComponent<RectTransform>();
+		SelectDefence = viewItemList[6].Target.GetComponent<RectTransform>();
+		SelectItem = viewItemList[7].Target.GetComponent<RectTransform>();
+		SelectSkill = viewItemList[8].Target.GetComponent<RectTransform>();
+		BtnAll = viewItemList[9].Target.GetComponent<Button>();
+		BtnCardShuriken = viewItemList[10].Target.GetComponent<Button>();
+		BtnCardMagic = viewItemList[11].Target.GetComponent<Button>();
+		BtnCardBlood = viewItemList[12].Target.GetComponent<Button>();
+		BtnCardFree = viewItemList[13].Target.GetComponent<Button>();
+		BtnCardKnight = viewItemList[14].Target.GetComponent<Button>();
+		BtnCardGrowth = viewItemList[15].Target.GetComponent<Button>();
+		SelectAll = viewItemList[16].Target.gameObject;
+		BtnDefence = viewItemList[17].Target.GetComponent<Button>();
 	}
 }

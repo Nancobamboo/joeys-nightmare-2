@@ -12,7 +12,7 @@ public enum ECardType
 	monster,
 	skill,
 	item,
-	other
+	other,
 }
 
 public enum EBuffType
@@ -254,7 +254,7 @@ public class UICardSimpleControl : YViewControl
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 				int attackValue = cachedCard.currentAttack + damageEffect;
-				
+
 				// DualWieldMastery relic: +5 damage when no defence equipped
 				bool hasDualWieldBonus = false;
 				if (!IsEnv && DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
@@ -265,7 +265,7 @@ public class UICardSimpleControl : YViewControl
 						hasDualWieldBonus = true;
 					}
 				}
-				
+
 				m_View.TxtAttack.text = attackValue.ToString();
 				if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
 				{
@@ -291,18 +291,18 @@ public class UICardSimpleControl : YViewControl
 				}
 				break;
 
-		case ECardType.monster:
-			m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
-			m_View.TxtAttack.color = Color.black;
-			m_View.TextHeart.text = cachedCard.currentHealth.ToString();
-			if (cachedCard.health > 0)
-			{
-				float ratio = (float)cachedCard.currentHealth / cachedCard.health;
-				m_View.MosterHeart.fillAmount = ratio;
-			}
-			// Update vulnerable visual effect
-			UpdateVulnerableUI();
-			break;
+			case ECardType.monster:
+				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
+				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
+				if (cachedCard.health > 0)
+				{
+					float ratio = (float)cachedCard.currentHealth / cachedCard.health;
+					m_View.MosterHeart.fillAmount = ratio;
+				}
+				// Update vulnerable visual effect
+				UpdateVulnerableUI();
+				break;
 
 			case ECardType.skill:
 				break;
@@ -349,7 +349,7 @@ public class UICardSimpleControl : YViewControl
 				float ratio = (float)card.currentHealth / card.health;
 				m_View.MosterHeart.fillAmount = ratio;
 			}
-			
+
 			// Update vulnerable visual effect
 			UpdateVulnerableUI();
 		}
@@ -464,7 +464,7 @@ public class UICardSimpleControl : YViewControl
 	{
 		int counter = GetBuffValue(EBuffType.Counter);
 		int vulnerable = GetBuffValue(EBuffType.Vulnerable);
-		
+
 		// Counter priority: Vulnerable > Counter
 		// Show vulnerable counter if exists
 		if (vulnerable > 0 && cachedCardType == ECardType.monster)
@@ -498,7 +498,7 @@ public class UICardSimpleControl : YViewControl
 			// Restore original color when vulnerable is removed
 			m_View.CardImg.color = Color.white;
 		}
-		
+
 		// Update Counter display when vulnerable changes
 		UpdateCounterUI();
 	}
@@ -840,17 +840,17 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.KnightSword_OnTop:
 				effect = new YKnightSword_OnTop();
 				break;
-		case ECardEffectId.KnightShield_OnTop:
-			effect = new YKnightShield_OnTop();
-			break;
+			case ECardEffectId.KnightShield_OnTop:
+				effect = new YKnightShield_OnTop();
+				break;
 			case ECardEffectId.SpiralShuriken:
 				effect = new YSpiralShuriken();
 				break;
-		case ECardEffectId.BlockFirstAttack:
-			effect = new YBlockFirstAttack();
-			break;
-		default:
-			return GetDefaultEffect();
+			case ECardEffectId.BlockFirstAttack:
+				effect = new YBlockFirstAttack();
+				break;
+			default:
+				return GetDefaultEffect();
 		}
 
 		effect.SetData(this);
@@ -896,20 +896,20 @@ public class UICardSimpleControl : YViewControl
 		CardEffect = GetCardEffect();
 		IsEffecting = false;
 
-	if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
-	{
-		DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
-		if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
+		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
 		{
-			AddRelicList(dataJoeyPlayer.RelicList);
-		}
-		// Refresh card display after applying relics (for bag cards)
-		if (!isEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
-		{
-			RefreshCard();
+			DataJoeyPlayer dataJoeyPlayer = DataSystem.Instance.GetDataJoeyPlayer();
+			if (dataJoeyPlayer != null && dataJoeyPlayer.RelicList != null)
+			{
+				AddRelicList(dataJoeyPlayer.RelicList);
+			}
+			// Refresh card display after applying relics (for bag cards)
+			if (!isEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
+			{
+				RefreshCard();
+			}
 		}
 	}
-}
 
 	private void SetTypeUI(Card card)
 	{
@@ -931,20 +931,20 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtDefence.color = Color.black;
 				break;
 
-		case ECardType.monster:
-			m_View.Attack.SetActive(true);
-			m_View.TxtAttack.text = card.currentAttack.ToString();
-			m_View.TxtAttack.color = Color.black;
-			m_View.Moster.SetActive(true);
-			m_View.TextHeart.text = card.currentHealth.ToString();
-			if (card.health > 0)
-			{
-				float ratio = (float)card.currentHealth / card.health;
-				m_View.MosterHeart.fillAmount = ratio;
-			}
-			// Update vulnerable visual effect for newly created monster cards
-			UpdateVulnerableUI();
-			break;
+			case ECardType.monster:
+				m_View.Attack.SetActive(true);
+				m_View.TxtAttack.text = card.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
+				m_View.Moster.SetActive(true);
+				m_View.TextHeart.text = card.currentHealth.ToString();
+				if (card.health > 0)
+				{
+					float ratio = (float)card.currentHealth / card.health;
+					m_View.MosterHeart.fillAmount = ratio;
+				}
+				// Update vulnerable visual effect for newly created monster cards
+				UpdateVulnerableUI();
+				break;
 
 			case ECardType.skill:
 				break;
