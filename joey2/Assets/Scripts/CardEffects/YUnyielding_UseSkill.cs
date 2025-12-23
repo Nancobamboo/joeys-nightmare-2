@@ -58,6 +58,7 @@ public partial class UIGamePhaseControl
         }
 
         AddBlockDamagePhaseEnd(baseExtra);
+        AddRemainingTurnsPhaseEnd(baseExtra);
     }
 
     void AddBlockDamagePhase(object[] paraArray)

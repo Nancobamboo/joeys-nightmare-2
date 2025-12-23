@@ -2,12 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ECardSchool
+{
+	None,
+	Shuriken,
+	Magic,
+	Blood,
+}
+
 public class UICardProgressControl : YViewControl
 {
 	private UICardProgressView m_View;
 	private List<UIPreviewCardControl> m_PreviewCardList = new List<UIPreviewCardControl>();
 	private Dictionary<int, List<UIPreviewCardControl>> m_CardTypeDict = new Dictionary<int, List<UIPreviewCardControl>>();
 	private ECardType m_CurrentCardType = ECardType.attack;
+	private ECardSchool m_CurrentCardSchool = ECardSchool.None;
+
+	private List<string> m_ShurikenSchoolCards = new List<string>
+	{
+		"1003", "1013", "1024", "3006"
+	};
+
+	private List<string> m_MagicSchoolCards = new List<string>
+	{
+		"1021", "1022", "2014", "4006", "4013", "4014", "4015", "4016"
+	};
+
+	private List<string> m_BloodSchoolCards = new List<string>
+	{
+		"1008", "1020", "2006", "2012", "3012", "3013", "4010", "4011", "4012"
+	};
 
 	public static EResType GetResType()
 	{
@@ -19,10 +43,15 @@ public class UICardProgressControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<UICardProgressView>();
 		m_View.BtnClose.onClick.AddListener(OnBtnCloseClick);
+		m_View.BtnAll.onClick.AddListener(() => OnTabClick(ECardType.other));
 		m_View.BtnAttack.onClick.AddListener(() => OnTabClick(ECardType.attack));
 		m_View.BtnDefence.onClick.AddListener(() => OnTabClick(ECardType.defence));
 		m_View.BtnItem.onClick.AddListener(() => OnTabClick(ECardType.item));
 		m_View.BtnSkill.onClick.AddListener(() => OnTabClick(ECardType.skill));
+		m_View.BtnCardFree.onClick.AddListener(() => OnSchoolClick(ECardSchool.None));
+		m_View.BtnCardShuriken.onClick.AddListener(() => OnSchoolClick(ECardSchool.Shuriken));
+		m_View.BtnCardMagic.onClick.AddListener(() => OnSchoolClick(ECardSchool.Magic));
+		m_View.BtnCardBlood.onClick.AddListener(() => OnSchoolClick(ECardSchool.Blood));
 	}
 
 	void OnBtnCloseClick()
@@ -36,6 +65,12 @@ public class UICardProgressControl : YViewControl
 		RefreshTabDisplay();
 	}
 
+	void OnSchoolClick(ECardSchool cardSchool)
+	{
+		m_CurrentCardSchool = cardSchool;
+		RefreshTabDisplay();
+	}
+
 	void RefreshTabDisplay()
 	{
 		m_View.SelectAttack.gameObject.SetActive(m_CurrentCardType == ECardType.attack);
@@ -43,17 +78,42 @@ public class UICardProgressControl : YViewControl
 		m_View.SelectItem.gameObject.SetActive(m_CurrentCardType == ECardType.item);
 		m_View.SelectSkill.gameObject.SetActive(m_CurrentCardType == ECardType.skill);
 
+		bool showAll = m_CurrentCardType == ECardType.other;
+		bool filterBySchool = m_CurrentCardSchool != ECardSchool.None;
+
 		foreach (var kvp in m_CardTypeDict)
 		{
 			ECardType cardType = (ECardType)kvp.Key;
-			bool shouldShow = cardType == m_CurrentCardType;
+			bool shouldShowByType = showAll || cardType == m_CurrentCardType;
 			foreach (var cardControl in kvp.Value)
 			{
 				if (cardControl != null)
 				{
+					bool shouldShow = shouldShowByType;
+					if (shouldShow && filterBySchool)
+					{
+						shouldShow = IsCardInSchool(cardControl.CardData.id, m_CurrentCardSchool);
+					}
 					cardControl.gameObject.SetActive(shouldShow);
 				}
 			}
+		}
+	}
+
+	bool IsCardInSchool(string cardId, ECardSchool school)
+	{
+		switch (school)
+		{
+			case ECardSchool.Shuriken:
+				return m_ShurikenSchoolCards.Contains(cardId);
+			case ECardSchool.Magic:
+				return m_MagicSchoolCards.Contains(cardId);
+			case ECardSchool.Blood:
+				return m_BloodSchoolCards.Contains(cardId);
+			case ECardSchool.None:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -63,19 +123,17 @@ public class UICardProgressControl : YViewControl
 		Dictionary<string, Card> cardDict = GData.Instance.CardDict;
 		DataCardProgress cardProgress = DataSystem.Instance.GetDataCardProgress();
 
-		// 需要过滤的卡牌ID集合
-		HashSet<string> filteredCardIds = new HashSet<string> 
-		{ 
-			"1000", "1001", "1011", "1019", "2000", "3000", 
-			"4000", "4002", "4003", "4004", "4005", "4009", 
-			"5000", "5001", "5007", "5008", "5030", "5031", "5038", "5039" 
+		HashSet<string> filteredCardIds = new HashSet<string>
+		{
+			"1000", "1001", "1011", "1019", "2000", "3000",
+			"4000", "4002", "4003", "4004", "4005", "4009",
+			"5000", "5001", "5007", "5008", "5030", "5031", "5038", "5039"
 		};
 
 
 
 		foreach (Card card in cardDict.Values)
 		{
-			// 跳过需要过滤的卡牌
 			if (filteredCardIds.Contains(card.id))
 			{
 				continue;
@@ -121,7 +179,8 @@ public class UICardProgressControl : YViewControl
 			}
 		}
 
-		m_CurrentCardType = ECardType.attack;
+		m_CurrentCardType = ECardType.other;
+		m_CurrentCardSchool = ECardSchool.None;
 		RefreshTabDisplay();
 	}
 

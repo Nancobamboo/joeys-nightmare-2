@@ -14,6 +14,11 @@ public class UICardProgressView : YBaseView
 	public RectTransform SelectDefence;
 	public RectTransform SelectItem;
 	public RectTransform SelectSkill;
+	public Button BtnAll;
+	public Button BtnCardShuriken;
+	public Button BtnCardMagic;
+	public Button BtnCardBlood;
+	public Button BtnCardFree;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -30,5 +35,10 @@ public class UICardProgressView : YBaseView
 		SelectDefence = viewItemList[7].Target.GetComponent<RectTransform>();
 		SelectItem = viewItemList[8].Target.GetComponent<RectTransform>();
 		SelectSkill = viewItemList[9].Target.GetComponent<RectTransform>();
+		BtnAll = viewItemList[10].Target.GetComponent<Button>();
+		BtnCardShuriken = viewItemList[11].Target.GetComponent<Button>();
+		BtnCardMagic = viewItemList[12].Target.GetComponent<Button>();
+		BtnCardBlood = viewItemList[13].Target.GetComponent<Button>();
+		BtnCardFree = viewItemList[14].Target.GetComponent<Button>();
 	}
 }
