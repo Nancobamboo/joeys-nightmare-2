@@ -94,8 +94,6 @@ public enum ECardEffectId
     KnightSword_OnTop,
     KnightShield_OnTop,
     SpiralShuriken,
-	KnightSword_OnTop,
-	KnightShield_OnTop,
 	BlockFirstAttack,
 
 }
