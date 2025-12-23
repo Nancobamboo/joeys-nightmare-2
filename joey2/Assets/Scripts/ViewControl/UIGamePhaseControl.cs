@@ -1055,6 +1055,11 @@ public partial class UIGamePhaseControl : YViewControl
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
 
 			Card configCard = GData.Instance.GetCardConfigById(monsterId);
+			if (configCard != null && configCard.stars == 3)
+			{
+				DataSystem.Instance.AddGrowthPoints(10);
+			}
+
 			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
 			if (configCard != null && configCard.price > 0)
 			{

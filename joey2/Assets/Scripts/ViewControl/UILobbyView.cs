@@ -11,6 +11,7 @@ public class UILobbyView : YBaseView
 	public Button BtnCardProgress;
 	public Button BtnHardGame;
 	public Button BtnSkip;
+	public Button BtnGrowth;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -24,5 +25,6 @@ public class UILobbyView : YBaseView
 		BtnCardProgress = viewItemList[4].Target.GetComponent<Button>();
 		BtnHardGame = viewItemList[5].Target.GetComponent<Button>();
 		BtnSkip = viewItemList[6].Target.GetComponent<Button>();
+		BtnGrowth = viewItemList[7].Target.GetComponent<Button>();
 	}
 }

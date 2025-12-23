@@ -20,6 +20,7 @@ public partial class DataSystem
         LoadVFX();
         LoadDataCardProgress();
         LoadDataAchievement();
+        LoadDataGrowth();
     }
 
     public void LoadVFX()
