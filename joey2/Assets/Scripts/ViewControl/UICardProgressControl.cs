@@ -8,6 +8,8 @@ public enum ECardSchool
 	Shuriken,
 	Magic,
 	Blood,
+	Knight,
+	Growth,
 }
 
 public class UICardProgressControl : YViewControl
@@ -20,7 +22,7 @@ public class UICardProgressControl : YViewControl
 
 	private List<string> m_ShurikenSchoolCards = new List<string>
 	{
-		"1003", "1013", "1024", "3006"
+		"1003", "1013", "1024", "3006", "1018", "2007", "4007", "4008", "2004", "2005"
 	};
 
 	private List<string> m_MagicSchoolCards = new List<string>
@@ -31,6 +33,16 @@ public class UICardProgressControl : YViewControl
 	private List<string> m_BloodSchoolCards = new List<string>
 	{
 		"1008", "1020", "2006", "2012", "3012", "3013", "4010", "4011", "4012"
+	};
+
+	private List<string> m_KnightSchoolCards = new List<string>
+	{
+		"1023", "2015", "2008", "1016", "2011", "2003", "2009", "2010", "2013", "4001", "4003", "4005"
+	};
+
+	private List<string> m_GrowthSchoolCards = new List<string>
+	{
+		"1012", "1013", "2008", "3007", "3008", "3009", "3010"
 	};
 
 	public static EResType GetResType()
@@ -52,6 +64,8 @@ public class UICardProgressControl : YViewControl
 		m_View.BtnCardShuriken.onClick.AddListener(() => OnSchoolClick(ECardSchool.Shuriken));
 		m_View.BtnCardMagic.onClick.AddListener(() => OnSchoolClick(ECardSchool.Magic));
 		m_View.BtnCardBlood.onClick.AddListener(() => OnSchoolClick(ECardSchool.Blood));
+		m_View.BtnCardKnight.onClick.AddListener(() => OnSchoolClick(ECardSchool.Knight));
+		m_View.BtnCardGrowth.onClick.AddListener(() => OnSchoolClick(ECardSchool.Growth));
 	}
 
 	void OnBtnCloseClick()
@@ -73,6 +87,7 @@ public class UICardProgressControl : YViewControl
 
 	void RefreshTabDisplay()
 	{
+		m_View.SelectAll.gameObject.SetActive(m_CurrentCardType == ECardType.other);
 		m_View.SelectAttack.gameObject.SetActive(m_CurrentCardType == ECardType.attack);
 		m_View.SelectDefence.gameObject.SetActive(m_CurrentCardType == ECardType.defence);
 		m_View.SelectItem.gameObject.SetActive(m_CurrentCardType == ECardType.item);
@@ -110,6 +125,10 @@ public class UICardProgressControl : YViewControl
 				return m_MagicSchoolCards.Contains(cardId);
 			case ECardSchool.Blood:
 				return m_BloodSchoolCards.Contains(cardId);
+			case ECardSchool.Knight:
+				return m_KnightSchoolCards.Contains(cardId);
+			case ECardSchool.Growth:
+				return m_GrowthSchoolCards.Contains(cardId);
 			case ECardSchool.None:
 				return true;
 			default:
