@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: VFX_Shihun_3
-  m_Shader: {fileID: 4800000, guid: d4f7c5def5e46e242b78092c12e7c8e1, type: 3}
+  m_Shader: {fileID: 4800000, guid: bd35eaa8d548cd3458f24b35b409c4d5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -18,7 +18,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -70,7 +70,7 @@ Material:
     - _AlphaLimit: 0
     - _AnimMode: 0
     - _BlendDst: 1
-    - _BlendMode: 0
+    - _BlendMode: 1
     - _BlendSrc: 5
     - _CustomDataUV: 0
     - _InvFade: 0.44
@@ -101,7 +101,7 @@ Material:
     - _DistortXY: {r: 0, g: 0, b: 0, a: 0}
     - _DistortXY1: {r: 0, g: 0, b: 0, a: 0}
     - _EdgeColor: {r: 43.74415, g: 1.8870025, b: 0, a: 1}
-    - _FixValue: {r: 1, g: 1, b: 0, a: 0}
+    - _FixValue: {r: 0, g: 0, b: 0, a: 0}
     - _MainRot: {r: 0, g: 1, b: 0, a: 1}
     - _Panner1: {r: 0, g: 0, b: 0, a: 0}
     - _Panner2: {r: 0, g: 0, b: 0, a: 0}
