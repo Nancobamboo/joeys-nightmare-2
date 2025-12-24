@@ -7,6 +7,75 @@ using UnityEngine;
 
 public partial class DataSystem
 {
+    private static bool ReplaceFirst(List<string> list, string fromId, string toId)
+    {
+        if (list == null || list.Count == 0) return false;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] == fromId)
+            {
+                list[i] = toId;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void ApplyGrowthToStartLoadout(
+        List<string> equipmentAttack,
+        List<string> equipmentDefence,
+        ref int coins,
+        ref int maxHealth,
+        List<int> extraRelics)
+    {
+        DataGrowth growth = GetDataGrowth();
+        bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
+
+        // Node 0: 初始遗物 - 烤肉香香
+        if (Unlocked(0))
+        {
+            extraRelics?.Add((int)ERelicType.BBQDelight);
+        }
+
+        // hp +4 nodes: 1,3,14,15,17,20
+        int hpNodeCount = 0;
+        if (Unlocked(1)) hpNodeCount++;
+        if (Unlocked(3)) hpNodeCount++;
+        if (Unlocked(14)) hpNodeCount++;
+        if (Unlocked(15)) hpNodeCount++;
+        if (Unlocked(17)) hpNodeCount++;
+        if (Unlocked(20)) hpNodeCount++;
+        if (hpNodeCount > 0) maxHealth += hpNodeCount * 4;
+
+        // gold +50 nodes: 2,4,13,16,18,19
+        int goldNodeCount = 0;
+        if (Unlocked(2)) goldNodeCount++;
+        if (Unlocked(4)) goldNodeCount++;
+        if (Unlocked(13)) goldNodeCount++;
+        if (Unlocked(16)) goldNodeCount++;
+        if (Unlocked(18)) goldNodeCount++;
+        if (Unlocked(19)) goldNodeCount++;
+        if (goldNodeCount > 0) coins += goldNodeCount * 50;
+
+        // 装备替换节点（每个节点只替换一把：ReplaceFirst）
+        if (Unlocked(5))
+        {
+            ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
+        }
+        if (Unlocked(8))
+        {
+            ReplaceFirst(equipmentAttack, "1002", "1004"); // 断剑 -> 木棒
+        }
+        if (Unlocked(10))
+        {
+            ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        }
+        if (Unlocked(11))
+        {
+            ReplaceFirst(equipmentAttack, "1002", "1018"); // 断剑 -> 刺客匕首
+        }
+    }
+
     public Dictionary<int, float> VFXDelayTimeDict = new Dictionary<int, float>();
     public Dictionary<int, float> AnimDelayTimeDict = new Dictionary<int, float>();
     public bool IsHardGame = false;
@@ -99,6 +168,13 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
 
+        int coins = characterData.coins;
+        int maxHealth = characterData.maxHealth;
+        var equipAttack = new List<string>(characterData.equipmentAttack);
+        var equipDefence = new List<string>(characterData.equipmentDefence);
+        var extraRelics = new List<int>();
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+
         for (int i = 0; i < characterData.cardDeck.Count; i++)
         {
             string cardId = characterData.cardDeck[i];
@@ -107,18 +183,18 @@ public partial class DataSystem
             dataJoeyPlayer.AddSelfCardDictData(card);
         }
 
-        for (int i = 0; i < characterData.equipmentAttack.Count; i++)
+        for (int i = 0; i < equipAttack.Count; i++)
         {
-            string cardId = characterData.equipmentAttack[i];
+            string cardId = equipAttack[i];
             if (string.IsNullOrEmpty(cardId)) continue;
             Card card = CreateCard(cardId);
             dataJoeyPlayer.AddSelfCardDictData(card);
             dataJoeyPlayer.AddEquipedAttackListData(card.UniqueId);
         }
 
-        for (int i = 0; i < characterData.equipmentDefence.Count; i++)
+        for (int i = 0; i < equipDefence.Count; i++)
         {
-            string cardId = characterData.equipmentDefence[i];
+            string cardId = equipDefence[i];
             if (string.IsNullOrEmpty(cardId)) continue;
             Card card = CreateCard(cardId);
             dataJoeyPlayer.AddSelfCardDictData(card);
@@ -154,7 +230,13 @@ public partial class DataSystem
             }
         }
 
-        dataJoeyPlayer.Coin = characterData.coins;
+        for (int i = 0; i < extraRelics.Count; i++)
+        {
+            int rid = extraRelics[i];
+            if (!dataJoeyPlayer.RelicList.Contains(rid)) dataJoeyPlayer.AddRelicListData(rid);
+        }
+
+        dataJoeyPlayer.Coin = coins;
 
         if (isNew)
         {
@@ -171,10 +253,10 @@ public partial class DataSystem
             dataJoeyPlayer.MaxEquipedSkillNum = 3;
         }
 
-        if (characterData.maxHealth > 0)
+        if (maxHealth > 0)
         {
-            dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
-            dataJoeyPlayer.playerHealth = characterData.maxHealth;
+            dataJoeyPlayer.playerMaxHealth = maxHealth;
+            dataJoeyPlayer.playerHealth = maxHealth;
         }
 
         RoguelikeStage firstStage = GData.Instance.GetRoguelikeStage(0);
@@ -213,6 +295,13 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
 
+        int coins = characterData.coins;
+        int maxHealth = characterData.maxHealth;
+        var equipAttack = new List<string>(characterData.equipmentAttack);
+        var equipDefence = new List<string>(characterData.equipmentDefence);
+        var extraRelics = new List<int>();
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+
         //dataJoeyPlayer.ClearEnvCardPool();
 
         // Env mode only uses card_deck, not equipment fields
@@ -236,12 +325,18 @@ public partial class DataSystem
             }
         }
 
-        dataJoeyPlayer.Coin = characterData.coins;
-
-        if (characterData.maxHealth > 0)
+        for (int i = 0; i < extraRelics.Count; i++)
         {
-            dataJoeyPlayer.playerMaxHealth = characterData.maxHealth;
-            dataJoeyPlayer.playerHealth = characterData.maxHealth;
+            int rid = extraRelics[i];
+            if (!dataJoeyPlayer.RelicList.Contains(rid)) dataJoeyPlayer.AddRelicListData(rid);
+        }
+
+        dataJoeyPlayer.Coin = coins;
+
+        if (maxHealth > 0)
+        {
+            dataJoeyPlayer.playerMaxHealth = maxHealth;
+            dataJoeyPlayer.playerHealth = maxHealth;
         }
 
         dataJoeyPlayer.currentLevel = 1;
