@@ -216,8 +216,6 @@ public class JoeyGameControl : YViewControl
 		{
 			if (DataSystem.Instance.IsHardGame && m_DataJoeyPlayer.StageId == 0)
 			{
-				m_DataJoeyPlayer.RemoveEnvCardPoolData("2001");
-				m_DataJoeyPlayer.AddEnvCardPoolData("2009");
 
 				m_DataJoeyPlayer.StageId++;
 				DataSystem.Instance.AddCoin(1000);
