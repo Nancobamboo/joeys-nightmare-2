@@ -73,6 +73,7 @@ public partial class DataSystem
         if (Unlocked(11))
         {
             ReplaceFirst(equipmentAttack, "1002", "1018"); // 断剑 -> 刺客匕首
+            ReplaceFirst(equipmentAttack, "1004", "1018");
         }
     }
 
