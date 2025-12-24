@@ -17,8 +17,11 @@ public class UIGrowthWindowControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIGrowthWindowView>();
-		m_View.BtnBuy.onClick.AddListener(OnBtnBuyClick);
-		m_View.BtnClose.onClick.AddListener(Close);
+		if (m_View.BtnBuy != null) m_View.BtnBuy.onClick.AddListener(OnBtnBuyClick);
+		else Debug.LogError("[UIGrowthWindowControl] BtnBuy is null (binding failed).");
+
+		if (m_View.BtnClose != null) m_View.BtnClose.onClick.AddListener(Close);
+		else Debug.LogError("[UIGrowthWindowControl] BtnClose is null (binding failed).");
 	}
 
 	public void SetData(int id, string desc, int price, Action onBuy)

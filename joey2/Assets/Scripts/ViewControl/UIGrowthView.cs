@@ -26,12 +26,45 @@ public class UIGrowthView : YBaseView
 	public RectTransform Btn19;
 	public RectTransform Btn20;
 	public Button BtnSkip;
-	public override void OnInit(Transform holder)
+	public Text TextCoins;
+
+	private static Transform FindDeepChild(Transform root, string name)
 	{
-		var itemRef = holder.GetComponent<YViewReference>();
-		if(itemRef == null) return;
-		var viewItemList = itemRef.ViewItemList;
-		if(viewItemList == null || viewItemList.Count == 0) return;
+		if (root == null) return null;
+		var stack = new System.Collections.Generic.Stack<Transform>();
+		stack.Push(root);
+		while (stack.Count > 0)
+		{
+			var t = stack.Pop();
+			if (t != null && t.name == name) return t;
+			for (int i = 0; i < t.childCount; i++)
+			{
+				stack.Push(t.GetChild(i));
+			}
+		}
+		return null;
+	}
+
+	private static RectTransform FindRect(Transform holder, string name)
+	{
+		var t = FindDeepChild(holder, name);
+		return t != null ? t.GetComponent<RectTransform>() : null;
+	}
+
+	private static Button FindButton(Transform holder, string name)
+	{
+		var t = FindDeepChild(holder, name);
+		return t != null ? t.GetComponent<Button>() : null;
+	}
+
+	private static Text FindText(Transform holder, string name)
+	{
+		var t = FindDeepChild(holder, name);
+		return t != null ? t.GetComponent<Text>() : null;
+	}
+
+	private void BindByIndex(System.Collections.Generic.List<YViewItem> viewItemList)
+	{
 		Btn = viewItemList[0].Target.GetComponent<RectTransform>();
 		Btn1 = viewItemList[1].Target.GetComponent<RectTransform>();
 		Btn2 = viewItemList[2].Target.GetComponent<RectTransform>();
@@ -54,5 +87,60 @@ public class UIGrowthView : YBaseView
 		Btn19 = viewItemList[19].Target.GetComponent<RectTransform>();
 		Btn20 = viewItemList[20].Target.GetComponent<RectTransform>();
 		BtnSkip = viewItemList[21].Target.GetComponent<Button>();
+		TextCoins = viewItemList[22].Target.GetComponent<Text>();
+	}
+
+	private void BindByNameFallback(Transform holder)
+	{
+		if (Btn == null) Btn = FindRect(holder, "Btn");
+		if (Btn1 == null) Btn1 = FindRect(holder, "Btn1");
+		if (Btn2 == null) Btn2 = FindRect(holder, "Btn2");
+		if (Btn3 == null) Btn3 = FindRect(holder, "Btn3");
+		if (Btn4 == null) Btn4 = FindRect(holder, "Btn4");
+		if (Btn5 == null) Btn5 = FindRect(holder, "Btn5");
+		if (Btn6 == null) Btn6 = FindRect(holder, "Btn6");
+		if (Btn7 == null) Btn7 = FindRect(holder, "Btn7");
+		if (Btn8 == null) Btn8 = FindRect(holder, "Btn8");
+		if (Btn9 == null) Btn9 = FindRect(holder, "Btn9");
+		if (Btn10 == null) Btn10 = FindRect(holder, "Btn10");
+		if (Btn11 == null) Btn11 = FindRect(holder, "Btn11");
+		if (Btn12 == null) Btn12 = FindRect(holder, "Btn12");
+		if (Btn13 == null) Btn13 = FindRect(holder, "Btn13");
+		if (Btn14 == null) Btn14 = FindRect(holder, "Btn14");
+		if (Btn15 == null) Btn15 = FindRect(holder, "Btn15");
+		if (Btn16 == null) Btn16 = FindRect(holder, "Btn16");
+		if (Btn17 == null) Btn17 = FindRect(holder, "Btn17");
+		if (Btn18 == null) Btn18 = FindRect(holder, "Btn18");
+		if (Btn19 == null) Btn19 = FindRect(holder, "Btn19");
+		if (Btn20 == null) Btn20 = FindRect(holder, "Btn20");
+
+		if (BtnSkip == null) BtnSkip = FindButton(holder, "BtnSkip");
+		// 你新增的文本，如果 prefab 名字叫 TextCoin/Coins 都做个兼容
+		if (TextCoins == null) TextCoins = FindText(holder, "TextCoins");
+		if (TextCoins == null) TextCoins = FindText(holder, "TextCoin");
+		if (TextCoins == null) TextCoins = FindText(holder, "TxtCoins");
+	}
+
+	public override void OnInit(Transform holder)
+	{
+		var itemRef = holder.GetComponent<YViewReference>();
+		if (itemRef != null)
+		{
+			var viewItemList = itemRef.ViewItemList;
+			if (viewItemList != null && viewItemList.Count >= 23)
+			{
+				BindByIndex(viewItemList);
+			}
+			else
+			{
+				Debug.LogWarning($"[UIGrowthView] ViewItemList count not enough (need 23). Actual: {(viewItemList == null ? 0 : viewItemList.Count)}. Fallback to Find-by-name.");
+			}
+		}
+		else
+		{
+			Debug.LogWarning("[UIGrowthView] Missing YViewReference on holder. Fallback to Find-by-name.");
+		}
+
+		BindByNameFallback(holder);
 	}
 }
