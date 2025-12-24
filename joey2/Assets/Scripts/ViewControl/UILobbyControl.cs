@@ -7,6 +7,8 @@ public class UILobbyControl : YViewControl
 	private UIShopControl m_ShopControl;
 	private UIAchievementControl m_AchievementControl;
 	private UICardProgressControl m_CardProgressControl;
+	private UIGrowthControl m_GrowthControl;
+
 	public static EResType GetResType()
 	{
 		return EResType.UILobby;
@@ -23,6 +25,10 @@ public class UILobbyControl : YViewControl
 		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
 		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
 		m_View.BtnSkip.onClick.AddListener(Close);
+		if (m_View.BtnGrowth != null)
+		{
+			m_View.BtnGrowth.onClick.AddListener(OnBtnGrowthClick);
+		}
 	}
 
 	public void OnBtnBuildClick()
@@ -41,6 +47,16 @@ public class UILobbyControl : YViewControl
 			m_CardProgressControl = Asset.OpenUI<UICardProgressControl>();
 		}
 		m_CardProgressControl.SetData();
+	}
+
+	void OnBtnGrowthClick()
+	{
+		if (m_GrowthControl == null)
+		{
+			m_GrowthControl = Asset.OpenUI<UIGrowthControl>();
+		}
+		m_GrowthControl.SetData();
+		m_GrowthControl.gameObject.SetActive(true);
 	}
 
 	void OnBtnHardGameClick()
@@ -109,6 +125,10 @@ public class UILobbyControl : YViewControl
 		if (m_CardProgressControl != null)
 		{
 			m_CardProgressControl.Close();
+		}
+		if (m_GrowthControl != null)
+		{
+			m_GrowthControl.Close();
 		}
 	}
 }
