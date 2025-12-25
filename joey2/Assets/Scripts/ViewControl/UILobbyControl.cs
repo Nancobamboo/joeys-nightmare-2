@@ -26,7 +26,8 @@ public class UILobbyControl : YViewControl
 		m_View.BtnGame.onClick.AddListener(OnBtnGameClick);
 		//m_View.BtnMerge.onClick.AddListener(OnBtnMergeClick);
 		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
-		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
+		m_View.BtnNew.onClick.AddListener(OnBtnNewClick);
+		m_View.BtnContinue.onClick.AddListener(OnBtnContinueClick);
 		m_View.BtnSkip.onClick.AddListener(Close);
 		if (m_View.BtnLeft != null)
 		{
@@ -43,6 +44,8 @@ public class UILobbyControl : YViewControl
 
 		// Setup difficulty tooltip
 		SetupDifficultyTooltip();
+
+		RefreshContinueButtonState();
 	}
 
 	void Update()
@@ -87,16 +90,39 @@ public class UILobbyControl : YViewControl
 		m_GrowthControl.gameObject.SetActive(true);
 	}
 
-	void OnBtnHardGameClick()
+	private void StartEnvGame(bool isNewGame)
 	{
-		if(m_IsNewGame)
+		if (isNewGame)
 		{
-            DataSystem.Instance.ResetDataJoeyPlayer();
+			DataSystem.Instance.ResetDataJoeyPlayer();
+		}
 
-        }
-        // Start Env mode game with current difficulty
-        DataSystem.Instance.IsHardGame = false;
+		// Start Env mode game with current difficulty
+		DataSystem.Instance.IsHardGame = false;
 		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
+	}
+
+	private void OnBtnNewClick()
+	{
+		StartEnvGame(true);
+	}
+
+	private void OnBtnContinueClick()
+	{
+		RefreshContinueButtonState();
+		if (m_View != null && m_View.BtnContinue != null && !m_View.BtnContinue.interactable)
+		{
+			return;
+		}
+		StartEnvGame(false);
+	}
+
+	private void RefreshContinueButtonState()
+	{
+		if (m_View == null || m_View.BtnContinue == null) return;
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
+		m_View.BtnContinue.interactable = hasSaveData;
 	}
 
 	void OnBtnShopClick()
@@ -240,7 +266,9 @@ public class UILobbyControl : YViewControl
         m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
 		m_View.BtnGame.gameObject.SetActive(isDebug);
-		m_View.BtnHardGame.gameObject.SetActive(!isDebug);
+		m_View.BtnNew.gameObject.SetActive(!isDebug);
+		m_View.BtnContinue.gameObject.SetActive(!isDebug);
+		RefreshContinueButtonState();
 		RefreshDifficultyUI();
 	}
 
