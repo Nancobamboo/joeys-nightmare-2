@@ -16,6 +16,8 @@ public class UILobbyView : YBaseView
 	public Button BtnRight;
 	public Text TextDiff;
 	public Button BtnContinue;
+	public Text TxtContinue;
+	public EventTriggerListener TriggerDiffer;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -34,5 +36,7 @@ public class UILobbyView : YBaseView
 		BtnRight = viewItemList[9].Target.GetComponent<Button>();
 		TextDiff = viewItemList[10].Target.GetComponent<Text>();
 		BtnContinue = viewItemList[11].Target.GetComponent<Button>();
+		TxtContinue = viewItemList[12].Target.GetComponent<Text>();
+		TriggerDiffer = viewItemList[13].Target.GetComponent<EventTriggerListener>();
 	}
 }
