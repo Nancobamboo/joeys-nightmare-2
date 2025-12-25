@@ -343,16 +343,10 @@ public partial class DataSystem
 
         dataJoeyPlayer.currentLevel = 1;
 
-        // Initialize difficulty level to 1 for new players
-        if (dataJoeyPlayer.EnvDifficultyLevel <= 0)
-        {
-            dataJoeyPlayer.EnvDifficultyLevel = 1;
-        }
-
         // Apply difficulty effects based on current difficulty level
         ApplyEnvDifficultyEffects(dataJoeyPlayer);
 
-        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool, difficulty level: {dataJoeyPlayer.EnvDifficultyLevel}");
+        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool, difficulty level: {GetCurrentDifficulty()}");
         SaveDataJoeyPlayer();
     }
 
@@ -362,7 +356,7 @@ public partial class DataSystem
     /// </summary>
     private void ApplyEnvDifficultyEffects(DataJoeyPlayer dataJoeyPlayer)
     {
-        int difficultyLevel = dataJoeyPlayer.EnvDifficultyLevel;
+        int difficultyLevel = GetCurrentDifficulty();
 
         // Apply cumulative effects from all difficulty levels up to current
         for (int level = 2; level <= difficultyLevel; level++)
@@ -484,22 +478,13 @@ public partial class DataSystem
 
     public void ResetDataJoeyPlayer()
     {
-        // Save current difficulty level before reset
-        int savedDifficultyLevel = m_DataJoeyPlayer != null ? m_DataJoeyPlayer.EnvDifficultyLevel : 1;
-        
+        // Difficulty is now tracked in DataDifficulty, no need to preserve in player data
         m_DataJoeyPlayer = new DataJoeyPlayer();
-        
-        // Restore difficulty level (keep player's progress)
-        m_DataJoeyPlayer.EnvDifficultyLevel = savedDifficultyLevel;
-        if (m_DataJoeyPlayer.EnvDifficultyLevel < 1)
-        {
-            m_DataJoeyPlayer.EnvDifficultyLevel = 1;
-        }
         
         isFinishGame = false;
         SaveDataJoeyPlayer();
         
-        Debug.Log($"Player data reset. Difficulty level preserved: {savedDifficultyLevel}");
+        Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
     }
 }
 

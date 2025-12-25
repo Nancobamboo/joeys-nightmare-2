@@ -46,78 +46,6 @@ public class UIStartControl : YViewControl
 		SetupButtonHoverEffect(m_View.BtnAchievement, m_View.TriggerAchieve);
 
 		ApplyScreenResolution(isFullScreen);
-		
-		// Display current difficulty level
-		UpdateDifficultyDisplay();
-	}
-	
-	void Update()
-	{
-		CheckDebugInput();
-	}
-	
-	void CheckDebugInput()
-	{
-		// Debug: Decrease difficulty (F9)
-		if (Input.GetKeyDown(KeyCode.F9))
-		{
-			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-			if (playerData.EnvDifficultyLevel > 1)
-			{
-				playerData.EnvDifficultyLevel--;
-				DataSystem.Instance.SaveDataJoeyPlayer();
-				UpdateDifficultyDisplay();
-				Debug.Log($"[DEBUG] Difficulty decreased to {playerData.EnvDifficultyLevel}");
-			}
-		}
-		
-		// Debug: Increase difficulty (F10)
-		if (Input.GetKeyDown(KeyCode.F10))
-		{
-			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-			if (playerData.EnvDifficultyLevel < 8)
-			{
-				playerData.EnvDifficultyLevel++;
-				DataSystem.Instance.SaveDataJoeyPlayer();
-				UpdateDifficultyDisplay();
-				Debug.Log($"[DEBUG] Difficulty increased to {playerData.EnvDifficultyLevel}");
-			}
-		}
-	}
-	
-	void UpdateDifficultyDisplay()
-	{
-		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-		
-		// Initialize difficulty if not set
-		if (playerData.EnvDifficultyLevel <= 0)
-		{
-			playerData.EnvDifficultyLevel = 1;
-			DataSystem.Instance.SaveDataJoeyPlayer();
-		}
-		
-		int difficulty = playerData.EnvDifficultyLevel;
-		int maxStage = GData.Instance.GetMaxUnlockedStage();
-		Debug.Log($"Current Difficulty: {difficulty} | Max Unlocked Stage: {maxStage}");
-		
-		// Update button text to show difficulty only
-		if (m_View != null && m_View.BtnEnv != null)
-		{
-			Text btnText = m_View.BtnEnv.GetComponentInChildren<Text>();
-			if (btnText != null)
-			{
-				btnText.text = $"难度{difficulty}";
-				Debug.Log($"Button text updated: {btnText.text}");
-			}
-			else
-			{
-				Debug.LogWarning("BtnEnv Text component not found!");
-			}
-		}
-		else
-		{
-			Debug.LogWarning("m_View or BtnEnv is null!");
-		}
 	}
 
 	private void SetupButtonHoverEffect(Button button, EventTriggerListener trigger)
@@ -142,9 +70,9 @@ public class UIStartControl : YViewControl
 
 	private void OnBtnRoguelikeClick()
 	{
-		DataSystem.Instance.IsHardGame = false;
-		ClearPlayerData();
-		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
+		// Open lobby instead of directly starting the game
+		var ctrl = Asset.OpenUI<UILobbyControl>();
+		ctrl.SetData(false); // false表示不是从成就界面进入
 	}
 
 	private void OnBtnGuideClick()

@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 public class DataDifficulty : IData
 {
     public const int MinDifficulty = 1;
-    public const int MaxDifficulty = 10;
+    public const int MaxDifficulty = 8; // Changed from 10 to match difficulty_config.csv (8 difficulty levels)
 
     /// <summary>
     /// 已解锁的最大难度（默认1）

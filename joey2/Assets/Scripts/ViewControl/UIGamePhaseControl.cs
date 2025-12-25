@@ -331,6 +331,9 @@ public partial class UIGamePhaseControl : YViewControl
 			case ETheme.deadkey:
 				m_View.DeadkeyBg.SetActive(true);
 				break;
+			case ETheme.tutorial:
+				m_View.GuideBg.SetActive(true);
+				break;
 		}
 	}
 
@@ -727,8 +730,7 @@ public partial class UIGamePhaseControl : YViewControl
 	/// </summary>
 	private void ApplyEnvDifficultyToMonster(Card monsterCard)
 	{
-		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-		int difficultyLevel = playerData.EnvDifficultyLevel;
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
 		
 		// Apply cumulative bonuses from difficulty levels 2 and up
 		for (int level = 2; level <= difficultyLevel; level++)

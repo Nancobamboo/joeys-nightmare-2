@@ -151,9 +151,8 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         EnvStage envStage = GData.Instance.GetEnvStage(level);
         if (envStage != null)
         {
-            // Get current difficulty level from player data
-            DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-            int difficultyLevel = playerData.EnvDifficultyLevel;
+            // Get current difficulty level from DataDifficulty system
+            int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
             
             // Get monsters for current difficulty (cumulative)
             List<string> monsters = envStage.GetMonstersByDifficulty(difficultyLevel);

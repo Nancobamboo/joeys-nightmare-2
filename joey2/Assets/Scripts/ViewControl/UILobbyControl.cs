@@ -8,6 +8,8 @@ public class UILobbyControl : YViewControl
 	private UIAchievementControl m_AchievementControl;
 	private UICardProgressControl m_CardProgressControl;
 	private UIGrowthControl m_GrowthControl;
+	private EventTriggerListener m_DiffTooltipTrigger;
+	private GameObject m_TooltipPanel;
 
 	public static EResType GetResType()
 	{
@@ -36,6 +38,23 @@ public class UILobbyControl : YViewControl
 		if (m_View.BtnGrowth != null)
 		{
 			m_View.BtnGrowth.onClick.AddListener(OnBtnGrowthClick);
+		}
+
+		// Setup difficulty tooltip
+		SetupDifficultyTooltip();
+	}
+
+	void Update()
+	{
+		// Debug: Unlock all difficulties (F9)
+		if (Input.GetKeyDown(KeyCode.F9))
+		{
+			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+			diffData.UnlockUpTo(8); // Unlock all 8 difficulty levels
+			diffData.Current = 1; // Reset to difficulty 1
+			DataSystem.Instance.SaveDataDifficulty();
+			RefreshDifficultyUI();
+			Debug.Log("[DEBUG] All difficulty levels unlocked (1-8)");
 		}
 	}
 
@@ -69,7 +88,8 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnHardGameClick()
 	{
-		DataSystem.Instance.IsHardGame = true;
+		// Start Env mode game with current difficulty
+		DataSystem.Instance.IsHardGame = false;
 		DataSystem.Instance.ResetDataJoeyPlayer();
 		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
 	}
@@ -95,6 +115,7 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnGameClick()
 	{
+		// This is now for debug mode only - kept for backward compatibility
 		if (m_ShopControl != null)
 		{
 			m_ShopControl.Close();
@@ -120,7 +141,22 @@ public class UILobbyControl : YViewControl
 	private void ChangeDifficulty(bool toRight)
 	{
 		DataDifficulty data = DataSystem.Instance.GetDataDifficulty();
-		int next = data.GetNext(toRight);
+		int currentDiff = data.Current;
+		int maxUnlocked = data.MaxUnlocked;
+
+		// Calculate next difficulty within unlocked range (no wrapping)
+		int next = toRight ? currentDiff + 1 : currentDiff - 1;
+
+		// Clamp to unlocked range [1, maxUnlocked] without wrapping
+		if (next > maxUnlocked)
+		{
+			next = maxUnlocked; // Stay at max
+		}
+		else if (next < 1)
+		{
+			next = 1; // Stay at min
+		}
+
 		data.Current = next;
 		data.Normalize();
 		DataSystem.Instance.SaveDataDifficulty();
@@ -130,17 +166,66 @@ public class UILobbyControl : YViewControl
 	private void RefreshDifficultyUI()
 	{
 		if (m_View == null) return;
+
+		DataDifficulty data = DataSystem.Instance.GetDataDifficulty();
+		int cur = data.Current;
+		int maxUnlocked = data.MaxUnlocked;
+
 		if (m_View.TextDiff != null)
 		{
-			int cur = DataSystem.Instance.GetCurrentDifficulty();
 			m_View.TextDiff.text = $"难度{cur}";
 		}
 
-		// 只有一个难度解锁时，左右按钮禁用（避免误导）
-		int maxUnlocked = DataSystem.Instance.GetMaxUnlockedDifficulty();
-		bool canSwitch = maxUnlocked > 1;
-		if (m_View.BtnLeft != null) m_View.BtnLeft.interactable = canSwitch;
-		if (m_View.BtnRight != null) m_View.BtnRight.interactable = canSwitch;
+		// Enable/disable buttons based on current position
+		if (m_View.BtnLeft != null)
+		{
+			m_View.BtnLeft.interactable = cur > 1; // Can go left if not at minimum
+		}
+		if (m_View.BtnRight != null)
+		{
+			m_View.BtnRight.interactable = cur < maxUnlocked; // Can go right if not at max unlocked
+		}
+	}
+
+	private void SetupDifficultyTooltip()
+	{
+		if (m_View.TextDiff != null)
+		{
+			// Add EventTriggerListener if not already present
+			m_DiffTooltipTrigger = m_View.TextDiff.gameObject.GetComponent<EventTriggerListener>();
+			if (m_DiffTooltipTrigger == null)
+			{
+				m_DiffTooltipTrigger = m_View.TextDiff.gameObject.AddComponent<EventTriggerListener>();
+			}
+
+			m_DiffTooltipTrigger.onEnter = OnDifficultyHoverEnter;
+			m_DiffTooltipTrigger.onExit = OnDifficultyHoverExit;
+		}
+	}
+
+	private void OnDifficultyHoverEnter(GameObject go, UnityEngine.EventSystems.BaseEventData data)
+	{
+		int cur = DataSystem.Instance.GetCurrentDifficulty();
+		DifficultyConfig config = GData.Instance.GetDifficultyConfig(cur);
+		if (config != null)
+		{
+			string tooltipText = config.description;
+			if (!string.IsNullOrEmpty(config.comment))
+			{
+				tooltipText += "\n" + config.comment;
+			}
+
+			// Simple debug log for now - could be enhanced with a proper UI tooltip
+			Debug.Log($"[Difficulty {cur}] {tooltipText}");
+
+			// If you want to show text on the UI, you can create a simple text display
+			// For now, using debug log as specified in requirements
+		}
+	}
+
+	private void OnDifficultyHoverExit(GameObject go, UnityEngine.EventSystems.BaseEventData data)
+	{
+		// Hide tooltip if needed
 	}
 
 	public void SetData(bool isUIStartEnter = false)

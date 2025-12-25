@@ -304,11 +304,16 @@ public class JoeyGameControl : YViewControl
 				achievement.PassGameNum++;
 				DataSystem.Instance.SaveDataAchievement();
 				
-				// Unlock next difficulty level (up to max 8)
-				if (m_DataJoeyPlayer.EnvDifficultyLevel < 8)
+				// Unlock next difficulty level (up to max 8) and automatically switch to it
+				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+				int currentDiff = diffData.Current;
+				if (currentDiff < 8)
 				{
-					m_DataJoeyPlayer.EnvDifficultyLevel++;
-					Debug.Log($"Unlocked difficulty level: {m_DataJoeyPlayer.EnvDifficultyLevel}");
+					int newDiff = currentDiff + 1;
+					diffData.UnlockUpTo(newDiff);
+					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+					DataSystem.Instance.SaveDataDifficulty();
+					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
 				}
 				
 				// Reset stage to 0 for next run
@@ -624,11 +629,16 @@ public class JoeyGameControl : YViewControl
 				achievement.PassGameNum++;
 				DataSystem.Instance.SaveDataAchievement();
 				
-				// Unlock next difficulty level (up to max 8)
-				if (m_DataJoeyPlayer.EnvDifficultyLevel < 8)
+				// Unlock next difficulty level (up to max 8) and automatically switch to it
+				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+				int currentDiff = diffData.Current;
+				if (currentDiff < 8)
 				{
-					m_DataJoeyPlayer.EnvDifficultyLevel++;
-					Debug.Log($"Unlocked difficulty level: {m_DataJoeyPlayer.EnvDifficultyLevel}");
+					int newDiff = currentDiff + 1;
+					diffData.UnlockUpTo(newDiff);
+					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+					DataSystem.Instance.SaveDataDifficulty();
+					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
 				}
 				
 				DataSystem.Instance.isFinishGame = true;
