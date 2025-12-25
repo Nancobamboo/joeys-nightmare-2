@@ -5,5 +5,5 @@ difficulty_level,description,comment,difficluty_effect
 4,解锁关卡18；获得高级牌概率降低,-10%,highGradeCardProbability:-0.1
 5,解锁更多怪物；开始游戏时损失生命值和上限,-20hp生命，-10生命上限,playerHealthPenalty:-20;playerMaxHealthPenalty:-10
 6,解锁关卡19；玩家攻击防御降低,攻击-1 防御-1,playerAttackPenalty:-1;playerDefencePenalty:-1
-7,解锁更多怪物；初始牌组加入苦痛之刃,(攻击为0),curseCards:1019
-8,解锁关卡20；初始牌组加入苦痛之盾,(防御为0),curseCards:2010
+7,解锁更多怪物；初始牌组加入苦痛之刃,(攻击为0),curseCards:1025
+8,解锁关卡20；初始牌组加入苦痛之盾,(防御为0),curseCards:2016

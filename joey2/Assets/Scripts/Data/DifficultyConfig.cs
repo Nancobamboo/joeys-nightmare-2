@@ -10,6 +10,7 @@ public class DifficultyConfig
 	public string description; // Description of what this difficulty unlocks/changes
 	public string comment; // Detailed comment
 	public string difficultyEffect; // Effect description (will be parsed)
+	public int maxUnlockedStage; // Maximum stage level that this difficulty unlocks (0 = use default)
 
 	// Parsed effects
 	public int monsterAttackBonus; // Additional attack for monsters
@@ -27,6 +28,7 @@ public class DifficultyConfig
 		startingCurseCards = new List<string>();
 		shopPriceMultiplier = 1.0f;
 		highGradeCardProbability = 0.0f;
+		maxUnlockedStage = 0;
 	}
 
 	/// <summary>
@@ -124,6 +126,13 @@ public class DifficultyConfig
 						{
 							startingCurseCards.Add(id);
 						}
+					}
+					break;
+
+				case "maxUnlockedStage":
+					if (int.TryParse(value, out int maxStage))
+					{
+						maxUnlockedStage = maxStage;
 					}
 					break;
 			}

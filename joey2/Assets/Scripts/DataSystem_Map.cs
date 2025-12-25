@@ -484,9 +484,22 @@ public partial class DataSystem
 
     public void ResetDataJoeyPlayer()
     {
+        // Save current difficulty level before reset
+        int savedDifficultyLevel = m_DataJoeyPlayer != null ? m_DataJoeyPlayer.EnvDifficultyLevel : 1;
+        
         m_DataJoeyPlayer = new DataJoeyPlayer();
+        
+        // Restore difficulty level (keep player's progress)
+        m_DataJoeyPlayer.EnvDifficultyLevel = savedDifficultyLevel;
+        if (m_DataJoeyPlayer.EnvDifficultyLevel < 1)
+        {
+            m_DataJoeyPlayer.EnvDifficultyLevel = 1;
+        }
+        
         isFinishGame = false;
         SaveDataJoeyPlayer();
+        
+        Debug.Log($"Player data reset. Difficulty level preserved: {savedDifficultyLevel}");
     }
 }
 

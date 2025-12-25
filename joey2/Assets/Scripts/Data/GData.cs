@@ -1404,4 +1404,46 @@ public sealed class GData : PureSingleton<GData>
 		return playerData.EnvDifficultyLevel;
 	}
 
+	/// <summary>
+	/// Get the maximum unlocked stage level based on player's difficulty level
+	/// Returns the highest stage number the player can access
+	/// </summary>
+	public int GetMaxUnlockedStage()
+	{
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		int difficultyLevel = playerData.EnvDifficultyLevel;
+
+		// Default max stages by difficulty level
+		// Difficulty 1: stages 1-16
+		// Difficulty 2: stages 1-17
+		// Difficulty 3: stages 1-17
+		// Difficulty 4: stages 1-18
+		// Difficulty 5: stages 1-18
+		// Difficulty 6: stages 1-19
+		// Difficulty 7: stages 1-19
+		// Difficulty 8: stages 1-20
+		int defaultMaxStage = 16; // Base max stage for difficulty 1
+
+		if (difficultyLevel >= 8)
+		{
+			return 20; // All stages unlocked
+		}
+		else if (difficultyLevel >= 6)
+		{
+			return 19;
+		}
+		else if (difficultyLevel >= 4)
+		{
+			return 18;
+		}
+		else if (difficultyLevel >= 2)
+		{
+			return 17;
+		}
+		else
+		{
+			return 16;
+		}
+	}
+
 }

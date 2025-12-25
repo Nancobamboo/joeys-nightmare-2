@@ -482,8 +482,9 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				int totalStages = 20;
-				m_View.TxtStage.text = envStage.level.ToString() + "/" + totalStages.ToString();
+				// Display current stage / max unlocked stage based on difficulty
+				int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+				m_View.TxtStage.text = envStage.level.ToString() + "/" + maxUnlockedStage.ToString();
 			}
 		}
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
@@ -739,9 +740,7 @@ public partial class UIGamePhaseControl : YViewControl
 			if (config.monsterAttackBonus != 0)
 			{
 				monsterCard.currentAttack += config.monsterAttackBonus;
-				monsterCard.attack += config.monsterAttackBonus;
 				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
-				if (monsterCard.attack < 0) monsterCard.attack = 0;
 			}
 			
 			// Apply monster health bonus

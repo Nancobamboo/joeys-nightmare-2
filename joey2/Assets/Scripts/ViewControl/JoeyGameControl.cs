@@ -166,6 +166,67 @@ public class JoeyGameControl : YViewControl
 				m_PauseControl.gameObject.SetActive(!isActive);
 			}
 		}
+		
+		// Debug: Jump to final stage (F11)
+		if (Input.GetKeyDown(KeyCode.F11) && GameMode == EGameMode.Env)
+		{
+			int maxStage = GData.Instance.GetMaxUnlockedStage();
+			// StageId is 0-indexed, so stage 20 = StageId 19
+			m_DataJoeyPlayer.StageId = maxStage - 1;
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[DEBUG] Jumped to final stage {maxStage} (StageId: {m_DataJoeyPlayer.StageId})");
+			// Reload the level
+			SetGamePhase(EGamePhase.BattleStart);
+		}
+		
+		// Debug: Quick win current stage (F12)
+		if (Input.GetKeyDown(KeyCode.F12))
+		{
+			Debug.Log("[DEBUG] Quick win triggered - clearing all monsters");
+			QuickWinCurrentStage();
+		}
+	}
+	
+	/// <summary>
+	/// Debug function: Instantly win current stage by clearing all monsters
+	/// </summary>
+	private void QuickWinCurrentStage()
+	{
+		if (m_GamePhaseControl == null) return;
+		
+		// Get all env cards (monsters)
+		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
+		
+		List<UICardSimpleControl> allMonsters = new List<UICardSimpleControl>();
+		foreach (var kvp in envCardDict)
+		{
+			foreach (var cardControl in kvp.Value)
+			{
+				if (cardControl != null && cardControl.CardData != null && cardControl.CardData.GetCardType() == ECardType.monster)
+				{
+					allMonsters.Add(cardControl);
+				}
+			}
+		}
+		
+		Debug.Log($"[DEBUG] Found {allMonsters.Count} monsters to clear");
+		
+		// Kill all monsters by setting health to 0 and hiding them
+		foreach (var monsterControl in allMonsters)
+		{
+			if (monsterControl != null && monsterControl.CardData != null && monsterControl.gameObject != null)
+			{
+				// Set health to 0
+				monsterControl.CardData.currentHealth = 0;
+				// Update display to show health change
+				monsterControl.UpdateCardDisplay(monsterControl.CardData);
+				// Hide the card instead of destroying it
+				monsterControl.gameObject.SetActive(false);
+			}
+		}
+		
+		// Clear the env card dictionary to remove references
+		envCardDict.Clear();
 	}
 
 	private void Default()
@@ -229,6 +290,41 @@ public class JoeyGameControl : YViewControl
 			m_GamePhaseControl.SetData();
 
 			int envLevelId = m_DataJoeyPlayer.StageId;
+			
+			// Check if player has unlocked this stage based on difficulty level
+			int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+			EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
+			
+			if (currentEnvStage != null && currentEnvStage.level > maxUnlockedStage)
+			{
+				// Player hasn't unlocked this stage yet, treat as final stage
+				Debug.Log($"Stage {currentEnvStage.level} not unlocked yet (max: {maxUnlockedStage}). Completing run.");
+				
+				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+				achievement.PassGameNum++;
+				DataSystem.Instance.SaveDataAchievement();
+				
+				// Unlock next difficulty level (up to max 8)
+				if (m_DataJoeyPlayer.EnvDifficultyLevel < 8)
+				{
+					m_DataJoeyPlayer.EnvDifficultyLevel++;
+					Debug.Log($"Unlocked difficulty level: {m_DataJoeyPlayer.EnvDifficultyLevel}");
+				}
+				
+				// Reset stage to 0 for next run
+				m_DataJoeyPlayer.StageId = 0;
+				DataSystem.Instance.SaveDataJoeyPlayer();
+				
+				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
+				if (m_LobbyControl == null)
+				{
+					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+				}
+				m_LobbyControl.OnBtnBuildClick();
+				return;
+			}
+			
 			List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
 			// Get card limit from character config
