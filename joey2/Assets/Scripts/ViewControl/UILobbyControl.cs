@@ -8,6 +8,7 @@ public class UILobbyControl : YViewControl
 	private UIAchievementControl m_AchievementControl;
 	private UICardProgressControl m_CardProgressControl;
 	private UIGrowthControl m_GrowthControl;
+	private bool m_IsNewGame;
 
 	public static EResType GetResType()
 	{
@@ -25,10 +26,9 @@ public class UILobbyControl : YViewControl
 		m_View.BtnCardProgress.onClick.AddListener(OnBtnCardProgressClick);
 		m_View.BtnHardGame.onClick.AddListener(OnBtnHardGameClick);
 		m_View.BtnSkip.onClick.AddListener(Close);
-		if (m_View.BtnGrowth != null)
-		{
-			m_View.BtnGrowth.onClick.AddListener(OnBtnGrowthClick);
-		}
+
+		m_View.BtnGrowth.onClick.AddListener(OnBtnGrowthClick);
+
 	}
 
 	public void OnBtnBuildClick()
@@ -61,8 +61,11 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnHardGameClick()
 	{
+		if (m_IsNewGame)
+		{
+			DataSystem.Instance.ResetDataJoeyPlayer();
+		}
 		DataSystem.Instance.IsHardGame = true;
-		DataSystem.Instance.ResetDataJoeyPlayer();
 		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
 	}
 
@@ -99,8 +102,9 @@ public class UILobbyControl : YViewControl
 	{
 	}
 
-	public void SetData(bool isUIStartEnter = false)
+	public void SetData(bool isNewGame, bool isUIStartEnter = false)
 	{
+		m_IsNewGame = isNewGame;
 		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
 		m_View.BtnGame.gameObject.SetActive(isDebug);

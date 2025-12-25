@@ -112,7 +112,7 @@ public class JoeyGameControl : YViewControl
 		else
 		{
 			var ctrl = Asset.OpenUI<UILobbyControl>();
-			ctrl.SetData(false);
+			ctrl.SetData(false, false);
 			SetGamePhase(EGamePhase.Default);
 		}
 	}
@@ -585,7 +585,7 @@ public class JoeyGameControl : YViewControl
 				{
 					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
 				}
-				m_LobbyControl.SetData();
+				m_LobbyControl.SetData(false, false);
 			};
 		}
 		else

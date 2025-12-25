@@ -213,7 +213,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6781\u9650\u6311\u6218"
+  m_Text: "\u7EE7\u7EED\u6E38\u620F"
 --- !u!1 &629011893183080059
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +228,7 @@ GameObject:
   - component: {fileID: 8914011054459005080}
   - component: {fileID: 4362001422628973123}
   m_Layer: 5
-  m_Name: BtnAchievement
+  m_Name: BtnContinue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -555,6 +555,11 @@ MonoBehaviour:
     Components:
     - {fileID: 8152644569115410480}
     VarNameArray: []
+  - Target: {fileID: 6915867916384513780}
+    Components:
+    - {fileID: 1857035245673277301}
+    VarNameArray:
+    - TxtContinue
 --- !u!114 &5815275189386955748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -646,7 +651,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5F00\u59CB\u6E38\u620F"
+  m_Text: "\u65B0\u7684\u5F00\u59CB"
 --- !u!1 &2099679810836337261
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,7 +741,7 @@ GameObject:
   - component: {fileID: 4070601610779293720}
   - component: {fileID: 8709280761900324184}
   m_Layer: 5
-  m_Name: BtnEnv
+  m_Name: BtnNewGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

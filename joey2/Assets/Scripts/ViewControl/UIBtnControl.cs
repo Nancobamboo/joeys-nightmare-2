@@ -25,18 +25,16 @@ public class UIBtnControl : YViewControl
 		m_Index = index;
 		m_OnClick = onClick;
 
-		if (m_View.UIBtn != null)
-		{
-			var colors = m_View.UIBtn.colors;
-			if (colors.disabledColor.a < 0.1f)
-			{
-				colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 1f);
-				m_View.UIBtn.colors = colors;
-			}
 
-			m_View.UIBtn.onClick.RemoveAllListeners();
-			m_View.UIBtn.onClick.AddListener(OnUIBtnClick);
+		var colors = m_View.UIBtn.colors;
+		if (colors.disabledColor.a < 0.1f)
+		{
+			colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+			m_View.UIBtn.colors = colors;
 		}
+
+		m_View.UIBtn.onClick.AddListener(OnUIBtnClick);
+
 	}
 
 	void OnUIBtnClick()
