@@ -281,6 +281,76 @@ public class UIGrowthControl : YViewControl
 		return m_LinesRoot.InverseTransformPoint(world);
 	}
 
+	private bool TryGetSlotLocalAABBInLinesRoot(int id, out Vector2 min, out Vector2 max, out Vector2 center)
+	{
+		min = Vector2.zero;
+		max = Vector2.zero;
+		center = Vector2.zero;
+
+		if (m_LinesRoot == null) return false;
+		if (!m_SlotById.TryGetValue(id, out var slot) || slot == null) return false;
+
+		Vector3[] corners = new Vector3[4];
+		slot.GetWorldCorners(corners);
+
+		float minX = float.PositiveInfinity, minY = float.PositiveInfinity;
+		float maxX = float.NegativeInfinity, maxY = float.NegativeInfinity;
+		for (int i = 0; i < 4; i++)
+		{
+			var local = (Vector2)m_LinesRoot.InverseTransformPoint(corners[i]);
+			if (local.x < minX) minX = local.x;
+			if (local.y < minY) minY = local.y;
+			if (local.x > maxX) maxX = local.x;
+			if (local.y > maxY) maxY = local.y;
+		}
+
+		min = new Vector2(minX, minY);
+		max = new Vector2(maxX, maxY);
+		center = (min + max) * 0.5f;
+		return true;
+	}
+
+	// 从 rect 的中心朝 target 方向，求与 rect 边界的交点（在 LinesRoot 的 local 坐标）
+	private Vector2 GetRectEdgePointTowards(int id, Vector2 targetLocal, float inset)
+	{
+		if (!TryGetSlotLocalAABBInLinesRoot(id, out var min, out var max, out var center))
+		{
+			return GetNodeLocalCenterInLinesRoot(id);
+		}
+
+		Vector2 dir = targetLocal - center;
+		if (dir.sqrMagnitude < 0.0001f) return center;
+
+		float dx = dir.x;
+		float dy = dir.y;
+
+		// 计算射线 center + t*dir 与 AABB 边界的最近正交点 t
+		float tX = float.PositiveInfinity;
+		if (Mathf.Abs(dx) > 0.0001f)
+		{
+			float boundX = dx > 0 ? max.x : min.x;
+			tX = (boundX - center.x) / dx;
+		}
+
+		float tY = float.PositiveInfinity;
+		if (Mathf.Abs(dy) > 0.0001f)
+		{
+			float boundY = dy > 0 ? max.y : min.y;
+			tY = (boundY - center.y) / dy;
+		}
+
+		float t = Mathf.Min(tX, tY);
+		if (float.IsInfinity(t) || t <= 0f) t = 1f;
+
+		Vector2 edge = center + dir * t;
+
+		// 留一点点间距，避免线压到按钮边缘（inset>0 会把点往中心缩）
+		Vector2 n = dir.normalized;
+		edge -= n * inset;
+
+		return edge;
+	}
+
 	private void UpdateLineGeometry(GrowthLine line, float thickness)
 	{
 		if (line == null || line.Rt == null) return;
@@ -292,8 +362,15 @@ public class UIGrowthControl : YViewControl
 
 		line.Rt.gameObject.SetActive(true);
 
-		Vector3 a = GetNodeLocalCenterInLinesRoot(line.A);
-		Vector3 b = GetNodeLocalCenterInLinesRoot(line.B);
+		// 关键：线不穿过按钮本体，只连到按钮边缘
+		Vector2 centerA = (Vector2)GetNodeLocalCenterInLinesRoot(line.A);
+		Vector2 centerB = (Vector2)GetNodeLocalCenterInLinesRoot(line.B);
+		const float inset = 6f;
+		Vector2 a2 = GetRectEdgePointTowards(line.A, centerB, inset);
+		Vector2 b2 = GetRectEdgePointTowards(line.B, centerA, inset);
+
+		Vector3 a = new Vector3(a2.x, a2.y, 0f);
+		Vector3 b = new Vector3(b2.x, b2.y, 0f);
 		Vector3 mid = (a + b) * 0.5f;
 		Vector3 dir = b - a;
 		float len = dir.magnitude;
