@@ -10,6 +10,7 @@ public class UILobbyControl : YViewControl
 	private UIGrowthControl m_GrowthControl;
 	private EventTriggerListener m_DiffTooltipTrigger;
 	private GameObject m_TooltipPanel;
+	bool m_IsNewGame = false;
 
 	public static EResType GetResType()
 	{
@@ -88,9 +89,13 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnHardGameClick()
 	{
-		// Start Env mode game with current difficulty
-		DataSystem.Instance.IsHardGame = false;
-		DataSystem.Instance.ResetDataJoeyPlayer();
+		if(m_IsNewGame)
+		{
+            DataSystem.Instance.ResetDataJoeyPlayer();
+
+        }
+        // Start Env mode game with current difficulty
+        DataSystem.Instance.IsHardGame = false;
 		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
 	}
 
@@ -228,9 +233,11 @@ public class UILobbyControl : YViewControl
 		// Hide tooltip if needed
 	}
 
-	public void SetData(bool isUIStartEnter = false)
+	public void SetData(bool isNewGame, bool isUIStartEnter = false)
 	{
-		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
+        m_IsNewGame = isNewGame;
+
+        m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
 		m_View.BtnGame.gameObject.SetActive(isDebug);
 		m_View.BtnHardGame.gameObject.SetActive(!isDebug);
