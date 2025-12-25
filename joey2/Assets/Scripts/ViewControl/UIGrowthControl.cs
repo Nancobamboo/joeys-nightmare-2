@@ -33,22 +33,13 @@ public class UIGrowthControl : YViewControl
 	private readonly Dictionary<int, UIBtnControl> m_BtnById = new Dictionary<int, UIBtnControl>();
 	private readonly Dictionary<int, bool> m_IsSoldById = new Dictionary<int, bool>();
 	private readonly Dictionary<int, bool> m_IsActiveById = new Dictionary<int, bool>();
-	private RectTransform m_LinesRoot;
 	private RectTransform m_SlotsRoot;
-	private readonly List<GrowthLine> m_Lines = new List<GrowthLine>();
 	private static Sprite s_WhiteSprite;
 	private float m_LayoutScale = 1f;
 	private ScrollRect m_ScrollRect;
 	private RectTransform m_ViewportRt;
 	private bool m_SlotsRootRuntimeCreated;
 	private readonly Dictionary<int, int> m_TreeParentByChild = new Dictionary<int, int>();
-	private class GrowthLine
-	{
-		public int A;
-		public int B;
-		public RectTransform Rt;
-		public Image Img;
-	}
 	public class GrowthNode
 	{
 		public int Id;
@@ -79,7 +70,6 @@ public class UIGrowthControl : YViewControl
 		EnsureScrollRect();
 		EnsureSlotsRoot();
 		InitSlotsAndButtons();
-		BuildLines();
 		Refresh();
 	}
 	public void SetData()
@@ -1171,24 +1161,48 @@ public class UIGrowthControl : YViewControl
 				btnCtrl.transform.localScale = Vector3.one;
 				btnCtrl.transform.localRotation = Quaternion.identity;
 			}
-			btnCtrl.SetTitle(node.Name);
+			// Text 不再使用
 			m_SlotById[id] = slot;
 			m_BtnById[id] = btnCtrl;
+		}
+
+		// 重要：让“靠近根节点/层级更浅”的节点绘制在更上层，避免子节点的线段盖到父节点上（看起来像线露出来）
+		ReorderSlotsByLevel();
+	}
+
+	private void ReorderSlotsByLevel()
+	{
+		if (m_SlotsRoot == null || m_SlotById.Count == 0 || m_NodeById.Count == 0) return;
+		var list = new List<GrowthNode>(m_NodeById.Values);
+		int LevelKey(GrowthNode n)
+		{
+			if (n == null) return int.MaxValue;
+			return n.Level >= 0 ? n.Level : int.MaxValue;
+		}
+		list.Sort((a, b) =>
+		{
+			int ka = LevelKey(a);
+			int kb = LevelKey(b);
+			// level 越深越靠后绘制(越靠下层)，所以这里先把深层放到前面，浅层(含root)放到后面
+			int c = kb.CompareTo(ka); // desc
+			if (c != 0) return c;
+			int ia = a != null ? a.Id : int.MaxValue;
+			int ib = b != null ? b.Id : int.MaxValue;
+			return ia.CompareTo(ib);
+		});
+
+		for (int i = 0; i < list.Count; i++)
+		{
+			var node = list[i];
+			if (node == null) continue;
+			if (m_SlotById.TryGetValue(node.Id, out var slot) && slot != null)
+			{
+				slot.SetSiblingIndex(i);
+			}
 		}
 	}
 	private void EnsureLinesRoot()
 	{
-		if (m_LinesRoot != null) return;
-		var parent = (m_SlotsRoot != null) ? m_SlotsRoot : transform;
-		var go = new GameObject("Lines", typeof(RectTransform));
-		go.transform.SetParent(parent, false);
-		m_LinesRoot = go.GetComponent<RectTransform>();
-		m_LinesRoot.anchorMin = Vector2.zero;
-		m_LinesRoot.anchorMax = Vector2.one;
-		m_LinesRoot.pivot = new Vector2(0.5f, 0.5f);
-		m_LinesRoot.anchoredPosition = Vector2.zero;
-		m_LinesRoot.sizeDelta = Vector2.zero;
-		m_LinesRoot.SetAsFirstSibling();
 	}
 	private static Sprite GetWhiteSprite()
 	{
@@ -1200,199 +1214,30 @@ public class UIGrowthControl : YViewControl
 	}
 	private void BuildLines()
 	{
-		EnsureLinesRoot();
-		for (int i = 0; i < m_Lines.Count; i++)
-		{
-			if (m_Lines[i] != null && m_Lines[i].Rt != null)
-			{
-				Destroy(m_Lines[i].Rt.gameObject);
-			}
-		}
-		m_Lines.Clear();
-		HashSet<string> dedup = new HashSet<string>();
-		void CreateLine(int a, int b)
-		{
-			var go = new GameObject($"Line_{a}_{b}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-			go.transform.SetParent(m_LinesRoot, false);
-			var img = go.GetComponent<Image>();
-			img.raycastTarget = false;
-			img.sprite = GetWhiteSprite();
-			img.type = Image.Type.Simple;
-			img.color = Color.black;
-			var rt = go.GetComponent<RectTransform>();
-			rt.anchorMin = new Vector2(0.5f, 0.5f);
-			rt.anchorMax = new Vector2(0.5f, 0.5f);
-			rt.pivot = new Vector2(0.5f, 0.5f);
-			var line = new GrowthLine { A = a, B = b, Rt = rt, Img = img };
-			m_Lines.Add(line);
-		}
-		void CreateLineDedup(int a, int b)
-		{
-			if (a == b) return;
-			int min = a < b ? a : b;
-			int max = a < b ? b : a;
-			string key = $"{min}_{max}";
-			if (!dedup.Add(key)) return;
-			CreateLine(a, b);
-		}
-		if (UseTreeLinesOnly && m_TreeParentByChild != null && m_TreeParentByChild.Count > 0)
-		{
-			foreach (var kv in m_TreeParentByChild)
-			{
-				int child = kv.Key;
-				int parent = kv.Value;
-				if (parent < 0) continue;
-				CreateLineDedup(child, parent);
-			}
-
-			// 修复：多依赖节点（例如 28 依赖 22 和 23）在 TreeLinesOnly 模式下也需要显示所有依赖连线
-			for (int i = 0; i < m_Nodes.Count; i++)
-			{
-				var node = m_Nodes[i];
-				if (node == null || node.Depends == null || node.Depends.Count <= 1) continue;
-				for (int d = 0; d < node.Depends.Count; d++)
-				{
-					int depId = node.Depends[d];
-					if (depId < 0) continue;
-					CreateLineDedup(node.Id, depId);
-				}
-			}
-		}
-		else
-		{
-			for (int i = 0; i < m_Nodes.Count; i++)
-			{
-				var node = m_Nodes[i];
-				if (node == null || node.Depends == null) continue;
-				for (int d = 0; d < node.Depends.Count; d++)
-				{
-					int depId = node.Depends[d];
-					if (depId < 0) continue;
-					CreateLineDedup(node.Id, depId);
-				}
-			}
-		}
-		UpdateAllLineGeometry();
 	}
 	private Vector3 GetNodeLocalCenterInLinesRoot(int id)
 	{
-		if (m_LinesRoot == null) return Vector3.zero;
-		if (!m_SlotById.TryGetValue(id, out var slot) || slot == null) return Vector3.zero;
-		Vector3 world = slot.TransformPoint(slot.rect.center);
-		return m_LinesRoot.InverseTransformPoint(world);
+		return Vector3.zero;
 	}
 	private bool TryGetSlotLocalAABBInLinesRoot(int id, out Vector2 min, out Vector2 max, out Vector2 center)
 	{
 		min = Vector2.zero;
 		max = Vector2.zero;
 		center = Vector2.zero;
-		if (m_LinesRoot == null) return false;
-		if (!m_SlotById.TryGetValue(id, out var slot) || slot == null) return false;
-		Vector3[] corners = new Vector3[4];
-		slot.GetWorldCorners(corners);
-		float minX = float.PositiveInfinity, minY = float.PositiveInfinity;
-		float maxX = float.NegativeInfinity, maxY = float.NegativeInfinity;
-		for (int i = 0; i < 4; i++)
-		{
-			var local = (Vector2)m_LinesRoot.InverseTransformPoint(corners[i]);
-			if (local.x < minX) minX = local.x;
-			if (local.y < minY) minY = local.y;
-			if (local.x > maxX) maxX = local.x;
-			if (local.y > maxY) maxY = local.y;
-		}
-		min = new Vector2(minX, minY);
-		max = new Vector2(maxX, maxY);
-		center = (min + max) * 0.5f;
-		return true;
+		return false;
 	}
 	private Vector2 GetRectEdgePointTowards(int id, Vector2 targetLocal, float inset)
 	{
-		if (!TryGetSlotLocalAABBInLinesRoot(id, out var min, out var max, out var center))
-		{
-			return GetNodeLocalCenterInLinesRoot(id);
-		}
-		Vector2 dir = targetLocal - center;
-		if (dir.sqrMagnitude < 0.0001f) return center;
-		float dx = dir.x;
-		float dy = dir.y;
-		float tX = float.PositiveInfinity;
-		if (Mathf.Abs(dx) > 0.0001f)
-		{
-			float boundX = dx > 0 ? max.x : min.x;
-			tX = (boundX - center.x) / dx;
-		}
-		float tY = float.PositiveInfinity;
-		if (Mathf.Abs(dy) > 0.0001f)
-		{
-			float boundY = dy > 0 ? max.y : min.y;
-			tY = (boundY - center.y) / dy;
-		}
-		float t = Mathf.Min(tX, tY);
-		if (float.IsInfinity(t) || t <= 0f) t = 1f;
-		Vector2 edge = center + dir * t;
-		Vector2 n = dir.normalized;
-		edge -= n * inset;
-		return edge;
+		return Vector2.zero;
 	}
-	private void UpdateLineGeometry(GrowthLine line, float thickness)
+	private void UpdateLineGeometry(object line, float thickness)
 	{
-		if (line == null || line.Rt == null) return;
-		if (!m_SlotById.ContainsKey(line.A) || !m_SlotById.ContainsKey(line.B))
-		{
-			line.Rt.gameObject.SetActive(false);
-			return;
-		}
-		line.Rt.gameObject.SetActive(true);
-		Vector2 centerA = (Vector2)GetNodeLocalCenterInLinesRoot(line.A);
-		Vector2 centerB = (Vector2)GetNodeLocalCenterInLinesRoot(line.B);
-		const float inset = 6f;
-		Vector2 a2 = GetRectEdgePointTowards(line.A, centerB, inset);
-		Vector2 b2 = GetRectEdgePointTowards(line.B, centerA, inset);
-		Vector3 a = new Vector3(a2.x, a2.y, 0f);
-		Vector3 b = new Vector3(b2.x, b2.y, 0f);
-		Vector3 mid = (a + b) * 0.5f;
-		Vector3 dir = b - a;
-		float len = dir.magnitude;
-		if (len < 0.01f) len = 0.01f;
-		float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-		line.Rt.localPosition = mid;
-		line.Rt.localRotation = Quaternion.Euler(0f, 0f, angle);
-		line.Rt.sizeDelta = new Vector2(len, thickness);
 	}
 	private void UpdateAllLineGeometry()
 	{
-		if (m_LinesRoot == null) return;
-		const float thickness = 12f;
-		for (int i = 0; i < m_Lines.Count; i++)
-		{
-			UpdateLineGeometry(m_Lines[i], thickness);
-		}
 	}
 	private void RefreshLinesStyle()
 	{
-		for (int i = 0; i < m_Lines.Count; i++)
-		{
-			var line = m_Lines[i];
-			if (line == null || line.Img == null) continue;
-			bool soldA = m_IsSoldById.TryGetValue(line.A, out var sa) && sa;
-			bool soldB = m_IsSoldById.TryGetValue(line.B, out var sb) && sb;
-			bool activeA = m_IsActiveById.TryGetValue(line.A, out var aa) && aa;
-			bool activeB = m_IsActiveById.TryGetValue(line.B, out var ab) && ab;
-			float alpha;
-			if (soldA && soldB)
-			{
-				alpha = 1f;
-			}
-			else if (activeA || activeB)
-			{
-				alpha = 0.45f;
-			}
-			else
-			{
-				alpha = 0.2f;
-			}
-			line.Img.color = new Color(0f, 0f, 0f, alpha);
-		}
 	}
 	private bool IsNodeActive(DataGrowth data, GrowthNode node)
 	{
@@ -1401,7 +1246,8 @@ public class UIGrowthControl : YViewControl
 		if (node.Depends == null || node.Depends.Count == 0) return true;
 		for (int i = 0; i < node.Depends.Count; i++)
 		{
-			if (!data.IsUnlocked(node.Depends[i])) return false;
+			int depId = node.Depends[i];
+			if (!data.IsUnlocked(depId)) return false;
 		}
 		return true;
 	}
@@ -1410,28 +1256,81 @@ public class UIGrowthControl : YViewControl
 		DataGrowth data = DataSystem.Instance.GetDataGrowth();
 		m_IsSoldById.Clear();
 		m_IsActiveById.Clear();
+		
 		foreach (var kv in m_BtnById)
 		{
 			int id = kv.Key;
 			var btn = kv.Value;
 			if (btn == null) continue;
+			
 			if (!m_NodeById.TryGetValue(id, out var node) || node == null)
 			{
-				btn.SetTitle(string.Empty);
-				btn.SetData(false, false);
+				btn.SetState(UIBtnControl.EBtnState.Unknow);
+				btn.SetInteractable(false);
 				m_IsSoldById[id] = false;
 				m_IsActiveById[id] = false;
 				continue;
 			}
-			bool sold = data.IsUnlocked(node.Id);
-			bool active = IsNodeActive(data, node);
-			btn.SetTitle(node.Name);
-			btn.SetData(sold, active);
-			m_IsSoldById[id] = sold;
-			m_IsActiveById[id] = active;
+
+			bool isUnlocked = data.IsUnlocked(node.Id);
+			bool isActive = IsNodeActive(data, node);
+			
+			m_IsSoldById[id] = isUnlocked;
+			m_IsActiveById[id] = isActive;
+
+			// Text 不再使用
+			
+			if (id == 0) // Start 节点：也需要购买激活
+			{
+				if (isUnlocked)
+				{
+					btn.SetState(UIBtnControl.EBtnState.Start);
+					btn.SetInteractable(false);
+				}
+				else
+				{
+					// 未激活时显示 lock，并允许点击购买
+					btn.SetState(UIBtnControl.EBtnState.Lock);
+					btn.SetInteractable(true);
+				}
+				btn.SetLine(false, false, 0, 0);
+			}
+			else
+			{
+				if (isUnlocked)
+				{
+					btn.SetState(UIBtnControl.EBtnState.Unlock);
+					btn.SetInteractable(false); // Already bought
+				}
+				else if (isActive)
+				{
+					btn.SetState(UIBtnControl.EBtnState.Lock);
+					btn.SetInteractable(true); // Can buy
+				}
+				else
+				{
+					btn.SetState(UIBtnControl.EBtnState.Unknow);
+					btn.SetInteractable(false); // Locked
+				}
+				
+				// Draw Line to Primary Parent
+				if (m_TreeParentByChild.TryGetValue(id, out int parentId) && m_SlotById.TryGetValue(parentId, out var parentRt) && m_SlotById.TryGetValue(id, out var myRt))
+				{
+					Vector2 dir = parentRt.anchoredPosition - myRt.anchoredPosition;
+					float len = dir.magnitude;
+					float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+					
+					// If node is unlocked -> Unlock Line. Else -> Lock Line.
+					bool useUnlockLine = isUnlocked;
+					
+					btn.SetLine(true, useUnlockLine, angle, len);
+				}
+				else
+				{
+					btn.SetLine(false, false, 0, 0);
+				}
+			}
 		}
-		UpdateAllLineGeometry();
-		RefreshLinesStyle();
 	}
 	private void OnGrowthBtnClick(int id)
 	{
@@ -1487,11 +1386,6 @@ public class UIGrowthControl : YViewControl
 			m_ScrollRect = null;
 			m_ViewportRt = null;
 		}
-		if (m_LinesRoot != null)
-		{
-			Destroy(m_LinesRoot.gameObject);
-			m_LinesRoot = null;
-		}
 		if (m_SlotsRoot != null)
 		{
 			if (m_SlotsRootRuntimeCreated)
@@ -1510,7 +1404,6 @@ public class UIGrowthControl : YViewControl
 			m_GrowthWindow.Close();
 			m_GrowthWindow = null;
 		}
-		m_Lines.Clear();
 		m_BtnById.Clear();
 		m_SlotById.Clear();
 		m_TreeParentByChild.Clear();
