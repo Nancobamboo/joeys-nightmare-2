@@ -1,5 +1,5 @@
-using UnityEngine;
 using System;
+using UnityEngine;
 
 public class UIGrowthWindowControl : YViewControl
 {
@@ -17,11 +17,8 @@ public class UIGrowthWindowControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIGrowthWindowView>();
-		if (m_View.BtnBuy != null) m_View.BtnBuy.onClick.AddListener(OnBtnBuyClick);
-		else Debug.LogError("[UIGrowthWindowControl] BtnBuy is null (binding failed).");
-
-		if (m_View.BtnClose != null) m_View.BtnClose.onClick.AddListener(Close);
-		else Debug.LogError("[UIGrowthWindowControl] BtnClose is null (binding failed).");
+		m_View.BtnBuy.onClick.AddListener(OnBtnBuyClick);
+		m_View.BtnClose.onClick.AddListener(Close);
 	}
 
 	public void SetData(int id, string desc, int price, Action onBuy)
@@ -29,14 +26,14 @@ public class UIGrowthWindowControl : YViewControl
 		m_Id = id;
 		m_Price = price;
 		m_OnBuy = onBuy;
-		if (m_View.TxtDesc != null) m_View.TxtDesc.text = desc;
-		if (m_View.TxtPrice != null) m_View.TxtPrice.text = price.ToString();
-		
+		m_View.TxtDesc.text = desc;
+		m_View.TxtPrice.text = "-" + price.ToString();
+
 		int currentPoints = DataSystem.Instance.GetDataGrowth().Points;
-		if (m_View.BtnBuy != null) m_View.BtnBuy.interactable = currentPoints >= price;
+		m_View.BtnBuy.interactable = currentPoints >= price;
 	}
 
-	void OnBtnBuyClick()
+	private void OnBtnBuyClick()
 	{
 		int currentPoints = DataSystem.Instance.GetDataGrowth().Points;
 		if (currentPoints >= m_Price)
