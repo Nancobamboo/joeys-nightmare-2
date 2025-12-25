@@ -17,7 +17,12 @@ public class YMagicRecall_UseSkill : YCardEffect
         "4001", // 连续攻击
         "4006", // 连环闪电
         "4007", // 匕首飞来
-        "4008", // 丢盔弃甲
+        "4009", // 技能强化
+        "4010", // 鲜血寄存
+        "4012", // 浴血奋战
+        "4013", // 魔力召唤
+        "4014", // 烈焰火球
+        "4015", // 冰霜魔法
     };
 
     public YMagicRecall_UseSkill(int baseExtra)

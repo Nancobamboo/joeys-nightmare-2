@@ -132,6 +132,9 @@ public enum EVFXName
     VFX_HuiXue,
     VFX_FanJia_shouji,
     VFX_Shihun,
+    VFX_HuoQiu,
+    VFX_Bing,
+    VFX_Bing2
 }
 
 public enum ECardAnimName
