@@ -12,6 +12,9 @@ public class UILobbyView : YBaseView
 	public Button BtnHardGame;
 	public Button BtnSkip;
 	public Button BtnGrowth;
+	public Button BtnLeft;
+	public Button BtnRight;
+	public Text TextDiff;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -26,5 +29,8 @@ public class UILobbyView : YBaseView
 		BtnHardGame = viewItemList[5].Target.GetComponent<Button>();
 		BtnSkip = viewItemList[6].Target.GetComponent<Button>();
 		BtnGrowth = viewItemList[7].Target.GetComponent<Button>();
+		BtnLeft = viewItemList[8].Target.GetComponent<Button>();
+		BtnRight = viewItemList[9].Target.GetComponent<Button>();
+		TextDiff = viewItemList[10].Target.GetComponent<Text>();
 	}
 }
