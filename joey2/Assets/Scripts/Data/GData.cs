@@ -13,6 +13,7 @@ public sealed class GData : PureSingleton<GData>
 	public List<RoguelikeCharacter> RoguelikeCharacterList { get; private set; } = new List<RoguelikeCharacter>();
 	public List<RoguelikeStage> RoguelikeStageList { get; private set; } = new List<RoguelikeStage>();
 	public List<EnvStage> EnvStageList { get; private set; } = new List<EnvStage>();
+	public Dictionary<int, DifficultyConfig> DifficultyConfigDict { get; private set; } = new Dictionary<int, DifficultyConfig>();
 
 	public Dictionary<int, List<EquipmentUnlock>> EquipmentUnlockDict { get; private set; } = new Dictionary<int, List<EquipmentUnlock>>();
 	public Dictionary<string, string> KeywordDict { get; private set; } = new Dictionary<string, string>();
@@ -31,6 +32,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_EnvStageCsvPath = "Data/env_stage";
 	private string m_StageRewardCsvPath = "Data/stage_reward";
 	private string m_GrowthCsvPath = "Data/growth";
+	private string m_DifficultyConfigCsvPath = "Data/difficulty_config";
 
 	// Separated equipment deck config files
 	private static readonly string[] m_EquipmentDeckCsvPaths = new string[]
@@ -67,6 +69,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadEnvStage();
 		LoadStageReward();
 		LoadGrowthInfo();
+		LoadDifficultyConfig();
 	}
 
 	public void SaveAll()
@@ -717,6 +720,9 @@ public sealed class GData : PureSingleton<GData>
 
 		int LevelIdx = idx.ContainsKey("level") ? idx["level"] : -1;
 		int MonsterIdsIdx = idx.ContainsKey("monster_ids") ? idx["monster_ids"] : -1;
+		int Difficulty3Idx = idx.ContainsKey("difficluty_3") ? idx["difficluty_3"] : -1;
+		int Difficulty5Idx = idx.ContainsKey("difficluty_5") ? idx["difficluty_5"] : -1;
+		int Difficulty7Idx = idx.ContainsKey("difficluty_7") ? idx["difficluty_7"] : -1;
 		int TypeIdx = idx.ContainsKey("type") ? idx["type"] : -1;
 		int ThemeIdx = idx.ContainsKey("theme") ? idx["theme"] : -1;
 
@@ -755,6 +761,26 @@ public sealed class GData : PureSingleton<GData>
 			EnvStage envStage = new EnvStage();
 			envStage.level = level;
 			envStage.monsterIds = ParseList(MonsterIdsIdx);
+
+			// Load difficulty-specific monsters (cumulative)
+			List<string> difficulty3Monsters = ParseList(Difficulty3Idx);
+			if (difficulty3Monsters.Count > 0)
+			{
+				envStage.difficultyMonsters[3] = difficulty3Monsters;
+			}
+
+			List<string> difficulty5Monsters = ParseList(Difficulty5Idx);
+			if (difficulty5Monsters.Count > 0)
+			{
+				envStage.difficultyMonsters[5] = difficulty5Monsters;
+			}
+
+			List<string> difficulty7Monsters = ParseList(Difficulty7Idx);
+			if (difficulty7Monsters.Count > 0)
+			{
+				envStage.difficultyMonsters[7] = difficulty7Monsters;
+			}
+
 			string typeStr = Get(TypeIdx);
 			if (!string.IsNullOrEmpty(typeStr) && System.Enum.TryParse<EStageType>(typeStr, true, out EStageType stageType))
 			{
@@ -1293,6 +1319,89 @@ public sealed class GData : PureSingleton<GData>
 			return growthInfo;
 		}
 		return null;
+	}
+
+	public void LoadDifficultyConfig(bool force = false)
+	{
+		if (!force && DifficultyConfigDict.Count > 0) return;
+
+		DifficultyConfigDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_DifficultyConfigCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Difficulty config CSV not found: {m_DifficultyConfigCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int DifficultyLevelIdx = idx.ContainsKey("difficulty_level") ? idx["difficulty_level"] : -1;
+		int DescriptionIdx = idx.ContainsKey("description") ? idx["description"] : -1;
+		int CommentIdx = idx.ContainsKey("comment") ? idx["comment"] : -1;
+		int DifficultyEffectIdx = idx.ContainsKey("difficluty_effect") ? idx["difficluty_effect"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			if (!int.TryParse(Get(DifficultyLevelIdx), out int difficultyLevel)) continue;
+
+			DifficultyConfig config = new DifficultyConfig();
+			config.difficultyLevel = difficultyLevel;
+			config.description = Get(DescriptionIdx);
+			config.comment = Get(CommentIdx);
+			config.difficultyEffect = Get(DifficultyEffectIdx);
+
+			// Parse the difficulty effect string to populate effect fields
+			config.ParseDifficultyEffect();
+
+			DifficultyConfigDict[difficultyLevel] = config;
+		}
+
+		Debug.Log($"Difficulty config loaded: {DifficultyConfigDict.Count} difficulty levels");
+	}
+
+	public DifficultyConfig GetDifficultyConfig(int difficultyLevel)
+	{
+		LoadDifficultyConfig();
+		if (DifficultyConfigDict.TryGetValue(difficultyLevel, out DifficultyConfig config))
+		{
+			return config;
+		}
+		Debug.LogWarning($"Difficulty config not found for level: {difficultyLevel}");
+		return null;
+	}
+
+	/// <summary>
+	/// Get the max unlocked difficulty level for the player
+	/// Difficulty levels: 1 (default), 2-8 (unlocked by beating final stage)
+	/// </summary>
+	public int GetMaxUnlockedDifficulty()
+	{
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		return playerData.EnvDifficultyLevel;
 	}
 
 }

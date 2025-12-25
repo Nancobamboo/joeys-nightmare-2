@@ -527,6 +527,14 @@ public class JoeyGameControl : YViewControl
 				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
 				achievement.PassGameNum++;
 				DataSystem.Instance.SaveDataAchievement();
+				
+				// Unlock next difficulty level (up to max 8)
+				if (m_DataJoeyPlayer.EnvDifficultyLevel < 8)
+				{
+					m_DataJoeyPlayer.EnvDifficultyLevel++;
+					Debug.Log($"Unlocked difficulty level: {m_DataJoeyPlayer.EnvDifficultyLevel}");
+				}
+				
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
 				if (m_LobbyControl == null)

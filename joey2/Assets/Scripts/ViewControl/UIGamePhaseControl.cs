@@ -701,6 +701,12 @@ public partial class UIGamePhaseControl : YViewControl
 				card.currentHealth *= 2;
 				card.health *= 2;
 			}
+			
+			// Apply difficulty effects to monsters in Env mode
+			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+			{
+				ApplyEnvDifficultyToMonster(card);
+			}
 
 			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
 			{
@@ -712,6 +718,40 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		}
+	}
+	
+	/// <summary>
+	/// Apply difficulty bonuses to monster cards (cumulative from all unlocked difficulties)
+	/// </summary>
+	private void ApplyEnvDifficultyToMonster(Card monsterCard)
+	{
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		int difficultyLevel = playerData.EnvDifficultyLevel;
+		
+		// Apply cumulative bonuses from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
+		{
+			DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+			if (config == null) continue;
+			
+			// Apply monster attack bonus
+			if (config.monsterAttackBonus != 0)
+			{
+				monsterCard.currentAttack += config.monsterAttackBonus;
+				monsterCard.attack += config.monsterAttackBonus;
+				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
+				if (monsterCard.attack < 0) monsterCard.attack = 0;
+			}
+			
+			// Apply monster health bonus
+			if (config.monsterHealthBonus != 0)
+			{
+				monsterCard.currentHealth += config.monsterHealthBonus;
+				monsterCard.health += config.monsterHealthBonus;
+				if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
+				if (monsterCard.health < 1) monsterCard.health = 1;
+			}
 		}
 	}
 
