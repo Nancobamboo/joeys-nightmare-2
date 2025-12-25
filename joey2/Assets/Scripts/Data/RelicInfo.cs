@@ -8,6 +8,9 @@ public class RelicInfo
 	public string description;
 	public int stars;
 
+	// 是否允许进入“可抽取/可选择”的遗物池（用于局外成长解锁控制）
+	public bool canDraw = true;
+
 
 	public RelicInfo(int id, string cardImage, string iconImage, string name, string description, int stars)
 	{
