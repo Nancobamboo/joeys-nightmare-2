@@ -91,6 +91,7 @@ public partial class DataSystem
         LoadDataCardProgress();
         LoadDataAchievement();
         LoadDataGrowth();
+        LoadDataDifficulty();
     }
 
     public void LoadVFX()
