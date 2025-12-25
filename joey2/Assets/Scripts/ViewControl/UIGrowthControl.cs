@@ -18,9 +18,15 @@ public class UIGrowthControl : YViewControl
 	private const bool UseGridLayout = false;
 	private const float GridXSpacing = 320f;
 	private const float GridYSpacing = 260f;
+	// TreeLayout 横向间距：以按钮宽度为基准，尽量做到“两个按钮之间留半个按钮宽”的空隙
+	// 即 center-to-center ≈ btnW * (1 + 0.5) = 1.5 * btnW
+	private const float TreeXGapRatio = 0.5f;
 	private const float TreeTopPadding = 180f;
 	private const float TreeBottomPadding = 220f;
 	private const float HorizontalMargin = 40f;
+	// 旧逻辑会把树的宽度强行压缩到视口内，导致节点横向越发拥挤。
+	// 现在改为允许左右拖动浏览，所以默认不再强行压缩。
+	private const bool ClampTreeWidthToViewport = false;
 	private readonly List<GrowthNode> m_Nodes = new List<GrowthNode>();
 	private readonly Dictionary<int, GrowthNode> m_NodeById = new Dictionary<int, GrowthNode>();
 	private readonly Dictionary<int, RectTransform> m_SlotById = new Dictionary<int, RectTransform>();
@@ -87,20 +93,16 @@ public class UIGrowthControl : YViewControl
 		if (m_ScrollRect != null) return;
 		m_ScrollRect = m_View.Scroll;
 		m_ViewportRt = m_View.Viewport;
-		m_ScrollRect.horizontal = false;
+		// 允许横向/纵向拖动浏览天赋树
+		m_ScrollRect.horizontal = true;
 		m_ScrollRect.vertical = true;
 		m_ScrollRect.movementType = ScrollRect.MovementType.Clamped;
+		// 不再强制把 content 的 x 归零（否则横向拖动无效）
 		m_ScrollRect.onValueChanged.RemoveListener(OnScrollValueChanged);
-		m_ScrollRect.onValueChanged.AddListener(OnScrollValueChanged);
 	}
 	private void OnScrollValueChanged(Vector2 _)
 	{
-		if (m_ScrollRect == null || m_SlotsRoot == null) return;
-		var p = m_SlotsRoot.anchoredPosition;
-		if (Mathf.Abs(p.x) > 0.01f)
-		{
-			m_SlotsRoot.anchoredPosition = new Vector2(0f, p.y);
-		}
+		// 兼容旧回调：保留方法避免丢失引用，但不再锁死横向位置
 	}
 	private void EnsureSlotsRoot()
 	{
@@ -743,6 +745,13 @@ public class UIGrowthControl : YViewControl
 		}
 		return Vector2.zero;
 	}
+	private float GetTreeXStep()
+	{
+		// 与 slot/button 的实际宽度保持一致（slot 在 InitSlotsAndButtons 里用 SlotBaseW * s 设置）
+		float s = Mathf.Clamp(m_LayoutScale, 0.6f, 1f);
+		float slotW = SlotBaseW * s;
+		return slotW * (1f + TreeXGapRatio);
+	}
 	private Dictionary<int, Vector2> BuildTreeLayoutPositions()
 	{
 		const int rootId = 0;
@@ -897,34 +906,38 @@ public class UIGrowthControl : YViewControl
 			}
 		}
 		float rootX = xIndexById.TryGetValue(rootId, out var rx) ? rx : 0f;
+		float xStep = GetTreeXStep();
 		foreach (var kv in m_NodeById)
 		{
 			int id = kv.Key;
 			float xi = xIndexById.TryGetValue(id, out var v) ? v : 0f;
 			int level = levelById.TryGetValue(id, out var l) ? l : 0;
-			float x = (xi - rootX) * GridXSpacing;
+			float x = (xi - rootX) * xStep;
 			float y = -(level * GridYSpacing + TreeTopPadding);
 			posById[id] = new Vector2(x, y);
 		}
-		Vector2 vp = GetViewportSize();
-		if (vp.x > 1f)
+		if (ClampTreeWidthToViewport)
 		{
-			float maxAbsX = 0f;
-			foreach (var kv in posById)
+			Vector2 vp = GetViewportSize();
+			if (vp.x > 1f)
 			{
-				float ax = Mathf.Abs(kv.Value.x);
-				if (ax > maxAbsX) maxAbsX = ax;
-			}
-			float allowed = vp.x * 0.5f - SlotBaseW * 0.5f - HorizontalMargin;
-			if (allowed > 10f && maxAbsX > allowed)
-			{
-				float scale = allowed / maxAbsX;
-				var keys = new List<int>(posById.Keys);
-				for (int i = 0; i < keys.Count; i++)
+				float maxAbsX = 0f;
+				foreach (var kv in posById)
 				{
-					int id = keys[i];
-					var p = posById[id];
-					posById[id] = new Vector2(p.x * scale, p.y);
+					float ax = Mathf.Abs(kv.Value.x);
+					if (ax > maxAbsX) maxAbsX = ax;
+				}
+				float allowed = vp.x * 0.5f - SlotBaseW * 0.5f - HorizontalMargin;
+				if (allowed > 10f && maxAbsX > allowed)
+				{
+					float scale = allowed / maxAbsX;
+					var keys = new List<int>(posById.Keys);
+					for (int i = 0; i < keys.Count; i++)
+					{
+						int id = keys[i];
+						var p = posById[id];
+						posById[id] = new Vector2(p.x * scale, p.y);
+					}
 				}
 			}
 		}
@@ -965,7 +978,15 @@ public class UIGrowthControl : YViewControl
 			float bottomMost = minY - slotH * 0.5f - TreeBottomPadding;
 			float needH = Mathf.Abs(bottomMost);
 			if (needH < minVisibleH) needH = minVisibleH;
-			m_SlotsRoot.sizeDelta = new Vector2(0f, needH);
+
+			// 横向：让 content 宽度覆盖所有节点范围，从而启用左右拖动
+			float minVisibleW = vp.x > 1f ? vp.x : 0f;
+			float wantContentW = maxAbsX * 2f + slotW + LayoutPadding;
+			if (wantContentW < minVisibleW) wantContentW = minVisibleW;
+			// anchorMax.x=1 时，实际宽度=viewport宽 + sizeDelta.x，所以这里只补“额外宽度”
+			float extraW = minVisibleW > 0f ? Mathf.Max(0f, wantContentW - minVisibleW) : wantContentW;
+
+			m_SlotsRoot.sizeDelta = new Vector2(extraW, needH);
 			return;
 		}
 		float wantW = maxAbsX * 2f + slotW + LayoutPadding;
@@ -1188,6 +1209,7 @@ public class UIGrowthControl : YViewControl
 			}
 		}
 		m_Lines.Clear();
+		HashSet<string> dedup = new HashSet<string>();
 		void CreateLine(int a, int b)
 		{
 			var go = new GameObject($"Line_{a}_{b}", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -1204,6 +1226,15 @@ public class UIGrowthControl : YViewControl
 			var line = new GrowthLine { A = a, B = b, Rt = rt, Img = img };
 			m_Lines.Add(line);
 		}
+		void CreateLineDedup(int a, int b)
+		{
+			if (a == b) return;
+			int min = a < b ? a : b;
+			int max = a < b ? b : a;
+			string key = $"{min}_{max}";
+			if (!dedup.Add(key)) return;
+			CreateLine(a, b);
+		}
 		if (UseTreeLinesOnly && m_TreeParentByChild != null && m_TreeParentByChild.Count > 0)
 		{
 			foreach (var kv in m_TreeParentByChild)
@@ -1211,12 +1242,24 @@ public class UIGrowthControl : YViewControl
 				int child = kv.Key;
 				int parent = kv.Value;
 				if (parent < 0) continue;
-				CreateLine(child, parent);
+				CreateLineDedup(child, parent);
+			}
+
+			// 修复：多依赖节点（例如 28 依赖 22 和 23）在 TreeLinesOnly 模式下也需要显示所有依赖连线
+			for (int i = 0; i < m_Nodes.Count; i++)
+			{
+				var node = m_Nodes[i];
+				if (node == null || node.Depends == null || node.Depends.Count <= 1) continue;
+				for (int d = 0; d < node.Depends.Count; d++)
+				{
+					int depId = node.Depends[d];
+					if (depId < 0) continue;
+					CreateLineDedup(node.Id, depId);
+				}
 			}
 		}
 		else
 		{
-			HashSet<string> dedup = new HashSet<string>();
 			for (int i = 0; i < m_Nodes.Count; i++)
 			{
 				var node = m_Nodes[i];
@@ -1225,14 +1268,7 @@ public class UIGrowthControl : YViewControl
 				{
 					int depId = node.Depends[d];
 					if (depId < 0) continue;
-					int a = node.Id;
-					int b = depId;
-					int min = a < b ? a : b;
-					int max = a < b ? b : a;
-					string key = $"{min}_{max}";
-					if (dedup.Contains(key)) continue;
-					dedup.Add(key);
-					CreateLine(a, b);
+					CreateLineDedup(node.Id, depId);
 				}
 			}
 		}
