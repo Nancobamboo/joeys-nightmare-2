@@ -40,6 +40,7 @@ public enum EActionId
 	AddKnifeToEnv_UseSkill,
 	ThrowDefenceToEnv,
 	OnCoinChange,
+	OnGrowthPointsChange,
 	MonsterHealOnDealDamage,
 	AddCardToBagFromSelect,
 	SwapTopTwoEnvCards,

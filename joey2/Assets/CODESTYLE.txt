@@ -20,8 +20,7 @@ Project Code Style
 - Use readonly where appropriate
 - Do not use foreach for value type arrays; use for loop instead
 - Do not use foreach for collections containing value types (e.g., List<string>, string[]); use for loop instead
-- Do not check null for m_View.xxx (m_View is always initialized)
-- m_View相关的代码都不判空
+- Do not check null for m_View and its properties (m_View is always initialized after OnInit)
 - Do not check null/empty for Action parameters in UIGamePhaseControl wrapper methods; directly cast from paraArray[0]
 
 5) JSON

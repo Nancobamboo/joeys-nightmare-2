@@ -413,12 +413,20 @@ public partial class DataSystem
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
     }
 
-    public void AddCoin(int delta)
-    {
-        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-        dataJoeyPlayer.Coin += delta;
-        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
-    }
+	public void AddCoin(int delta)
+	{
+		DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+		dataJoeyPlayer.Coin += delta;
+		YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
+	}
+	
+	public void AddGrowthPoints(int delta)
+	{
+		DataGrowth dataGrowth = GetDataGrowth();
+		dataGrowth.Points += delta;
+		YActionSystem.Instance.DispatchAction(EActionId.OnGrowthPointsChange, dataGrowth.Points, delta);
+		SaveDataGrowth();
+	}
 
     public bool AddCardToDataJoeyPlayer(Card card)
     {
