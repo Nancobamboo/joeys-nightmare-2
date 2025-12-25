@@ -19,6 +19,7 @@ public sealed class GData : PureSingleton<GData>
 	public Dictionary<int, RelicInfo> RelicInfoDict { get; private set; } = new Dictionary<int, RelicInfo>();
 	public Dictionary<string, ERelicType> RelicNameToTypeDict { get; private set; } = new Dictionary<string, ERelicType>();
 	public Dictionary<EStageType, StageReward> StageRewardDict { get; private set; } = new Dictionary<EStageType, StageReward>();
+	public Dictionary<int, GrowthInfo> GrowthInfoDict { get; private set; } = new Dictionary<int, GrowthInfo>();
 
 	private string m_CardCsvPath = "Data/card_info";
 	private string m_DeckCsvPath = "Data/deck_data";
@@ -29,6 +30,7 @@ public sealed class GData : PureSingleton<GData>
 	private string m_RelicInfoCsvPath = "Data/relic_info";
 	private string m_EnvStageCsvPath = "Data/env_stage";
 	private string m_StageRewardCsvPath = "Data/stage_reward";
+	private string m_GrowthCsvPath = "Data/growth";
 
 	// Separated equipment deck config files
 	private static readonly string[] m_EquipmentDeckCsvPaths = new string[]
@@ -64,6 +66,7 @@ public sealed class GData : PureSingleton<GData>
 		LoadRelicInfo();
 		LoadEnvStage();
 		LoadStageReward();
+		LoadGrowthInfo();
 	}
 
 	public void SaveAll()
@@ -1014,7 +1017,7 @@ public sealed class GData : PureSingleton<GData>
 			int stars = GetInt(starsIdx, 0);
 			RelicInfo relicInfo = new RelicInfo(id, cardImage, iconImage, name, description, stars);
 			RelicInfoDict[id] = relicInfo;
-			
+
 			// Build name to enum mapping and validate ID consistency
 			if (System.Enum.IsDefined(typeof(ERelicType), id))
 			{
@@ -1043,7 +1046,7 @@ public sealed class GData : PureSingleton<GData>
 			int id = (int)relicType;
 			// Skip the special CardLimitDebuff enum
 			if (id == 9999) continue;
-			
+
 			if (!RelicInfoDict.ContainsKey(id))
 			{
 				Debug.LogWarning($"ERelicType.{relicType} ({id}) is defined in code but missing in relic_info.csv");
@@ -1210,6 +1213,85 @@ public sealed class GData : PureSingleton<GData>
 			return stageReward;
 		}
 		Debug.LogWarning($"Stage reward not found for type: {stageType}");
+		return null;
+	}
+
+	public void LoadGrowthInfo(bool force = false)
+	{
+		if (!force && GrowthInfoDict.Count > 0) return;
+
+		GrowthInfoDict.Clear();
+		TextAsset ta = Resources.Load<TextAsset>(m_GrowthCsvPath);
+		if (ta == null)
+		{
+			Debug.LogWarning($"Growth CSV not found: {m_GrowthCsvPath}");
+			return;
+		}
+
+		string[] lines = ta.text.Split('\n');
+		if (lines.Length <= 1)
+		{
+			return;
+		}
+
+		string[] header = lines[0].Split(',');
+		Dictionary<string, int> idx = new Dictionary<string, int>();
+		for (int i = 0; i < header.Length; i++)
+		{
+			string key = header[i].Trim();
+			if (!idx.ContainsKey(key)) idx[key] = i;
+		}
+
+		int IdIdx = idx.ContainsKey("id") ? idx["id"] : -1;
+		int NameIdx = idx.ContainsKey("name") ? idx["name"] : -1;
+		int DependIdx = idx.ContainsKey("dependency") ? idx["dependency"] : -1;
+		int DescIdx = idx.ContainsKey("desc") ? idx["desc"] : -1;
+		int PriceIdx = idx.ContainsKey("price") ? idx["price"] : -1;
+
+		for (int i = 1; i < lines.Length; i++)
+		{
+			string line = lines[i];
+			if (string.IsNullOrWhiteSpace(line)) continue;
+
+			string[] values = ParseCSVLine(line);
+			if (values == null || values.Length == 0) continue;
+
+			string Get(int index)
+			{
+				if (index < 0 || index >= values.Length) return string.Empty;
+				return values[index].Trim();
+			}
+
+			int GetInt(int index, int defaultValue = 0)
+			{
+				string value = Get(index);
+				if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+				if (int.TryParse(value, out int result)) return result;
+				return defaultValue;
+			}
+
+			int id = GetInt(IdIdx, -1);
+			if (id < 0) continue;
+
+			string name = Get(NameIdx);
+			int depend = GetInt(DependIdx, -1);
+			string desc = Get(DescIdx);
+			int price = GetInt(PriceIdx, 0);
+
+			GrowthInfo growthInfo = new GrowthInfo(id, name, depend, desc, price);
+			GrowthInfoDict[id] = growthInfo;
+		}
+
+		Debug.Log($"Growth info loaded: {GrowthInfoDict.Count} nodes");
+	}
+
+	public GrowthInfo GetGrowthInfo(int id)
+	{
+		LoadGrowthInfo();
+		if (GrowthInfoDict.TryGetValue(id, out GrowthInfo growthInfo))
+		{
+			return growthInfo;
+		}
 		return null;
 	}
 

@@ -441,7 +441,6 @@ public class UIGrowthControl : YViewControl
 	{
 		DataGrowth data = DataSystem.Instance.GetDataGrowth();
 
-		// 刷新局外积分显示
 		if (m_View != null && m_View.TextCoins != null)
 		{
 			m_View.TextCoins.text = data.Points.ToString();
@@ -496,5 +495,26 @@ public class UIGrowthControl : YViewControl
 			DataSystem.Instance.SaveDataGrowth();
 			Refresh();
 		});
+	}
+
+	protected override void OnClose()
+	{
+		// 这个 UI 关闭时 GameObject 会被销毁，这里只做引用清理与额外节点销毁（防御/避免复用时残留）
+		if (m_LinesRoot != null)
+		{
+			Destroy(m_LinesRoot.gameObject);
+			m_LinesRoot = null;
+		}
+		m_Lines.Clear();
+		m_BtnById.Clear();
+		m_SlotById.Clear();
+		m_NodeById.Clear();
+		m_Nodes.Clear();
+		base.OnClose();
+	}
+
+	protected override void OnReturn()
+	{
+		base.OnReturn();
 	}
 }
