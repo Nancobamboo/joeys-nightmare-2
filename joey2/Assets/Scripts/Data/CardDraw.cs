@@ -151,7 +151,12 @@ public sealed class CardDraw : PureSingleton<CardDraw>
         EnvStage envStage = GData.Instance.GetEnvStage(level);
         if (envStage != null)
         {
-            return new List<string>(envStage.monsterIds);
+            // Get current difficulty level from DataDifficulty system
+            int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+            
+            // Get monsters for current difficulty (cumulative)
+            List<string> monsters = envStage.GetMonstersByDifficulty(difficultyLevel);
+            return monsters;
         }
         Debug.LogWarning($"Env stage for level {level} not found, using default monsters");
         return new List<string> { "5001", "5001", "5003" };

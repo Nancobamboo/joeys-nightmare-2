@@ -18,28 +18,43 @@ public class UIBtnControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIBtnView>();
+
+		// 统一由本组件处理点击，再转发给外部回调
+		if (m_View != null && m_View.UIBtn != null)
+		{
+			var colors = m_View.UIBtn.colors;
+			if (colors.disabledColor.a < 0.1f)
+			{
+				colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+				m_View.UIBtn.colors = colors;
+			}
+
+			m_View.UIBtn.onClick.RemoveAllListeners();
+			m_View.UIBtn.onClick.AddListener(OnUIBtnClick);
+		}
 	}
 
-	public void InitWithTransform(int index, Action<int> onClick)
+	/// <summary>
+	/// 由外部（如 UIGrowthControl）设置按钮索引与点击回调。
+	/// 该方法不会负责绑定 View（绑定在 OnInit 完成）。
+	/// </summary>
+	public void Setup(int index, Action<int> onClick)
 	{
 		m_Index = index;
 		m_OnClick = onClick;
-
-
-		var colors = m_View.UIBtn.colors;
-		if (colors.disabledColor.a < 0.1f)
-		{
-			colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 1f);
-			m_View.UIBtn.colors = colors;
-		}
-
-		m_View.UIBtn.onClick.AddListener(OnUIBtnClick);
-
 	}
 
 	void OnUIBtnClick()
 	{
 		m_OnClick?.Invoke(m_Index);
+	}
+
+	public void SetTitle(string title)
+	{
+		if (m_View != null && m_View.Text != null)
+		{
+			m_View.Text.text = title ?? string.Empty;
+		}
 	}
 
 	public void SetData(bool isUnlocked, bool interactable)

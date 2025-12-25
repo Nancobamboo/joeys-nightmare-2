@@ -1,0 +1,9 @@
+difficulty_level,description,comment,difficluty_effect
+1,适合新手的起始难度,,
+2,解锁关卡17；怪物小幅强化,攻击+1 hp+5,monsterAttackBonus:1;monsterHealthBonus:5
+3,解锁更多怪物；商店价格上升,+20%,shopPriceMultiplier:1.2
+4,解锁关卡18；获得高级牌概率降低,-10%,highGradeCardProbability:-0.1
+5,解锁更多怪物；开始游戏时损失生命值和上限,-20hp生命，-10生命上限,playerHealthPenalty:-20;playerMaxHealthPenalty:-10
+6,解锁关卡19；玩家攻击防御降低,攻击-1 防御-1,playerAttackPenalty:-1;playerDefencePenalty:-1
+7,解锁更多怪物；初始牌组加入苦痛之刃,(攻击为0),curseCards:1025
+8,解锁关卡20；初始牌组加入苦痛之盾,(防御为0),curseCards:2016
