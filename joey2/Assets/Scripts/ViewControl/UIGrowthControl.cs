@@ -1417,6 +1417,8 @@ public class UIGrowthControl : YViewControl
 		{
 			DataSystem.Instance.GetDataGrowth().Unlock(node.Id);
 			DataSystem.Instance.SaveDataGrowth();
+			// 立即应用解锁到卡池/遗物池，避免必须重启或重新进局
+			DataSystem.Instance.ApplyGrowthUnlocks();
 			Refresh();
 		});
 	}

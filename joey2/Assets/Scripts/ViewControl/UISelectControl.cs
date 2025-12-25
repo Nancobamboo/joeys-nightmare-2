@@ -211,6 +211,12 @@ public class UISelectControl : YViewControl
 		List<RelicInfo> allRelics = GData.Instance.RelicInfoDict.Values.ToList();
 		List<RelicInfo> availableRelics = allRelics.Where(r =>
 		{
+			// Growth unlock gating: locked relics cannot enter selection pool
+			if (r != null && !r.canDraw)
+			{
+				return false;
+			}
+
 			// Exclude CardLimitDebuff from selection pool
 			if (r.id == (int)ERelicType.CardLimitDebuff)
 			{

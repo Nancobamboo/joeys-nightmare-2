@@ -7,6 +7,51 @@ using UnityEngine;
 
 public partial class DataSystem
 {
+    // -------- Growth unlock mappings (keep in sync with Resources/Data/growth.csv) --------
+    // Card unlock: when NOT unlocked => price=0 (excluded from shop/reward pools). When unlocked => price restored (>0).
+    private static readonly Dictionary<string, int> CardUnlockNodeByCardId = new Dictionary<string, int>
+    {
+        // id, nodeId
+        { "4013", 3 },   // 魔力召唤
+        { "1023", 5 },   // 骑士剑
+        { "1020", 7 },   // 噩梦长枪
+        { "4015", 8 },   // 冰霜魔法
+        { "1021", 9 },   // 魔法剑
+        { "2015", 10 },  // 骑士盾
+        { "1024", 11 },  // 螺旋手里剑
+        { "2012", 14 },  // 复仇之盾
+        { "2013", 15 },  // 破盾的救赎
+        { "3012", 16 },  // 沸腾兽血
+        { "3013", 17 },  // 鲜血护符
+        { "1022", 18 },  // 魔杖
+        { "2014", 19 },  // 魔法盾
+        { "3014", 20 },  // 魔法药水
+        { "4014", 21 },  // 烈焰火球
+        { "4011", 24 },  // 宁死不屈
+        { "4012", 25 },  // 浴血奋战
+        { "4016", 26 },  // 技能强化
+    };
+
+    // Relic unlock: when NOT unlocked => canDraw=false (excluded from relic selection pool).
+    private static readonly Dictionary<int, int> RelicUnlockNodeByRelicId = new Dictionary<int, int>
+    {
+        { (int)ERelicType.BBQDelight, 0 },            // 烤肉香香
+        { (int)ERelicType.WeaponParry, 12 },          // 弹刀
+        { (int)ERelicType.CounterInsight, 13 },       // 看破
+        { (int)ERelicType.DualWieldMastery, 23 },     // 双持精通
+        { (int)ERelicType.HighArt, 27 },              // 高等艺术
+        { (int)ERelicType.BareHandParry, 28 },        // 空手接白刃
+        { (int)ERelicType.ShieldReflect, 29 },        // 护盾反伤
+        { (int)ERelicType.RegenerationAmulet, 30 },   // 再生护符
+        { (int)ERelicType.HalfHealthAmulet, 31 },     // 半血护符
+        { (int)ERelicType.BloodyGloves, 32 },         // 染血拳法
+        { (int)ERelicType.ArcaneOrb, 33 },            // 奥术宝珠
+        { (int)ERelicType.MagicSwordsmanRing, 34 },   // 魔剑士指环
+    };
+
+    // Cache original prices from card_info.csv so we can restore after unlocking
+    private Dictionary<string, int> m_BaseCardPriceById = new Dictionary<string, int>();
+
     private static bool ReplaceFirst(List<string> list, string fromId, string toId)
     {
         if (list == null || list.Count == 0) return false;
@@ -31,49 +76,116 @@ public partial class DataSystem
         DataGrowth growth = GetDataGrowth();
         bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
 
-        // Node 0: 初始遗物 - 烤肉香香
-        if (Unlocked(0))
-        {
-            extraRelics?.Add((int)ERelicType.BBQDelight);
-        }
+        // 初始遗物（growth.csv: 0 / 28 / 32 / 33）
+        if (Unlocked(0)) extraRelics?.Add((int)ERelicType.BBQDelight);      // 烤肉香香
+        if (Unlocked(28)) extraRelics?.Add((int)ERelicType.BareHandParry);  // 空手接白刃
+        if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BloodyGloves);   // 染血拳法
+        if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ArcaneOrb);      // 奥术宝珠
 
-        // hp +4 nodes: 1,3,14,15,17,20
-        int hpNodeCount = 0;
-        if (Unlocked(1)) hpNodeCount++;
-        if (Unlocked(3)) hpNodeCount++;
-        if (Unlocked(14)) hpNodeCount++;
-        if (Unlocked(15)) hpNodeCount++;
-        if (Unlocked(17)) hpNodeCount++;
-        if (Unlocked(20)) hpNodeCount++;
-        if (hpNodeCount > 0) maxHealth += hpNodeCount * 4;
+        // hp +4（growth.csv: 1）
+        if (Unlocked(1)) maxHealth += 4;
 
-        // gold +50 nodes: 2,4,13,16,18,19
-        int goldNodeCount = 0;
-        if (Unlocked(2)) goldNodeCount++;
-        if (Unlocked(4)) goldNodeCount++;
-        if (Unlocked(13)) goldNodeCount++;
-        if (Unlocked(16)) goldNodeCount++;
-        if (Unlocked(18)) goldNodeCount++;
-        if (Unlocked(19)) goldNodeCount++;
-        if (goldNodeCount > 0) coins += goldNodeCount * 50;
+        // gold +50（growth.csv: 2）
+        if (Unlocked(2)) coins += 50;
 
-        // 装备替换节点（每个节点只替换一把：ReplaceFirst）
-        if (Unlocked(5))
+        // 初始装备替换（growth.csv: 4 / 6 / 22）
+        if (Unlocked(4))
         {
             ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
         }
-        if (Unlocked(8))
+        if (Unlocked(6))
         {
             ReplaceFirst(equipmentAttack, "1002", "1004"); // 断剑 -> 木棒
         }
-        if (Unlocked(10))
+        if (Unlocked(22))
         {
             ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
         }
-        if (Unlocked(11))
+    }
+
+    /// <summary>
+    /// Apply growth unlocks to runtime config:
+    /// - Locked cards: price = 0 (excluded from shop/reward pools)
+    /// - Locked relics: RelicInfo.canDraw = false (excluded from relic selection pool)
+    /// Call this after loading growth data, and after unlocking a node.
+    /// </summary>
+    public void ApplyGrowthUnlocks()
+    {
+        ApplyGrowthCardUnlocks();
+        ApplyGrowthRelicUnlocks();
+    }
+
+    private void EnsureBaseCardPricesCached()
+    {
+        if (m_BaseCardPriceById != null && m_BaseCardPriceById.Count > 0) return;
+        if (m_BaseCardPriceById == null) m_BaseCardPriceById = new Dictionary<string, int>();
+
+        GData.Instance.LoadCards();
+        foreach (var kv in GData.Instance.CardDict)
         {
-            ReplaceFirst(equipmentAttack, "1002", "1018"); // 断剑 -> 刺客匕首
-            ReplaceFirst(equipmentAttack, "1004", "1018");
+            if (kv.Value == null) continue;
+            m_BaseCardPriceById[kv.Key] = kv.Value.price;
+        }
+    }
+
+    private void ApplyGrowthCardUnlocks()
+    {
+        DataGrowth growth = GetDataGrowth();
+        if (growth == null) return;
+
+        GData.Instance.LoadCards();
+        EnsureBaseCardPricesCached();
+
+        foreach (var kv in CardUnlockNodeByCardId)
+        {
+            string cardId = kv.Key;
+            int nodeId = kv.Value;
+
+            if (!GData.Instance.CardDict.TryGetValue(cardId, out Card cfg) || cfg == null) continue;
+
+            bool unlocked = growth.IsUnlocked(nodeId);
+            if (!unlocked)
+            {
+                cfg.price = 0;
+                continue;
+            }
+
+            // Restore price from CSV; if CSV price is 0, ensure it's still "unlockable" (price > 0)
+            int basePrice = 0;
+            m_BaseCardPriceById.TryGetValue(cardId, out basePrice);
+            if (basePrice > 0)
+            {
+                cfg.price = basePrice;
+            }
+            else
+            {
+                // Fallback: stars * 100 (keeps it consistent with existing economy tiers)
+                cfg.price = Mathf.Max(1, cfg.stars * 100);
+                Debug.LogWarning($"[GrowthUnlock] Card {cardId} base price is {basePrice} in card_info.csv, fallback to {cfg.price} on unlock.");
+            }
+        }
+    }
+
+    private void ApplyGrowthRelicUnlocks()
+    {
+        DataGrowth growth = GetDataGrowth();
+        if (growth == null) return;
+
+        GData.Instance.LoadRelicInfo();
+        foreach (var kv in GData.Instance.RelicInfoDict)
+        {
+            RelicInfo info = kv.Value;
+            if (info == null) continue;
+
+            // Default: drawable unless gated by growth
+            if (RelicUnlockNodeByRelicId.TryGetValue(info.id, out int nodeId))
+            {
+                info.canDraw = growth.IsUnlocked(nodeId);
+            }
+            else
+            {
+                info.canDraw = true;
+            }
         }
     }
 
@@ -92,6 +204,9 @@ public partial class DataSystem
         LoadDataAchievement();
         LoadDataGrowth();
         LoadDataDifficulty();
+
+        // Ensure growth unlocks are applied to card/relic pools for this session
+        ApplyGrowthUnlocks();
     }
 
     public void LoadVFX()
@@ -169,6 +284,9 @@ public partial class DataSystem
     public void InitRoguelikeCharacterData(RoguelikeCharacter characterData)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        // Apply latest growth unlocks before initializing run data
+        ApplyGrowthUnlocks();
 
         int coins = characterData.coins;
         int maxHealth = characterData.maxHealth;
@@ -296,6 +414,9 @@ public partial class DataSystem
     public void InitEnvModeCharacterData(RoguelikeCharacter characterData)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        // Apply latest growth unlocks before initializing env run data
+        ApplyGrowthUnlocks();
 
         int coins = characterData.coins;
         int maxHealth = characterData.maxHealth;
