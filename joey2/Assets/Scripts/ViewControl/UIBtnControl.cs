@@ -17,48 +17,45 @@ public class UIBtnControl : YViewControl
 	protected override void OnInit()
 	{
 		base.OnInit();
-		// 此方法通常由 AssetSystem 调用，但在我们手动管理时可能不会自动调用
-		// 我们将在 InitWithTransform 中手动处理
-	}
+		m_View = CreateView<UIBtnView>();
 
-	public void InitWithTransform(Transform trs, int index, Action<int> onClick)
-	{
-		m_Index = index;
-		m_OnClick = onClick;
-		
-		m_View = new UIBtnView();
-		m_View.OnInit(trs);
-
-		// Fallback logic
-		if (m_View.UIBtn == null)
-		{
-			m_View.UIBtn = trs.GetComponent<Button>();
-		}
-		if (m_View.Sold == null)
-		{
-			Transform soldTr = trs.Find("Sold");
-			if (soldTr != null) m_View.Sold = soldTr.gameObject;
-		}
-
-		if (m_View.UIBtn != null)
+		// 统一由本组件处理点击，再转发给外部回调
+		if (m_View != null && m_View.UIBtn != null)
 		{
 			// Ensure disabled buttons are still visible (grayed out)
 			var colors = m_View.UIBtn.colors;
-			// Set disabled color to gray with full alpha if it was transparent
 			if (colors.disabledColor.a < 0.1f)
 			{
 				colors.disabledColor = new Color(0.5f, 0.5f, 0.5f, 1f);
 				m_View.UIBtn.colors = colors;
 			}
-			
+
 			m_View.UIBtn.onClick.RemoveAllListeners();
 			m_View.UIBtn.onClick.AddListener(OnUIBtnClick);
 		}
 	}
 
+	/// <summary>
+	/// 由外部（如 UIGrowthControl）设置按钮索引与点击回调。
+	/// 该方法不会负责绑定 View（绑定在 OnInit 完成）。
+	/// </summary>
+	public void Setup(int index, Action<int> onClick)
+	{
+		m_Index = index;
+		m_OnClick = onClick;
+	}
+
 	void OnUIBtnClick()
 	{
 		m_OnClick?.Invoke(m_Index);
+	}
+
+	public void SetTitle(string title)
+	{
+		if (m_View != null && m_View.Text != null)
+		{
+			m_View.Text.text = title ?? string.Empty;
+		}
 	}
 
 	public void SetData(bool isUnlocked, bool interactable)

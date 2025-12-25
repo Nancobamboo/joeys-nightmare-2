@@ -6,13 +6,67 @@ public class UIBtnView : YBaseView
 {
 	public Button UIBtn;
 	public GameObject Sold;
+	public Text Text;
+
+	private static Transform FindDeepChild(Transform root, string name)
+	{
+		if (root == null) return null;
+		var stack = new System.Collections.Generic.Stack<Transform>();
+		stack.Push(root);
+		while (stack.Count > 0)
+		{
+			var t = stack.Pop();
+			if (t != null && t.name == name) return t;
+			for (int i = 0; i < t.childCount; i++)
+			{
+				stack.Push(t.GetChild(i));
+			}
+		}
+		return null;
+	}
+
+	private static Button FindButton(Transform holder, string name)
+	{
+		var t = FindDeepChild(holder, name);
+		return t != null ? t.GetComponent<Button>() : null;
+	}
+
+	private static Text FindText(Transform holder, string name)
+	{
+		var t = FindDeepChild(holder, name);
+		return t != null ? t.GetComponent<Text>() : null;
+	}
+
 	public override void OnInit(Transform holder)
 	{
+		if (holder == null) return;
+
 		var itemRef = holder.GetComponent<YViewReference>();
-		if(itemRef == null) return;
-		var viewItemList = itemRef.ViewItemList;
-		if(viewItemList == null || viewItemList.Count == 0) return;
-		UIBtn = viewItemList[0].Target.GetComponent<Button>();
-		Sold = viewItemList[1].Target.gameObject;
+		var viewItemList = itemRef != null ? itemRef.ViewItemList : null;
+
+		// 优先走 ViewItemList（生成器绑定）
+		if (viewItemList != null && viewItemList.Count >= 3)
+		{
+			UIBtn = viewItemList[0].Target != null ? viewItemList[0].Target.GetComponent<Button>() : null;
+			Sold = viewItemList[1].Target != null ? viewItemList[1].Target.gameObject : null;
+			Text = viewItemList[2].Target != null ? viewItemList[2].Target.GetComponent<Text>() : null;
+		}
+
+		// 兜底：按名字找
+		if (UIBtn == null)
+		{
+			// prefab 根节点通常就有 Button
+			UIBtn = holder.GetComponent<Button>();
+			if (UIBtn == null) UIBtn = FindButton(holder, "UIBtn");
+		}
+		if (Sold == null)
+		{
+			var soldTr = holder.Find("Sold") ?? FindDeepChild(holder, "Sold") ?? holder.Find("sold") ?? FindDeepChild(holder, "sold");
+			if (soldTr != null) Sold = soldTr.gameObject;
+		}
+		if (Text == null)
+		{
+			Text = FindText(holder, "Text");
+		}
 	}
 }
