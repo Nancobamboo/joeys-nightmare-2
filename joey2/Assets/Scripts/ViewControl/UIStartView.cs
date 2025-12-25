@@ -4,31 +4,33 @@ using UnityEngine.UI;
 
 public class UIStartView : YBaseView
 {
-	public Button BtnEnv;
+	public Button BtnNewGame;
 	public EventTriggerListener EnvTrigger;
 	public Button BtnOver;
 	public EventTriggerListener OverTrigger;
 	public Button BtnGuide;
 	public EventTriggerListener GuideTrigger;
 	public Button BtnStart;
-	public Button BtnAchievement;
+	public Button BtnContinue;
 	public EventTriggerListener TriggerAchieve;
 	public Toggle ToggleScreen;
+	public Text TxtContinue;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
 		if(itemRef == null) return;
 		var viewItemList = itemRef.ViewItemList;
 		if(viewItemList == null || viewItemList.Count == 0) return;
-		BtnEnv = viewItemList[0].Target.GetComponent<Button>();
+		BtnNewGame = viewItemList[0].Target.GetComponent<Button>();
 		EnvTrigger = viewItemList[0].Target.GetComponent<EventTriggerListener>();
 		BtnOver = viewItemList[1].Target.GetComponent<Button>();
 		OverTrigger = viewItemList[1].Target.GetComponent<EventTriggerListener>();
 		BtnGuide = viewItemList[2].Target.GetComponent<Button>();
 		GuideTrigger = viewItemList[2].Target.GetComponent<EventTriggerListener>();
 		BtnStart = viewItemList[3].Target.GetComponent<Button>();
-		BtnAchievement = viewItemList[4].Target.GetComponent<Button>();
+		BtnContinue = viewItemList[4].Target.GetComponent<Button>();
 		TriggerAchieve = viewItemList[4].Target.GetComponent<EventTriggerListener>();
 		ToggleScreen = viewItemList[5].Target.GetComponent<Toggle>();
+		TxtContinue = viewItemList[6].Target.GetComponent<Text>();
 	}
 }

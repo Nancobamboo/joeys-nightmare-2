@@ -33,19 +33,20 @@ public class UIStartControl : YViewControl
 		bool isFullScreen = PlayerPrefs.GetInt(PREF_KEY_FULLSCREEN, 1) == 1;
 
 		m_View = CreateView<UIStartView>();
-		m_View.BtnEnv.onClick.AddListener(OnBtnRoguelikeClick);
+		m_View.BtnNewGame.onClick.AddListener(OnBtnNewGameClick);
 		m_View.BtnGuide.onClick.AddListener(OnBtnGuideClick);
 		m_View.BtnOver.onClick.AddListener(OnBtnOverClick);
-		m_View.BtnAchievement.onClick.AddListener(OnBtnAchievementClick);
+		m_View.BtnContinue.onClick.AddListener(OnBtnContinueClick);
 		m_View.ToggleScreen.onValueChanged.AddListener(OnToggleScreenValueChanged);
 		m_View.ToggleScreen.isOn = isFullScreen;
 
-		SetupButtonHoverEffect(m_View.BtnEnv, m_View.EnvTrigger);
+		SetupButtonHoverEffect(m_View.BtnNewGame, m_View.EnvTrigger);
 		SetupButtonHoverEffect(m_View.BtnGuide, m_View.GuideTrigger);
 		SetupButtonHoverEffect(m_View.BtnOver, m_View.OverTrigger);
-		SetupButtonHoverEffect(m_View.BtnAchievement, m_View.TriggerAchieve);
+		SetupButtonHoverEffect(m_View.BtnContinue, m_View.TriggerAchieve);
 
 		ApplyScreenResolution(isFullScreen);
+		CheckContinueButtonState();
 	}
 
 	private void SetupButtonHoverEffect(Button button, EventTriggerListener trigger)
@@ -68,11 +69,10 @@ public class UIStartControl : YViewControl
 		button.transform.localScale = Vector3.one;
 	}
 
-	private void OnBtnRoguelikeClick()
+	private void OnBtnNewGameClick()
 	{
-		// Open lobby instead of directly starting the game
 		var ctrl = Asset.OpenUI<UILobbyControl>();
-		ctrl.SetData(false); // false表示不是从成就界面进入
+		ctrl.SetData(true, true);
 	}
 
 	private void OnBtnGuideClick()
@@ -90,10 +90,10 @@ public class UIStartControl : YViewControl
 #endif
 	}
 
-	void OnBtnAchievementClick()
+	void OnBtnContinueClick()
 	{
 		var ctrl = Asset.OpenUI<UILobbyControl>();
-		ctrl.SetData(true);
+		ctrl.SetData(false, true);
 	}
 
 	void OnToggleScreenValueChanged(bool isOn)
@@ -118,6 +118,14 @@ public class UIStartControl : YViewControl
 	private void ClearPlayerData()
 	{
 		DataSystem.Instance.ResetDataJoeyPlayer();
+	}
+
+	private void CheckContinueButtonState()
+	{
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
+		m_View.BtnContinue.interactable = hasSaveData;
+		m_View.TxtContinue.color = hasSaveData ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
 	}
 
 	public void SetData()
