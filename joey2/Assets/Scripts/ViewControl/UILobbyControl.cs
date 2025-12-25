@@ -9,7 +9,7 @@ public class UILobbyControl : YViewControl
 	private UICardProgressControl m_CardProgressControl;
 	private UIGrowthControl m_GrowthControl;
 	private EventTriggerListener m_DiffTooltipTrigger;
-	private GameObject m_TooltipPanel;
+	private UIDescExtControl m_DifficultyDescExtControl;
 	bool m_IsNewGame = false;
 
 	public static EResType GetResType()
@@ -110,7 +110,7 @@ public class UILobbyControl : YViewControl
 	private void OnBtnContinueClick()
 	{
 		RefreshContinueButtonState();
-		if (m_View != null && m_View.BtnContinue != null && !m_View.BtnContinue.interactable)
+		if (!m_View.BtnContinue.interactable)
 		{
 			return;
 		}
@@ -119,10 +119,10 @@ public class UILobbyControl : YViewControl
 
 	private void RefreshContinueButtonState()
 	{
-		if (m_View == null || m_View.BtnContinue == null) return;
 		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
 		bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
 		m_View.BtnContinue.interactable = hasSaveData;
+		m_View.TxtContinue.color = hasSaveData ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
 	}
 
 	void OnBtnShopClick()
@@ -246,24 +246,27 @@ public class UILobbyControl : YViewControl
 				tooltipText += "\n" + config.comment;
 			}
 
-			// Simple debug log for now - could be enhanced with a proper UI tooltip
-			Debug.Log($"[Difficulty {cur}] {tooltipText}");
-
-			// If you want to show text on the UI, you can create a simple text display
-			// For now, using debug log as specified in requirements
+			m_DifficultyDescExtControl = Asset.OpenUI<UIDescExtControl>(Asset.UIRoot);
+			m_DifficultyDescExtControl.SetData(tooltipText);
+			RectTransform diffRect = m_View.TextDiff.transform as RectTransform;
+			m_DifficultyDescExtControl.SetPositionRelativeTo(diffRect);
 		}
 	}
 
 	private void OnDifficultyHoverExit(GameObject go, UnityEngine.EventSystems.BaseEventData data)
 	{
-		// Hide tooltip if needed
+		if (m_DifficultyDescExtControl != null)
+		{
+			m_DifficultyDescExtControl.Close();
+			m_DifficultyDescExtControl = null;
+		}
 	}
 
 	public void SetData(bool isNewGame, bool isUIStartEnter = false)
 	{
-        m_IsNewGame = isNewGame;
+		m_IsNewGame = isNewGame;
 
-        m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
+		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
 		m_View.BtnGame.gameObject.SetActive(isDebug);
 		m_View.BtnNew.gameObject.SetActive(!isDebug);
@@ -294,6 +297,11 @@ public class UILobbyControl : YViewControl
 		if (m_GrowthControl != null)
 		{
 			m_GrowthControl.Close();
+		}
+		if (m_DifficultyDescExtControl != null)
+		{
+			m_DifficultyDescExtControl.Close();
+			m_DifficultyDescExtControl = null;
 		}
 	}
 }
