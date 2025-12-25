@@ -70,9 +70,9 @@ public class UIStartControl : YViewControl
 
 	private void OnBtnRoguelikeClick()
 	{
-		DataSystem.Instance.IsHardGame = false;
-		ClearPlayerData();
-		SceneLoader.Instance.LoadScene(ESceneName.BattleEnv.ToString());
+		// Open lobby instead of directly starting the game
+		var ctrl = Asset.OpenUI<UILobbyControl>();
+		ctrl.SetData(false); // false表示不是从成就界面进入
 	}
 
 	private void OnBtnGuideClick()

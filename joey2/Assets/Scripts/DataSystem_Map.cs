@@ -343,8 +343,69 @@ public partial class DataSystem
 
         dataJoeyPlayer.currentLevel = 1;
 
-        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool");
+        // Apply difficulty effects based on current difficulty level
+        ApplyEnvDifficultyEffects(dataJoeyPlayer);
+
+        Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool, difficulty level: {GetCurrentDifficulty()}");
         SaveDataJoeyPlayer();
+    }
+
+    /// <summary>
+    /// Apply difficulty effects to player stats and card pool
+    /// This should be called when initializing env mode or when difficulty changes
+    /// </summary>
+    private void ApplyEnvDifficultyEffects(DataJoeyPlayer dataJoeyPlayer)
+    {
+        int difficultyLevel = GetCurrentDifficulty();
+
+        // Apply cumulative effects from all difficulty levels up to current
+        for (int level = 2; level <= difficultyLevel; level++)
+        {
+            DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+            if (config == null) continue;
+
+            // Apply player stat penalties
+            if (config.playerHealthPenalty != 0)
+            {
+                dataJoeyPlayer.playerHealth += config.playerHealthPenalty;
+                if (dataJoeyPlayer.playerHealth < 1) dataJoeyPlayer.playerHealth = 1;
+            }
+
+            if (config.playerMaxHealthPenalty != 0)
+            {
+                dataJoeyPlayer.playerMaxHealth += config.playerMaxHealthPenalty;
+                if (dataJoeyPlayer.playerMaxHealth < 1) dataJoeyPlayer.playerMaxHealth = 1;
+                // Adjust current health if it exceeds new max
+                if (dataJoeyPlayer.playerHealth > dataJoeyPlayer.playerMaxHealth)
+                {
+                    dataJoeyPlayer.playerHealth = dataJoeyPlayer.playerMaxHealth;
+                }
+            }
+
+            if (config.playerAttackPenalty != 0)
+            {
+                dataJoeyPlayer.playerAttack += config.playerAttackPenalty;
+                if (dataJoeyPlayer.playerAttack < 0) dataJoeyPlayer.playerAttack = 0;
+            }
+
+            if (config.playerDefencePenalty != 0)
+            {
+                dataJoeyPlayer.playerDefence += config.playerDefencePenalty;
+                if (dataJoeyPlayer.playerDefence < 0) dataJoeyPlayer.playerDefence = 0;
+            }
+
+            // Add curse cards to starting deck (only add once per difficulty level)
+            foreach (string curseCardId in config.startingCurseCards)
+            {
+                if (!dataJoeyPlayer.EnvCardPool.Contains(curseCardId))
+                {
+                    dataJoeyPlayer.AddEnvCardPoolData(curseCardId);
+                    Debug.Log($"Difficulty {level}: Added curse card {curseCardId} to card pool");
+                }
+            }
+
+            Debug.Log($"Applied difficulty {level} effects: Health {config.playerHealthPenalty}, MaxHealth {config.playerMaxHealthPenalty}, Attack {config.playerAttackPenalty}, Defence {config.playerDefencePenalty}");
+        }
     }
 
     public void AddRelic(ERelicType relicType)
@@ -417,9 +478,13 @@ public partial class DataSystem
 
     public void ResetDataJoeyPlayer()
     {
+        // Difficulty is now tracked in DataDifficulty, no need to preserve in player data
         m_DataJoeyPlayer = new DataJoeyPlayer();
+        
         isFinishGame = false;
         SaveDataJoeyPlayer();
+        
+        Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
     }
 }
 

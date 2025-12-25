@@ -331,6 +331,9 @@ public partial class UIGamePhaseControl : YViewControl
 			case ETheme.deadkey:
 				m_View.DeadkeyBg.SetActive(true);
 				break;
+			case ETheme.tutorial:
+				m_View.GuideBg.SetActive(true);
+				break;
 		}
 	}
 
@@ -482,8 +485,9 @@ public partial class UIGamePhaseControl : YViewControl
 			EnvStage envStage = GData.Instance.GetEnvStage(m_DataJoeyPlayer.StageId);
 			if (envStage != null)
 			{
-				int totalStages = 20;
-				m_View.TxtStage.text = envStage.level.ToString() + "/" + totalStages.ToString();
+				// Display current stage / max unlocked stage based on difficulty
+				int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+				m_View.TxtStage.text = envStage.level.ToString() + "/" + maxUnlockedStage.ToString();
 			}
 		}
 		else if (JoeyGameControl.Instance.GameMode == EGameMode.Guide)
@@ -701,6 +705,12 @@ public partial class UIGamePhaseControl : YViewControl
 				card.currentHealth *= 2;
 				card.health *= 2;
 			}
+			
+			// Apply difficulty effects to monsters in Env mode
+			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+			{
+				ApplyEnvDifficultyToMonster(card);
+			}
 
 			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
 			{
@@ -712,6 +722,37 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.SetData(card, isEnv: true, envIndex: index);
 			AddEnvCard(index, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		}
+	}
+	
+	/// <summary>
+	/// Apply difficulty bonuses to monster cards (cumulative from all unlocked difficulties)
+	/// </summary>
+	private void ApplyEnvDifficultyToMonster(Card monsterCard)
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		
+		// Apply cumulative bonuses from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
+		{
+			DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+			if (config == null) continue;
+			
+			// Apply monster attack bonus
+			if (config.monsterAttackBonus != 0)
+			{
+				monsterCard.currentAttack += config.monsterAttackBonus;
+				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
+			}
+			
+			// Apply monster health bonus
+			if (config.monsterHealthBonus != 0)
+			{
+				monsterCard.currentHealth += config.monsterHealthBonus;
+				monsterCard.health += config.monsterHealthBonus;
+				if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
+				if (monsterCard.health < 1) monsterCard.health = 1;
+			}
 		}
 	}
 
@@ -1299,6 +1340,29 @@ public partial class UIGamePhaseControl : YViewControl
 		if (lastAttackCard != null)
 		{
 			int attackValue = lastAttackCard.CardData.currentAttack;
+			
+			// Add all bonuses that should be doubled by DualWield
+			// Include DualWieldMastery relic bonus if applicable
+			if (DataSystem.Instance.HasRelic(ERelicType.DualWieldMastery))
+			{
+				if (!HasBagCard(ECardType.defence))
+				{
+					attackValue += 5;
+				}
+			}
+			
+			// Include BloodyGloves relic bonus if applicable
+			if (DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+			{
+				if (lastAttackCard.CardEffect != null && lastAttackCard.CardEffect.Id == ECardEffectId.BareHands)
+				{
+					if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+					{
+						attackValue += 5;
+					}
+				}
+			}
+			
 			Debug.Log($"Before DoubleLastWeaponAttack: {attackValue}");
 			lastAttackCard.AddEffectValue(EEffectType.Damage, attackValue);
 			Debug.Log($"After DoubleLastWeaponAttack: {lastAttackCard.CardData.currentAttack + lastAttackCard.CardEffect.GetEffectValue(EEffectType.Damage)}");
