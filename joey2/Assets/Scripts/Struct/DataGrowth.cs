@@ -13,7 +13,7 @@ public class DataGrowth : IData
 
         if (jobject.ContainsKey("Points"))
             Points = (int)jobject["Points"];
-        
+
         UnlockedNodes.Clear();
         if (jobject.ContainsKey("UnlockedNodes"))
         {
@@ -28,7 +28,7 @@ public class DataGrowth : IData
     public void SaveToJson(JObject jobject)
     {
         jobject.Add("Points", Points);
-        
+
         JArray array = new JArray();
         foreach (var id in UnlockedNodes)
         {
@@ -72,13 +72,6 @@ public partial class DataSystem
     public void LoadDataGrowth()
     {
         LoadJsonFile("Data_Growth", ref m_DataGrowth);
-    }
-    
-    // Helper to add growth points
-    public void AddGrowthPoints(int amount)
-    {
-        GetDataGrowth().Points += amount;
-        SaveDataGrowth();
     }
 }
 
