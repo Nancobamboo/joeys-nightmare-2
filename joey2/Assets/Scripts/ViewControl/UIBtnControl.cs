@@ -49,6 +49,7 @@ public class UIBtnControl : YViewControl
 	{
 		if (isUnlocked)
 		{
+			m_View.Text.gameObject.SetActive(false);
 			m_View.Sold.SetActive(true);
 			m_View.UIBtn.interactable = false;
 		}
