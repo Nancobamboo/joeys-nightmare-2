@@ -9,12 +9,13 @@ public class UILobbyView : YBaseView
 	public Button BtnGame;
 	public Button BtnMerge;
 	public Button BtnCardProgress;
-	public Button BtnHardGame;
+	public Button BtnNew;
 	public Button BtnSkip;
 	public Button BtnGrowth;
 	public Button BtnLeft;
 	public Button BtnRight;
 	public Text TextDiff;
+	public Button BtnContinue;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -26,11 +27,12 @@ public class UILobbyView : YBaseView
 		BtnGame = viewItemList[2].Target.GetComponent<Button>();
 		BtnMerge = viewItemList[3].Target.GetComponent<Button>();
 		BtnCardProgress = viewItemList[4].Target.GetComponent<Button>();
-		BtnHardGame = viewItemList[5].Target.GetComponent<Button>();
+		BtnNew = viewItemList[5].Target.GetComponent<Button>();
 		BtnSkip = viewItemList[6].Target.GetComponent<Button>();
 		BtnGrowth = viewItemList[7].Target.GetComponent<Button>();
 		BtnLeft = viewItemList[8].Target.GetComponent<Button>();
 		BtnRight = viewItemList[9].Target.GetComponent<Button>();
 		TextDiff = viewItemList[10].Target.GetComponent<Text>();
+		BtnContinue = viewItemList[11].Target.GetComponent<Button>();
 	}
 }
