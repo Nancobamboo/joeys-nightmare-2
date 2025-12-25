@@ -60,7 +60,7 @@ public class UIGrowthControl : YViewControl
 	{
 		base.OnInit();
 		m_View = CreateView<UIGrowthView>();
-		m_View.BtnSkip.onClick.AddListener(Close);
+		m_View.BtnBack.onClick.AddListener(Close);
 
 		RegistAction(EActionId.OnGrowthPointsChange, OnGrowthPointsChange);
 
@@ -80,7 +80,7 @@ public class UIGrowthControl : YViewControl
 	{
 		Refresh();
 		DataGrowth dataGrowth = DataSystem.Instance.GetDataGrowth();
-		m_View.TxtCoin.text = dataGrowth.Points.ToString();
+		m_View.TextCoins.text = dataGrowth.Points.ToString();
 	}
 	private void EnsureScrollRect()
 	{
@@ -1425,7 +1425,7 @@ public class UIGrowthControl : YViewControl
 	{
 		int points = (int)paraArray[0];
 		int delta = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 0;
-		m_View.TxtCoin.text = points.ToString();
+		m_View.TextCoins.text = points.ToString();
 		if (delta != 0)
 		{
 			UIDamageTextControl damageTextControl = m_DamageTextPool.Get();
@@ -1437,7 +1437,7 @@ public class UIGrowthControl : YViewControl
 			{
 				damageTextControl.SetData(-delta, Asset.UIRoot, Vector3.zero, true);
 			}
-			damageTextControl.transform.position = m_View.TxtCoin.transform.position - new Vector3(1f, 1f, 0f);
+			damageTextControl.transform.position = m_View.TextCoins.transform.position - new Vector3(1f, 1f, 0f);
 		}
 	}
 

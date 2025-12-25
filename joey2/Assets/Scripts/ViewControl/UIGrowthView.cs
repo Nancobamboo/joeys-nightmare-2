@@ -25,11 +25,11 @@ public class UIGrowthView : YBaseView
 	public RectTransform Btn18;
 	public RectTransform Btn19;
 	public RectTransform Btn20;
-	public Button BtnSkip;
+	public Button BtnBack;
+	public Text TextCoins;
 	public ScrollRect Scroll;
 	public RectTransform Viewport;
 	public RectTransform Content;
-	public Text TxtCoin;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -57,10 +57,10 @@ public class UIGrowthView : YBaseView
 		Btn18 = viewItemList[18].Target.GetComponent<RectTransform>();
 		Btn19 = viewItemList[19].Target.GetComponent<RectTransform>();
 		Btn20 = viewItemList[20].Target.GetComponent<RectTransform>();
-		BtnSkip = viewItemList[21].Target.GetComponent<Button>();
-		Scroll = viewItemList[22].Target.GetComponent<ScrollRect>();
-		Viewport = viewItemList[23].Target.GetComponent<RectTransform>();
-		Content = viewItemList[24].Target.GetComponent<RectTransform>();
-		TxtCoin = viewItemList[25].Target.GetComponent<Text>();
+		BtnBack = viewItemList[21].Target.GetComponent<Button>();
+		TextCoins = viewItemList[22].Target.GetComponent<Text>();
+		Scroll = viewItemList[23].Target.GetComponent<ScrollRect>();
+		Viewport = viewItemList[24].Target.GetComponent<RectTransform>();
+		Content = viewItemList[25].Target.GetComponent<RectTransform>();
 	}
 }
