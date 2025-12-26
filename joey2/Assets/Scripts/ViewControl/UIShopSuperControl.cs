@@ -126,11 +126,13 @@ public class UIShopSuperControl : YViewControl
         List<Card> availableCards = allCards.Where(c =>
         {
             ECardType cardType = c.GetCardType();
+            // Exclude curse cards (1025: Pain Blade, 2016: Pain Shield)
             return (cardType == ECardType.attack ||
                 cardType == ECardType.defence ||
                 cardType == ECardType.skill ||
                 cardType == ECardType.item) &&
-            c.price > 0;
+            c.price > 0 &&
+            c.id != "1025" && c.id != "2016";
         }).ToList();
 
         int shopCardCount = 8;
