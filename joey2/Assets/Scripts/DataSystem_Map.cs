@@ -430,12 +430,27 @@ public partial class DataSystem
         var extraRelics = new List<int>();
         ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
 
-        //dataJoeyPlayer.ClearEnvCardPool();
+        // Safety: ensure a clean env run init (normally EnvCardPool is empty when this is called)
+        if (dataJoeyPlayer.EnvCardPool != null) dataJoeyPlayer.EnvCardPool.Clear();
+        if (dataJoeyPlayer.EnvCardDict != null) dataJoeyPlayer.EnvCardDict.Clear();
 
-        // Env mode only uses card_deck, not equipment fields
-        for (int i = 0; i < characterData.cardDeck.Count; i++)
+        // Env mode only uses card_deck, not equipment fields.
+        // Important: growth "initial equipment replacement" nodes should still affect Env start deck,
+        // because the base character CSV puts those equipment cards into card_deck as well.
+        var envDeck = new List<string>(characterData.cardDeck);
         {
-            string cardId = characterData.cardDeck[i];
+            DataGrowth growth = GetDataGrowth();
+            bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
+
+            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 4 / 6 / 22)
+            if (Unlocked(4)) ReplaceFirst(envDeck, "2001", "2009"); // 破盾 -> 马甲
+            if (Unlocked(6)) ReplaceFirst(envDeck, "1002", "1004"); // 断剑 -> 木棒
+            if (Unlocked(22)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        }
+
+        for (int i = 0; i < envDeck.Count; i++)
+        {
+            string cardId = envDeck[i];
             if (!string.IsNullOrEmpty(cardId))
             {
                 dataJoeyPlayer.AddEnvCardPoolData(cardId);
