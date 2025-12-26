@@ -1144,6 +1144,8 @@ public class UIGrowthControl : YViewControl
 			slot.anchoredPosition = posById.TryGetValue(id, out var p) ? p : Vector2.zero;
 			var btnCtrl = Asset.OpenUI<UIBtnControl>(slot);
 			btnCtrl.Setup(id, OnGrowthBtnClick);
+			// 给 uibtn 补上文字：默认显示节点名（为空时回退到 id）
+			btnCtrl.SetTitle(!string.IsNullOrEmpty(node.Name) ? node.Name : id.ToString());
 			var rt = btnCtrl.transform as RectTransform;
 			if (rt != null)
 			{
@@ -1161,7 +1163,6 @@ public class UIGrowthControl : YViewControl
 				btnCtrl.transform.localScale = Vector3.one;
 				btnCtrl.transform.localRotation = Quaternion.identity;
 			}
-			// Text 不再使用
 			m_SlotById[id] = slot;
 			m_BtnById[id] = btnCtrl;
 		}
