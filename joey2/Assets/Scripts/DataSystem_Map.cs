@@ -49,6 +49,12 @@ public partial class DataSystem
         { (int)ERelicType.MagicSwordsmanRing, 34 },   // 魔剑士指环
     };
 
+    // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
+    // - HP cap +4 nodes: 35/37/39/41/43/45/47
+    // - Starting coins +40 nodes: 36/38/40/42/44/46/48
+    private static readonly int[] StartMaxHealthPlus4NodeIds = { 35, 37, 39, 41, 43, 45, 47 };
+    private static readonly int[] StartCoinsPlus40NodeIds = { 36, 38, 40, 42, 44, 46, 48 };
+
     // Cache original prices from card_info.csv so we can restore after unlocking
     private Dictionary<string, int> m_BaseCardPriceById = new Dictionary<string, int>();
 
@@ -69,6 +75,7 @@ public partial class DataSystem
     private void ApplyGrowthToStartLoadout(
         List<string> equipmentAttack,
         List<string> equipmentDefence,
+        List<string> equipmentItem,
         ref int coins,
         ref int maxHealth,
         List<int> extraRelics)
@@ -86,11 +93,18 @@ public partial class DataSystem
         {
             equipmentItem.Add("3001");
         }
-        // // hp +4（growth.csv: 1）
-        // if (Unlocked(1)) maxHealth += 4;
 
-        // // gold +50（growth.csv: 2）
-        // if (Unlocked(2)) coins += 50;
+        // 局外成长：开局属性加成（growth.csv: 35-48）
+        // hp 上限 +4（可叠加）
+        for (int i = 0; i < StartMaxHealthPlus4NodeIds.Length; i++)
+        {
+            if (Unlocked(StartMaxHealthPlus4NodeIds[i])) maxHealth += 4;
+        }
+        // 初始金币 +40（可叠加）
+        for (int i = 0; i < StartCoinsPlus40NodeIds.Length; i++)
+        {
+            if (Unlocked(StartCoinsPlus40NodeIds[i])) coins += 40;
+        }
 
         // 初始装备替换（growth.csv: 2 / 4 / 6 / 22）
         if (Unlocked(4)) ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
@@ -294,8 +308,9 @@ public partial class DataSystem
         int maxHealth = characterData.maxHealth;
         var equipAttack = new List<string>(characterData.equipmentAttack);
         var equipDefence = new List<string>(characterData.equipmentDefence);
+        var equipItem = new List<string>(characterData.equipmentItem);
         var extraRelics = new List<int>();
-        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, equipItem, ref coins, ref maxHealth, extraRelics);
 
         for (int i = 0; i < characterData.cardDeck.Count; i++)
         {
@@ -323,9 +338,9 @@ public partial class DataSystem
             dataJoeyPlayer.AddEquipedDefenceListData(card.UniqueId);
         }
 
-        for (int i = 0; i < characterData.equipmentItem.Count; i++)
+        for (int i = 0; i < equipItem.Count; i++)
         {
-            string cardId = characterData.equipmentItem[i];
+            string cardId = equipItem[i];
             if (string.IsNullOrEmpty(cardId)) continue;
             Card card = CreateCard(cardId);
             dataJoeyPlayer.AddSelfCardDictData(card);
@@ -424,8 +439,9 @@ public partial class DataSystem
         int maxHealth = characterData.maxHealth;
         var equipAttack = new List<string>(characterData.equipmentAttack);
         var equipDefence = new List<string>(characterData.equipmentDefence);
+        var equipItem = new List<string>(characterData.equipmentItem);
         var extraRelics = new List<int>();
-        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, equipItem, ref coins, ref maxHealth, extraRelics);
 
         // Safety: ensure a clean env run init (normally EnvCardPool is empty when this is called)
         if (dataJoeyPlayer.EnvCardPool != null) dataJoeyPlayer.EnvCardPool.Clear();
@@ -443,6 +459,18 @@ public partial class DataSystem
             if (Unlocked(4)) ReplaceFirst(envDeck, "2001", "2009"); // 破盾 -> 马甲
             if (Unlocked(6)) ReplaceFirst(envDeck, "1002", "1004"); // 断剑 -> 木棒
             if (Unlocked(22)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        }
+
+        // Growth may add starting items via equipmentItem (e.g. node 1 adds 3001 小血瓶).
+        // Env mode doesn't use equipment lists, so we merge item cards into the Env start deck/pool here.
+        if (equipItem != null && equipItem.Count > 0)
+        {
+            for (int i = 0; i < equipItem.Count; i++)
+            {
+                string id = equipItem[i];
+                if (string.IsNullOrEmpty(id)) continue;
+                if (!envDeck.Contains(id)) envDeck.Add(id);
+            }
         }
 
         for (int i = 0; i < envDeck.Count; i++)
