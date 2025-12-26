@@ -8,7 +8,6 @@ public class UIShopControl : YViewControl
 	private List<UIShopCardControl> m_ShopCardList = new List<UIShopCardControl>();
 	private List<ShopCardData> m_CurrentShopCards = new List<ShopCardData>();
 	private DataJoeyPlayer m_PlayerData;
-	private int m_RefreshCost = 50;
 	private UIBuildControl m_BuildControl;
 	private UIBuildNewControl m_BuildNewControl;
 	private bool m_IsNew;
@@ -97,18 +96,42 @@ public class UIShopControl : YViewControl
 
 	void OnBtnRefreshClick()
 	{
-		if (m_PlayerData.Coin < m_RefreshCost)
+		int refreshCost = GetRefreshCost();
+		if (m_PlayerData.Coin < refreshCost)
 		{
-			Debug.Log("金币不足，无法刷新！需要 " + m_RefreshCost + " 金币");
+			Debug.Log("金币不足，无法刷新！需要 " + refreshCost + " 金币");
 			return;
 		}
 
-		DataSystem.Instance.AddCoin(-m_RefreshCost);
+		DataSystem.Instance.AddCoin(-refreshCost);
 
 		GenerateShopCards();
 		RefreshShopDisplay();
 
 		DataSystem.Instance.SaveDataJoeyPlayer();
+	}
+
+	private int GetRefreshCost()
+	{
+		int baseCost = 50;
+		
+		// Apply difficulty price multiplier
+		float difficultyMultiplier = GData.Instance.GetShopPriceMultiplier();
+		int costWithDifficulty = Mathf.RoundToInt(baseCost * difficultyMultiplier);
+		
+		// Apply shop discount relic
+		if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
+		{
+			costWithDifficulty = Mathf.RoundToInt(costWithDifficulty * 0.8f);
+		}
+		
+		// Minimum cost is 1
+		if (costWithDifficulty < 1)
+		{
+			costWithDifficulty = 1;
+		}
+		
+		return costWithDifficulty;
 	}
 
 	public void SetData(bool isNew = false)
@@ -162,16 +185,29 @@ public class UIShopControl : YViewControl
 		}).ToList();
 
 		int shopCardCount = 8;
-		List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
+
+		// Use default shop star rates (similar to normal stage: 60% 1-star, 30% 2-star, 10% 3-star)
+		Dictionary<int, int> shopStarRates = new Dictionary<int, int>
+		{
+			{ 1, 60 },
+			{ 2, 30 },
+			{ 3, 10 }
+		};
+
+		// Select cards with difficulty-adjusted star probabilities
+		List<Card> selectedCards = GData.Instance.SelectCardsWithStarProbability(availableCards, shopCardCount, shopStarRates);
 
 		// Randomly select one card for 50% discount
-		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, shuffledCards.Count));
+		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, selectedCards.Count));
 
 
 
-		for (int i = 0; i < shopCardCount && i < shuffledCards.Count; i++)
+		// Get difficulty price multiplier
+		float difficultyPriceMultiplier = GData.Instance.GetShopPriceMultiplier();
+
+		for (int i = 0; i < selectedCards.Count; i++)
 		{
-			Card card = shuffledCards[i];
+			Card card = selectedCards[i];
 			int shopPrice;
 
 			if (i == halfPriceIndex)
@@ -185,6 +221,9 @@ public class UIShopControl : YViewControl
 				float discountRate = Random.Range(0.8f, 1.0f);
 				shopPrice = Mathf.RoundToInt(card.price * discountRate);
 			}
+
+			// Apply difficulty price multiplier
+			shopPrice = Mathf.RoundToInt(shopPrice * difficultyPriceMultiplier);
 
 			// Apply shop discount relic on top of existing discount
 			if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))

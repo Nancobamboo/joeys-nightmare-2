@@ -262,6 +262,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public void SetData()
 	{
+		PhaseCounter = 0;
 		RefreshView();
 		ClearAllCard();
 		CreateFistCardCache();
@@ -279,6 +280,9 @@ public partial class UIGamePhaseControl : YViewControl
 		ResetShieldBashState();
 		ResetFortressState();
 		ResetStrikeState();
+		
+		// Initialize turn counter display
+		m_View.TxtPhaseCnt.text = (PhaseCounter + 1).ToString();
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -700,19 +704,28 @@ public partial class UIGamePhaseControl : YViewControl
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
 
-			if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
-			{
-				card.currentHealth *= 2;
-				card.health *= 2;
-			}
-			
-			// Apply difficulty effects to monsters in Env mode
-			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+		if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
+		{
+			card.currentHealth *= 2;
+			card.health *= 2;
+		}
+		
+		// Apply difficulty effects to monsters in Env mode
+		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		{
+			ECardType cardType = card.GetCardType();
+			if (cardType == ECardType.monster)
 			{
 				ApplyEnvDifficultyToMonster(card);
 			}
+			// Apply player card difficulty penalties
+			else if (cardType == ECardType.attack || cardType == ECardType.defence)
+			{
+				ApplyEnvDifficultyToPlayerCard(card);
+			}
+		}
 
-			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
+		if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
 			{
 				if (card.currentAttack > 0) card.currentAttack = Mathf.Max(1, card.currentAttack - 1);
 				if (card.currentHealth > 0) card.currentHealth = Mathf.Max(1, card.currentHealth - 1);
@@ -769,6 +782,35 @@ public partial class UIGamePhaseControl : YViewControl
 			if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
 			if (monsterCard.health < 1) monsterCard.health = 1;
 		}
+		}
+	}
+
+	/// <summary>
+	/// Apply difficulty penalties to player cards in env (cumulative from all unlocked difficulties)
+	/// </summary>
+	private void ApplyEnvDifficultyToPlayerCard(Card playerCard)
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		
+		// Apply cumulative penalties from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
+		{
+			DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+			if (config == null) continue;
+			
+			// Apply attack penalty to attack cards
+			if (playerCard.GetCardType() == ECardType.attack && config.playerAttackPenalty != 0)
+			{
+				playerCard.currentAttack += config.playerAttackPenalty;
+				if (playerCard.currentAttack < 0) playerCard.currentAttack = 0;
+			}
+			
+			// Apply defence penalty to defence cards
+			if (playerCard.GetCardType() == ECardType.defence && config.playerDefencePenalty != 0)
+			{
+				playerCard.currentDefence += config.playerDefencePenalty;
+				if (playerCard.currentDefence < 0) playerCard.currentDefence = 0;
+			}
 		}
 	}
 
@@ -925,6 +967,13 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				Debug.Log($"[RemoveBagCard] New top card: {newLastBagCard.CardData.cardName} (UniqueId: {newLastBagCard.CardData.UniqueId}), calling OnBecomeTopOfPile");
 				float delayTime = newLastBagCard.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
+				await UniTask.WaitForSeconds(delayTime);
+			}
+			// If no weapon card left and we removed an attack card, trigger bare hands OnBecomeTopOfPile
+			else if (cardType == ECardType.attack && m_FistCardCache != null)
+			{
+				Debug.Log($"[RemoveBagCard] No attack cards left, triggering bare hands OnBecomeTopOfPile");
+				float delayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime);
 			}
 			else
@@ -1170,6 +1219,13 @@ public partial class UIGamePhaseControl : YViewControl
 		for (int i = 0; i < cardIds.Count; i++)
 		{
 			Card card = CreateCard(cardIds[i]);
+			
+			// Apply difficulty effects to monsters in Env mode
+			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+			{
+				ApplyEnvDifficultyToMonster(card);
+			}
+			
 			dropCards.Add(card);
 		}
 
@@ -1898,12 +1954,16 @@ public partial class UIGamePhaseControl : YViewControl
 			Debug.Log($"Monster at envIndex {envIndex} unfrozen after weapon attack");
 		}
 
-		if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	{
+		int enemyAttack = enemyCardControl.CardData.currentAttack;
+		// Only counter-attack if enemy has attack power > 0
+		if (enemyAttack > 0)
 		{
-			int enemyAttack = enemyCardControl.CardData.currentAttack;
 			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
 			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
 		}
+	}
 
 		// Play card consumption animation after enemy counter-attack (if any)
 		// This ensures counter-insight parry/counter animations complete before the card disappears
@@ -1920,26 +1980,15 @@ public partial class UIGamePhaseControl : YViewControl
 			// Check if card should be kept in bag (durability mechanic)
 			bool shouldKeep = attackCardControl.CardEffect?.ShouldKeepInBag() ?? false;
 
-			if (!shouldKeep)
+		if (!shouldKeep)
+		{
+			await RemoveBagCard(ECardType.attack, attackCardControl);
+			float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+			if (removeDelayTime > 0f)
 			{
-				await RemoveBagCard(ECardType.attack, attackCardControl);
-				float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-				if (removeDelayTime > 0f)
-				{
-					await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-				}
-
-				// Check if attack bag is empty, if so trigger fist card's OnBecomeTopOfPile
-				UICardSimpleControl nextAttackCard = GetLastBagCard(ECardType.attack);
-				if (nextAttackCard == null && m_FistCardCache != null)
-				{
-					float fistDelayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0f;
-					if (fistDelayTime > 0f)
-					{
-						await UniTask.WaitForSeconds(fistDelayTime);
-					}
-				}
+				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 			}
+		}
 		}
 		else
 		{
@@ -2350,15 +2399,15 @@ public partial class UIGamePhaseControl : YViewControl
 					lastCard.UpdateBuffValue();
 				}
 			}
-			if (cardControl.gameObject.activeSelf)
-			{
-				cardControl.IsEffecting = true;
-				m_CardActionQueue.Enqueue(cardControl);
-				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
-				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
-			}
-			m_View.TxtPhaseCnt.text = PhaseCounter.ToString();
-			CheckAndSpawnKeyPath();
+		if (cardControl.gameObject.activeSelf)
+		{
+			cardControl.IsEffecting = true;
+			m_CardActionQueue.Enqueue(cardControl);
+			CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
+			CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
+		}
+		m_View.TxtPhaseCnt.text = (PhaseCounter + 1).ToString();
+		CheckAndSpawnKeyPath();
 		}
 	}
 

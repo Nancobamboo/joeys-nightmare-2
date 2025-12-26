@@ -76,6 +76,11 @@ public partial class UIGamePhaseControl
         {
             newLastBagCard.CardEffect?.OnBecomeTopOfPile();
         }
+        // If no weapon card left and we removed an attack card, trigger bare hands OnBecomeTopOfPile
+        else if (cardType == ECardType.attack && m_FistCardCache != null)
+        {
+            m_FistCardCache.CardEffect?.OnBecomeTopOfPile();
+        }
     }
 
 

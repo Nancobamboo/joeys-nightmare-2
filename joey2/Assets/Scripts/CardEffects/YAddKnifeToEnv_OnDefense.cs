@@ -47,6 +47,13 @@ public partial class UIGamePhaseControl
         }
         // TODO fix card id to knife card id
         Card knifeCard = CreateCard(cardId);
+        
+        // Apply difficulty effects to monsters in Env mode
+        if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && knifeCard.GetCardType() == ECardType.monster)
+        {
+            ApplyEnvDifficultyToMonster(knifeCard);
+        }
+        
         int randomIndex = envIndex == -1 ? Random.Range(0, m_EnvPanels.Count) : envIndex;
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
         m_CardDict[knifeCard.UniqueId] = knifeCard;
