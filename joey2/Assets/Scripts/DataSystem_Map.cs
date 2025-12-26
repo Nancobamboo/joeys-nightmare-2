@@ -224,6 +224,9 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_HuiXue] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_FanJia_shouji] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Shihun] = 1f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_HuoQiu] = 0.4f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Bing] = 0.4f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Bing2] = 0.4f;
 
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_diaoluo_anim] = 0.4f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_dunpai] = 0.3f;
