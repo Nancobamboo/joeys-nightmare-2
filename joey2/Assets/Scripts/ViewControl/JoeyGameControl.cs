@@ -300,21 +300,21 @@ public class JoeyGameControl : YViewControl
 				// Player hasn't unlocked this stage yet, treat as final stage
 				Debug.Log($"Stage {currentEnvStage.level} not unlocked yet (max: {maxUnlockedStage}). Completing run.");
 				
-				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-				achievement.PassGameNum++;
-				DataSystem.Instance.SaveDataAchievement();
-				
-				// Unlock next difficulty level (up to max 8) and automatically switch to it
-				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-				int currentDiff = diffData.Current;
-				if (currentDiff < 8)
-				{
-					int newDiff = currentDiff + 1;
-					diffData.UnlockUpTo(newDiff);
-					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-					DataSystem.Instance.SaveDataDifficulty();
-					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-				}
+		DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+		achievement.PassGameNum++;
+		DataSystem.Instance.SaveDataAchievement();
+		
+		// Unlock next difficulty level (up to max 12) and automatically switch to it
+		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+		int currentDiff = diffData.Current;
+		if (currentDiff < 12)
+		{
+			int newDiff = currentDiff + 1;
+			diffData.UnlockUpTo(newDiff);
+			diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+			DataSystem.Instance.SaveDataDifficulty();
+			Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+		}
 				
 				// Reset stage to 0 for next run
 				m_DataJoeyPlayer.StageId = 0;
@@ -634,10 +634,10 @@ public class JoeyGameControl : YViewControl
 			achievement.PassGameNum++;
 			DataSystem.Instance.SaveDataAchievement();
 			
-			// Unlock next difficulty level (up to max 8) and automatically switch to it
+			// Unlock next difficulty level (up to max 12) and automatically switch to it
 			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
 			int currentDiff = diffData.Current;
-			if (currentDiff < 8)
+			if (currentDiff < 12)
 			{
 				int newDiff = currentDiff + 1;
 				diffData.UnlockUpTo(newDiff);

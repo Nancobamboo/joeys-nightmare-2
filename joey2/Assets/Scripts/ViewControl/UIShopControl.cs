@@ -185,19 +185,29 @@ public class UIShopControl : YViewControl
 		}).ToList();
 
 		int shopCardCount = 8;
-		List<Card> shuffledCards = availableCards.OrderBy(x => Random.value).ToList();
+
+		// Use default shop star rates (similar to normal stage: 60% 1-star, 30% 2-star, 10% 3-star)
+		Dictionary<int, int> shopStarRates = new Dictionary<int, int>
+		{
+			{ 1, 60 },
+			{ 2, 30 },
+			{ 3, 10 }
+		};
+
+		// Select cards with difficulty-adjusted star probabilities
+		List<Card> selectedCards = GData.Instance.SelectCardsWithStarProbability(availableCards, shopCardCount, shopStarRates);
 
 		// Randomly select one card for 50% discount
-		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, shuffledCards.Count));
+		int halfPriceIndex = Random.Range(0, Mathf.Min(shopCardCount, selectedCards.Count));
 
 
 
 		// Get difficulty price multiplier
 		float difficultyPriceMultiplier = GData.Instance.GetShopPriceMultiplier();
 
-		for (int i = 0; i < shopCardCount && i < shuffledCards.Count; i++)
+		for (int i = 0; i < selectedCards.Count; i++)
 		{
-			Card card = shuffledCards[i];
+			Card card = selectedCards[i];
 			int shopPrice;
 
 			if (i == halfPriceIndex)

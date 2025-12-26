@@ -54,11 +54,11 @@ public class UILobbyControl : YViewControl
 		if (Input.GetKeyDown(KeyCode.F9))
 		{
 			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-			diffData.UnlockUpTo(8);
+			diffData.UnlockUpTo(12);
 			diffData.Current = 1;
 			DataSystem.Instance.SaveDataDifficulty();
 			RefreshDifficultyUI();
-			Debug.Log("[DEBUG] All difficulty levels unlocked (1-8)");
+			Debug.Log("[DEBUG] All difficulty levels unlocked (1-12)");
 		}
 	}
 

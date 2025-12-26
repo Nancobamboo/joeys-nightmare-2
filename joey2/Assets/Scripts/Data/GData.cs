@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -1460,6 +1461,132 @@ public sealed class GData : PureSingleton<GData>
 		}
 		
 		return totalMultiplier;
+	}
+
+	/// <summary>
+	/// Get cumulative high-grade card probability penalty from difficulty
+	/// Returns negative value (e.g., -0.3 = -30% for high-grade cards)
+	/// </summary>
+	public float GetHighGradeCardProbabilityPenalty()
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		float totalPenalty = 0f;
+		
+		// Apply cumulative penalties from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
+		{
+			DifficultyConfig config = GetDifficultyConfig(level);
+			if (config != null)
+			{
+				totalPenalty += config.highGradeCardProbability;
+			}
+		}
+		
+		return totalPenalty;
+	}
+
+	/// <summary>
+	/// Select cards with weighted star level probabilities adjusted by difficulty
+	/// </summary>
+	/// <param name="availableCards">Pool of cards to select from</param>
+	/// <param name="count">Number of cards to select</param>
+	/// <param name="baseStarRates">Base star level probabilities (e.g., 1:60;2:30;3:10)</param>
+	/// <returns>List of selected cards</returns>
+	public List<Card> SelectCardsWithStarProbability(List<Card> availableCards, int count, Dictionary<int, int> baseStarRates)
+	{
+		List<Card> selectedCards = new List<Card>();
+		if (availableCards == null || availableCards.Count == 0 || baseStarRates == null || baseStarRates.Count == 0)
+		{
+			// Fallback: random selection
+			List<Card> shuffled = availableCards.OrderBy(x => UnityEngine.Random.value).ToList();
+			return shuffled.Take(count).ToList();
+		}
+
+		float highGradeReduction = GetHighGradeCardProbabilityPenalty();
+
+		// Build adjusted probability distribution
+		Dictionary<int, int> adjustedRates = new Dictionary<int, int>();
+		int totalAdjusted = 0;
+
+		foreach (var kvp in baseStarRates)
+		{
+			int star = kvp.Key;
+			int baseRate = kvp.Value;
+			int adjustedRate = baseRate;
+
+			// Apply penalty to high-grade cards (2-star and 3-star)
+			if (star >= 2)
+			{
+				// Direct percentage point reduction
+				// highGradeReduction is negative (e.g., -0.1 = -10 percentage points)
+				// Convert to absolute value: -0.1 * 100 = -10 points
+				int reductionPoints = UnityEngine.Mathf.RoundToInt(highGradeReduction * 100);
+				adjustedRate = UnityEngine.Mathf.Max(0, baseRate + reductionPoints);
+			}
+
+			adjustedRates[star] = adjustedRate;
+			totalAdjusted += adjustedRate;
+		}
+
+		// Normalize to ensure probabilities sum to 100
+		if (totalAdjusted != 100)
+		{
+			Dictionary<int, int> normalizedRates = new Dictionary<int, int>();
+			int accumulated = 0;
+			int lastStar = 1;
+
+			foreach (var kvp in adjustedRates)
+			{
+				lastStar = kvp.Key;
+				int normalizedRate = UnityEngine.Mathf.RoundToInt((float)kvp.Value * 100f / totalAdjusted);
+				normalizedRates[kvp.Key] = normalizedRate;
+				accumulated += normalizedRate;
+			}
+
+			// Adjust last rate to ensure sum equals 100
+			if (normalizedRates.ContainsKey(lastStar))
+			{
+				normalizedRates[lastStar] += (100 - accumulated);
+			}
+
+			adjustedRates = normalizedRates;
+		}
+
+		// Select cards based on adjusted star probabilities
+		for (int i = 0; i < count; i++)
+		{
+			// Determine target star level
+			int random = UnityEngine.Random.Range(0, 100);
+			int cumulative = 0;
+			int targetStar = 1;
+
+			foreach (var kvp in adjustedRates)
+			{
+				cumulative += kvp.Value;
+				if (random < cumulative)
+				{
+					targetStar = kvp.Key;
+					break;
+				}
+			}
+
+			// Filter cards by star level
+			List<Card> starFilteredCards = availableCards.Where(c => c.stars == targetStar && !selectedCards.Contains(c)).ToList();
+
+			// If no cards available for this star level, fallback to any available card
+			if (starFilteredCards.Count == 0)
+			{
+				starFilteredCards = availableCards.Where(c => !selectedCards.Contains(c)).ToList();
+			}
+
+			if (starFilteredCards.Count > 0)
+			{
+				Card selectedCard = starFilteredCards[UnityEngine.Random.Range(0, starFilteredCards.Count)];
+				selectedCards.Add(selectedCard);
+			}
+		}
+
+		return selectedCards;
 	}
 
 }

@@ -521,6 +521,10 @@ public partial class DataSystem
             dataJoeyPlayer.playerHealth = maxHealth;
         }
 
+        // Initialize base attack and defence for Env mode
+        dataJoeyPlayer.playerAttack = 0;
+        dataJoeyPlayer.playerDefence = 0;
+
         dataJoeyPlayer.currentLevel = 1;
 
         // Apply difficulty effects based on current difficulty level
