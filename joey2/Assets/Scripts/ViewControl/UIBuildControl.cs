@@ -421,27 +421,27 @@ public class UIBuildControl : YViewControl
 		}
 
 		Card card = draggedCard.CardData;
-		
+
 		// Cannot sell curse cards (1025: Pain Blade, 2016: Pain Shield)
 		if (card.id == "1025" || card.id == "2016")
 		{
 			Debug.Log("诅咒卡牌无法出售！");
-			RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
-			if (rectTransform != null)
+			RectTransform curseCardRect = draggedCard.CacheTrans as RectTransform;
+			if (curseCardRect != null)
 			{
 				if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
 				{
-					rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+					curseCardRect.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
 				}
 				else
 				{
 					int tempIndex = draggedCard.EquipIndex - m_EquipedItemArray.Length;
-					rectTransform.localPosition = m_TempItemArray[tempIndex].localPosition;
+					curseCardRect.localPosition = m_TempItemArray[tempIndex].localPosition;
 				}
 			}
 			return;
 		}
-		
+
 		ECardType cardType = card.GetCardType();
 		int uniqueId = card.UniqueId;
 

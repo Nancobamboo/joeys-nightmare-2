@@ -287,12 +287,12 @@ public class UIBuildNewControl : YViewControl
 		if (card.id == "1025" || card.id == "2016")
 		{
 			Debug.Log("诅咒卡牌无法出售！");
-			RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
-			if (rectTransform != null)
+			RectTransform curseCardRect = draggedCard.CacheTrans as RectTransform;
+			if (curseCardRect != null)
 			{
 				if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
 				{
-					rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
+					curseCardRect.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
 				}
 			}
 			return;
