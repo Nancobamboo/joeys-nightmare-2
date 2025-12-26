@@ -15,6 +15,8 @@ public class DifficultyConfig
 	// Parsed effects
 	public int monsterAttackBonus; // Additional attack for monsters
 	public int monsterHealthBonus; // Additional health for monsters
+	public float monsterAttackMultiplier; // Monster attack multiplier (1.0 = normal, 1.2 = 20% more)
+	public float monsterHealthMultiplier; // Monster health multiplier (1.0 = normal, 1.2 = 20% more)
 	public float shopPriceMultiplier; // Shop price multiplier (1.0 = normal, 1.2 = 20% more expensive)
 	public float highGradeCardProbability; // Probability reduction for high-grade cards (-0.1 = -10%)
 	public int playerHealthPenalty; // Player starting health penalty
@@ -27,6 +29,8 @@ public class DifficultyConfig
 	{
 		startingCurseCards = new List<string>();
 		shopPriceMultiplier = 1.0f;
+		monsterAttackMultiplier = 1.0f;
+		monsterHealthMultiplier = 1.0f;
 		highGradeCardProbability = 0.0f;
 		maxUnlockedStage = 0;
 	}
@@ -71,6 +75,20 @@ public class DifficultyConfig
 					if (int.TryParse(value, out int healthBonus))
 					{
 						monsterHealthBonus = healthBonus;
+					}
+					break;
+
+				case "monsterAttackMultiplier":
+					if (float.TryParse(value, out float attackMultiplier))
+					{
+						monsterAttackMultiplier = attackMultiplier;
+					}
+					break;
+
+				case "monsterHealthMultiplier":
+					if (float.TryParse(value, out float healthMultiplier))
+					{
+						monsterHealthMultiplier = healthMultiplier;
 					}
 					break;
 
