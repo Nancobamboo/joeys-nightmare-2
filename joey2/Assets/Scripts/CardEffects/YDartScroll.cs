@@ -42,6 +42,12 @@ public partial class UIGamePhaseControl
                 card.SetDefence(enhancedCard.currentDefence);
             }
             
+            // Apply difficulty effects to monsters in Env mode
+            if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+            {
+                ApplyEnvDifficultyToMonster(card);
+            }
+            
             int envIndex = selectedIndices[i];
 
             VerticalLayoutGroup parent = m_EnvPanels[envIndex];

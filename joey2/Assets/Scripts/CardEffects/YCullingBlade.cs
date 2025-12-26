@@ -18,16 +18,21 @@ public class YCullingBlade : YDefaultEffect
 		{
 			int currentHealth = targetCard.CardData.currentHealth;
 			int maxHealth = targetCard.CardData.health;
+			float halfHealth = maxHealth / 2.0f;
 
-			if (currentHealth < maxHealth / 2.0f)
+			Debug.Log($"[CullingBlade] Target: {targetCard.CardData.cardName}, Current HP: {currentHealth}, Max HP: {maxHealth}, Half HP: {halfHealth}, Can Execute: {currentHealth <= halfHealth}");
+
+			if (currentHealth <= halfHealth)
 			{
 				int weaponDamage = CardControl?.CardData?.currentAttack ?? 0;
 				int currentEffectDamage = GetEffectValue(EEffectType.Damage);
 				int totalDamage = weaponDamage + currentEffectDamage;
 				int extraDamage = Mathf.Max(0, currentHealth - totalDamage);
+				Debug.Log($"[CullingBlade] Execute triggered! Weapon: {weaponDamage}, Current Effect: {currentEffectDamage}, Total: {totalDamage}, Extra needed: {extraDamage}");
 				if (extraDamage > 0)
 				{
 					CardControl.AddEffectValue(EEffectType.Damage, extraDamage);
+					Debug.Log($"[CullingBlade] Added {extraDamage} damage to execute target");
 				}
 			}
 		}

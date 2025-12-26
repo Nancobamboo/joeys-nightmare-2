@@ -273,14 +273,28 @@ public partial class DataSystem
     public Card CreateCard(string cardId)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-
-        Card card = dataJoeyPlayer.GetEnvCardDictData(cardId);
-        if (card != null)
+        
+        // Get base card config to check card type
+        Card configCard = GData.Instance.GetCardConfigById(cardId);
+        if (configCard == null)
         {
-            return card;
+            Debug.LogError($"Card config not found for ID: {cardId}");
+            return null;
+        }
+        
+        // Monster cards should NOT use cached data because they need difficulty bonuses applied fresh each time
+        // Only non-monster cards (attack/defence/skill/item) use EnvCardDict for permanent upgrades
+        if (configCard.GetCardType() != ECardType.monster)
+        {
+            Card cachedCard = dataJoeyPlayer.GetEnvCardDictData(cardId);
+            if (cachedCard != null)
+            {
+                return cachedCard;
+            }
         }
 
-        card = GData.Instance.GetCardConfigById(cardId).Clone();
+        // Create fresh card (either monster, or non-monster that's not cached)
+        Card card = configCard.Clone();
         dataJoeyPlayer.UniqueIdGen++;
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
 
@@ -506,6 +520,10 @@ public partial class DataSystem
             dataJoeyPlayer.playerMaxHealth = maxHealth;
             dataJoeyPlayer.playerHealth = maxHealth;
         }
+
+        // Initialize base attack and defence for Env mode
+        dataJoeyPlayer.playerAttack = 0;
+        dataJoeyPlayer.playerDefence = 0;
 
         dataJoeyPlayer.currentLevel = 1;
 

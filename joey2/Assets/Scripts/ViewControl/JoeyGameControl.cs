@@ -300,21 +300,21 @@ public class JoeyGameControl : YViewControl
 				// Player hasn't unlocked this stage yet, treat as final stage
 				Debug.Log($"Stage {currentEnvStage.level} not unlocked yet (max: {maxUnlockedStage}). Completing run.");
 				
-				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-				achievement.PassGameNum++;
-				DataSystem.Instance.SaveDataAchievement();
-				
-				// Unlock next difficulty level (up to max 8) and automatically switch to it
-				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-				int currentDiff = diffData.Current;
-				if (currentDiff < 8)
-				{
-					int newDiff = currentDiff + 1;
-					diffData.UnlockUpTo(newDiff);
-					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-					DataSystem.Instance.SaveDataDifficulty();
-					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-				}
+		DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+		achievement.PassGameNum++;
+		DataSystem.Instance.SaveDataAchievement();
+		
+		// Unlock next difficulty level (up to max 12) and automatically switch to it
+		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+		int currentDiff = diffData.Current;
+		if (currentDiff < 12)
+		{
+			int newDiff = currentDiff + 1;
+			diffData.UnlockUpTo(newDiff);
+			diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+			DataSystem.Instance.SaveDataDifficulty();
+			Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+		}
 				
 				// Reset stage to 0 for next run
 				m_DataJoeyPlayer.StageId = 0;
@@ -617,45 +617,50 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
-		else if (GameMode == EGameMode.Env)
+	else if (GameMode == EGameMode.Env)
+	{
+		int envLevelId = m_DataJoeyPlayer.StageId;
+		EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
+		EStageType stageType = GetEnvStageType(envLevelId);
+		StageReward stageReward = GData.Instance.GetStageReward(stageType);
+
+		// Check if this is the last stage for current difficulty
+		int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+		bool isFinalStageForDifficulty = currentEnvStage != null && currentEnvStage.level >= maxUnlockedStage;
+
+		if (stageType == EStageType.final || isFinalStageForDifficulty)
 		{
-			int envLevelId = m_DataJoeyPlayer.StageId;
-			EStageType stageType = GetEnvStageType(envLevelId);
-			StageReward stageReward = GData.Instance.GetStageReward(stageType);
-
-			if (stageType == EStageType.final)
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			achievement.PassGameNum++;
+			DataSystem.Instance.SaveDataAchievement();
+			
+			// Unlock next difficulty level (up to max 12) and automatically switch to it
+			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+			int currentDiff = diffData.Current;
+			if (currentDiff < 12)
 			{
-				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-				achievement.PassGameNum++;
-				DataSystem.Instance.SaveDataAchievement();
-				
-				// Unlock next difficulty level (up to max 8) and automatically switch to it
-				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-				int currentDiff = diffData.Current;
-				if (currentDiff < 8)
-				{
-					int newDiff = currentDiff + 1;
-					diffData.UnlockUpTo(newDiff);
-					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-					DataSystem.Instance.SaveDataDifficulty();
-					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-				}
-				
-				DataSystem.Instance.isFinishGame = true;
-				ClearAllUniTasks();
-				if (m_LobbyControl == null)
-				{
-					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
-				}
-				m_LobbyControl.OnBtnBuildClick();
-				return;
+				int newDiff = currentDiff + 1;
+				diffData.UnlockUpTo(newDiff);
+				diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+				DataSystem.Instance.SaveDataDifficulty();
+				Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
 			}
-
-			// Handle rewards based on stage_reward.csv configuration
-			HandleStageRewardEnv(stageReward, stageType);
-
-			m_DataJoeyPlayer.StageId++;
+			
+			DataSystem.Instance.isFinishGame = true;
+			ClearAllUniTasks();
+			if (m_LobbyControl == null)
+			{
+				m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+			}
+			m_LobbyControl.OnBtnBuildClick();
+			return;
 		}
+
+		// Handle rewards based on stage_reward.csv configuration
+		HandleStageRewardEnv(stageReward, stageType);
+
+		m_DataJoeyPlayer.StageId++;
+	}
 		else if (GameMode == EGameMode.Guide)
 		{
 			if (m_DataJoeyPlayer.currentLevel >= 3)
