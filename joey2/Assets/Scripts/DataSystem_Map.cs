@@ -81,26 +81,23 @@ public partial class DataSystem
         if (Unlocked(28)) extraRelics?.Add((int)ERelicType.BareHandParry);  // 空手接白刃
         if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BloodyGloves);   // 染血拳法
         if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ArcaneOrb);      // 奥术宝珠
-
-        // hp +4（growth.csv: 1）
-        if (Unlocked(1)) maxHealth += 4;
-
-        // gold +50（growth.csv: 2）
-        if (Unlocked(2)) coins += 50;
-
-        // 初始装备替换（growth.csv: 4 / 6 / 22）
-        if (Unlocked(4))
+        // 初始装备增加一个小血瓶（growth.csv: 1，card_info.csv: 3001）
+        if (Unlocked(1) && equipmentItem != null && !equipmentItem.Contains("3001"))
         {
-            ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
+            equipmentItem.Add("3001");
         }
-        if (Unlocked(6))
-        {
-            ReplaceFirst(equipmentAttack, "1002", "1004"); // 断剑 -> 木棒
-        }
-        if (Unlocked(22))
-        {
-            ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
-        }
+        // // hp +4（growth.csv: 1）
+        // if (Unlocked(1)) maxHealth += 4;
+
+        // // gold +50（growth.csv: 2）
+        // if (Unlocked(2)) coins += 50;
+
+        // 初始装备替换（growth.csv: 2 / 4 / 6 / 22）
+        if (Unlocked(4)) ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
+        if (Unlocked(2)) ReplaceFirst(equipmentAttack, "1002", "1004");  // 断剑 -> 木棒
+        if (Unlocked(6)) ReplaceFirst(equipmentAttack, "1004", "1010");  // 木棒 -> kejiaren
+        if (Unlocked(22)) ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+
     }
 
     /// <summary>
