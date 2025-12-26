@@ -111,7 +111,27 @@ public class UIStartControl : YViewControl
 		}
 		else
 		{
-			Screen.SetResolution(800, 450, FullScreenMode.Windowed);
+			// 默认窗口模式分辨率调大一些（原来是 800x450）
+			const int targetWidth = 1280;
+			const int targetHeight = 720;
+
+			// 避免在小屏设备上设置超过屏幕的窗口尺寸
+			int maxWidth = Screen.currentResolution.width;
+			int maxHeight = Screen.currentResolution.height;
+			float scale = Mathf.Min(1f, maxWidth / (float)targetWidth, maxHeight / (float)targetHeight);
+
+			int width = Mathf.RoundToInt(targetWidth * scale);
+			int height = Mathf.RoundToInt(targetHeight * scale);
+
+			// 兜底：至少保证一个合理的最小值，同时保持 16:9
+			width = Mathf.Max(width, 800);
+			height = Mathf.RoundToInt(width * 9f / 16f);
+
+			// 偶数更稳（部分平台/后处理对奇数尺寸不友好）
+			if ((width & 1) == 1) width -= 1;
+			if ((height & 1) == 1) height -= 1;
+
+			Screen.SetResolution(width, height, FullScreenMode.Windowed);
 		}
 	}
 
