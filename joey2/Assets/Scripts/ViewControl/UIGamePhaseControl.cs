@@ -1170,6 +1170,13 @@ public partial class UIGamePhaseControl : YViewControl
 		for (int i = 0; i < cardIds.Count; i++)
 		{
 			Card card = CreateCard(cardIds[i]);
+			
+			// Apply difficulty effects to monsters in Env mode
+			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+			{
+				ApplyEnvDifficultyToMonster(card);
+			}
+			
 			dropCards.Add(card);
 		}
 
