@@ -18,7 +18,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1017,Art/Img/Attack/死神之镰,Art/Img/Attack/img_bg_Attack,死神之镰,,attack,斩杀生命值小于一半的怪物,5,0,0,300,3,CullingBlade
 1018,Art/Img/Attack/img_card_Dagger,Art/Img/Attack/img_bg_Attack,刺客匕首,,attack,敌人不会反击,4,0,0,175,2,NoCounterAttack
 1019,Art/Img/Attack/赤手空拳加拳套,Art/Img/Attack/img_bg_Attack,拳击手套,,attack,永不消耗,6,0,0,0,2,BareHands
-1020,Art/Img/NewAdd/噩梦长枪,Art/Img/Attack/img_bg_Attack,噩梦长枪,,attack,攻击力额外加成损失血量值的一半,5,0,0,300,3,NightmareLance
+1020,Art/Img/NewAdd/噩梦长枪,Art/Img/Attack/img_bg_Attack,噩梦长枪,,attack,攻击力额外加成损失血量值的三分之一,7,0,0,300,3,NightmareLance
 1021,Art/Img/NewAdd/魔法剑,Art/Img/Attack/img_bg_Attack,魔法剑,,attack,玩家每使用一张技能牌，当前武器牌攻击力增加5点,5,0,0,300,3,MagicSword:5
 1022,Art/Img/NewAdd/魔杖,Art/Img/Attack/img_bg_Attack,魔杖,,attack,攻击视作技能施放,3,0,0,0,1,MagicWand
 1023,Art/Img/Attack/骑士剑,Art/Img/Attack/img_bg_Attack,骑士剑,,attack,装备：使用次数+1  剩余次数:{durability},10,0,0,300,3,KnightSword_OnTop
