@@ -1,9 +1,13 @@
 difficulty_level,description,comment,difficluty_effect
 1,适合新手的起始难度,,
-2,解锁关卡17；怪物小幅强化,攻击+1 hp+5,monsterAttackBonus:1;monsterHealthBonus:5
-3,解锁更多怪物；商店价格上升,+20%,shopPriceMultiplier:1.2
-4,解锁关卡18；获得高级牌概率降低,-10%,highGradeCardProbability:-0.1
-5,解锁更多怪物；开始游戏时损失生命值和上限,-20hp生命，-10生命上限,playerHealthPenalty:-20;playerMaxHealthPenalty:-10
-6,解锁关卡19；玩家攻击防御降低,攻击-1 防御-1,playerAttackPenalty:-1;playerDefencePenalty:-1
-7,解锁更多怪物；初始牌组加入苦痛之刃,(攻击为0),curseCards:1025
-8,解锁关卡20；初始牌组加入苦痛之盾,(防御为0),curseCards:2016
+2,怪物小幅强化,攻击+10% hp+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.2
+3,解锁关卡17；商店价格上升,+20%,shopPriceMultiplier:1.2
+4,解锁更多怪物；获得高级牌概率降低,-10%,highGradeCardProbability:-0.1
+5,开始游戏时损失生命值和上限,-10hp生命 -5生命上限,playerHealthPenalty:-10;playerMaxHealthPenalty:-5
+6,解锁关卡18；怪物中幅强化,攻击+15% hp+30%,monsterAttackMultiplier:1.2;monsterHealthMultiplier:1.4
+7,玩家攻击防御降低,攻击-1 防御-1,playerAttackPenalty:-1;playerDefencePenalty:-1
+8,解锁更多怪物；商店价格再次上升；初始牌组加入苦痛之刃,价格+35% 攻击为0,shopPriceMultiplier:1.35;curseCards:1025
+9,解锁关卡19；怪物大幅强化,攻击+20% hp+40%,monsterAttackMultiplier:1.35;monsterHealthMultiplier:1.6
+10,获得高级牌概率再次降低；玩家属性进一步削弱,概率-20% 攻击-2 防御-2,highGradeCardProbability:-0.25;playerAttackPenalty:-2;playerDefencePenalty:-2
+11,生命值大幅削弱；初始牌组加入苦痛之盾,起始-20hp 上限-10 防御为0,playerHealthPenalty:-20;playerMaxHealthPenalty:-10;curseCards:2016
+12,解锁关卡20；解锁更多怪物；怪物极限强化,攻击+25% hp+50% 价格+50%,monsterAttackMultiplier:1.5;monsterHealthMultiplier:1.8;shopPriceMultiplier:1.5

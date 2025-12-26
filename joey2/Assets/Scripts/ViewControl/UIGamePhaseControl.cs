@@ -738,14 +738,21 @@ public partial class UIGamePhaseControl : YViewControl
 			DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
 			if (config == null) continue;
 			
-			// Apply monster attack bonus
+			// Apply monster attack bonus (flat)
 			if (config.monsterAttackBonus != 0)
 			{
 				monsterCard.currentAttack += config.monsterAttackBonus;
 				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
 			}
 			
-			// Apply monster health bonus
+		// Apply monster attack multiplier (percentage)
+		if (config.monsterAttackMultiplier != 1.0f)
+		{
+			monsterCard.currentAttack = UnityEngine.Mathf.CeilToInt(monsterCard.currentAttack * config.monsterAttackMultiplier);
+			if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
+		}
+			
+			// Apply monster health bonus (flat)
 			if (config.monsterHealthBonus != 0)
 			{
 				monsterCard.currentHealth += config.monsterHealthBonus;
@@ -753,6 +760,15 @@ public partial class UIGamePhaseControl : YViewControl
 				if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
 				if (monsterCard.health < 1) monsterCard.health = 1;
 			}
+			
+		// Apply monster health multiplier (percentage)
+		if (config.monsterHealthMultiplier != 1.0f)
+		{
+			monsterCard.currentHealth = UnityEngine.Mathf.CeilToInt(monsterCard.currentHealth * config.monsterHealthMultiplier);
+			monsterCard.health = UnityEngine.Mathf.CeilToInt(monsterCard.health * config.monsterHealthMultiplier);
+			if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
+			if (monsterCard.health < 1) monsterCard.health = 1;
+		}
 		}
 	}
 
@@ -1784,7 +1800,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			if (ControlUtil.IsRandomSucceed(5))
+			if (ControlUtil.IsRandomSucceed(10))
 			{
 				AddCardToBag("3009");
 			}

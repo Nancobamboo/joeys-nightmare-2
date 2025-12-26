@@ -41,7 +41,7 @@ public class YNightmareLance : YCardEffect
             int maxHealth = playerData.playerMaxHealth;
             int currentHealth = playerData.playerHealth;
             int healthLost = maxHealth - currentHealth;
-            int extraDamage = healthLost / 2;
+            int extraDamage = healthLost / 3;
 
             if (extraDamage > 0)
             {
