@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 public class DataGrowth : IData
 {
     // 没有存档数据时的默认局外积分
-    public int Points = 100;
+    public int Points = 50;
     public List<int> UnlockedNodes = new List<int>();
 
     public void LoadFromJson(JObject jobject)
