@@ -6,7 +6,6 @@ public class UIBtnView : YBaseView
 {
 	public Button UIBtn;
 	public Image Lock;
-	public Text Text;
 	public Image Start;
 	public Image IconStart;
 	public Image UnLock;
@@ -17,6 +16,7 @@ public class UIBtnView : YBaseView
 	public RectTransform Rotation;
 	public Image LineLock;
 	public Image LineUnlock;
+	public Text Text;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -25,16 +25,16 @@ public class UIBtnView : YBaseView
 		if(viewItemList == null || viewItemList.Count == 0) return;
 		UIBtn = viewItemList[0].Target.GetComponent<Button>();
 		Lock = viewItemList[1].Target.GetComponent<Image>();
-		Text = viewItemList[2].Target.GetComponent<Text>();
-		Start = viewItemList[3].Target.GetComponent<Image>();
-		IconStart = viewItemList[4].Target.GetComponent<Image>();
-		UnLock = viewItemList[5].Target.GetComponent<Image>();
-		IconUnlock = viewItemList[6].Target.GetComponent<Image>();
-		IconLock = viewItemList[7].Target.GetComponent<Image>();
-		Unknow = viewItemList[8].Target.GetComponent<Image>();
-		IconUnknow = viewItemList[9].Target.GetComponent<Image>();
-		Rotation = viewItemList[10].Target.GetComponent<RectTransform>();
-		LineLock = viewItemList[11].Target.GetComponent<Image>();
-		LineUnlock = viewItemList[12].Target.GetComponent<Image>();
+		Start = viewItemList[2].Target.GetComponent<Image>();
+		IconStart = viewItemList[3].Target.GetComponent<Image>();
+		UnLock = viewItemList[4].Target.GetComponent<Image>();
+		IconUnlock = viewItemList[5].Target.GetComponent<Image>();
+		IconLock = viewItemList[6].Target.GetComponent<Image>();
+		Unknow = viewItemList[7].Target.GetComponent<Image>();
+		IconUnknow = viewItemList[8].Target.GetComponent<Image>();
+		Rotation = viewItemList[9].Target.GetComponent<RectTransform>();
+		LineLock = viewItemList[10].Target.GetComponent<Image>();
+		LineUnlock = viewItemList[11].Target.GetComponent<Image>();
+		Text = viewItemList[12].Target.GetComponent<Text>();
 	}
 }

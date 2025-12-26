@@ -7,6 +7,7 @@ public class UIBtnControl : YViewControl
 	private UIBtnView m_View;
 	private Action<int> m_OnClick;
 	private int m_Index;
+	private const string RuntimeTitleName = "RuntimeTitle";
 
 	public enum EBtnState
 	{
@@ -26,12 +27,9 @@ public class UIBtnControl : YViewControl
 		base.OnInit();
 		m_View = CreateView<UIBtnView>();
 
-		// Text 不再使用，并且避免子节点(Icon/Line等)抢射线导致 Button 无法点击
-		if (m_View.Text != null)
-		{
-			m_View.Text.raycastTarget = false;
-			m_View.Text.gameObject.SetActive(false);
-		}
+		// 确保按钮文本存在（有些 prefab 可能缺少 Text 节点；这里做运行时兜底）
+		EnsureTitleText();
+		// 避免子节点(Icon/Line/Text等)抢射线导致 Button 无法点击
 		DisableRaycastTargets();
 
 		var colors = m_View.UIBtn.colors;
@@ -58,11 +56,11 @@ public class UIBtnControl : YViewControl
 
 	public void SetTitle(string title)
 	{
-		// Text 不再使用：保持接口以免其他地方引用，但不再显示任何文字
-		if (m_View.Text != null && m_View.Text.gameObject.activeSelf)
-		{
-			m_View.Text.gameObject.SetActive(false);
-		}
+		EnsureTitleText();
+		if (m_View.Text == null) return;
+
+		m_View.Text.text = title ?? string.Empty;
+		if (!m_View.Text.gameObject.activeSelf) m_View.Text.gameObject.SetActive(true);
 	}
 
 	public void SetState(EBtnState state)
@@ -81,8 +79,6 @@ public class UIBtnControl : YViewControl
 		SetActiveSafe(m_View.IconLock, false);
 		SetActiveSafe(m_View.Unknow, false);
 		SetActiveSafe(m_View.IconUnknow, false);
-		// Text 不再使用
-		if (m_View.Text != null) m_View.Text.gameObject.SetActive(false);
 
 		switch (state)
 		{
@@ -148,6 +144,45 @@ public class UIBtnControl : YViewControl
 		}
 	}
 
+	private void EnsureTitleText()
+	{
+		// 先尝试从 view 里拿（auto-generated view 可能绑定不到时这里也能补救）
+		if (m_View != null && m_View.Text == null)
+		{
+			m_View.Text = GetComponentInChildren<Text>(true);
+		}
+
+		if (m_View == null || m_View.UIBtn == null) return;
+
+		if (m_View.Text == null)
+		{
+			// 运行时创建一个 Text，放在按钮下面作为标题
+			var go = new GameObject(RuntimeTitleName, typeof(RectTransform), typeof(Text));
+			go.transform.SetParent(m_View.UIBtn.transform, false);
+			go.transform.SetAsLastSibling();
+
+			var rt = go.GetComponent<RectTransform>();
+			rt.anchorMin = Vector2.zero;
+			rt.anchorMax = Vector2.one;
+			rt.pivot = new Vector2(0.5f, 0.5f);
+			rt.anchoredPosition = Vector2.zero;
+			rt.sizeDelta = Vector2.zero;
+
+			var t = go.GetComponent<Text>();
+			t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+			t.alignment = TextAnchor.MiddleCenter;
+			t.color = Color.white;
+			t.raycastTarget = false;
+			t.supportRichText = false;
+			t.text = string.Empty;
+
+			m_View.Text = t;
+		}
+
+		// 文本不应该挡点击
+		if (m_View.Text != null) m_View.Text.raycastTarget = false;
+	}
+
 	private void DisableRaycastTargets()
 	{
 		// 这些都是装饰/状态/连线，不应该挡住点击
@@ -161,6 +196,7 @@ public class UIBtnControl : YViewControl
 		SetRaycastTarget(m_View.IconUnknow, false);
 		SetRaycastTarget(m_View.LineLock, false);
 		SetRaycastTarget(m_View.LineUnlock, false);
+		SetRaycastTarget(m_View.Text, false);
 	}
 
 	private void SetRaycastTarget(Graphic g, bool enable)
