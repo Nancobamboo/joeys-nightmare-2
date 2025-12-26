@@ -195,6 +195,8 @@ public partial class DataSystem
 
     public const bool isNew = true;
     public bool isFinishGame = false;
+    public bool IsNewCardUnlock = true;
+    public bool IsGrowthUnlock = true;
     public void LoadGameData()
     {
         Debug.Log("LoadGameData called");
@@ -224,6 +226,9 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_HuiXue] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_FanJia_shouji] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Shihun] = 1f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_HuoQiu] = 0.4f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Bing] = 0.4f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Bing2] = 0.4f;
 
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_diaoluo_anim] = 0.4f;
         AnimDelayTimeDict[(int)ECardAnimName.UI_Carditem_dunpai] = 0.3f;
@@ -425,12 +430,27 @@ public partial class DataSystem
         var extraRelics = new List<int>();
         ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
 
-        //dataJoeyPlayer.ClearEnvCardPool();
+        // Safety: ensure a clean env run init (normally EnvCardPool is empty when this is called)
+        if (dataJoeyPlayer.EnvCardPool != null) dataJoeyPlayer.EnvCardPool.Clear();
+        if (dataJoeyPlayer.EnvCardDict != null) dataJoeyPlayer.EnvCardDict.Clear();
 
-        // Env mode only uses card_deck, not equipment fields
-        for (int i = 0; i < characterData.cardDeck.Count; i++)
+        // Env mode only uses card_deck, not equipment fields.
+        // Important: growth "initial equipment replacement" nodes should still affect Env start deck,
+        // because the base character CSV puts those equipment cards into card_deck as well.
+        var envDeck = new List<string>(characterData.cardDeck);
         {
-            string cardId = characterData.cardDeck[i];
+            DataGrowth growth = GetDataGrowth();
+            bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
+
+            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 4 / 6 / 22)
+            if (Unlocked(4)) ReplaceFirst(envDeck, "2001", "2009"); // 破盾 -> 马甲
+            if (Unlocked(6)) ReplaceFirst(envDeck, "1002", "1004"); // 断剑 -> 木棒
+            if (Unlocked(22)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        }
+
+        for (int i = 0; i < envDeck.Count; i++)
+        {
+            string cardId = envDeck[i];
             if (!string.IsNullOrEmpty(cardId))
             {
                 dataJoeyPlayer.AddEnvCardPoolData(cardId);
@@ -534,19 +554,90 @@ public partial class DataSystem
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
     }
 
-	public void AddCoin(int delta)
-	{
-		DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-		dataJoeyPlayer.Coin += delta;
-		YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
-	}
-	
-	public void AddGrowthPoints(int delta)
+    public void AddCoin(int delta)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.Coin += delta;
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
+    }
+
+    public void AddGrowthPoints(int delta)
+    {
+        DataGrowth dataGrowth = GetDataGrowth();
+        dataGrowth.Points += delta;
+        if (delta > 0)
+        {
+            IsGrowthUnlock = true;
+        }
+        YActionSystem.Instance.DispatchAction(EActionId.OnGrowthPointsChange, dataGrowth.Points, delta);
+        SaveDataGrowth();
+    }
+
+	/// <summary>
+	/// 判断当前是否存在“买得起”的成长点：
+	/// - 尚未解锁
+	/// - 价格 <= 当前 Points
+	/// - 与已解锁节点联通（dependency 指向已解锁节点）
+	/// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
+	///
+	/// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
+	/// </summary>
+	public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
 	{
 		DataGrowth dataGrowth = GetDataGrowth();
-		dataGrowth.Points += delta;
-		YActionSystem.Instance.DispatchAction(EActionId.OnGrowthPointsChange, dataGrowth.Points, delta);
-		SaveDataGrowth();
+		if (dataGrowth == null) return false;
+
+		int points = dataGrowth.Points;
+		var unlockedList = dataGrowth.UnlockedNodes;
+		HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
+
+		GData.Instance.LoadGrowthInfo();
+		foreach (var kv in GData.Instance.GrowthInfoDict)
+		{
+			GrowthInfo info = kv.Value;
+			if (info == null) continue;
+
+			int id = info.id;
+			if (unlocked.Contains(id)) continue;               // 已解锁不算
+			if (info.price > points) continue;                // 买不起
+
+			bool hasPrereq = false;
+			bool allPrereqUnlocked = true;
+			bool connectedToUnlocked = false;
+
+			var deps = info.depends;
+			if (deps != null)
+			{
+				for (int i = 0; i < deps.Count; i++)
+				{
+					int depId = deps[i];
+					if (depId < 0) continue; // -1 表示无前置
+
+					hasPrereq = true;
+					if (!unlocked.Contains(depId))
+					{
+						allPrereqUnlocked = false;
+						break;
+					}
+					connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
+				}
+			}
+
+			// 根节点：无前置（或前置都是 -1）
+			if (!hasPrereq)
+			{
+				if (!includeRootNodes) continue;
+				allPrereqUnlocked = true;
+				connectedToUnlocked = true;
+			}
+
+			if (allPrereqUnlocked && connectedToUnlocked)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
     public bool AddCardToDataJoeyPlayer(Card card)
@@ -592,6 +683,7 @@ public partial class DataSystem
             }
             tempList.Add(card.UniqueId);
             dataJoeyPlayer.AddSelfCardDictData(card);
+            IsNewCardUnlock = true;
             return true;
         }
 
@@ -599,6 +691,7 @@ public partial class DataSystem
         {
             equipList.Add(card.UniqueId);
             dataJoeyPlayer.AddSelfCardDictData(card);
+            IsNewCardUnlock = true;
             return true;
         }
 
@@ -609,10 +702,10 @@ public partial class DataSystem
     {
         // Difficulty is now tracked in DataDifficulty, no need to preserve in player data
         m_DataJoeyPlayer = new DataJoeyPlayer();
-        
+
         isFinishGame = false;
         SaveDataJoeyPlayer();
-        
+
         Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
     }
 }

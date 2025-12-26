@@ -100,7 +100,7 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             // TODO: 替换为火球专用的VFX特效（需要在EVFXName中添加）
-            var fireBallVfxNames = new List<EVFXName> { EVFXName.VFX_boom };
+            var fireBallVfxNames = new List<EVFXName> { EVFXName.VFX_HuoQiu };
             CardControl.PlayVFX(fireBallVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
             // TODO: 替换为火球专用的音效（需要添加音效文件）
             SFX.PlayAudio("Audio/SFX/Battle/boom", 1.0f, 0f);
@@ -114,7 +114,7 @@ public class YDefaultEffect : YCardEffect
         if (CardControl != null && CardControl.gameObject != null)
         {
             // TODO: 替换为火球专用的VFX特效（需要在EVFXName中添加）
-            var iceMagicVfxNames = new List<EVFXName> { EVFXName.VFX_Shihun };
+            var iceMagicVfxNames = new List<EVFXName> { EVFXName.VFX_Bing };
             CardControl.PlayVFX(iceMagicVfxNames, ECardAnimName.UI_Carditem_shouji, EVFXLife.CardLife);
             SFX.PlayAudio("Audio/SFX/Battle/iceMagic", 1.0f, 0f);
             await UniTask.WaitForSeconds(0.5f);

@@ -2,17 +2,18 @@ using Newtonsoft.Json.Linq;
 
 /// <summary>
 /// 难度存档数据：记录已解锁最大难度和当前选择难度。
-/// 默认：解锁难度1，当前难度1；总共10个难度。
+/// 默认：解锁到难度2，当前难度1；总共8个难度。
 /// </summary>
 public class DataDifficulty : IData
 {
     public const int MinDifficulty = 1;
     public const int MaxDifficulty = 8; // Changed from 10 to match difficulty_config.csv (8 difficulty levels)
+    public const int DefaultUnlockedDifficulty = 2;
 
     /// <summary>
-    /// 已解锁的最大难度（默认1）
+    /// 已解锁的最大难度（默认2）
     /// </summary>
-    public int MaxUnlocked = 1;
+    public int MaxUnlocked = DefaultUnlockedDifficulty;
 
     /// <summary>
     /// 当前选择的难度（默认1）
@@ -28,6 +29,10 @@ public class DataDifficulty : IData
 
     public void Normalize()
     {
+        // 初始就解锁到难度2（不影响已解锁到更高难度的存档）
+        int minUnlocked = Clamp(DefaultUnlockedDifficulty, MinDifficulty, MaxDifficulty);
+        if (MaxUnlocked < minUnlocked) MaxUnlocked = minUnlocked;
+
         MaxUnlocked = Clamp(MaxUnlocked, MinDifficulty, MaxDifficulty);
         // Current 必须在 [1, MaxUnlocked] 范围内
         Current = Clamp(Current, MinDifficulty, MaxUnlocked);

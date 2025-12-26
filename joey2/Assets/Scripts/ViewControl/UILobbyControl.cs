@@ -42,24 +42,30 @@ public class UILobbyControl : YViewControl
 			m_View.BtnGrowth.onClick.AddListener(OnBtnGrowthClick);
 		}
 
-		// Setup difficulty tooltip
 		SetupDifficultyTooltip();
-
 		RefreshContinueButtonState();
+		RefreshTips();
 	}
 
 	void Update()
 	{
-		// Debug: Unlock all difficulties (F9)
+		RefreshTips();
+
 		if (Input.GetKeyDown(KeyCode.F9))
 		{
 			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-			diffData.UnlockUpTo(8); // Unlock all 8 difficulty levels
-			diffData.Current = 1; // Reset to difficulty 1
+			diffData.UnlockUpTo(8);
+			diffData.Current = 1;
 			DataSystem.Instance.SaveDataDifficulty();
 			RefreshDifficultyUI();
 			Debug.Log("[DEBUG] All difficulty levels unlocked (1-8)");
 		}
+	}
+
+	private void RefreshTips()
+	{
+		m_View.TipCard.SetActive(DataSystem.Instance.IsNewCardUnlock);
+		m_View.TipGrowth.SetActive(DataSystem.Instance.HasAffordableConnectedGrowthNode());
 	}
 
 	public void OnBtnBuildClick()
@@ -73,6 +79,8 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnCardProgressClick()
 	{
+		DataSystem.Instance.IsNewCardUnlock = false;
+		RefreshTips();
 		if (m_CardProgressControl == null)
 		{
 			m_CardProgressControl = Asset.OpenUI<UICardProgressControl>();
@@ -82,6 +90,8 @@ public class UILobbyControl : YViewControl
 
 	void OnBtnGrowthClick()
 	{
+		DataSystem.Instance.IsGrowthUnlock = false;
+		RefreshTips();
 		if (m_GrowthControl == null)
 		{
 			m_GrowthControl = Asset.OpenUI<UIGrowthControl>();
@@ -265,6 +275,10 @@ public class UILobbyControl : YViewControl
 	public void SetData(bool isNewGame, bool isUIStartEnter = false)
 	{
 		m_IsNewGame = isNewGame;
+
+		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+		diffData.Current = diffData.MaxUnlocked;
+		//DataSystem.Instance.SaveDataDifficulty();
 
 		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;

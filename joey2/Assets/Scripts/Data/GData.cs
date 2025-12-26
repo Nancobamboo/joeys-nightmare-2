@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public sealed class GData : PureSingleton<GData>
@@ -1300,11 +1302,24 @@ public sealed class GData : PureSingleton<GData>
 			if (id < 0) continue;
 
 			string name = Get(NameIdx);
-			int depend = GetInt(DependIdx, -1);
+			string depRaw = Get(DependIdx);
+			List<int> depends = new List<int>();
+			if (!string.IsNullOrWhiteSpace(depRaw))
+			{
+				// 支持多依赖：用 ';' 或 '|' 分隔（与 UIGrowthControl 的解析保持一致）
+				var parts = depRaw.Split(new char[] { '|', ';' }, StringSplitOptions.RemoveEmptyEntries);
+				for (int p = 0; p < parts.Length; p++)
+				{
+					if (int.TryParse(parts[p].Trim(), out int depId))
+					{
+						depends.Add(depId);
+					}
+				}
+			}
 			string desc = Get(DescIdx);
 			int price = GetInt(PriceIdx, 0);
 
-			GrowthInfo growthInfo = new GrowthInfo(id, name, depend, desc, price);
+			GrowthInfo growthInfo = new GrowthInfo(id, name, depends, desc, price);
 			GrowthInfoDict[id] = growthInfo;
 		}
 
