@@ -32,12 +32,15 @@ public class YMimicChest : YDefaultEffect
 
     public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
+        // Mimic reveals itself on the first time it takes damage.
+        // Important: still call base.OnTakeDamage so the hit VFX/anim/sfx are played.
         if (CardControl != null && m_RealCard != null && !m_IsRevealed)
         {
             m_IsRevealed = true;
             CardControl.UpdateCardDisplay(m_RealCard);
         }
-        return 0f;
+
+        return base.OnTakeDamage(effectType, damage);
     }
 }
 
