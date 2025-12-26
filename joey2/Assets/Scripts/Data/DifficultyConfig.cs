@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// </summary>
 public class DifficultyConfig
 {
-	public int difficultyLevel; // Difficulty level (1-8)
+	public int difficultyLevel; // Difficulty level (1-12)
 	public string description; // Description of what this difficulty unlocks/changes
 	public string comment; // Detailed comment
 	public string difficultyEffect; // Effect description (will be parsed)

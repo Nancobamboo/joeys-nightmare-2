@@ -745,12 +745,12 @@ public partial class UIGamePhaseControl : YViewControl
 				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
 			}
 			
-			// Apply monster attack multiplier (percentage)
-			if (config.monsterAttackMultiplier != 1.0f)
-			{
-				monsterCard.currentAttack = UnityEngine.Mathf.RoundToInt(monsterCard.currentAttack * config.monsterAttackMultiplier);
-				if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
-			}
+		// Apply monster attack multiplier (percentage)
+		if (config.monsterAttackMultiplier != 1.0f)
+		{
+			monsterCard.currentAttack = UnityEngine.Mathf.CeilToInt(monsterCard.currentAttack * config.monsterAttackMultiplier);
+			if (monsterCard.currentAttack < 0) monsterCard.currentAttack = 0;
+		}
 			
 			// Apply monster health bonus (flat)
 			if (config.monsterHealthBonus != 0)
@@ -761,14 +761,14 @@ public partial class UIGamePhaseControl : YViewControl
 				if (monsterCard.health < 1) monsterCard.health = 1;
 			}
 			
-			// Apply monster health multiplier (percentage)
-			if (config.monsterHealthMultiplier != 1.0f)
-			{
-				monsterCard.currentHealth = UnityEngine.Mathf.RoundToInt(monsterCard.currentHealth * config.monsterHealthMultiplier);
-				monsterCard.health = UnityEngine.Mathf.RoundToInt(monsterCard.health * config.monsterHealthMultiplier);
-				if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
-				if (monsterCard.health < 1) monsterCard.health = 1;
-			}
+		// Apply monster health multiplier (percentage)
+		if (config.monsterHealthMultiplier != 1.0f)
+		{
+			monsterCard.currentHealth = UnityEngine.Mathf.CeilToInt(monsterCard.currentHealth * config.monsterHealthMultiplier);
+			monsterCard.health = UnityEngine.Mathf.CeilToInt(monsterCard.health * config.monsterHealthMultiplier);
+			if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
+			if (monsterCard.health < 1) monsterCard.health = 1;
+		}
 		}
 	}
 
