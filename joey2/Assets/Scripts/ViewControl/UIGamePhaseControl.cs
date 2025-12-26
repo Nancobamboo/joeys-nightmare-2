@@ -927,6 +927,13 @@ public partial class UIGamePhaseControl : YViewControl
 				float delayTime = newLastBagCard.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime);
 			}
+			// If no weapon card left and we removed an attack card, trigger bare hands OnBecomeTopOfPile
+			else if (cardType == ECardType.attack && m_FistCardCache != null)
+			{
+				Debug.Log($"[RemoveBagCard] No attack cards left, triggering bare hands OnBecomeTopOfPile");
+				float delayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
+				await UniTask.WaitForSeconds(delayTime);
+			}
 			else
 			{
 				Debug.Log($"[RemoveBagCard] No cards left in {cardType} pile");

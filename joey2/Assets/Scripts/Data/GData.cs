@@ -1420,43 +1420,46 @@ public sealed class GData : PureSingleton<GData>
 
 	/// <summary>
 	/// Get the maximum unlocked stage level based on player's difficulty level
-	/// Returns the highest stage number the player can access
+	/// Returns the highest stage number the player can access from difficulty config
 	/// </summary>
 	public int GetMaxUnlockedStage()
 	{
 		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		DifficultyConfig config = GetDifficultyConfig(difficultyLevel);
+		
+		if (config != null && config.maxUnlockedStage > 0)
+		{
+			return config.maxUnlockedStage;
+		}
+		
+		// Fallback to 16 if config not found
+		Debug.LogWarning($"Max unlocked stage not configured for difficulty {difficultyLevel}, using default 16");
+		return 16;
+	}
 
-		// Default max stages by difficulty level
-		// Difficulty 1: stages 1-16
-		// Difficulty 2: stages 1-17
-		// Difficulty 3: stages 1-17
-		// Difficulty 4: stages 1-18
-		// Difficulty 5: stages 1-18
-		// Difficulty 6: stages 1-19
-		// Difficulty 7: stages 1-19
-		// Difficulty 8: stages 1-20
-		int defaultMaxStage = 16; // Base max stage for difficulty 1
-
-		if (difficultyLevel >= 8)
+	/// <summary>
+	/// Get cumulative shop price multiplier from all difficulty levels up to current
+	/// Multipliers are stacked multiplicatively (e.g. 1.2 * 1.35 = 1.62)
+	/// </summary>
+	public float GetShopPriceMultiplier()
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		float totalMultiplier = 1.0f;
+		
+		// Apply cumulative multipliers from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
 		{
-			return 20; // All stages unlocked
+			DifficultyConfig config = GetDifficultyConfig(level);
+			if (config == null) continue;
+			
+			// Multiply price multipliers (e.g. 1.0 * 1.2 * 1.35)
+			if (config.shopPriceMultiplier != 1.0f)
+			{
+				totalMultiplier *= config.shopPriceMultiplier;
+			}
 		}
-		else if (difficultyLevel >= 6)
-		{
-			return 19;
-		}
-		else if (difficultyLevel >= 4)
-		{
-			return 18;
-		}
-		else if (difficultyLevel >= 2)
-		{
-			return 17;
-		}
-		else
-		{
-			return 16;
-		}
+		
+		return totalMultiplier;
 	}
 
 }

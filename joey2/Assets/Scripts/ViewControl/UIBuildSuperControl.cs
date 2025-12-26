@@ -309,7 +309,25 @@ public class UIBuildSuperControl : YViewControl
 
     private int GetSellCardCost()
     {
-        return 50 * (m_SellCardCount + 1);
+        int baseCost = 50 * (m_SellCardCount + 1);
+        
+        // Apply difficulty price multiplier
+        float difficultyMultiplier = GData.Instance.GetShopPriceMultiplier();
+        int costWithDifficulty = Mathf.RoundToInt(baseCost * difficultyMultiplier);
+        
+        // Apply shop discount relic (reduces cost to sell)
+        if (DataSystem.Instance.HasRelic(ERelicType.ShopDiscount))
+        {
+            costWithDifficulty = Mathf.RoundToInt(costWithDifficulty * 0.8f);
+        }
+        
+        // Minimum cost is 1
+        if (costWithDifficulty < 1)
+        {
+            costWithDifficulty = 1;
+        }
+        
+        return costWithDifficulty;
     }
 
     private void OnCardDragEndSwap(UIBuildCardNewControl draggedCard, int targetItemIndex)
