@@ -558,6 +558,73 @@ public partial class DataSystem
         SaveDataGrowth();
     }
 
+	/// <summary>
+	/// 判断当前是否存在“买得起”的成长点：
+	/// - 尚未解锁
+	/// - 价格 <= 当前 Points
+	/// - 与已解锁节点联通（dependency 指向已解锁节点）
+	/// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
+	///
+	/// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
+	/// </summary>
+	public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
+	{
+		DataGrowth dataGrowth = GetDataGrowth();
+		if (dataGrowth == null) return false;
+
+		int points = dataGrowth.Points;
+		var unlockedList = dataGrowth.UnlockedNodes;
+		HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
+
+		GData.Instance.LoadGrowthInfo();
+		foreach (var kv in GData.Instance.GrowthInfoDict)
+		{
+			GrowthInfo info = kv.Value;
+			if (info == null) continue;
+
+			int id = info.id;
+			if (unlocked.Contains(id)) continue;               // 已解锁不算
+			if (info.price > points) continue;                // 买不起
+
+			bool hasPrereq = false;
+			bool allPrereqUnlocked = true;
+			bool connectedToUnlocked = false;
+
+			var deps = info.depends;
+			if (deps != null)
+			{
+				for (int i = 0; i < deps.Count; i++)
+				{
+					int depId = deps[i];
+					if (depId < 0) continue; // -1 表示无前置
+
+					hasPrereq = true;
+					if (!unlocked.Contains(depId))
+					{
+						allPrereqUnlocked = false;
+						break;
+					}
+					connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
+				}
+			}
+
+			// 根节点：无前置（或前置都是 -1）
+			if (!hasPrereq)
+			{
+				if (!includeRootNodes) continue;
+				allPrereqUnlocked = true;
+				connectedToUnlocked = true;
+			}
+
+			if (allPrereqUnlocked && connectedToUnlocked)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
     public bool AddCardToDataJoeyPlayer(Card card)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
