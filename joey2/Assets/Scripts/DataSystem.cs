@@ -55,17 +55,14 @@ public partial class DataSystem : YSingletonModule<DataSystem>
 
     private bool LoadJsonFile<T>(string filename, ref T dat) where T : IData, new()
     {
-#if UNITY_WEBGL || UNITY_ANDROID
-        JArray jarray = null;
         var result = PlayerPrefs.GetString(filename, "");
+        JArray jarray = null;
+        
         if (!string.IsNullOrEmpty(result))
         {
             jarray = (JArray)JsonConvert.DeserializeObject(result);
         }
 
-#else
-        JArray jarray = JsonUtil.LoadFile(this.SavePath + "/" + filename + ".json");
-#endif
         if (jarray == null)
         {
             return false;
@@ -84,34 +81,26 @@ public partial class DataSystem : YSingletonModule<DataSystem>
 
     private bool SaveJsonFile<T>(string filename, List<T> dats) where T : IData, new()
     {
-        // write to backup file, when finish, change name
-        string tmpFile = SavePath + "/" + filename + "_tmp" + m_JsonFix;
-
+        JArray jrry = new JArray();
+        foreach (T dat in dats)
         {
-            JArray jrry = new JArray();
-            foreach (T dat in dats)
-            {
-                JObject jobj = new JObject();
-                dat.SaveToJson(jobj);
-                jrry.Add(jobj);
-            }
-
-            string str = JsonConvert.SerializeObject(jrry);
-#if UNITY_WEBGL || UNITY_ANDROID
-
-            PlayerPrefs.SetString(filename, str);
-#endif
-
-#if !UNITY_WEBGL || UNITY_EDITOR
-            using (StreamWriter writer = new StreamWriter(tmpFile))
-            {
-                writer.Write(str);
-                writer.Close();
-            }
-#endif
+            JObject jobj = new JObject();
+            dat.SaveToJson(jobj);
+            jrry.Add(jobj);
         }
 
-#if !UNITY_WEBGL || UNITY_EDITOR
+        string str = JsonConvert.SerializeObject(jrry);
+        
+        PlayerPrefs.SetString(filename, str);
+        PlayerPrefs.Save();
+
+        string tmpFile = SavePath + "/" + filename + "_tmp" + m_JsonFix;
+        using (StreamWriter writer = new StreamWriter(tmpFile))
+        {
+            writer.Write(str);
+            writer.Close();
+        }
+
         string saveFile = SavePath + "/" + filename + m_JsonFix;
         string backupFile = SavePath + "/" + filename + "_backup" + m_JsonFix;
         if (File.Exists(saveFile))
@@ -131,7 +120,6 @@ public partial class DataSystem : YSingletonModule<DataSystem>
             }
             File.Move(tmpFile, saveFile);
         }
-#endif
 
         return true;
     }
