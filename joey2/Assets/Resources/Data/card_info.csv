@@ -55,7 +55,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 3007,Art/Img/Item/img_card_TurkeyFeathers,Art/Img/Item/img_bg_Item,火鸡羽毛,,item   ,当前装备的防御卡永久防御+1,,,,0,3,TurkeyFeather
 3008,Art/Img/Item/img_card_DonkeyMeatFireBun,Art/Img/Item/img_bg_Item,驴肉火烧,,item   ,生命上限永久+2,,,,0,3,DonkeyMeatFireBun
 3009,Art/Img/Item/img_card_MonkeyBanana,Art/Img/Item/img_bg_Item,猴子香蕉,,item   ,当前装备的攻击卡永久攻击+1(赤手空拳除外),,,,0,3,MonkeyBanana
-3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,骷髅骸骨,,item   ,随机获得火鸡羽毛/驴肉火烧/猴子香蕉的效果,,,,0,3,Bone
+3010,Art/Img/Item/img_card_Bone,Art/Img/Item/img_bg_Item,骷髅骸骨,,item   ,随机获得火鸡羽毛/驴肉火烧/猴子香蕉的效果,,,,300,3,Bone
 3011,Art/Img/Item/img_card_GravityShoes,Art/Img/Item/img_bg_Item,重力鞋,1丛林,item   ,将环境卡中全部卡牌和它下方的卡牌交换位置,,,,200,2,GravityShoes
 3012,Art/Img/NewAdd/沸腾兽血,Art/Img/Item/img_bg_Item,沸腾兽血,,item   ,失去一半血给所有手牌武器加损失血量一半攻击(最低5点),,,,200,2,BeastBloodBoiling_UseItem:5
 3013,Art/Img/NewAdd/鲜血护符,Art/Img/Item/img_bg_Item,鲜血护符,,item   ,失去一半血给所有手牌护具加损失血量一半防御(最低5点),,,,200,2,FreshBloodGuard_UseItem:5
