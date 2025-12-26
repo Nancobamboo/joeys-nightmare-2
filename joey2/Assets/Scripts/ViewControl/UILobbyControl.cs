@@ -65,7 +65,7 @@ public class UILobbyControl : YViewControl
 	private void RefreshTips()
 	{
 		m_View.TipCard.SetActive(DataSystem.Instance.IsNewCardUnlock);
-		m_View.TipGrowth.SetActive(DataSystem.Instance.IsGrowthUnlock);
+		m_View.TipGrowth.SetActive(DataSystem.Instance.HasAffordableConnectedGrowthNode());
 	}
 
 	public void OnBtnBuildClick()
@@ -275,6 +275,10 @@ public class UILobbyControl : YViewControl
 	public void SetData(bool isNewGame, bool isUIStartEnter = false)
 	{
 		m_IsNewGame = isNewGame;
+
+		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+		diffData.Current = diffData.MaxUnlocked;
+		//DataSystem.Instance.SaveDataDifficulty();
 
 		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;
