@@ -18,6 +18,8 @@ public class UILobbyView : YBaseView
 	public Button BtnContinue;
 	public Text TxtContinue;
 	public EventTriggerListener TriggerDiffer;
+	public GameObject TipCard;
+	public GameObject TipGrowth;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -38,5 +40,7 @@ public class UILobbyView : YBaseView
 		BtnContinue = viewItemList[11].Target.GetComponent<Button>();
 		TxtContinue = viewItemList[12].Target.GetComponent<Text>();
 		TriggerDiffer = viewItemList[13].Target.GetComponent<EventTriggerListener>();
+		TipCard = viewItemList[14].Target.gameObject;
+		TipGrowth = viewItemList[15].Target.gameObject;
 	}
 }

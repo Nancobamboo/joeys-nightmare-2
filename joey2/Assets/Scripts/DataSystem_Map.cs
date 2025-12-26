@@ -195,6 +195,8 @@ public partial class DataSystem
 
     public const bool isNew = true;
     public bool isFinishGame = false;
+    public bool IsNewCardUnlock = true;
+    public bool IsGrowthUnlock = true;
     public void LoadGameData()
     {
         Debug.Log("LoadGameData called");
@@ -537,20 +539,24 @@ public partial class DataSystem
         m_DataJoeyPlayer.AddRelicListData((int)relicType);
     }
 
-	public void AddCoin(int delta)
-	{
-		DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-		dataJoeyPlayer.Coin += delta;
-		YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
-	}
-	
-	public void AddGrowthPoints(int delta)
-	{
-		DataGrowth dataGrowth = GetDataGrowth();
-		dataGrowth.Points += delta;
-		YActionSystem.Instance.DispatchAction(EActionId.OnGrowthPointsChange, dataGrowth.Points, delta);
-		SaveDataGrowth();
-	}
+    public void AddCoin(int delta)
+    {
+        DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+        dataJoeyPlayer.Coin += delta;
+        YActionSystem.Instance.DispatchAction(EActionId.OnCoinChange, dataJoeyPlayer.Coin, delta);
+    }
+
+    public void AddGrowthPoints(int delta)
+    {
+        DataGrowth dataGrowth = GetDataGrowth();
+        dataGrowth.Points += delta;
+        if (delta > 0)
+        {
+            IsGrowthUnlock = true;
+        }
+        YActionSystem.Instance.DispatchAction(EActionId.OnGrowthPointsChange, dataGrowth.Points, delta);
+        SaveDataGrowth();
+    }
 
     public bool AddCardToDataJoeyPlayer(Card card)
     {
@@ -595,6 +601,7 @@ public partial class DataSystem
             }
             tempList.Add(card.UniqueId);
             dataJoeyPlayer.AddSelfCardDictData(card);
+            IsNewCardUnlock = true;
             return true;
         }
 
@@ -602,6 +609,7 @@ public partial class DataSystem
         {
             equipList.Add(card.UniqueId);
             dataJoeyPlayer.AddSelfCardDictData(card);
+            IsNewCardUnlock = true;
             return true;
         }
 
@@ -612,10 +620,10 @@ public partial class DataSystem
     {
         // Difficulty is now tracked in DataDifficulty, no need to preserve in player data
         m_DataJoeyPlayer = new DataJoeyPlayer();
-        
+
         isFinishGame = false;
         SaveDataJoeyPlayer();
-        
+
         Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
     }
 }
