@@ -265,6 +265,15 @@ public partial class UIGamePhaseControl : YViewControl
 		PhaseCounter = 0;
 		RefreshView();
 		ClearAllCard();
+
+		// Restart/重置时：拳头卡缓存不会被 ClearAllCard 回收（为避免频繁重建）
+		// 但像猿酒(ApeWine)/双持等会通过 AddEffectValue 写入临时伤害加成，
+		// 如果此处不清理，会导致“重新开始 buff 不清空”（尤其赤手空拳/拳套永不消耗时更明显）。
+		if (m_FistCardCache != null)
+		{
+			m_FistCardCache.ClearEffectVlaue();
+		}
+
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
 		if (m_KeyPathCardCache != null)
@@ -896,9 +905,6 @@ public partial class UIGamePhaseControl : YViewControl
 			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
 		}
 
-		// Check if card will become top of pile (last in list)
-		bool willBecomeTop = (m_BagCardDict[cardTypeInt].Count == 0);
-
 		m_BagCardDict[cardTypeInt].Add(cardControl);
 		cardControl.IsEnv = false;
 		cardControl.EnvIndex = -1;
@@ -943,8 +949,10 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		// Trigger OnBecomeTopOfPile if card becomes top of pile
+		// 注意：AddBagCard 是“直接加入手牌”的路径（例如从弃牌堆抓回/生成卡牌等）。
+		// 由于本函数会把 cardControl 追加到列表末尾，它将成为该牌堆的“顶牌”（GetLastBagCard）。
 		// Skip if isMoveCard=true, as MoveCard callback will handle it
-		if (!isMoveCard && willBecomeTop && cardControl.CardEffect != null)
+		if (!isMoveCard && cardControl.CardEffect != null && GetLastBagCard(cardType) == cardControl)
 		{
 			Debug.Log($"[AddBagCard] Card becomes top of pile, calling OnBecomeTopOfPile for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
 			cardControl.CardEffect.OnBecomeTopOfPile();
@@ -1118,11 +1126,20 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			// Apply vulnerable damage bonus (50% extra damage)
 			int vulnerableTurns = cardControl.GetBuffValue(EBuffType.Vulnerable);
-			if (vulnerableTurns > 0 && effectType == EEffectType.Damage)
+			// 易伤应对“所有造成伤害的来源”生效（武器伤害/炸弹/技能/反伤等），而不只限于普通攻击
+			bool isDamageEffect =
+				effectType == EEffectType.Damage ||
+				effectType == EEffectType.Boom ||
+				effectType == EEffectType.Electric ||
+				effectType == EEffectType.FireBall ||
+				effectType == EEffectType.IceMagic ||
+				effectType == EEffectType.ReflectDamage;
+
+			if (vulnerableTurns > 0 && isDamageEffect)
 			{
 				int bonusDamage = Mathf.RoundToInt(damage * 0.5f);
 				damage += bonusDamage;
-				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage ({vulnerableTurns} turns remaining)");
+				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage from {effectType} ({vulnerableTurns} turns remaining)");
 			}
 
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
@@ -1139,6 +1156,28 @@ public partial class UIGamePhaseControl : YViewControl
 			if (delayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+			}
+
+			// 怪物“反伤”处理：受击后对玩家造成固定反伤（例如：榴莲Donkey 反伤 5）
+			// 这里不要走 TakePlayerDamageAsync（它会播放怪物攻击动画，像“主动反击”），
+			// 反伤只需要直接结算玩家掉血即可。
+			if (damage > 0 && effectType != EEffectType.ReflectDamage)
+			{
+				int thornsDamage = cardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+				if (thornsDamage > 0)
+				{
+					// 反伤属于直接伤害：不走防御/格挡流程，但仍应遵循“抵挡致命伤害”(Unyielding)逻辑
+					if (TryBlockFatalDamage(thornsDamage))
+					{
+						thornsDamage = m_DataJoeyPlayer.playerHealth - 1;
+					}
+
+					if (thornsDamage > 0)
+					{
+						SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+						ApplyPlayerHealthChange(-thornsDamage);
+					}
+				}
 			}
 
 			// 火球攻击解除冰冻状态
