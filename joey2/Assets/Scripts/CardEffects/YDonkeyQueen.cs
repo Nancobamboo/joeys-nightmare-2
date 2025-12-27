@@ -7,7 +7,7 @@ public class YDonkeyQueen : YDefaultEffect
 {
     private int m_HealAmount;
 
-    public YDonkeyQueen(int healAmount = 5)
+    public YDonkeyQueen(int healAmount = 6)
     {
         m_HealAmount = Mathf.Max(0, healAmount);
         Id = ECardEffectId.DonkeyQueen;
