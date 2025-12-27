@@ -126,6 +126,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.MonkeyKingRemoveDefence, MonkeyKingRemoveDefence);
 		RegistAction(EActionId.DonkeyQueenHealKing, DonkeyQueenHealKing);
 		RegistAction(EActionId.DonkeyQueenRefreshPlayerCards, DonkeyQueenRefreshPlayerCards);
+		RegistAction(EActionId.JokerNightmareCurse, JokerNightmareCurse);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -2144,7 +2145,11 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 		else if (effectId == ECardEffectId.MonkeyKing)
 		{
-			await TriggerKingAttackedEffects();
+			await TriggerKingAttackedEffects(enemyCardControl);
+		}
+		else if (effectId == ECardEffectId.JokerNightmare)
+		{
+			await TriggerJokerNightmareAttackedEffects(enemyCardControl);
 		}
 	}
 

@@ -925,6 +925,9 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.MonkeyKing:
 				effect = new YMonkeyKing();
 				break;
+			case ECardEffectId.JokerNightmare:
+				effect = new YJokerNightmare();
+				break;
 			default:
 				return GetDefaultEffect();
 		}

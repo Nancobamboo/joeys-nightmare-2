@@ -80,6 +80,7 @@ public enum EActionId
 	MonkeyKingRemoveDefence,
 	DonkeyQueenHealKing,
 	DonkeyQueenRefreshPlayerCards,
+	JokerNightmareCurse,
 	Upper,
 
 }

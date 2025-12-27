@@ -82,15 +82,15 @@ public partial class UIGamePhaseControl
 
     void DonkeyQueenHealKing(object[] paraArray)
     {
-        DonkeyQueenHealKingAsync().Forget();
+        UICardSimpleControl targetCard = (UICardSimpleControl)paraArray[0];
+        DonkeyQueenHealTargetAsync(targetCard).Forget();
     }
 
-    public async UniTask DonkeyQueenHealKingAsync()
+    public async UniTask DonkeyQueenHealTargetAsync(UICardSimpleControl targetCard)
     {
         UICardSimpleControl queenCard = FindEnvCardByEffectId(ECardEffectId.DonkeyQueen);
-        UICardSimpleControl kingCard = FindEnvCardByEffectId(ECardEffectId.MonkeyKing);
 
-        if (queenCard == null || kingCard == null)
+        if (queenCard == null || targetCard == null)
         {
             return;
         }
@@ -100,7 +100,7 @@ public partial class UIGamePhaseControl
             return;
         }
 
-        if (!kingCard.gameObject.activeSelf || kingCard.CardData.currentHealth <= 0)
+        if (!targetCard.gameObject.activeSelf || targetCard.CardData.currentHealth <= 0)
         {
             return;
         }
@@ -116,18 +116,18 @@ public partial class UIGamePhaseControl
             return;
         }
 
-        if (kingCard.CacheTrans != null)
+        if (targetCard.CacheTrans != null)
         {
-            JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Shihun, kingCard.CacheTrans, 1f);
+            JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Shihun, targetCard.CacheTrans, 1f);
         }
         await UniTask.WaitForSeconds(0.5f);
 
-        kingCard.CardData.currentHealth += healAmount;
-        if (kingCard.CardData.currentHealth > kingCard.CardData.health)
+        targetCard.CardData.currentHealth += healAmount;
+        if (targetCard.CardData.currentHealth > targetCard.CardData.health)
         {
-            kingCard.CardData.currentHealth = kingCard.CardData.health;
+            targetCard.CardData.currentHealth = targetCard.CardData.health;
         }
-        kingCard.RefreshCard();
+        targetCard.RefreshCard();
 
         await UniTask.WaitForSeconds(0.3f);
     }

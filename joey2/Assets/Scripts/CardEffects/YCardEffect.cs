@@ -98,6 +98,7 @@ public enum ECardEffectId
 	TurkeyJack,
 	DonkeyQueen,
 	MonkeyKing,
+	JokerNightmare,
 
 }
 

@@ -69,13 +69,13 @@ public partial class UIGamePhaseControl
         }
     }
 
-    public async UniTask TriggerKingAttackedEffects()
+    public async UniTask TriggerKingAttackedEffects(UICardSimpleControl attackedCard)
     {
         UICardSimpleControl queenCard = FindEnvCardByEffectId(ECardEffectId.DonkeyQueen);
         if (queenCard != null && queenCard.gameObject.activeSelf && queenCard.CardData.currentHealth > 0)
         {
             await UniTask.WaitForSeconds(0.5f);
-            await DonkeyQueenHealKingAsync();
+            await DonkeyQueenHealTargetAsync(attackedCard);
         }
 
         UICardSimpleControl turkeyCard = FindEnvCardByEffectId(ECardEffectId.TurkeyJack);
