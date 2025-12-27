@@ -7,7 +7,7 @@ difficulty_level,description,comment,difficluty_effect
 6,解锁关卡18；怪物中幅强化；商店价格上升,攻击+10% hp+20% 价格+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.2;shopPriceMultiplier:1.2;maxUnlockedStage:18
 7,玩家攻击防御降低,攻击-1 防御-1,playerAttackPenalty:-1;playerDefencePenalty:-1;maxUnlockedStage:18
 8,解锁更多怪物；初始牌组加入苦痛之刃,攻击为0,curseCards:1025;maxUnlockedStage:18
-9,解锁关卡19；怪物大幅强化；商店价格上升,攻击+10% hp+20% 价格+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.2;shopPriceMultiplier:1.2;maxUnlockedStage:19
+9,解锁关卡19；怪物大幅强化；商店价格上升,攻击+10% hp+25% 价格+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.25;shopPriceMultiplier:1.2;maxUnlockedStage:19
 10,获得高级牌概率再次降低；玩家属性进一步削弱,概率-5% 攻击-1 防御-1,highGradeCardProbability:-0.05;playerAttackPenalty:-1;playerDefencePenalty:-1;maxUnlockedStage:19
 11,生命值大幅削弱；初始牌组加入苦痛之盾,起始-20hp 上限-10 防御为0,playerHealthPenalty:-20;playerMaxHealthPenalty:-10;curseCards:2016;maxUnlockedStage:19
-12,解锁关卡20；解锁更多怪物；怪物极限强化；商店价格上升,攻击+10% hp+20% 价格+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.2;shopPriceMultiplier:1.2;maxUnlockedStage:20
+12,解锁关卡20；解锁更多怪物；怪物极限强化；商店价格上升,攻击+10% hp+25% 价格+20%,monsterAttackMultiplier:1.1;monsterHealthMultiplier:1.25;shopPriceMultiplier:1.2;maxUnlockedStage:20
