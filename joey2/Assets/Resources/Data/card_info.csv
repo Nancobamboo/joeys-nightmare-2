@@ -122,6 +122,9 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5037,Art/Img/Monster/img_card_MimicChestking,Art/Img/Monster/img_bg_Monster,伪装宝箱王,4墓地,monster,离场:掉落大量宝物,15,,30,100,3,MimicChest:5016
 5038,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,教学牌,monster,点击攻击,9,,16,25,1,
 5039,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,
+5040,Art/Img/Monster/img_card_DonkeyQueen,Art/Img/Monster/img_bg_Monster,女王Donkey,4墓地,monster,削弱玩家武器/护甲1/3 国王受击:回复其生命,10,,25,15,3,DonkeyQueen
+5041,Art/Img/Monster/img_card_MonkeyKing,Art/Img/Monster/img_bg_Monster,国王Monkey,4墓地,monster,无视护甲 女王受击:移除玩家防御牌,8,,50,15,3,MonkeyKing
+5042,Art/Img/Monster/img_card_TurkeyJack,Art/Img/Monster/img_bg_Monster,卫士Turkey,3感恩节,monster,反击两次 女王/国王受击:触发反击,10,,30,15,3,TurkeyJack
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,

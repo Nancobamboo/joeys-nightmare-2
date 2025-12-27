@@ -87,10 +87,9 @@ public class UICardSimpleControl : YViewControl
 
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 	private UIDescExtControl m_DescExtControl;
-	private GameObject m_FrozenOverlay;
+	private Transform m_FrozenVFX; // 冰冻特效，循环播放 VFX_Bing2
 
 	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
-	private static readonly Color FROZEN_OVERLAY_COLOR = new Color(0.4f, 0.7f, 1f, 0.4f);
 
 	public static EResType GetResType()
 	{
@@ -266,8 +265,19 @@ public class UICardSimpleControl : YViewControl
 					}
 				}
 
+				bool hasDonkeyQueenDebuff = false;
+				if (!IsEnv && JoeyGameControl.Instance != null && JoeyGameControl.Instance.IsDonkeyQueenAlive())
+				{
+					attackValue = JoeyGameControl.Instance.ApplyDonkeyQueenDebuff(attackValue);
+					hasDonkeyQueenDebuff = true;
+				}
+
 				m_View.TxtAttack.text = attackValue.ToString();
-				if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
+				if (hasDonkeyQueenDebuff)
+				{
+					m_View.TxtAttack.color = Color.red;
+				}
+				else if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
@@ -280,8 +290,20 @@ public class UICardSimpleControl : YViewControl
 			case ECardType.defence:
 				int defenceEffect = CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0;
 				int defenceValue = cachedCard.currentDefence + defenceEffect;
+
+				bool hasDefenceQueenDebuff = false;
+				if (!IsEnv && JoeyGameControl.Instance != null && JoeyGameControl.Instance.IsDonkeyQueenAlive())
+				{
+					defenceValue = JoeyGameControl.Instance.ApplyDonkeyQueenDebuff(defenceValue);
+					hasDefenceQueenDebuff = true;
+				}
+
 				m_View.TxtDefence.text = defenceValue.ToString();
-				if (defenceEffect != 0)
+				if (hasDefenceQueenDebuff)
+				{
+					m_View.TxtDefence.color = Color.red;
+				}
+				else if (defenceEffect != 0)
 				{
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
@@ -418,26 +440,27 @@ public class UICardSimpleControl : YViewControl
 		bool isFrozen = GetBuffValue(EBuffType.Frozen) > 0;
 		if (isFrozen)
 		{
-			if (m_FrozenOverlay == null)
+			// 开始循环播放 VFX_Bing2 特效
+			if (m_FrozenVFX == null)
 			{
-				m_FrozenOverlay = new GameObject("FrozenOverlay");
-				m_FrozenOverlay.transform.SetParent(m_View.CardImg.transform, false);
-				RectTransform rect = m_FrozenOverlay.AddComponent<RectTransform>();
-				rect.anchorMin = Vector2.zero;
-				rect.anchorMax = Vector2.one;
-				rect.offsetMin = Vector2.zero;
-				rect.offsetMax = Vector2.zero;
-				Image img = m_FrozenOverlay.AddComponent<Image>();
-				img.color = FROZEN_OVERLAY_COLOR;
-				img.raycastTarget = false;
+				m_FrozenVFX = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Bing2, m_View.Anim.transform);
 			}
-			m_FrozenOverlay.SetActive(true);
+			else
+			{
+				// 确保 VFX 的 parent 是正确的（可能被 ReturnVFXPool 移动过）
+				m_FrozenVFX.SetParent(m_View.Anim.transform);
+				m_FrozenVFX.localPosition = Vector3.zero;
+				m_FrozenVFX.localScale = Vector3.one;
+				m_FrozenVFX.gameObject.SetActive(true);
+			}
 		}
 		else
 		{
-			if (m_FrozenOverlay != null)
+			// 停止并回收冰冻特效
+			if (m_FrozenVFX != null)
 			{
-				m_FrozenOverlay.SetActive(false);
+				JoeyGameControl.Instance.ReturnVFXPool(m_FrozenVFX, EnvIndex);
+				m_FrozenVFX = null;
 			}
 		}
 	}
@@ -447,16 +470,47 @@ public class UICardSimpleControl : YViewControl
 		return GetBuffValue(EBuffType.Frozen) > 0;
 	}
 
+	/// <summary>
+	/// 当卡牌被其他卡牌覆盖时调用，隐藏所有持续特效
+	/// </summary>
+	public void OnCoveredByCard()
+	{
+		// 隐藏冰冻特效
+		if (m_FrozenVFX != null)
+		{
+			m_FrozenVFX.gameObject.SetActive(false);
+		}
+		// 未来可以在这里添加其他特效的隐藏逻辑
+	}
+
+	/// <summary>
+	/// 当卡牌成为顶层时调用，显示所有持续特效
+	/// </summary>
+	public void OnBecomeTopCard()
+	{
+		// 显示冰冻特效
+		if (IsFrozen() && m_FrozenVFX != null)
+		{
+			m_FrozenVFX.SetParent(m_View.Anim.transform);
+			m_FrozenVFX.localPosition = Vector3.zero;
+			m_FrozenVFX.localScale = Vector3.one;
+			m_FrozenVFX.gameObject.SetActive(true);
+		}
+		// 未来可以在这里添加其他特效的显示逻辑
+	}
+
 	private void ClearAllBuffs()
 	{
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
 		{
 			m_BuffValueArray[i] = 0;
 		}
-		// 清理冰冻覆盖层
-		if (m_FrozenOverlay != null)
+		// 清理冰冻特效
+		if (m_FrozenVFX != null)
 		{
-			m_FrozenOverlay.SetActive(false);
+			// 直接隐藏 VFX，避免 EnvIndex 无效时的问题
+			m_FrozenVFX.gameObject.SetActive(false);
+			m_FrozenVFX = null;
 		}
 	}
 
@@ -849,6 +903,15 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BlockFirstAttack:
 				effect = new YBlockFirstAttack();
 				break;
+			case ECardEffectId.TurkeyJack:
+				effect = new YTurkeyJack(effectValue > 0 ? effectValue : 2);
+				break;
+			case ECardEffectId.DonkeyQueen:
+				effect = new YDonkeyQueen(effectValue > 0 ? effectValue : 5);
+				break;
+			case ECardEffectId.MonkeyKing:
+				effect = new YMonkeyKing();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -1094,6 +1157,14 @@ public class UICardSimpleControl : YViewControl
 				JoeyGameControl.Instance.ReturnVFXPool(go, EnvIndex);
 			}
 		}
+		
+		// 清理冰冻特效
+		if (m_FrozenVFX != null)
+		{
+			JoeyGameControl.Instance.ReturnVFXPool(m_FrozenVFX, EnvIndex);
+			m_FrozenVFX = null;
+		}
+		
 		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)

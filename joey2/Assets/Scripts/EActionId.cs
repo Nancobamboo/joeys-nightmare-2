@@ -76,6 +76,10 @@ public enum EActionId
 	ShieldBashActivate,
 	FortressActivate,
 	StrikeActivate,
+	TurkeyJackExtraCounter,
+	MonkeyKingRemoveDefence,
+	DonkeyQueenHealKing,
+	DonkeyQueenRefreshPlayerCards,
 	Upper,
 
 }

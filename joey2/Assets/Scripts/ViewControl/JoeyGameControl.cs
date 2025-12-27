@@ -962,6 +962,24 @@ public class JoeyGameControl : YViewControl
 		return false;
 	}
 
+	public int ApplyDonkeyQueenDebuff(int value)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.ApplyDonkeyQueenDebuff(value);
+		}
+		return value;
+	}
+
+	public bool IsDonkeyQueenAlive()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.IsDonkeyQueenAlive();
+		}
+		return false;
+	}
+
 	public bool IsCardOnTop(UICardSimpleControl cardControl, int envIndex)
 	{
 		UICardSimpleControl lastCard = m_GamePhaseControl.GetLastEnvCard(envIndex);

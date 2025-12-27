@@ -95,6 +95,9 @@ public enum ECardEffectId
     KnightShield_OnTop,
     SpiralShuriken,
 	BlockFirstAttack,
+	TurkeyJack,
+	DonkeyQueen,
+	MonkeyKing,
 
 }
 

@@ -122,6 +122,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.ShieldBashActivate, ShieldBashActivate);
 		RegistAction(EActionId.FortressActivate, FortressActivate);
 		RegistAction(EActionId.StrikeActivate, StrikeActivate);
+		RegistAction(EActionId.TurkeyJackExtraCounter, TurkeyJackExtraCounter);
+		RegistAction(EActionId.MonkeyKingRemoveDefence, MonkeyKingRemoveDefence);
+		RegistAction(EActionId.DonkeyQueenHealKing, DonkeyQueenHealKing);
+		RegistAction(EActionId.DonkeyQueenRefreshPlayerCards, DonkeyQueenRefreshPlayerCards);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -1094,6 +1098,14 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			m_EnvCardDict[index] = new List<UICardSimpleControl>();
 		}
+		
+		// 通知被覆盖的卡牌
+		UICardSimpleControl lastCard = GetLastEnvCard(index);
+		if (lastCard != null)
+		{
+			lastCard.OnCoveredByCard();
+		}
+		
 		m_EnvCardDict[index].Add(cardControl);
 	}
 
@@ -1104,6 +1116,13 @@ public partial class UIGamePhaseControl : YViewControl
 			cardList.Remove(cardControl);
 			RemoveCardData(cardControl.CardData.UniqueId);
 			cardControl.Return();
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
 		}
 	}
 
@@ -1112,6 +1131,13 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
 		{
 			cardList.Remove(cardControl);
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
 		}
 	}
 
@@ -1730,6 +1756,12 @@ public partial class UIGamePhaseControl : YViewControl
 					layout.enabled = true;
 					cardControl.SetMoving(false);
 					
+					// Refresh card display to apply DonkeyQueen debuff if needed
+					if (cardType == ECardType.attack || cardType == ECardType.defence)
+					{
+						cardControl.RefreshCard();
+					}
+					
 					// Trigger OnEnterBag for the moved card
 					if (cardControl.CardEffect != null)
 					{
@@ -1949,6 +1981,8 @@ public partial class UIGamePhaseControl : YViewControl
 					damage += 5;
 				}
 			}
+			// 女王debuff在所有增益计算完成后最后应用
+			damage = ApplyDonkeyQueenDebuff(damage);
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));
@@ -1996,11 +2030,31 @@ public partial class UIGamePhaseControl : YViewControl
 	if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
 	{
 		int enemyAttack = enemyCardControl.CardData.currentAttack;
-		// Only counter-attack if enemy has attack power > 0
 		if (enemyAttack > 0)
 		{
-			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
+			int counterCount = GetMonsterCounterAttackCount(enemyCardControl);
+			for (int c = 0; c < counterCount; c++)
+			{
+				if (enemyCardControl == null || !enemyCardControl.gameObject.activeSelf || enemyCardControl.CardData.currentHealth <= 0)
+				{
+					break;
+				}
+				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
+			}
+		}
+	}
+
+	if (!enemyKilled && enemyCardControl != null && enemyCardControl.CardEffect != null)
+	{
+		ECardEffectId effectId = enemyCardControl.CardEffect.Id;
+		if (effectId == ECardEffectId.DonkeyQueen)
+		{
+			await TriggerQueenAttackedEffects();
+		}
+		else if (effectId == ECardEffectId.MonkeyKing)
+		{
+			await TriggerKingAttackedEffects();
 		}
 	}
 
@@ -2091,6 +2145,13 @@ public partial class UIGamePhaseControl : YViewControl
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		bool usedWeaponParry = false;
+		bool isMonkeyKingAttack = IsMonkeyKingAttack(enemyCardControl);
+
+		if (isMonkeyKingAttack && defenceCardControl != null)
+		{
+			Debug.Log("MonkeyKing attack: Ignoring defence cards!");
+			defenceCardControl = null;
+		}
 
 		// Check if DualWield is active - if so, cannot use defence cards
 		if (m_DualWieldActive && defenceCardControl != null)
@@ -2147,6 +2208,7 @@ public partial class UIGamePhaseControl : YViewControl
 		else if (defenceCardControl != null)
 		{
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
+			defenceValue = ApplyDonkeyQueenDebuff(defenceValue);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
