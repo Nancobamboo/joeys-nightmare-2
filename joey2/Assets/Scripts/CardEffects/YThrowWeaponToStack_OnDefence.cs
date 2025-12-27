@@ -109,5 +109,19 @@ public partial class UIGamePhaseControl
 		newCardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		parent.enabled = true;
 		newCardControl.SetMoving(false);
+
+		// Update monster buffs after new card is added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
+		}
 	}
 }

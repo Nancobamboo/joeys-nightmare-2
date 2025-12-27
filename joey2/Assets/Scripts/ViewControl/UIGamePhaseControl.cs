@@ -749,6 +749,20 @@ public partial class UIGamePhaseControl : YViewControl
 			AddEnvCard(index, cardControl);
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 		}
+
+		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
+		}
 	}
 	
 	/// <summary>
@@ -1126,6 +1140,40 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	public void RemoveEnvCardAndUpdate(int index, UICardSimpleControl cardControl)
+	{
+		// Remove from env card dictionary first
+		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
+		{
+			cardList.Remove(cardControl);
+			RemoveCardData(cardControl.CardData.UniqueId);
+			
+			// Update remaining monster buffs (for BadMonkey/MonkeyKing attack updates)
+			for (int i = 0; i < m_EnvPanels.Count; i++)
+			{
+				UICardSimpleControl lastCard = GetLastEnvCard(i);
+				if (lastCard != null && lastCard.CardType == ECardType.monster)
+				{
+					// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+					if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+					{
+						lastCard.UpdateBuffValue();
+					}
+				}
+			}
+			
+			// Then return the card and notify
+			cardControl.Return();
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
+		}
+	}
+
 	private void RemoveEnvCardFromDict(int index, UICardSimpleControl cardControl)
 	{
 		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
@@ -1246,19 +1294,33 @@ public partial class UIGamePhaseControl : YViewControl
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterFly", 1.0f, 0.5f);
 
 
-			RemoveEnvCard(envIndex, cardControl);
-			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
-			RemoveCardCts(cardControl);
+		RemoveEnvCard(envIndex, cardControl);
+		delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+		RemoveCardCts(cardControl);
 
-			if (dropCards != null && dropCards.Count > 0)
+		if (dropCards != null && dropCards.Count > 0)
+		{
+			AddEnvDropCard(dropCards, envIndex);
+		}
+
+		// Update remaining monster buffs immediately after monster death (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
 			{
-				AddEnvDropCard(dropCards, envIndex);
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
 			}
+		}
 
-			CheckAndSpawnKeyPath();
+		CheckAndSpawnKeyPath();
 
-			return true;
+		return true;
 		}
 
 		return false;
@@ -1330,6 +1392,20 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 
 			usedIndices.Add(panelIndex);
+		}
+
+		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
 		}
 	}
 
@@ -1722,6 +1798,20 @@ public partial class UIGamePhaseControl : YViewControl
 
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
 			AddBagCard(cardType, cardControl, true);
+
+			// Update monster buffs after card is removed from env (for BadMonkey/MonkeyKing attack updates)
+			for (int i = 0; i < m_EnvPanels.Count; i++)
+			{
+				UICardSimpleControl lastCard = GetLastEnvCard(i);
+				if (lastCard != null && lastCard.CardType == ECardType.monster)
+				{
+					// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+					if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+					{
+						lastCard.UpdateBuffValue();
+					}
+				}
+			}
 
 			VerticalLayoutGroup layout = null;
 			switch (cardType)
@@ -2492,10 +2582,12 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		if (cardControl != null && !cardControl.IsEffecting && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
+			// Only update UpdateAttack buffs at turn start (for BadMonkey/MonkeyKing attack updates)
+			// Counter buffs are updated after each action completes in FixedUpdate
 			for (int i = 0; i < m_EnvPanels.Count; i++)
 			{
 				UICardSimpleControl lastCard = GetLastEnvCard(i);
-				if (lastCard != null)
+				if (lastCard != null && lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
 				{
 					lastCard.UpdateBuffValue();
 				}
@@ -2535,19 +2627,30 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
+	if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
+	{
+
+		TryBloodStorageHeal();
+		TryUnyieldingTurnUpdate();
+		TryRegenerationHeal();
+		TryHalfHealthAmulet();
+		UpdateVulnerableDebuffs();
+		
+		// Update Counter buffs after each action completes (for AutoBoomMoney, StealMoney, Ghost, etc.)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
 		{
-
-			TryBloodStorageHeal();
-			TryUnyieldingTurnUpdate();
-			TryRegenerationHeal();
-			TryHalfHealthAmulet();
-			UpdateVulnerableDebuffs();
-			CurrentEffectCard = null;
-			PhaseCounter++;
-			UpdateBlockFatalDisplay();
-
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.GetBuffValue(EBuffType.Counter) > 0)
+			{
+				lastCard.UpdateBuffValue();
+			}
 		}
+		
+		CurrentEffectCard = null;
+		PhaseCounter++;
+		UpdateBlockFatalDisplay();
+
+	}
 		else if (CurrentEffectCard != null)
 		{
 			if (CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)

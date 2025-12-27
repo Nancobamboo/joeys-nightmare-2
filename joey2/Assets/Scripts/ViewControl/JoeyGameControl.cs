@@ -52,6 +52,7 @@ public class JoeyGameControl : YViewControl
 		public int PlayerHealth;
 		public int PlayerMaxHealth;
 		public int Coin;
+		public int EnvRandomSeed; // Random seed for env card arrangement
 	}
 
 	private GameStateCache m_GameStateCache;
@@ -336,7 +337,20 @@ public class JoeyGameControl : YViewControl
 			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
 			int cardLimit = characterData != null ? characterData.envCardLimit : 0;
 
-			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit);
+			// Check if we should use existing seed (continue game) or generate new one
+			bool isContinueGame = m_DataJoeyPlayer.envRandomSeed != 0;
+			if (!isContinueGame)
+			{
+				// Generate new env random seed for deterministic card arrangement
+				m_DataJoeyPlayer.envRandomSeed = UnityEngine.Random.Range(1, int.MaxValue);
+				Debug.Log($"Generated new env random seed: {m_DataJoeyPlayer.envRandomSeed}");
+			}
+			else
+			{
+				Debug.Log($"Using saved env random seed: {m_DataJoeyPlayer.envRandomSeed}");
+			}
+
+			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit, m_DataJoeyPlayer.envRandomSeed);
 			for (int i = 0; i < envModeCardList.Count; i++)
 			{
 				List<string> cardIdList = envModeCardList[i];
@@ -461,6 +475,7 @@ public class JoeyGameControl : YViewControl
 		m_GameStateCache.PlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_GameStateCache.PlayerMaxHealth = m_DataJoeyPlayer.playerMaxHealth;
 		m_GameStateCache.Coin = m_DataJoeyPlayer.Coin;
+		m_GameStateCache.EnvRandomSeed = m_DataJoeyPlayer.envRandomSeed; // Save env random seed
 
 		m_GameStateCache.EnvCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
@@ -512,6 +527,7 @@ public class JoeyGameControl : YViewControl
 		m_DataJoeyPlayer.playerHealth = m_GameStateCache.PlayerHealth;
 		m_DataJoeyPlayer.playerMaxHealth = m_GameStateCache.PlayerMaxHealth;
 		m_DataJoeyPlayer.Coin = m_GameStateCache.Coin;
+		m_DataJoeyPlayer.envRandomSeed = m_GameStateCache.EnvRandomSeed; // Restore env random seed
 
 		m_DataJoeyPlayer.EnvCardPool.Clear();
 		m_DataJoeyPlayer.EnvCardPool.AddRange(m_GameStateCache.EnvCardPool);
@@ -548,6 +564,8 @@ public class JoeyGameControl : YViewControl
 		}
 		else if (GameMode == EGameMode.Env)
 		{
+			// Clear env random seed when moving to next level so a new one will be generated
+			m_DataJoeyPlayer.envRandomSeed = 0;
 			DataSystem.Instance.SaveDataJoeyPlayer();
 		}
 		else if (GameMode == EGameMode.Guide)
@@ -1000,6 +1018,14 @@ public class JoeyGameControl : YViewControl
 
 		m_GamePhaseControl.UpdateBadMonkeyAttack(cardControl);
 
+	}
+
+	public void RemoveEnvCardAndUpdate(int envIndex, UICardSimpleControl cardControl)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.RemoveEnvCardAndUpdate(envIndex, cardControl);
+		}
 	}
 
 	public bool IsPlayerHalfHealth()

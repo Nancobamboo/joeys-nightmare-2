@@ -32,8 +32,10 @@ public class YAutoBoomMoney : YDefaultEffect
                 value--;
                 if (value == 0)
                 {
-                    YActionSystem.Instance.DispatchAction(EActionId.TakePlayerBoomDamage, baseExtra, EVFXName.VFX_boom);
-                    CardControl.Return();
+                    // Queue the action to trigger
+                    JoeyGameControl.Instance.QueueAction(EActionId.TakePlayerBoomDamage, baseExtra, EVFXName.VFX_boom);
+                    // Remove from env and update other monsters
+                    JoeyGameControl.Instance.RemoveEnvCardAndUpdate(envIndex, CardControl);
                 }
             }
         }

@@ -30,6 +30,7 @@ public class DataJoeyPlayer : IData
 	public int StageId;
 	public int levelRandomSeed;
 	public int giftBoxUseCounter;
+	public int envRandomSeed;
 	public List<string> EnvCardPool = new List<string>();
 	public Dictionary<string, Card> EnvCardDict = new Dictionary<string, Card>();
 	public void LoadFromJson(JObject jobject)
@@ -64,6 +65,7 @@ public class DataJoeyPlayer : IData
 		StageId = (int)jobject["StageId"];
 		levelRandomSeed = jobject.ContainsKey("levelRandomSeed") ? (int)jobject["levelRandomSeed"] : 0;
 		giftBoxUseCounter = jobject.ContainsKey("giftBoxUseCounter") ? (int)jobject["giftBoxUseCounter"] : 0;
+		envRandomSeed = jobject.ContainsKey("envRandomSeed") ? (int)jobject["envRandomSeed"] : 0;
 		JsonUtil.ToList(jobject, "EnvCardPool", ref EnvCardPool);
 		var EnvCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "EnvCardList", ref EnvCardList);
@@ -100,6 +102,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("StageId", StageId);
 		jobject.Add("levelRandomSeed", levelRandomSeed);
 		jobject.Add("giftBoxUseCounter", giftBoxUseCounter);
+		jobject.Add("envRandomSeed", envRandomSeed);
 		jobject.Add("EnvCardPool", JsonUtil.ToJArray(EnvCardPool));
 		var EnvCardList = EnvCardDict.Values.ToList();
 		jobject.Add("EnvCardList", JsonUtil.ToJArray(EnvCardList));
