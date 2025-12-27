@@ -130,6 +130,7 @@ public enum EVFXName
     VFX_LeiDan,
     VFX_Shouji,
     VFX_Shouji_2, // Changed from VFX_Shouji2 to match prefab filename
+	VFX_Yishun,
     VFX_Fanjia, //仞甲
     VFX_joey_souji,
     VFX_HuiXue,

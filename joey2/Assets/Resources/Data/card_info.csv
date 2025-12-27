@@ -117,14 +117,14 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5032,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,2戈壁,monster,,8,,18,25,1,
 5033,Art/Img/Monster/榴莲Donkey,Art/Img/Monster/img_bg_Monster,榴莲Donkey,2戈壁,monster,受击时：反伤5点伤害,8,,19,40,2,IronHoofDonkey
 5034,Art/Img/Monster/img_card_GuolaoDonkey,Art/Img/Monster/img_bg_Monster,Donkey市长,2戈壁,monster,每次受到攻击时，增加2点攻击力,8,,50,80,3,DonkeyMajor:2
-5035,Art/Img/Monster/img_card_doctorMonkey,Art/Img/Monster/img_bg_Monster,医生monkey,1丛林,monster      ,离场：所有怪物回复3点生命,3,,11,15,1,BananaMonkey
+5035,Art/Img/Monster/img_card_doctorMonkey,Art/Img/Monster/img_bg_Monster,医生monkey,1丛林,monster,离场：所有怪物回复3点生命,3,,11,15,1,BananaMonkey
 5036,Art/Img/Monster/img_card_ShamanDonkey,Art/Img/Monster/img_bg_Monster,萨满Donkey,2戈壁,monster,受击时:场上每只Donkey攻击+3,1,,30,20,2,ShamanDonkey
 5037,Art/Img/Monster/img_card_MimicChestking,Art/Img/Monster/img_bg_Monster,伪装宝箱王,4墓地,monster,离场:掉落大量宝物,15,,30,100,3,MimicChest:5016
 5038,Art/Img/Monster/img_card_BadTurkey,Art/Img/Monster/img_bg_Monster,坏Turkey,教学牌,monster,点击攻击,9,,16,25,1,
 5039,Art/Img/Monster/坏Donkey,Art/Img/Monster/img_bg_Monster,坏Donkey,教学牌,monster,点击攻击,8,,12,25,1,
-5040,Art/Img/Monster/img_card_DonkeyQueen,Art/Img/Monster/img_bg_Monster,女王Donkey,4墓地,monster,削弱玩家武器/护甲1/3 国王受击:回复其生命,10,,25,15,3,DonkeyQueen
-5041,Art/Img/Monster/img_card_MonkeyKing,Art/Img/Monster/img_bg_Monster,国王Monkey,4墓地,monster,无视护甲 女王受击:移除玩家防御牌,8,,50,15,3,MonkeyKing
-5042,Art/Img/Monster/img_card_TurkeyJack,Art/Img/Monster/img_bg_Monster,卫士Turkey,3感恩节,monster,反击两次 女王/国王受击:触发反击,10,,30,15,3,TurkeyJack
+5040,Art/Img/Monster/img_card_DonkeyQueen,Art/Img/Monster/img_bg_Monster,女王Donkey,4墓地,monster,joey武器与护甲 -1/3 国王受击时回复生命,22,,67,15,3,DonkeyQueen
+5041,Art/Img/Monster/img_card_MonkeyKing,Art/Img/Monster/img_bg_Monster,国王Monkey,4墓地,monster,无视护甲 女王受击时移除joey护甲,10,,56,15,3,MonkeyKing
+5042,Art/Img/Monster/img_card_TurkeyJack,Art/Img/Monster/img_bg_Monster,卫士Turkey,3感恩节,monster,反击两次 女王/国王受击:触发反击,14,,45,15,3,TurkeyJack
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,

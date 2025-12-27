@@ -64,12 +64,8 @@ public partial class UIGamePhaseControl
             {
                 Debug.Log($"Strike: {enemyCard.CardData.cardName} already has Vulnerable debuff for {currentVulnerable} turns");
             }
-            
-            // Play debuff visual effect
-            if (enemyCard.CacheTrans != null)
-            {
-                JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Shouji_2, enemyCard.CacheTrans, 1f);
-            }
+
+            // Vulnerable VFX is handled centrally in UICardSimpleControl.AddBuff(EBuffType.Vulnerable)
             
             // Consume the strike buff
             m_StrikeActive = false;
