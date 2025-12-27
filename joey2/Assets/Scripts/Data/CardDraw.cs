@@ -170,9 +170,20 @@ public sealed class CardDraw : PureSingleton<CardDraw>
     /// <param name="level">Current level</param>
     /// <param name="playerCardPool">Player's accumulated card pool (card IDs)</param>
     /// <param name="cardLimit">Maximum number of cards to select from pool (0 = no limit)</param>
+    /// <param name="randomSeed">Random seed for deterministic card arrangement (0 = use current random state)</param>
     /// <returns>List of 5 columns, each containing card IDs (first=top, last=bottom due to reverse iteration in AddEnvCardList)</returns>
-    public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool, int cardLimit = 0)
+    public List<List<string>> DrawCardEnvMode(int level, List<string> playerCardPool, int cardLimit = 0, int randomSeed = 0)
     {
+        // Save current random state if using deterministic seed
+        Random.State oldState = Random.state;
+        bool useDeterministicSeed = randomSeed != 0;
+        
+        if (useDeterministicSeed)
+        {
+            Random.InitState(randomSeed);
+            Debug.Log($"Using deterministic seed {randomSeed} for env card arrangement");
+        }
+
         List<string> monsters = GetEnvStageMonsters(level);
         List<string> nonMonsterCards = new List<string>(playerCardPool);
 
@@ -320,6 +331,12 @@ public sealed class CardDraw : PureSingleton<CardDraw>
                   $"{nonMonsterTopCount} non-monster top cards guaranteed, " +
                   $"{threeStarMonsters.Count} 3-star monsters placed at bottom, " +
                   $"exit will appear when all monsters cleared");
+
+        // Restore previous random state if using deterministic seed
+        if (useDeterministicSeed)
+        {
+            Random.state = oldState;
+        }
 
         return columns;
     }

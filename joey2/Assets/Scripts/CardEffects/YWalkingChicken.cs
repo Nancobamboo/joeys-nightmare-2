@@ -28,7 +28,8 @@ public class YWalkingChicken : YDefaultEffect
                 value--;
                 if (value == 0)
                 {
-                    YActionSystem.Instance.DispatchAction(EActionId.MoveEnvCardLeft, CardControl);
+                    // Queue action to trigger
+                    JoeyGameControl.Instance.QueueAction(EActionId.MoveEnvCardLeft, CardControl);
                     value = 2;
                 }
             }

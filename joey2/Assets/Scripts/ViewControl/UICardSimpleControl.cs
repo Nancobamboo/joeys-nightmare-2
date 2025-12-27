@@ -530,7 +530,7 @@ public class UICardSimpleControl : YViewControl
 		else if (counter > 0)
 		{
 			m_View.Counter.SetActive(true);
-			m_View.TxtCnt.text = (counter - 1).ToString();
+			m_View.TxtCnt.text = counter.ToString();
 		}
 		else
 		{

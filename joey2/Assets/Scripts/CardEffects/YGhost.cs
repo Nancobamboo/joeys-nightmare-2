@@ -32,7 +32,8 @@ public class YGhost : YDefaultEffect
                     {
                         value = 5;
                         int attack = CardControl.CardData.currentAttack;
-                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerNoDefenceDamage, attack, EVFXName.VFX_Shouji);
+                        // Queue action to trigger
+                        JoeyGameControl.Instance.QueueAction(EActionId.TakePlayerNoDefenceDamage, attack, EVFXName.VFX_Shouji);
                     }
                 }
             }

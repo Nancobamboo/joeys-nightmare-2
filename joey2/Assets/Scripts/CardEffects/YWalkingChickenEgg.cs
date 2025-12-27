@@ -30,8 +30,10 @@ public class YWalkingChickenEgg : YDefaultEffect
                 value--;
                 if (value == 0)
                 {
-                    YActionSystem.Instance.DispatchAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
-                    CardControl.Return();
+                    // Queue action to trigger
+                    JoeyGameControl.Instance.QueueAction(EActionId.AddCardToSpecifiedEnv, CardControl, baseExtra.ToString(), CardControl.EnvIndex);
+                    // Remove from env and update other monsters
+                    JoeyGameControl.Instance.RemoveEnvCardAndUpdate(envIndex, CardControl);
                 }
             }
         }

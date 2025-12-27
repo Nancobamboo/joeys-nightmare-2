@@ -69,7 +69,8 @@ public class YLifeShareMonster : YDefaultEffect
         CardControl.CardData.currentHealth = averageHealth;
         CardControl.RefreshCard();
 
-        YActionSystem.Instance.DispatchAction(EActionId.LifeShareSetPlayerHealth, averageHealth);
+        // Queue action to trigger
+        JoeyGameControl.Instance.QueueAction(EActionId.LifeShareSetPlayerHealth, averageHealth);
     }
 }
 
