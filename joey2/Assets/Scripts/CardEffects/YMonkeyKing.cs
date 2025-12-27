@@ -77,6 +77,12 @@ public partial class UIGamePhaseControl
             await UniTask.WaitForSeconds(0.5f);
             await DonkeyQueenHealKingAsync();
         }
+
+        UICardSimpleControl turkeyCard = FindEnvCardByEffectId(ECardEffectId.TurkeyJack);
+        if (turkeyCard != null && turkeyCard.gameObject.activeSelf && turkeyCard.CardData.currentHealth > 0)
+        {
+            await TurkeyJackExtraCounterAsync();
+        }
     }
 }
 
