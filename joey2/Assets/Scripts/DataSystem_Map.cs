@@ -232,6 +232,7 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_disappear] = 0f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Dunsui] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_glow] = 0f;
+		VFXDelayTimeDict[(int)EVFXName.VFX_Yishun] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Fanjia] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_joey_souji] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_HuiXue] = 0.65f;

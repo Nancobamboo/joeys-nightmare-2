@@ -405,6 +405,7 @@ public class UICardSimpleControl : YViewControl
 	public void AddBuff(EBuffType buffType, int value)
 	{
 		Debug.Log(this.name + " AddBuff " + buffType + " " + value);
+		int oldValue = m_BuffValueArray[(int)buffType];
 		m_BuffValueArray[(int)buffType] = value;
 
 		switch (buffType)
@@ -416,6 +417,18 @@ public class UICardSimpleControl : YViewControl
 				UpdateFrozenUI();
 				break;
 			case EBuffType.Vulnerable:
+				// Play vulnerable VFX only when vulnerable is newly applied or increased
+				// (avoid playing when it decreases at end of turn)
+				if (cachedCardType == ECardType.monster && value > 0 && value > oldValue)
+				{
+					Transform vfxParent = m_View != null && m_View.Anim != null ? m_View.Anim.transform : CacheTrans;
+					if (vfxParent != null && JoeyGameControl.Instance != null)
+					{
+						float delay = DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_Yishun);
+						if (delay <= 0f) delay = 1f;
+						JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Yishun, vfxParent, delay);
+					}
+				}
 				UpdateVulnerableUI();
 				break;
 		}
