@@ -1126,11 +1126,20 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			// Apply vulnerable damage bonus (50% extra damage)
 			int vulnerableTurns = cardControl.GetBuffValue(EBuffType.Vulnerable);
-			if (vulnerableTurns > 0 && effectType == EEffectType.Damage)
+			// 易伤应对“所有造成伤害的来源”生效（武器伤害/炸弹/技能/反伤等），而不只限于普通攻击
+			bool isDamageEffect =
+				effectType == EEffectType.Damage ||
+				effectType == EEffectType.Boom ||
+				effectType == EEffectType.Electric ||
+				effectType == EEffectType.FireBall ||
+				effectType == EEffectType.IceMagic ||
+				effectType == EEffectType.ReflectDamage;
+
+			if (vulnerableTurns > 0 && isDamageEffect)
 			{
 				int bonusDamage = Mathf.RoundToInt(damage * 0.5f);
 				damage += bonusDamage;
-				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage ({vulnerableTurns} turns remaining)");
+				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage from {effectType} ({vulnerableTurns} turns remaining)");
 			}
 
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
