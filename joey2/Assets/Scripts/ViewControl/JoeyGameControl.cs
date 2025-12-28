@@ -1048,6 +1048,15 @@ public class JoeyGameControl : YViewControl
 		return 0;
 	}
 
+	public int GetEnvPanelCount()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.GetEnvPanelCount();
+		}
+		return 0;
+	}
+
 	public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
 	{
 

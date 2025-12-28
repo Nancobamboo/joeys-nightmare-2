@@ -712,6 +712,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BadMonkey:
 				effect = new YBadMonkey(effectValue);
 				break;
+			case ECardEffectId.BadMonkeyBro:
+				effect = new YBadMonkeyBro(effectValue);
+				break;
+			case ECardEffectId.BadMonkeySis:
+				effect = new YBadMonkeySis(effectValue);
+				break;
 			case ECardEffectId.PermanentAttackBoost:
 				effect = new YPermanentAttackBoost(effectValue);
 				break;
@@ -927,6 +933,12 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.JokerNightmare:
 				effect = new YJokerNightmare();
+				break;
+			case ECardEffectId.WhipDonkey:
+				effect = new YWhipDonkey(effectValue);
+				break;
+			case ECardEffectId.ShadowTurkey:
+				effect = new YShadowTurkey();
 				break;
 			default:
 				return GetDefaultEffect();

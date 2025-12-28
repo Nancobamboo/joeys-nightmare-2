@@ -127,6 +127,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.DonkeyQueenHealKing, DonkeyQueenHealKing);
 		RegistAction(EActionId.DonkeyQueenRefreshPlayerCards, DonkeyQueenRefreshPlayerCards);
 		RegistAction(EActionId.JokerNightmareCurse, JokerNightmareCurse);
+		RegistAction(EActionId.WhipDonkeyDamage, WhipDonkeyDamage);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -1090,6 +1091,11 @@ public partial class UIGamePhaseControl : YViewControl
 		return 0;
 	}
 
+	public int GetEnvPanelCount()
+	{
+		return m_EnvPanels != null ? m_EnvPanels.Count : 0;
+	}
+
 	public bool HasBagCard(ECardType cardType)
 	{
 		List<UICardSimpleControl> cardList = GetBagCardList(cardType);
@@ -1190,7 +1196,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
-	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage, CancellationToken? cancellationToken = null)
+	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage, CancellationToken? cancellationToken = null, bool triggerThorns = true)
 	{
 		CancellationToken token = cancellationToken ?? CancellationToken.None;
 
@@ -1236,7 +1242,7 @@ public partial class UIGamePhaseControl : YViewControl
 			// 怪物“反伤”处理：受击后对玩家造成固定反伤（例如：榴莲Donkey 反伤 5）
 			// 这里不要走 TakePlayerDamageAsync（它会播放怪物攻击动画，像“主动反击”），
 			// 反伤只需要直接结算玩家掉血即可。
-			if (damage > 0 && effectType != EEffectType.ReflectDamage)
+			if (triggerThorns && damage > 0 && effectType != EEffectType.ReflectDamage)
 			{
 				int thornsDamage = cardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
 				if (thornsDamage > 0)
