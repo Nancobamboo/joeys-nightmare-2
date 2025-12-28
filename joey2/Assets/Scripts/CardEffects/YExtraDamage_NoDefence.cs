@@ -36,10 +36,16 @@ public class YExtraDamage_NoDefence : YDefaultEffect
             if (currentNoDefence != m_CachedNoDefence)
             {
                 m_CachedNoDefence = currentNoDefence;
-                CardControl.ClearEffectVlaue();
+                // Don't clear all effect values! Just add or subtract our bonus
                 if (currentNoDefence)
                 {
+                    // No defence card, add our bonus
                     CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
+                }
+                else
+                {
+                    // Defence card equipped, remove our bonus
+                    CardControl.AddEffectValue(EEffectType.Damage, -baseExtra);
                 }
             }
         }

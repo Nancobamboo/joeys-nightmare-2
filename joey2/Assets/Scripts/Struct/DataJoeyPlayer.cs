@@ -8,6 +8,7 @@ public class DataJoeyPlayer : IData
 	public int lastPlayerHealth;
 	public int playerHealth;
 	public int playerMaxHealth;
+	public int stageStartHealth; // Health at the start of current stage (for save/load)
 	public int playerAttack;
 	public int playerDefence;
 	public int currentLevel;
@@ -38,6 +39,7 @@ public class DataJoeyPlayer : IData
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
 		playerHealth = (int)jobject["playerHealth"];
 		playerMaxHealth = (int)jobject["playerMaxHealth"];
+		stageStartHealth = jobject.ContainsKey("stageStartHealth") ? (int)jobject["stageStartHealth"] : playerHealth;
 		playerAttack = (int)jobject["playerAttack"];
 		playerDefence = (int)jobject["playerDefence"];
 		currentLevel = (int)jobject["currentLevel"];
@@ -79,6 +81,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("lastPlayerHealth", lastPlayerHealth);
 		jobject.Add("playerHealth", playerHealth);
 		jobject.Add("playerMaxHealth", playerMaxHealth);
+		jobject.Add("stageStartHealth", stageStartHealth);
 		jobject.Add("playerAttack", playerAttack);
 		jobject.Add("playerDefence", playerDefence);
 		jobject.Add("currentLevel", currentLevel);
