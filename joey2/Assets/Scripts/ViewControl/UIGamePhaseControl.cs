@@ -73,6 +73,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.UseBagCard, UseBagCard);
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
 		RegistAction(EActionId.AttackRandomEnemy, AttackRandomEnemy);
+		RegistAction(EActionId.AttackRandomEnemyAndClearEffect, AttackRandomEnemyAndClearEffect);
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
 		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
@@ -128,6 +129,8 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.DonkeyQueenRefreshPlayerCards, DonkeyQueenRefreshPlayerCards);
 		RegistAction(EActionId.JokerNightmareCurse, JokerNightmareCurse);
 		RegistAction(EActionId.WhipDonkeyDamage, WhipDonkeyDamage);
+		RegistAction(EActionId.OnHoverMonster, OnHoverMonster);
+		RegistAction(EActionId.OnUnhoverMonster, OnUnhoverMonster);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -2159,6 +2162,15 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 	}
 
+	// Handle DodgeChicken swap after counter attack animation completes
+	if (!enemyKilled && enemyCardControl != null && enemyCardControl.CardEffect != null && 
+		enemyCardControl.CardEffect.Id == ECardEffectId.DodgeChicken)
+	{
+		// Add a small delay to ensure counter attack animation fully completes before swapping
+		await UniTask.WaitForSeconds(0.3f, cancellationToken: GetOrCreateCardToken(enemyCardControl));
+		YActionSystem.Instance.DispatchAction(EActionId.SwapEnvCardWithRandom, enemyCardControl);
+	}
+
 		// Play card consumption animation after enemy counter-attack (if any)
 		// This ensures counter-insight parry/counter animations complete before the card disappears
 		bool isSkip = IsUseAttackFinishAnim();
@@ -2183,10 +2195,16 @@ public partial class UIGamePhaseControl : YViewControl
 				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 			}
 		}
+		else
+		{
+			// For permanent weapons (like Shuriken), clear temporary bonuses but keep relic bonuses
+			attackCardControl.ClearTemporaryAndRestoreConditional();
+			Debug.Log($"[PermanentWeapon] Cleared temporary effects after attack for {attackCardControl.CardData.cardName}");
+		}
 		}
 		else
 		{
-			m_FistCardCache.ClearEffectVlaue();
+			m_FistCardCache.ClearTemporaryAndRestoreConditional();
 
 		}
 
@@ -2572,6 +2590,25 @@ public partial class UIGamePhaseControl : YViewControl
 		await AttackRandomEnemy(damage, attackTime).SuppressCancellationThrow();
 	}
 
+	async void AttackRandomEnemyAndClearEffect(object[] paraArray)
+	{
+		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
+		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
+		UICardSimpleControl attackCard = paraArray.Length > 2 ? paraArray[2] as UICardSimpleControl : null;
+		
+		// Passive attacks (like shuriken) trigger when weapon is equipped
+		// They should consume temporary buffs (like ApeWine, DualWield) so they only apply once
+		await AttackRandomEnemy(damage, attackTime).SuppressCancellationThrow();
+		
+		// Clear temporary effects after passive attack completes
+		if (attackCard != null)
+		{
+			attackCard.ClearTemporaryAndRestoreConditional();
+			Debug.Log($"[PassiveAttack] Cleared temporary effects after passive attack for {attackCard.CardData?.cardName}");
+		}
+	}
+
+
 	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex, CancellationToken? cancellationToken = null)
 	{
 		if (enemyCardControl == null)
@@ -2806,6 +2843,12 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			RefreshAllAttackCards();
 		}
+		
+		// HealEnhance relic: Refresh item cards to update health potion descriptions
+		if (relicId == (int)ERelicType.HealEnhance)
+		{
+			RefreshAllItemCards();
+		}
 	}
 
 	private void UpdateAllCardsRelic(int relicId)
@@ -2845,6 +2888,12 @@ public partial class UIGamePhaseControl : YViewControl
 				{
 					cardControl.AddRelic(relicId);
 				}
+				
+				// HealEnhance relic: Update item card descriptions in environment
+				if (relicId == (int)ERelicType.HealEnhance && cardControl.CardType == ECardType.item)
+				{
+					cardControl.UpdateDescription();
+				}
 			}
 		}
 	}
@@ -2865,6 +2914,23 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_FistCardCache != null)
 		{
 			m_FistCardCache.RefreshCard();
+		}
+	}
+	
+	private void RefreshAllItemCards()
+	{
+		// Refresh all item cards in bag to update descriptions (for health potions with HealEnhance relic)
+		List<UICardSimpleControl> itemCardList = GetBagCardList(ECardType.item);
+		if (itemCardList != null)
+		{
+			for (int i = 0; i < itemCardList.Count; i++)
+			{
+				UICardSimpleControl cardControl = itemCardList[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardControl.UpdateDescription();
+				}
+			}
 		}
 	}
 
@@ -2893,6 +2959,54 @@ public partial class UIGamePhaseControl : YViewControl
 		if (shouldShow)
 		{
 			cardControl.ShowCardHoverEffect();
+		}
+	}
+	
+	void OnHoverMonster(object[] paraArray)
+	{
+		UICardSimpleControl monsterCard = (UICardSimpleControl)paraArray[0];
+		if (monsterCard == null || monsterCard.CardType != ECardType.monster)
+		{
+			return;
+		}
+		
+		// Store the hovered monster for CullingBlade to reference
+		m_CurrentAttackTargetEnvIndex = monsterCard.EnvIndex;
+		
+		// Refresh attack card display to show updated damage based on monster's health
+		UICardSimpleControl attackCard = GetLastBagCard(ECardType.attack);
+		if (attackCard == null)
+		{
+			attackCard = GetFistCard();
+		}
+		
+		if (attackCard != null)
+		{
+			attackCard.RefreshCard();
+		}
+	}
+	
+	void OnUnhoverMonster(object[] paraArray)
+	{
+		UICardSimpleControl monsterCard = (UICardSimpleControl)paraArray[0];
+		if (monsterCard == null || monsterCard.CardType != ECardType.monster)
+		{
+			return;
+		}
+		
+		// Clear the hovered monster reference
+		m_CurrentAttackTargetEnvIndex = -1;
+		
+		// Refresh attack card display back to normal
+		UICardSimpleControl attackCard = GetLastBagCard(ECardType.attack);
+		if (attackCard == null)
+		{
+			attackCard = GetFistCard();
+		}
+		
+		if (attackCard != null)
+		{
+			attackCard.RefreshCard();
 		}
 	}
 

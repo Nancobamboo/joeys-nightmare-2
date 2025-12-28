@@ -138,7 +138,37 @@ public class Card : IData
             formattedDesc = formattedDesc.Replace("{durability}", durability.ToString());
         }
         
+        // Replace heal placeholder for health potions
+        if (formattedDesc.Contains("{heal}"))
+        {
+            int healAmount = GetHealAmount();
+            formattedDesc = formattedDesc.Replace("{heal}", healAmount.ToString());
+        }
+        
         return formattedDesc;
+    }
+    
+    // Get heal amount for health potion cards, accounting for HealEnhance relic
+    private int GetHealAmount()
+    {
+        // Parse heal amount from effectId (format: HealPlayer_OnPlay:5)
+        int baseHeal = 0;
+        if (!string.IsNullOrEmpty(effectId) && effectId.StartsWith("HealPlayer_OnPlay:"))
+        {
+            string[] parts = effectId.Split(':');
+            if (parts.Length > 1 && int.TryParse(parts[1], out int amount))
+            {
+                baseHeal = amount;
+            }
+        }
+        
+        // Apply HealEnhance relic bonus if player has it
+        if (DataSystem.Instance != null && DataSystem.Instance.HasRelic(ERelicType.HealEnhance))
+        {
+            baseHeal += 5;
+        }
+        
+        return baseHeal;
     }
 
     public void SetAttack(int value)

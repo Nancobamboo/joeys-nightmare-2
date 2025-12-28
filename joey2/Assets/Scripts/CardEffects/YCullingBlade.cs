@@ -10,6 +10,30 @@ public class YCullingBlade : YDefaultEffect
 	{
 		Id = ECardEffectId.CullingBlade;
 	}
+	
+	/// <summary>
+	/// Calculate preview execute damage when hovering over a monster
+	/// </summary>
+	public int GetPreviewExecuteDamage()
+	{
+		UICardSimpleControl targetCard = JoeyGameControl.Instance?.GetCurrentAttackTarget();
+		if (targetCard != null && targetCard.CardData != null)
+		{
+			int currentHealth = targetCard.CardData.currentHealth;
+			int maxHealth = targetCard.CardData.health;
+			float halfHealth = maxHealth / 2.0f;
+			
+			if (currentHealth <= halfHealth)
+			{
+				int weaponDamage = CardControl?.CardData?.currentAttack ?? 0;
+				int currentEffectDamage = GetEffectValue(EEffectType.Damage);
+				int totalDamage = weaponDamage + currentEffectDamage;
+				int extraDamage = Mathf.Max(0, currentHealth - totalDamage);
+				return extraDamage;
+			}
+		}
+		return 0;
+	}
 
 	public override float OnDealDamage()
 	{
@@ -28,7 +52,8 @@ public class YCullingBlade : YDefaultEffect
 				int currentEffectDamage = GetEffectValue(EEffectType.Damage);
 				int totalDamage = weaponDamage + currentEffectDamage;
 				int extraDamage = Mathf.Max(0, currentHealth - totalDamage);
-				Debug.Log($"[CullingBlade] Execute triggered! Weapon: {weaponDamage}, Current Effect: {currentEffectDamage}, Total: {totalDamage}, Extra needed: {extraDamage}");
+				
+				Debug.Log($"[CullingBlade] Execute triggered! Extra damage needed: {extraDamage}");
 				if (extraDamage > 0)
 				{
 					CardControl.AddEffectValue(EEffectType.Damage, extraDamage);
