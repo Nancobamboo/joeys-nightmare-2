@@ -67,21 +67,24 @@ public partial class UIGamePhaseControl
 				Debug.Log($"Electric: Damaging {enemyCardControl.CardData.cardName} at envIndex {envIndex}, HP before: {enemyCardControl.CardData.currentHealth}");
 				
 				CancellationToken token = GetOrCreateCardToken(enemyCardControl);
-				await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric, token);
+				// DealDamageToEnvCard 返回 true 表示敌人死亡，内部已调用 RemoveCardCts
+				bool enemyKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Electric, token);
 				
-				// Check if enemy survived and apply vulnerable BEFORE RemoveCardCts
-				if (enemyCardControl != null && enemyCardControl.gameObject.activeSelf && 
-				    enemyCardControl.CardData.currentHealth > 0)
+				// 只有敌人存活时才需要清理 CTS 和应用易伤效果
+				if (!enemyKilled)
 				{
-					Debug.Log($"Electric: {enemyCardControl.CardData.cardName} survived with HP: {enemyCardControl.CardData.currentHealth}, applying vulnerable");
-					ApplyElectricVulnerable(enemyCardControl);
+					if (enemyCardControl != null && enemyCardControl.gameObject.activeSelf && 
+					    enemyCardControl.CardData.currentHealth > 0)
+					{
+						Debug.Log($"Electric: {enemyCardControl.CardData.cardName} survived with HP: {enemyCardControl.CardData.currentHealth}, applying vulnerable");
+						ApplyElectricVulnerable(enemyCardControl);
+					}
+					RemoveCardCts(enemyCardControl);
 				}
 				else
 				{
 					Debug.Log($"Electric: {enemyCardControl.CardData?.cardName ?? "null"} died or destroyed");
 				}
-				
-				RemoveCardCts(enemyCardControl);
 			}
 		}
 	}
