@@ -172,6 +172,7 @@ public class YCardEffect
     public ECardEffectId Id;
     public UICardSimpleControl CardControl;
     private int[] m_EffectValues = new int[(int)EEffectType.Upper];
+    private int[] m_RelicEffectValues = new int[(int)EEffectType.Upper]; // Store relic bonuses separately
 
     public virtual void SetData(UICardSimpleControl cardControl)
     {
@@ -279,11 +280,30 @@ public class YCardEffect
         }
     }
 
+    public void AddRelicEffectValue(EEffectType effectType, int value)
+    {
+        int index = (int)effectType;
+        if (index >= 0 && index < m_RelicEffectValues.Length)
+        {
+            m_RelicEffectValues[index] += value;
+            m_EffectValues[index] += value; // Also add to total
+        }
+    }
+
     public void ClearAllEffectValues()
     {
         for (int i = 0; i < m_EffectValues.Length; i++)
         {
             m_EffectValues[i] = 0;
+        }
+    }
+
+    public void ClearTemporaryEffectValues()
+    {
+        // Clear all effect values, then restore relic bonuses
+        for (int i = 0; i < m_EffectValues.Length; i++)
+        {
+            m_EffectValues[i] = m_RelicEffectValues[i];
         }
     }
 

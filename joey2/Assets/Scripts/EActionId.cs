@@ -14,6 +14,7 @@ public enum EActionId
 	UseBagCard,
 	AddCardFromDiscard,
 	AttackRandomEnemy,
+	AttackRandomEnemyAndClearEffect,
 	TakeAllEnemyDamage,
 	AddCardToQueue,
 	TryLoadScene,
@@ -82,6 +83,8 @@ public enum EActionId
 	DonkeyQueenRefreshPlayerCards,
 	JokerNightmareCurse,
 	WhipDonkeyDamage,
+	OnHoverMonster,
+	OnUnhoverMonster,
 	Upper,
 
 }
