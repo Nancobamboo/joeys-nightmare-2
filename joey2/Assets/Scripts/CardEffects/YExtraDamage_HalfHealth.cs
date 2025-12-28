@@ -36,10 +36,16 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
             if (currentHalfHealth != m_CachedHalfHealth)
             {
                 m_CachedHalfHealth = currentHalfHealth;
-                CardControl.ClearEffectVlaue();
+                // Don't clear all effect values! Just add or subtract our bonus
                 if (currentHalfHealth)
                 {
+                    // Player health dropped below 50%, add our bonus
                     CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
+                }
+                else
+                {
+                    // Player health went above 50%, remove our bonus
+                    CardControl.AddEffectValue(EEffectType.Damage, -baseExtra);
                 }
             }
         }

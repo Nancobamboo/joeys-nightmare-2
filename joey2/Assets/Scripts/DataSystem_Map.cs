@@ -409,6 +409,7 @@ public partial class DataSystem
         {
             dataJoeyPlayer.playerMaxHealth = maxHealth;
             dataJoeyPlayer.playerHealth = maxHealth;
+            dataJoeyPlayer.stageStartHealth = maxHealth; // Initialize stage start health
         }
 
         RoguelikeStage firstStage = GData.Instance.GetRoguelikeStage(0);
@@ -520,6 +521,7 @@ public partial class DataSystem
         {
             dataJoeyPlayer.playerMaxHealth = maxHealth;
             dataJoeyPlayer.playerHealth = maxHealth;
+            dataJoeyPlayer.stageStartHealth = maxHealth; // Initialize stage start health
         }
 
         // Initialize base attack and defence for Env mode

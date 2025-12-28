@@ -477,6 +477,9 @@ public class JoeyGameControl : YViewControl
 		m_GameStateCache.Coin = m_DataJoeyPlayer.Coin;
 		m_GameStateCache.EnvRandomSeed = m_DataJoeyPlayer.envRandomSeed; // Save env random seed
 
+		// Save current health as stage start health for save/load persistence
+		m_DataJoeyPlayer.stageStartHealth = m_DataJoeyPlayer.playerHealth;
+
 		m_GameStateCache.EnvCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
 		m_GameStateCache.EnvCardDictData = new Dictionary<string, Card>();
@@ -564,9 +567,8 @@ public class JoeyGameControl : YViewControl
 		}
 		else if (GameMode == EGameMode.Env)
 		{
-			// Clear env random seed when moving to next level so a new one will be generated
-			m_DataJoeyPlayer.envRandomSeed = 0;
-			DataSystem.Instance.SaveDataJoeyPlayer();
+			// Env random seed is cleared in EndGamePhase() when stage is completed
+			// This prevents losing the seed if player quits during level transition
 		}
 		else if (GameMode == EGameMode.Guide)
 		{
@@ -589,6 +591,13 @@ public class JoeyGameControl : YViewControl
 		}
 		else
 		{
+			// When starting a new stage (no cache), restore health from stageStartHealth if available
+			// This handles the case where player quit mid-stage and continues
+			if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_DataJoeyPlayer.stageStartHealth > 0)
+			{
+				m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.stageStartHealth;
+				Debug.Log($"Restored health from stageStartHealth: {m_DataJoeyPlayer.stageStartHealth}");
+			}
 			SetGamePhase(EGamePhase.BattleStart);
 		}
 	}
@@ -604,6 +613,13 @@ public class JoeyGameControl : YViewControl
 		if (DataSystem.Instance.HasRelic(ERelicType.BBQDelight))
 		{
 			YActionSystem.Instance.DispatchAction(EActionId.AddHp, 6);
+		}
+
+		// Save current health state to cache before processing rewards
+		// This ensures that if player quits during reward selection, they resume at stage end health
+		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
+		{
+			SaveGameStateCache();
 		}
 
 		if (GameMode == EGameMode.Battle)
@@ -677,7 +693,11 @@ public class JoeyGameControl : YViewControl
 		// Handle rewards based on stage_reward.csv configuration
 		HandleStageRewardEnv(stageReward, stageType);
 
+		// Increment stage and clear env random seed for next level
+		// This ensures new level layout when player continues
 		m_DataJoeyPlayer.StageId++;
+		m_DataJoeyPlayer.envRandomSeed = 0;
+		DataSystem.Instance.SaveDataJoeyPlayer();
 	}
 		else if (GameMode == EGameMode.Guide)
 		{
@@ -850,6 +870,21 @@ public class JoeyGameControl : YViewControl
 
 	public void ReturnToMainMenu()
 	{
+		// Restore health to stage start health before saving
+		// This ensures that when player continues, they start from the beginning of the current stage
+		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_DataJoeyPlayer.stageStartHealth > 0)
+		{
+			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.stageStartHealth;
+			Debug.Log($"Restored health to stage start before saving: {m_DataJoeyPlayer.stageStartHealth}");
+		}
+		
+		// Save current game state before returning to main menu
+		// This ensures seed and progress are not lost if player quits
+		DataSystem.Instance.SaveDataJoeyPlayer();
+		
+		// Clear game state cache to ensure fresh load on continue
+		m_GameStateCache = null;
+		
 		ClearAllUniTasks();
 		Close();
 		SceneLoader.Instance.LoadScene("Start");
@@ -1031,7 +1066,9 @@ public class JoeyGameControl : YViewControl
 	public bool IsPlayerHalfHealth()
 	{
 		Debug.Log("IsPlayerHalfHealth: " + m_DataJoeyPlayer.playerHealth + " " + m_DataJoeyPlayer.playerMaxHealth);
-		return m_DataJoeyPlayer.playerHealth <= m_DataJoeyPlayer.playerMaxHealth / 2;
+		// Use < instead of <= for "below 50%" semantic (strictly less than half)
+		// Use float division to avoid integer division rounding issues
+		return m_DataJoeyPlayer.playerHealth < (m_DataJoeyPlayer.playerMaxHealth / 2.0f);
 	}
 
 	/// <summary>
