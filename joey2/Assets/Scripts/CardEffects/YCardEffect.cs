@@ -27,6 +27,8 @@ public enum ECardEffectId
     RomeoMonkey,
     JulietMonkey,
     BadMonkey,
+    BadMonkeyBro,
+    BadMonkeySis,
     PermanentAttackBoost,
     PermanentDefenceBoost,
     MoveWeaponToEnv,
@@ -99,6 +101,8 @@ public enum ECardEffectId
 	DonkeyQueen,
 	MonkeyKing,
 	JokerNightmare,
+	WhipDonkey,
+	ShadowTurkey,
 
 }
 

@@ -51,7 +51,16 @@ public partial class UIGamePhaseControl
             UICardSimpleControl lastCard = GetLastEnvCard(i);
             if (lastCard != null && lastCard.gameObject.activeSelf && lastCard.CardType == ECardType.monster)
             {
-                monsterCount++;
+                // 5045/5046：被兄贵视作两个怪物
+                string id = lastCard.CardData != null ? lastCard.CardData.id : null;
+                if (id == "5045" || id == "5046")
+                {
+                    monsterCount += 2;
+                }
+                else
+                {
+                    monsterCount++;
+                }
             }
         }
 
@@ -63,7 +72,7 @@ public partial class UIGamePhaseControl
                 badMonkeyEffect.InitialAttack = cardControl.CardData.currentAttack;
             }
             Card cardData = cardControl.CardData;
-            cardData.SetAttack( monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack);
+            cardData.SetAttack(monsterCount * badMonkeyEffect.baseExtra + badMonkeyEffect.InitialAttack);
             cardControl.RefreshCard();
         }
     }
