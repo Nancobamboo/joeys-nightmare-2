@@ -88,6 +88,7 @@ public class UICardSimpleControl : YViewControl
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 	private UIDescExtControl m_DescExtControl;
 	private Transform m_FrozenVFX; // 冰冻特效，循环播放 VFX_Bing2
+	private Transform m_VulnerableVFX; // 易伤特效：怪物存活且易伤>0时常驻播放，易伤结束/怪物死亡立刻回收
 
 	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
 
@@ -512,23 +513,8 @@ public class UICardSimpleControl : YViewControl
 				UpdateFrozenUI();
 				break;
 			case EBuffType.Vulnerable:
-				// Play vulnerable VFX only when vulnerable is newly applied or increased
-				// (avoid playing when it decreases at end of turn)
-				if (cachedCardType == ECardType.monster && value > 0 && value > oldValue)
-				{
-					Transform vfxParent = m_View != null && m_View.Anim != null ? m_View.Anim.transform : CacheTrans;
-					if (vfxParent != null && JoeyGameControl.Instance != null)
-					{
-						float delay = DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_Yishun);
-						if (delay <= 0f) delay = 1f;
-
-						// Important: tie VFX lifecycle to this card, so when the card is returned to pool (killed)
-						// the VFX won't accidentally show up on the next reused card.
-						Transform vfxTransform = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Yishun, vfxParent);
-						EffectEntityList.Add(vfxTransform);
-						DelayHideCardLifeVFX(vfxTransform, delay).Forget();
-					}
-				}
+				// 易伤特效：不使用固定时长，怪物活着且易伤>0就一直播放；易伤结束或怪物死亡(卡牌回收)就回收。
+				UpdateVulnerableVFX();
 				UpdateVulnerableUI();
 				break;
 		}
@@ -543,8 +529,68 @@ public class UICardSimpleControl : YViewControl
 				UpdateFrozenUI();
 				break;
 			case EBuffType.Vulnerable:
+				UpdateVulnerableVFX();
 				UpdateVulnerableUI();
 				break;
+		}
+	}
+
+	private void UpdateVulnerableVFX()
+	{
+		// 只给怪物显示易伤特效
+		if (cachedCardType != ECardType.monster)
+		{
+			StopVulnerableVFX();
+			return;
+		}
+
+		bool isVulnerable = GetBuffValue(EBuffType.Vulnerable) > 0;
+		if (!isVulnerable)
+		{
+			StopVulnerableVFX();
+			return;
+		}
+
+		if (JoeyGameControl.Instance == null || m_View == null || m_View.Anim == null)
+		{
+			return;
+		}
+
+		Transform parent = m_View.Anim.transform;
+
+		if (m_VulnerableVFX == null)
+		{
+			m_VulnerableVFX = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Yishun, parent);
+		}
+		else
+		{
+			m_VulnerableVFX.SetParent(parent, false);
+		}
+
+		// 如果被覆盖（不是顶层怪物卡），先隐藏，等 OnBecomeTopCard 再显示
+		if (IsEnv && EnvIndex >= 0 && !JoeyGameControl.Instance.IsCardOnTop(this, EnvIndex))
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+			return;
+		}
+
+		JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Yishun, m_VulnerableVFX);
+		m_VulnerableVFX.gameObject.SetActive(true);
+	}
+
+	private void StopVulnerableVFX()
+	{
+		if (m_VulnerableVFX != null)
+		{
+			if (JoeyGameControl.Instance != null)
+			{
+				JoeyGameControl.Instance.ReturnVFXPool(m_VulnerableVFX, EnvIndex);
+			}
+			else
+			{
+				m_VulnerableVFX.gameObject.SetActive(false);
+			}
+			m_VulnerableVFX = null;
 		}
 	}
 
@@ -601,6 +647,11 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_FrozenVFX.gameObject.SetActive(false);
 		}
+		// 隐藏易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+		}
 		// 未来可以在这里添加其他特效的隐藏逻辑
 	}
 
@@ -624,6 +675,12 @@ public class UICardSimpleControl : YViewControl
 				m_FrozenVFX.localScale = Vector3.one;
 			}
 			m_FrozenVFX.gameObject.SetActive(true);
+		}
+
+		// 显示易伤特效（常驻）
+		if (GetBuffValue(EBuffType.Vulnerable) > 0)
+		{
+			UpdateVulnerableVFX();
 		}
 		
 		// Update HP-dependent effects when card becomes visible (exposed from underneath)
@@ -649,6 +706,12 @@ public class UICardSimpleControl : YViewControl
 			// 直接隐藏 VFX，避免 EnvIndex 无效时的问题
 			m_FrozenVFX.gameObject.SetActive(false);
 			m_FrozenVFX = null;
+		}
+		// 清理易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+			m_VulnerableVFX = null;
 		}
 	}
 
@@ -1335,6 +1398,13 @@ public class UICardSimpleControl : YViewControl
 		{
 			JoeyGameControl.Instance.ReturnVFXPool(m_FrozenVFX, EnvIndex);
 			m_FrozenVFX = null;
+		}
+
+		// 清理易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			JoeyGameControl.Instance.ReturnVFXPool(m_VulnerableVFX, EnvIndex);
+			m_VulnerableVFX = null;
 		}
 		
 		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
