@@ -40,7 +40,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 2011,Art/Img/Defence/img_card_KingShield,Art/Img/Defence/img_bg_Defence,王者剑盾（盾）,,defence,攻击后切换为剑形态  剩余切换次数:2,0,12,0,300,3,KingShield_OnDefense
 2012,Art/Img/Defence/复仇之盾,Art/Img/Defence/img_bg_Defence,噩梦之盾,,defence,防御力额外加成损失血量的三分之一,0,3,0,300,3,VengeanceShield
 2013,Art/Img/Defence/破盾的救赎,Art/Img/Defence/img_bg_Defence,破盾的救赎,,defence,抵挡一次致命攻击,0,3,0,100,2,BrokenShieldRedemption
-2014,Art/Img/Defence/魔法盾,Art/Img/Defence/img_bg_Defence,魔法盾,,defence,玩家每使用一张技能牌，当前防御牌防御力增加3点,0,5,0,300,3,MagicShield:3
+2014,Art/Img/Defence/魔法盾,Art/Img/Defence/img_bg_Defence,魔法盾,,defence,玩家每使用一张技能牌，当前防御牌防御力增加2点,0,5,0,300,3,MagicShield:2
 2015,Art/Img/Defence/骑士盾,Art/Img/Defence/img_bg_Defence,骑士盾,,defence,装备：使用次数+1  剩余次数:{durability},0,10,0,300,3,KnightShield_OnTop
 2016,Art/Img/Defence/苦痛之盾,Art/Img/Defence/img_bg_Defence,苦痛之盾,诅咒,defence,防御力为0的诅咒盾牌,0,0,0,0,1,
 ,,,,,,,,,,,,
