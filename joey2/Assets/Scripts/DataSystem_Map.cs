@@ -51,15 +51,38 @@ public partial class DataSystem
 
     // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
     // - Card limit +1 nodes: 35 / 48
-    // - Weapon attack +1 nodes: 36 / 44
-    // - Armor defence +1 nodes: 37 / 45
-    // - HP cap +4 nodes: 39/41/43/47
-    // - Starting coins +40 nodes: 38/40/42/46
-    private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48 };
-    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 44 };
-    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 45 };
-    private static readonly int[] StartMaxHealthPlus4NodeIds = { 39, 41, 43, 47 };
-    private static readonly int[] StartCoinsPlus40NodeIds = { 38, 40, 42, 46 };
+    // - Weapon attack +1 nodes: 36 / 39 / 44
+    // - Armor defence +1 nodes: 37 / 40 / 45
+    // - HP cap +4 nodes: 41/43/47/52
+    // - Starting coins +40 nodes: 46/51/54
+    // - High-grade card probability +5% nodes: 38/42/49/50
+    private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48, 53 };
+    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 39, 44 };
+    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 40, 45 };
+    private static readonly int[] StartMaxHealthPlus4NodeIds = { 41, 43, 47, 52 };
+    private static readonly int[] StartCoinsPlus40NodeIds = { 46, 51, 54 };
+    private static readonly int[] HighGradeCardProbabilityPlus5NodeIds = { 38, 42, 49, 50 };
+
+    /// <summary>
+    /// Growth bonus: +5% per unlocked node (growth.csv: 38/42/49/50).
+    /// This is applied as a probability modifier to high-grade card selection (stars 2/3),
+    /// and is designed to stack with difficulty penalties.
+    /// </summary>
+    public float GetGrowthHighGradeCardProbabilityBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+        if (growth == null) return 0f;
+
+        float bonus = 0f;
+        for (int i = 0; i < HighGradeCardProbabilityPlus5NodeIds.Length; i++)
+        {
+            if (growth.IsUnlocked(HighGradeCardProbabilityPlus5NodeIds[i]))
+            {
+                bonus += 0.05f;
+            }
+        }
+        return bonus;
+    }
 
     // Growth-applied bonus tracking (to avoid double-applying when ApplyGrowthUnlocks is called multiple times)
     private int m_AppliedEnvCardLimitGrowthBonus = 0;
@@ -105,7 +128,7 @@ public partial class DataSystem
             equipmentItem.Add("3001");
         }
 
-        // 局外成长：开局属性加成（growth.csv: 35-48）
+        // 局外成长：开局属性加成（growth.csv: 35-54）
         // hp 上限 +4（可叠加）
         for (int i = 0; i < StartMaxHealthPlus4NodeIds.Length; i++)
         {
@@ -141,8 +164,8 @@ public partial class DataSystem
 
     /// <summary>
     /// Apply growth nodes:
-    /// - 36/44: Weapon attack +1 (applies to attack cards)
-    /// - 37/45: Armor defence +1 (applies to defence cards)
+    /// - 36/39/44: Weapon attack +1 (applies to attack cards)
+    /// - 37/40/45: Armor defence +1 (applies to defence cards)
     /// This is applied as a delta so it won't stack if called multiple times.
     /// </summary>
     private void ApplyGrowthWeaponArmorStatBonus()

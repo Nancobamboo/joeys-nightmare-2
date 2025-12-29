@@ -1313,7 +1313,8 @@ public sealed class GData : PureSingleton<GData>
 				{
 					if (int.TryParse(parts[p].Trim(), out int depId))
 					{
-						depends.Add(depId);
+						// -1 表示无前置；与 UIGrowthControl 保持一致，这里不放进 depends
+						if (depId >= 0) depends.Add(depId);
 					}
 				}
 			}
@@ -1481,7 +1482,11 @@ public sealed class GData : PureSingleton<GData>
 				totalPenalty += config.highGradeCardProbability;
 			}
 		}
-		
+
+		// Apply growth bonus (+5% per unlocked node) on top of difficulty penalty
+		// This allows difficulty to reduce high-grade odds while growth can offset/increase it.
+		totalPenalty += DataSystem.Instance.GetGrowthHighGradeCardProbabilityBonus();
+
 		return totalPenalty;
 	}
 
