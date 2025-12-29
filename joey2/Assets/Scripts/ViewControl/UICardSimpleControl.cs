@@ -521,7 +521,12 @@ public class UICardSimpleControl : YViewControl
 					{
 						float delay = DataSystem.Instance.GetVFXDelayTime(EVFXName.VFX_Yishun);
 						if (delay <= 0f) delay = 1f;
-						JoeyGameControl.Instance.PlayVFX(EVFXName.VFX_Yishun, vfxParent, delay);
+
+						// Important: tie VFX lifecycle to this card, so when the card is returned to pool (killed)
+						// the VFX won't accidentally show up on the next reused card.
+						Transform vfxTransform = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Yishun, vfxParent);
+						EffectEntityList.Add(vfxTransform);
+						DelayHideCardLifeVFX(vfxTransform, delay).Forget();
 					}
 				}
 				UpdateVulnerableUI();
