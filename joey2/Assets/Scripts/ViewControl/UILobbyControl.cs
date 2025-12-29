@@ -150,15 +150,29 @@ public class UILobbyControl : YViewControl
 		{
 			return;
 		}
+
+		// Check and generate envRandomSeed if needed before continuing
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		if (playerData.envRandomSeed == 0)
+		{
+			// Generate new random seed for env card arrangement
+			playerData.envRandomSeed = UnityEngine.Random.Range(1, int.MaxValue);
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[Continue Game] Generated new env random seed: {playerData.envRandomSeed}");
+		}
+		else
+		{
+			Debug.Log($"[Continue Game] Using existing env random seed: {playerData.envRandomSeed}");
+		}
+
 		StartEnvGame(false);
 	}
 
 	private void RefreshContinueButtonState()
 	{
-		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-		bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
-		m_View.BtnContinue.interactable = hasSaveData;
-		m_View.TxtContinue.color = hasSaveData ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
+		bool canContinue = DataSystem.Instance.CanContinueSavedGame();
+		m_View.BtnContinue.interactable = canContinue;
+		m_View.TxtContinue.color = canContinue ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
 	}
 
 	void OnBtnShopClick()
@@ -252,6 +266,9 @@ public class UILobbyControl : YViewControl
 		{
 			m_View.BtnRight.interactable = cur < maxUnlocked; // Can go right if not at max unlocked
 		}
+
+		// Refresh continue button state when difficulty changes
+		RefreshContinueButtonState();
 	}
 
 	private void SetupDifficultyTooltip()
@@ -302,9 +319,41 @@ public class UILobbyControl : YViewControl
 	{
 		m_IsNewGame = isNewGame;
 
+		// Smart difficulty selection logic:
+		// 1. If just finished game: keep current difficulty (newly unlocked)
+		// 2. If has save data: switch to save's difficulty
+		// 3. Otherwise: keep current difficulty selection
 		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-		diffData.Current = diffData.MaxUnlocked;
-		//DataSystem.Instance.SaveDataDifficulty();
+		
+		if (DataSystem.Instance.isFinishGame)
+		{
+			// Just completed a run - stay on the newly unlocked difficulty
+			// Current difficulty was already set by JoeyGameControl after winning
+			Debug.Log($"Just finished game - staying on difficulty {diffData.Current}");
+			
+			// Clear the flag after using it once
+			DataSystem.Instance.isFinishGame = false;
+		}
+		else
+		{
+			// Check if we have a save - if so, switch to save's difficulty
+			DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+			bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
+			
+			if (hasSaveData && playerData.savedDifficulty > 0)
+			{
+				// Switch to the difficulty that the save was created on
+				int savedDiff = playerData.savedDifficulty;
+				if (diffData.IsUnlocked(savedDiff))
+				{
+					diffData.Current = savedDiff;
+					Debug.Log($"Found save from difficulty {savedDiff} - switching to it");
+				}
+			}
+			// Otherwise keep current difficulty selection unchanged
+		}
+		
+		DataSystem.Instance.SaveDataDifficulty();
 
 		m_View.BtnSkip.gameObject.SetActive(isUIStartEnter);
 		bool isDebug = JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Debug;

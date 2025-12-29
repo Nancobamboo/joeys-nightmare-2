@@ -264,6 +264,12 @@ public class UICardSimpleControl : YViewControl
 			case ECardType.attack:
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
 				
+				// Debug log for attack cards with UpdateByHpChange buff
+				if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+				{
+					Debug.Log($"[RefreshCard] {cachedCard?.cardName}: damageEffect={damageEffect}, baseAttack={cachedCard?.currentAttack}");
+				}
+				
 				// Special handling for CullingBlade: add preview execute damage
 				if (CardEffect != null && CardEffect.Id == ECardEffectId.CullingBlade)
 				{
@@ -614,6 +620,15 @@ public class UICardSimpleControl : YViewControl
 			}
 			m_FrozenVFX.gameObject.SetActive(true);
 		}
+		
+		// Update HP-dependent effects when card becomes visible (exposed from underneath)
+		if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+		{
+			Debug.Log($"[OnBecomeTopCard] Card {cachedCard?.cardName} has UpdateByHpChange buff, triggering update");
+			UpdateBuffValue();
+			RefreshCard();
+		}
+		
 		// 未来可以在这里添加其他特效的显示逻辑
 	}
 
@@ -1091,7 +1106,9 @@ public class UICardSimpleControl : YViewControl
 
 		SetTypeUI(card);
 		SetStars(card.stars);
+		Debug.Log($"[SetData] Before GetCardEffect: Card={card.cardName}, isEnv={isEnv}");
 		CardEffect = GetCardEffect();
+		Debug.Log($"[SetData] After GetCardEffect: Card={card.cardName}, CardEffect={CardEffect?.GetType().Name}, effectId={card.effectId}");
 		IsEffecting = false;
 
 		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
@@ -1101,9 +1118,10 @@ public class UICardSimpleControl : YViewControl
 			{
 				AddRelicList(dataJoeyPlayer.RelicList);
 			}
-			// Refresh card display after applying relics (for bag cards)
-			if (!isEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
+			// Refresh card display after applying relics and effects
+			if (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence)
 			{
+				Debug.Log($"[SetData] Calling RefreshCard for {card.cardName}");
 				RefreshCard();
 			}
 		}

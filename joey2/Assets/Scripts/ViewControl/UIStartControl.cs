@@ -142,10 +142,9 @@ public class UIStartControl : YViewControl
 
 	private void CheckContinueButtonState()
 	{
-		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
-		bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
-		m_View.BtnContinue.interactable = hasSaveData;
-		m_View.TxtContinue.color = hasSaveData ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
+		bool canContinue = DataSystem.Instance.CanContinueSavedGame();
+		m_View.BtnContinue.interactable = canContinue;
+		m_View.TxtContinue.color = canContinue ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.5f);
 	}
 
 	public void SetData()
