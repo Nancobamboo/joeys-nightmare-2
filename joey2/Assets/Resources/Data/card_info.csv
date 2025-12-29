@@ -73,8 +73,8 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 4007,Art/Img/Skill/img_card_FlyingDagger,Art/Img/Skill/img_bg_Skill,匕首飞来,,skill     ,在环境中召唤2个匕首,0,0,0,300,3,AddKnifeToEnv_UseSkill
 4008,Art/Img/Skill/img_card_DropGear,Art/Img/Skill/img_bg_Skill,丢盔弃甲,,skill     ,将装备中的武器牌和防具牌丢入环境中,0,0,0,100,1,ThrowWeaponDefenceToStack_UseSkill
 4010,Art/Img/Skill/img_card_Strike,Art/Img/Skill/img_bg_Skill,鲜血寄存,,skill     ,失去一半血，恢复5%最大血量持续五回合,0,0,0,180,2,BloodStorage_UseSkill
-4011,Art/Img/Skill/宁死不屈,Art/Img/Skill/img_bg_Skill,宁死不屈,,skill     ,生命值变为1，之后三回合抵挡致命伤害，最后恢复承受伤害血量,,,,180,2,Unyielding_UseSkill:3
-4012,Art/Img/Skill/浴血奋战,Art/Img/Skill/img_bg_Skill,浴血奋战,,skill     ,失去一半血给所有敌人造成伤害（最低5点），一回合抵挡致命伤,,,,180,2,BloodyBattle_UseSkill:1
+4011,Art/Img/Skill/宁死不屈,Art/Img/Skill/img_bg_Skill,宁死不屈,,skill     ,生命值变为1，2回合内免疫致死；结束时回复期间所受伤害,,,,300,3,Unyielding_UseSkill:2
+4012,Art/Img/Skill/浴血奋战,Art/Img/Skill/img_bg_Skill,浴血奋战,,skill     ,失去一半生命，对全体敌人造成等量伤害（至少5点）；1回合内免疫致死,,,,300,3,BloodyBattle_UseSkill:1
 4013,Art/Img/Skill/魔力召唤,Art/Img/Skill/img_bg_Skill,魔力召唤,,skill     ,在环境中随机召唤2张技能卡,,,,200,2,MagicRecall_UseSkill:2
 4014,Art/Img/Skill/烈焰火球,Art/Img/Skill/img_bg_Skill,烈焰火球,,skill     ,对随机敌人及两侧目标造成10点伤害,,,,300,3,FireBall:10
 4015,Art/Img/Skill/冰霜魔法,Art/Img/Skill/img_bg_Skill,冰霜魔法,,skill     ,对随机敌人造成10点伤害，并使其冻结一回合,,,,300,3,IceMagic:10

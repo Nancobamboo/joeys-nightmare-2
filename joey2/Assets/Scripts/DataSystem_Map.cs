@@ -50,10 +50,15 @@ public partial class DataSystem
     };
 
     // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
-    // - HP cap +4 nodes: 35/37/39/41/43/45/47
-    // - Starting coins +40 nodes: 36/38/40/42/44/46/48
-    private static readonly int[] StartMaxHealthPlus4NodeIds = { 35, 37, 39, 41, 43, 45, 47 };
-    private static readonly int[] StartCoinsPlus40NodeIds = { 36, 38, 40, 42, 44, 46, 48 };
+    // - Card limit +1 nodes: 35 / 48
+    // - HP cap +4 nodes: 37/39/41/43/45/47
+    // - Starting coins +40 nodes: 36/38/40/42/44/46
+    private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48 };
+    private static readonly int[] StartMaxHealthPlus4NodeIds = { 37, 39, 41, 43, 45, 47 };
+    private static readonly int[] StartCoinsPlus40NodeIds = { 36, 38, 40, 42, 44, 46 };
+
+    // Growth-applied bonus tracking (to avoid double-applying when ApplyGrowthUnlocks is called multiple times)
+    private int m_AppliedEnvCardLimitGrowthBonus = 0;
 
     // Cache original prices from card_info.csv so we can restore after unlocking
     private Dictionary<string, int> m_BaseCardPriceById = new Dictionary<string, int>();
@@ -124,6 +129,40 @@ public partial class DataSystem
     {
         ApplyGrowthCardUnlocks();
         ApplyGrowthRelicUnlocks();
+        ApplyGrowthEnvCardLimitBonus();
+    }
+
+    /// <summary>
+    /// Apply growth "卡牌上限 +1" nodes to Env mode card limit (RoguelikeCharacter.envCardLimit).
+    /// This is applied as a delta so it remains compatible with other runtime modifiers (e.g. relics).
+    /// </summary>
+    private void ApplyGrowthEnvCardLimitBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+
+        int bonus = 0;
+        if (growth != null)
+        {
+            for (int i = 0; i < StartEnvCardLimitPlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartEnvCardLimitPlus1NodeIds[i])) bonus += 1;
+            }
+        }
+
+        int delta = bonus - m_AppliedEnvCardLimitGrowthBonus;
+        if (delta == 0) return;
+        m_AppliedEnvCardLimitGrowthBonus = bonus;
+
+        // Apply to all roguelike characters (index defaults to 0 in most call sites)
+        GData.Instance.LoadRoguelikeCharacter();
+        var list = GData.Instance.RoguelikeCharacterList;
+        if (list == null) return;
+        for (int i = 0; i < list.Count; i++)
+        {
+            RoguelikeCharacter ch = list[i];
+            if (ch == null) continue;
+            ch.envCardLimit += delta;
+        }
     }
 
     private void EnsureBaseCardPricesCached()
