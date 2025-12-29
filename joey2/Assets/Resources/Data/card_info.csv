@@ -125,7 +125,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 5040,Art/Img/Monster/img_card_DonkeyQueen,Art/Img/Monster/img_bg_Monster,女王Donkey,4墓地,monster,joey武器与护甲 -1/3 国王受击时回复国王生命6点,22,,67,15,3,DonkeyQueen
 5041,Art/Img/Monster/img_card_MonkeyKing,Art/Img/Monster/img_bg_Monster,国王Monkey,4墓地,monster,无视护甲 女王受击时移除joey一张护甲,10,,56,15,3,MonkeyKing
 5042,Art/Img/Monster/img_card_TurkeyJack,Art/Img/Monster/img_bg_Monster,卫士Turkey,3感恩节,monster,反击两次 女王/国王受击:触发反击,14,,45,15,3,TurkeyJack
-5043,Art/Img/Monster/img_card_JokerNightmare,Art/Img/Monster/img_bg_Monster,小丑Nightmare,4墓地,monster,3回合后:诅咒joey武器/护甲 被视为国王/女王,12,,40,50,3,JokerNightmare
+5043,Art/Img/Monster/img_card_JokerNightmare,Art/Img/Monster/img_bg_Monster,小丑Nightmare,4墓地,monster,3回合后:诅咒joey武器/护甲 被视为国王/女王,12,,80,50,3,JokerNightmare
 5044,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,大兄贵Monkey,1丛林,monster,场上每有1个怪物，攻击+5,12,,72,80,3,BadMonkey:5
 5045,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,Monkey兄弟,1丛林,monster,被兄贵视作2个怪物，倒计时8:召唤一个亲戚 ,16,,48,80,3,BadMonkeyBro:8
 5046,Art/Img/Monster/img_card_bigmonkey,Art/Img/Monster/img_bg_Monster,Monkey姐妹,1丛林,monster,被兄贵视作2个怪物，倒计时5:主动攻击一次 ,16,,48,80,3,BadMonkeySis:5
