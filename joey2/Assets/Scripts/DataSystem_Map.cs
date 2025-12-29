@@ -503,6 +503,9 @@ public partial class DataSystem
             }
         }
 
+        // Save the difficulty level when this save was created
+        dataJoeyPlayer.savedDifficulty = GetCurrentDifficulty();
+
         SaveDataJoeyPlayer();
     }
 
@@ -612,6 +615,9 @@ public partial class DataSystem
 
         // Apply difficulty effects based on current difficulty level
         ApplyEnvDifficultyEffects(dataJoeyPlayer);
+
+        // Save the difficulty level when this save was created
+        dataJoeyPlayer.savedDifficulty = GetCurrentDifficulty();
 
         Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool, difficulty level: {GetCurrentDifficulty()}");
         SaveDataJoeyPlayer();
@@ -833,6 +839,34 @@ public partial class DataSystem
         SaveDataJoeyPlayer();
 
         Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
+    }
+
+    /// <summary>
+    /// Check if the saved game's difficulty matches the current difficulty
+    /// Returns true if save can be continued, false if difficulty mismatch
+    /// </summary>
+    public bool CanContinueSavedGame()
+    {
+        DataJoeyPlayer playerData = GetDataJoeyPlayer();
+
+        // Check if there's save data
+        bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
+        if (!hasSaveData)
+        {
+            return false;
+        }
+
+        // Check if difficulty matches (savedDifficulty defaults to 1 for old saves)
+        int savedDiff = playerData.savedDifficulty > 0 ? playerData.savedDifficulty : 1;
+        int currentDiff = GetCurrentDifficulty();
+
+        if (savedDiff != currentDiff)
+        {
+            Debug.Log($"Cannot continue: Save is from difficulty {savedDiff}, but current difficulty is {currentDiff}");
+            return false;
+        }
+
+        return true;
     }
 }
 

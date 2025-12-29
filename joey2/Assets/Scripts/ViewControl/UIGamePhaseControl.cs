@@ -175,16 +175,44 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float ratio = (float)hp / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
+			
+			// Update player health text color based on health percentage
+			if (ratio < 0.25f)
+			{
+				m_View.TextHeart.color = Color.red; // < 25% health: red
+			}
+			else if (ratio < 0.5f)
+			{
+				m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+			}
+			else
+			{
+				m_View.TextHeart.color = Color.white; // >= 50% health: white
+			}
 		}
 
+		// Update cards in hand (bag) with HP-dependent effects
 		RunActionForEachLastBagCard((x) =>
 		{
 			if (x.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
 			{
 				x.UpdateBuffValue();
+				// Refresh card display to show updated attack/defence values in real-time
+				x.RefreshCard();
 			}
 
 		});
+		
+		// Update cards in environment with HP-dependent effects
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+			{
+				lastCard.UpdateBuffValue();
+				lastCard.RefreshCard();
+			}
+		}
 
 	}
 
@@ -501,6 +529,20 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float ratio = (float)m_DataJoeyPlayer.playerHealth / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
+			
+			// Update player health text color based on health percentage
+			if (ratio < 0.25f)
+			{
+				m_View.TextHeart.color = Color.red; // < 25% health: red
+			}
+			else if (ratio < 0.5f)
+			{
+				m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+			}
+			else
+			{
+				m_View.TextHeart.color = Color.white; // >= 50% health: white
+			}
 		}
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
 		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
@@ -747,11 +789,24 @@ public partial class UIGamePhaseControl : YViewControl
 				if (card.currentHealth > 0) card.currentHealth = Mathf.Max(1, card.currentHealth - 1);
 			}
 
-			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
-			cardControl.SetData(card, isEnv: true, envIndex: index);
-			AddEnvCard(index, cardControl);
-			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
+		cardControl.SetData(card, isEnv: true, envIndex: index);
+		AddEnvCard(index, cardControl);
+		
+		// If card has HP-dependent effects, trigger initial update after SetData
+		if (cardControl.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+		{
+			Debug.Log($"[AddEnvCardList] Card {card.cardName} has UpdateByHpChange buff, triggering update. CardEffect={cardControl.CardEffect?.GetType().Name}");
+			cardControl.UpdateBuffValue();
+			cardControl.RefreshCard();
 		}
+		else if (card.GetCardType() == ECardType.attack || card.GetCardType() == ECardType.defence)
+		{
+			Debug.Log($"[AddEnvCardList] Card {card.cardName} (player card) has NO UpdateByHpChange buff. CardEffect={cardControl.CardEffect?.GetType().Name}");
+		}
+		
+		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+	}
 
 		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
 		for (int i = 0; i < m_EnvPanels.Count; i++)
@@ -1828,6 +1883,12 @@ public partial class UIGamePhaseControl : YViewControl
 					// Refresh card display to apply DonkeyQueen debuff if needed
 					if (cardType == ECardType.attack || cardType == ECardType.defence)
 					{
+						// Check if card has HP-dependent effects and trigger update
+						if (cardControl.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+						{
+							Debug.Log($"[MoveCard] Card {cardControl.CardData?.cardName} has UpdateByHpChange buff, triggering update");
+							cardControl.UpdateBuffValue();
+						}
 						cardControl.RefreshCard();
 					}
 					

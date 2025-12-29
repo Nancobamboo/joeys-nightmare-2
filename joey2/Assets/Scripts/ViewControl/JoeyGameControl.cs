@@ -343,6 +343,7 @@ public class JoeyGameControl : YViewControl
 			{
 				// Generate new env random seed for deterministic card arrangement
 				m_DataJoeyPlayer.envRandomSeed = UnityEngine.Random.Range(1, int.MaxValue);
+				DataSystem.Instance.SaveDataJoeyPlayer();
 				Debug.Log($"Generated new env random seed: {m_DataJoeyPlayer.envRandomSeed}");
 			}
 			else
@@ -357,6 +358,11 @@ public class JoeyGameControl : YViewControl
 				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
 			SaveGameStateCache();
+			
+			// Auto-save when entering new level
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[Auto-Save] Game saved when entering Env level (Stage {envLevelId})");
+			
 			return;
 		}
 
@@ -461,6 +467,10 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
 		{
 			SaveGameStateCache();
+			
+			// Auto-save when entering new level
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[Auto-Save] Game saved when entering level {levelId}");
 		}
 	}
 
