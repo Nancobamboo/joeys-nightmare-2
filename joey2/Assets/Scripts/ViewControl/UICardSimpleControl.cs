@@ -550,9 +550,17 @@ public class UICardSimpleControl : YViewControl
 			else
 			{
 				// 确保 VFX 的 parent 是正确的（可能被 ReturnVFXPool 移动过）
-				m_FrozenVFX.SetParent(m_View.Anim.transform);
-				m_FrozenVFX.localPosition = Vector3.zero;
-				m_FrozenVFX.localScale = Vector3.one;
+				m_FrozenVFX.SetParent(m_View.Anim.transform, false);
+				if (JoeyGameControl.Instance != null)
+				{
+					JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Bing2, m_FrozenVFX);
+				}
+				else
+				{
+					m_FrozenVFX.localPosition = Vector3.zero;
+					m_FrozenVFX.localRotation = Quaternion.identity;
+					m_FrozenVFX.localScale = Vector3.one;
+				}
 				m_FrozenVFX.gameObject.SetActive(true);
 			}
 		}
@@ -593,9 +601,17 @@ public class UICardSimpleControl : YViewControl
 		// 显示冰冻特效
 		if (IsFrozen() && m_FrozenVFX != null)
 		{
-			m_FrozenVFX.SetParent(m_View.Anim.transform);
-			m_FrozenVFX.localPosition = Vector3.zero;
-			m_FrozenVFX.localScale = Vector3.one;
+			m_FrozenVFX.SetParent(m_View.Anim.transform, false);
+			if (JoeyGameControl.Instance != null)
+			{
+				JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Bing2, m_FrozenVFX);
+			}
+			else
+			{
+				m_FrozenVFX.localPosition = Vector3.zero;
+				m_FrozenVFX.localRotation = Quaternion.identity;
+				m_FrozenVFX.localScale = Vector3.one;
+			}
 			m_FrozenVFX.gameObject.SetActive(true);
 		}
 		// 未来可以在这里添加其他特效的显示逻辑
