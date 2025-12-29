@@ -48,7 +48,8 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private UIRelicControl m_CardLimitDebuffControl;
 
-	// ArcaneOrb relic: 每施放三次技能获得一张技能牌
+	// ArcaneOrb relic: 每施放6次技能获得一张技能牌4013（魔力召唤）
+	private const int ARCANE_ORB_TRIGGER_SKILL_CASTS = 6;
 	private int m_ArcaneOrbSkillCounter = 0;
 
 	public static EResType GetResType()
@@ -2515,7 +2516,7 @@ public partial class UIGamePhaseControl : YViewControl
 					AddCardToBag("3008");
 				}
 			}
-			// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+			// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
 			TryArcaneOrbTrigger();
 		}
 		else if (cardType == ECardType.item)
@@ -3339,14 +3340,14 @@ public partial class UIGamePhaseControl : YViewControl
 	}
 
 	/// <summary>
-	/// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+	/// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
 	/// </summary>
 	private void TryArcaneOrbTrigger()
 	{
 		if (DataSystem.Instance.HasRelic(ERelicType.ArcaneOrb))
 		{
 			m_ArcaneOrbSkillCounter++;
-			if (m_ArcaneOrbSkillCounter >= 5)
+			if (m_ArcaneOrbSkillCounter >= ARCANE_ORB_TRIGGER_SKILL_CASTS)
 			{
 				m_ArcaneOrbSkillCounter = 0;
 				AddCardToBag("4013");
