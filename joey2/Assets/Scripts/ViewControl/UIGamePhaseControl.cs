@@ -737,11 +737,8 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				ApplyEnvDifficultyToMonster(card);
 			}
-			// Apply player card difficulty penalties
-			else if (cardType == ECardType.attack || cardType == ECardType.defence)
-			{
-				ApplyEnvDifficultyToPlayerCard(card);
-			}
+			// Player card difficulty penalties are now applied in DataSystem.CreateCard()
+			// when the card is first created, to prevent duplicate applications when loading from cache
 		}
 
 		if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
@@ -815,35 +812,6 @@ public partial class UIGamePhaseControl : YViewControl
 			if (monsterCard.currentHealth < 1) monsterCard.currentHealth = 1;
 			if (monsterCard.health < 1) monsterCard.health = 1;
 		}
-		}
-	}
-
-	/// <summary>
-	/// Apply difficulty penalties to player cards in env (cumulative from all unlocked difficulties)
-	/// </summary>
-	private void ApplyEnvDifficultyToPlayerCard(Card playerCard)
-	{
-		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
-		
-		// Apply cumulative penalties from difficulty levels 2 and up
-		for (int level = 2; level <= difficultyLevel; level++)
-		{
-			DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
-			if (config == null) continue;
-			
-			// Apply attack penalty to attack cards
-			if (playerCard.GetCardType() == ECardType.attack && config.playerAttackPenalty != 0)
-			{
-				playerCard.currentAttack += config.playerAttackPenalty;
-				if (playerCard.currentAttack < 0) playerCard.currentAttack = 0;
-			}
-			
-			// Apply defence penalty to defence cards
-			if (playerCard.GetCardType() == ECardType.defence && config.playerDefencePenalty != 0)
-			{
-				playerCard.currentDefence += config.playerDefencePenalty;
-				if (playerCard.currentDefence < 0) playerCard.currentDefence = 0;
-			}
 		}
 	}
 

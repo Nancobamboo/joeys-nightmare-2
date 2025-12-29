@@ -271,7 +271,7 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_disappear] = 0f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Dunsui] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_glow] = 0f;
-		VFXDelayTimeDict[(int)EVFXName.VFX_Yishun] = 1f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Yishun] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Fanjia] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_joey_souji] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_HuiXue] = 0.65f;
@@ -313,7 +313,7 @@ public partial class DataSystem
     public Card CreateCard(string cardId)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
-        
+
         // Get base card config to check card type
         Card configCard = GData.Instance.GetCardConfigById(cardId);
         if (configCard == null)
@@ -321,7 +321,7 @@ public partial class DataSystem
             Debug.LogError($"Card config not found for ID: {cardId}");
             return null;
         }
-        
+
         // Monster cards should NOT use cached data because they need difficulty bonuses applied fresh each time
         // Only non-monster cards (attack/defence/skill/item) use EnvCardDict for permanent upgrades
         if (configCard.GetCardType() != ECardType.monster)
@@ -342,7 +342,48 @@ public partial class DataSystem
         cardProgress.AddCardIdDictData(cardId, 1);
         SaveDataCardProgress();
 
+        // Apply difficulty effects to player cards in Env mode ONLY when first created (not cached)
+        // This ensures difficulty penalties are applied exactly once, not every time the card is loaded
+        if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+        {
+            ECardType cardType = card.GetCardType();
+            if (cardType == ECardType.attack || cardType == ECardType.defence)
+            {
+                ApplyEnvDifficultyToPlayerCard(card);
+            }
+        }
+
         return card;
+    }
+
+    /// <summary>
+    /// Apply difficulty penalties to player cards in env (cumulative from all unlocked difficulties)
+    /// This should only be called when a card is first created, NOT when loaded from cache
+    /// </summary>
+    private void ApplyEnvDifficultyToPlayerCard(Card playerCard)
+    {
+        int difficultyLevel = GetCurrentDifficulty();
+
+        // Apply cumulative penalties from difficulty levels 2 and up
+        for (int level = 2; level <= difficultyLevel; level++)
+        {
+            DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+            if (config == null) continue;
+
+            // Apply attack penalty to attack cards
+            if (playerCard.GetCardType() == ECardType.attack && config.playerAttackPenalty != 0)
+            {
+                playerCard.currentAttack += config.playerAttackPenalty;
+                if (playerCard.currentAttack < 0) playerCard.currentAttack = 0;
+            }
+
+            // Apply defence penalty to defence cards
+            if (playerCard.GetCardType() == ECardType.defence && config.playerDefencePenalty != 0)
+            {
+                playerCard.currentDefence += config.playerDefencePenalty;
+                if (playerCard.currentDefence < 0) playerCard.currentDefence = 0;
+            }
+        }
     }
 
     public bool HasRelic(ERelicType relicType)
@@ -658,72 +699,72 @@ public partial class DataSystem
         SaveDataGrowth();
     }
 
-	/// <summary>
-	/// 判断当前是否存在“买得起”的成长点：
-	/// - 尚未解锁
-	/// - 价格 <= 当前 Points
-	/// - 与已解锁节点联通（dependency 指向已解锁节点）
-	/// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
-	///
-	/// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
-	/// </summary>
-	public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
-	{
-		DataGrowth dataGrowth = GetDataGrowth();
-		if (dataGrowth == null) return false;
+    /// <summary>
+    /// 判断当前是否存在“买得起”的成长点：
+    /// - 尚未解锁
+    /// - 价格 <= 当前 Points
+    /// - 与已解锁节点联通（dependency 指向已解锁节点）
+    /// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
+    ///
+    /// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
+    /// </summary>
+    public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
+    {
+        DataGrowth dataGrowth = GetDataGrowth();
+        if (dataGrowth == null) return false;
 
-		int points = dataGrowth.Points;
-		var unlockedList = dataGrowth.UnlockedNodes;
-		HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
+        int points = dataGrowth.Points;
+        var unlockedList = dataGrowth.UnlockedNodes;
+        HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
 
-		GData.Instance.LoadGrowthInfo();
-		foreach (var kv in GData.Instance.GrowthInfoDict)
-		{
-			GrowthInfo info = kv.Value;
-			if (info == null) continue;
+        GData.Instance.LoadGrowthInfo();
+        foreach (var kv in GData.Instance.GrowthInfoDict)
+        {
+            GrowthInfo info = kv.Value;
+            if (info == null) continue;
 
-			int id = info.id;
-			if (unlocked.Contains(id)) continue;               // 已解锁不算
-			if (info.price > points) continue;                // 买不起
+            int id = info.id;
+            if (unlocked.Contains(id)) continue;               // 已解锁不算
+            if (info.price > points) continue;                // 买不起
 
-			bool hasPrereq = false;
-			bool allPrereqUnlocked = true;
-			bool connectedToUnlocked = false;
+            bool hasPrereq = false;
+            bool allPrereqUnlocked = true;
+            bool connectedToUnlocked = false;
 
-			var deps = info.depends;
-			if (deps != null)
-			{
-				for (int i = 0; i < deps.Count; i++)
-				{
-					int depId = deps[i];
-					if (depId < 0) continue; // -1 表示无前置
+            var deps = info.depends;
+            if (deps != null)
+            {
+                for (int i = 0; i < deps.Count; i++)
+                {
+                    int depId = deps[i];
+                    if (depId < 0) continue; // -1 表示无前置
 
-					hasPrereq = true;
-					if (!unlocked.Contains(depId))
-					{
-						allPrereqUnlocked = false;
-						break;
-					}
-					connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
-				}
-			}
+                    hasPrereq = true;
+                    if (!unlocked.Contains(depId))
+                    {
+                        allPrereqUnlocked = false;
+                        break;
+                    }
+                    connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
+                }
+            }
 
-			// 根节点：无前置（或前置都是 -1）
-			if (!hasPrereq)
-			{
-				if (!includeRootNodes) continue;
-				allPrereqUnlocked = true;
-				connectedToUnlocked = true;
-			}
+            // 根节点：无前置（或前置都是 -1）
+            if (!hasPrereq)
+            {
+                if (!includeRootNodes) continue;
+                allPrereqUnlocked = true;
+                connectedToUnlocked = true;
+            }
 
-			if (allPrereqUnlocked && connectedToUnlocked)
-			{
-				return true;
-			}
-		}
+            if (allPrereqUnlocked && connectedToUnlocked)
+            {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     public bool AddCardToDataJoeyPlayer(Card card)
     {
