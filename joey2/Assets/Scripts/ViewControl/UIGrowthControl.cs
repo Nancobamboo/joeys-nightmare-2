@@ -34,12 +34,31 @@ public class UIGrowthControl : YViewControl
 	private readonly Dictionary<int, bool> m_IsSoldById = new Dictionary<int, bool>();
 	private readonly Dictionary<int, bool> m_IsActiveById = new Dictionary<int, bool>();
 	private RectTransform m_SlotsRoot;
+	private RectTransform m_LinesRoot;
 	private static Sprite s_WhiteSprite;
 	private float m_LayoutScale = 1f;
 	private ScrollRect m_ScrollRect;
 	private RectTransform m_ViewportRt;
 	private bool m_SlotsRootRuntimeCreated;
 	private readonly Dictionary<int, int> m_TreeParentByChild = new Dictionary<int, int>();
+
+	private class LineInstance
+	{
+		public int ParentId;
+		public int ChildId;
+		public RectTransform Rt;
+		public Image Img;
+	}
+
+	// key = (parentId << 32) | (uint)childId
+	private readonly Dictionary<long, LineInstance> m_LineByKey = new Dictionary<long, LineInstance>();
+	private bool m_LineStyleInited;
+	private Sprite m_LineLockSprite;
+	private Sprite m_LineUnlockSprite;
+	private Color m_LineLockColor = Color.white;
+	private Color m_LineUnlockColor = Color.white;
+	private float m_LineThickness = 6f;
+	private const float LineInset = 10f;
 	public class GrowthNode
 	{
 		public int Id;
@@ -1108,6 +1127,9 @@ public class UIGrowthControl : YViewControl
 	{
 		m_SlotById.Clear();
 		m_BtnById.Clear();
+		m_LineByKey.Clear();
+		m_LinesRoot = null;
+		m_LineStyleInited = false;
 		EnsureSlotsRoot();
 		if (m_SlotsRoot != null)
 		{
@@ -1116,6 +1138,8 @@ public class UIGrowthControl : YViewControl
 				Destroy(m_SlotsRoot.GetChild(i).gameObject);
 			}
 		}
+
+		EnsureLinesRoot();
 		var posById = UseTreeLayout
 			? BuildTreeLayoutPositions()
 			: (UseGridLayout ? BuildGridLayoutPositions() : BuildAutoLayoutPositions());
@@ -1146,6 +1170,10 @@ public class UIGrowthControl : YViewControl
 			btnCtrl.Setup(id, OnGrowthBtnClick);
 			// 给 uibtn 补上文字：默认显示节点名（为空时回退到 id）
 			btnCtrl.SetTitle(!string.IsNullOrEmpty(node.Name) ? node.Name : id.ToString());
+			if (!m_LineStyleInited)
+			{
+				TryInitLineStyleFromBtn(btnCtrl);
+			}
 			var rt = btnCtrl.transform as RectTransform;
 			if (rt != null)
 			{
@@ -1174,6 +1202,10 @@ public class UIGrowthControl : YViewControl
 	private void ReorderSlotsByLevel()
 	{
 		if (m_SlotsRoot == null || m_SlotById.Count == 0 || m_NodeById.Count == 0) return;
+		if (m_LinesRoot != null && m_LinesRoot.parent == m_SlotsRoot)
+		{
+			m_LinesRoot.SetAsFirstSibling();
+		}
 		var list = new List<GrowthNode>(m_NodeById.Values);
 		int LevelKey(GrowthNode n)
 		{
@@ -1198,12 +1230,30 @@ public class UIGrowthControl : YViewControl
 			if (node == null) continue;
 			if (m_SlotById.TryGetValue(node.Id, out var slot) && slot != null)
 			{
-				slot.SetSiblingIndex(i);
+				// 如果存在 LinesRoot，预留 0 号 sibling 给线容器，避免排序把线容器夹进来
+				int baseIndex = (m_LinesRoot != null && m_LinesRoot.parent == m_SlotsRoot) ? 1 : 0;
+				slot.SetSiblingIndex(i + baseIndex);
 			}
 		}
 	}
 	private void EnsureLinesRoot()
 	{
+		if (m_SlotsRoot == null) return;
+		if (m_LinesRoot != null) return;
+
+		var go = new GameObject("LinesRoot", typeof(RectTransform));
+		go.transform.SetParent(m_SlotsRoot, false);
+		m_LinesRoot = go.GetComponent<RectTransform>();
+
+		// 保持与 m_SlotsRoot 同样的坐标系（pivot 在顶部），这样可直接复用 slot.anchoredPosition 来算线段坐标
+		m_LinesRoot.anchorMin = new Vector2(0f, 1f);
+		m_LinesRoot.anchorMax = new Vector2(1f, 1f);
+		m_LinesRoot.pivot = new Vector2(0.5f, 1f);
+		m_LinesRoot.anchoredPosition = Vector2.zero;
+		m_LinesRoot.sizeDelta = m_SlotsRoot.sizeDelta;
+
+		// 确保线永远绘制在按钮下面
+		m_LinesRoot.SetAsFirstSibling();
 	}
 	private static Sprite GetWhiteSprite()
 	{
@@ -1215,9 +1265,61 @@ public class UIGrowthControl : YViewControl
 	}
 	private void BuildLines()
 	{
+		EnsureLinesRoot();
+		if (m_LinesRoot == null) return;
+
+		// 同步 LinesRoot 的尺寸（content 可能会在布局后改变）
+		m_LinesRoot.sizeDelta = m_SlotsRoot != null ? m_SlotsRoot.sizeDelta : m_LinesRoot.sizeDelta;
+		m_LinesRoot.SetAsFirstSibling();
+
+		DataGrowth data = DataSystem.Instance.GetDataGrowth();
+		HashSet<long> used = new HashSet<long>();
+
+		foreach (var kv in m_NodeById)
+		{
+			var node = kv.Value;
+			if (node == null) continue;
+			if (node.Depends == null || node.Depends.Count == 0) continue;
+			if (!m_SlotById.ContainsKey(node.Id)) continue;
+
+			for (int i = 0; i < node.Depends.Count; i++)
+			{
+				int parentId = node.Depends[i];
+				if (parentId < 0) continue;
+				if (!m_SlotById.ContainsKey(parentId)) continue;
+
+				long key = (((long)parentId) << 32) | (uint)node.Id;
+				used.Add(key);
+
+				if (!m_LineByKey.TryGetValue(key, out var line) || line == null || line.Rt == null || line.Img == null)
+				{
+					line = CreateLineInstance(parentId, node.Id);
+					m_LineByKey[key] = line;
+				}
+
+				bool isUnlocked = data != null && data.IsUnlocked(node.Id);
+				ApplyLineStyle(line, isUnlocked);
+				UpdateLineGeometry(line, m_LineThickness);
+				line.Rt.gameObject.SetActive(true);
+			}
+		}
+
+		// 关闭不再需要的线
+		var keys = new List<long>(m_LineByKey.Keys);
+		for (int i = 0; i < keys.Count; i++)
+		{
+			long k = keys[i];
+			if (used.Contains(k)) continue;
+			var line = m_LineByKey[k];
+			if (line != null && line.Rt != null) line.Rt.gameObject.SetActive(false);
+		}
 	}
 	private Vector3 GetNodeLocalCenterInLinesRoot(int id)
 	{
+		if (m_SlotById.TryGetValue(id, out var rt) && rt != null)
+		{
+			return (Vector3)rt.anchoredPosition;
+		}
 		return Vector3.zero;
 	}
 	private bool TryGetSlotLocalAABBInLinesRoot(int id, out Vector2 min, out Vector2 max, out Vector2 center)
@@ -1225,20 +1327,93 @@ public class UIGrowthControl : YViewControl
 		min = Vector2.zero;
 		max = Vector2.zero;
 		center = Vector2.zero;
-		return false;
+
+		if (!m_SlotById.TryGetValue(id, out var rt) || rt == null) return false;
+		center = rt.anchoredPosition;
+		Vector2 size = rt.rect.size;
+		if (size.x <= 0.01f || size.y <= 0.01f)
+		{
+			// rect 可能尚未刷新，用 sizeDelta 做兜底
+			size = rt.sizeDelta;
+		}
+		Vector2 half = size * 0.5f;
+		min = center - half;
+		max = center + half;
+		return true;
 	}
 	private Vector2 GetRectEdgePointTowards(int id, Vector2 targetLocal, float inset)
 	{
-		return Vector2.zero;
+		if (!TryGetSlotLocalAABBInLinesRoot(id, out var min, out var max, out var center)) return center;
+
+		Vector2 dir = targetLocal - center;
+		float dx = dir.x;
+		float dy = dir.y;
+		if (Mathf.Abs(dx) < 0.0001f && Mathf.Abs(dy) < 0.0001f) return center;
+
+		Vector2 half = (max - min) * 0.5f;
+		float adx = Mathf.Abs(dx);
+		float ady = Mathf.Abs(dy);
+
+		float t;
+		// 与矩形边界相交：选择更“先碰到”的那一条边
+		if (adx * half.y > ady * half.x)
+		{
+			// 先碰到左右边
+			t = half.x / Mathf.Max(0.0001f, adx);
+		}
+		else
+		{
+			// 先碰到上下边
+			t = half.y / Mathf.Max(0.0001f, ady);
+		}
+
+		Vector2 edge = center + dir * t;
+		Vector2 n = dir.normalized;
+		edge -= n * inset;
+		return edge;
 	}
-	private void UpdateLineGeometry(object line, float thickness)
+	private void UpdateLineGeometry(LineInstance line, float thickness)
 	{
+		if (line == null || line.Rt == null) return;
+		if (!m_SlotById.ContainsKey(line.ParentId) || !m_SlotById.ContainsKey(line.ChildId)) return;
+
+		Vector2 parentCenter = m_SlotById[line.ParentId].anchoredPosition;
+		Vector2 childCenter = m_SlotById[line.ChildId].anchoredPosition;
+
+		Vector2 start = GetRectEdgePointTowards(line.ParentId, childCenter, LineInset);
+		Vector2 end = GetRectEdgePointTowards(line.ChildId, parentCenter, LineInset);
+
+		Vector2 delta = end - start;
+		float len = delta.magnitude;
+		if (len < 0.1f)
+		{
+			line.Rt.gameObject.SetActive(false);
+			return;
+		}
+
+		float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
+		line.Rt.localRotation = Quaternion.Euler(0f, 0f, angle);
+		line.Rt.anchoredPosition = (start + end) * 0.5f;
+		line.Rt.sizeDelta = new Vector2(len, thickness);
 	}
 	private void UpdateAllLineGeometry()
 	{
+		if (m_LinesRoot == null) return;
+		foreach (var kv in m_LineByKey)
+		{
+			var line = kv.Value;
+			if (line == null || line.Rt == null || !line.Rt.gameObject.activeSelf) continue;
+			UpdateLineGeometry(line, m_LineThickness);
+		}
 	}
 	private void RefreshLinesStyle()
 	{
+		foreach (var kv in m_LineByKey)
+		{
+			var line = kv.Value;
+			if (line == null || line.Img == null) continue;
+			// 样式由 BuildLines/ApplyLineStyle 驱动，这里保留方法用于未来扩展（比如主题/缩放）
+		}
 	}
 	private bool IsNodeActive(DataGrowth data, GrowthNode node)
 	{
@@ -1314,24 +1489,97 @@ public class UIGrowthControl : YViewControl
 					btn.SetInteractable(false); // Locked
 				}
 				
-				// Draw Line to Primary Parent
-				if (m_TreeParentByChild.TryGetValue(id, out int parentId) && m_SlotById.TryGetValue(parentId, out var parentRt) && m_SlotById.TryGetValue(id, out var myRt))
-				{
-					Vector2 dir = parentRt.anchoredPosition - myRt.anchoredPosition;
-					float len = dir.magnitude;
-					float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-					
-					// If node is unlocked -> Unlock Line. Else -> Lock Line.
-					bool useUnlockLine = isUnlocked;
-					
-					btn.SetLine(true, useUnlockLine, angle, len);
-				}
-				else
-				{
-					btn.SetLine(false, false, 0, 0);
-				}
+				// 连线统一由 LinesRoot 里运行时绘制（支持多依赖）；按钮自带的单根线禁用掉
+				btn.SetLine(false, false, 0, 0);
 			}
 		}
+
+		BuildLines();
+	}
+
+	private void TryInitLineStyleFromBtn(UIBtnControl btnCtrl)
+	{
+		if (btnCtrl == null) return;
+		try
+		{
+			Image lockImg = null;
+			Image unlockImg = null;
+			var imgs = btnCtrl.GetComponentsInChildren<Image>(true);
+			for (int i = 0; i < imgs.Length; i++)
+			{
+				var img = imgs[i];
+				if (img == null) continue;
+				string n = img.gameObject != null ? img.gameObject.name : string.Empty;
+				if (lockImg == null && !string.IsNullOrEmpty(n) && n.IndexOf("LineLock", StringComparison.OrdinalIgnoreCase) >= 0) lockImg = img;
+				if (unlockImg == null && !string.IsNullOrEmpty(n) && n.IndexOf("LineUnlock", StringComparison.OrdinalIgnoreCase) >= 0) unlockImg = img;
+			}
+
+			if (lockImg != null)
+			{
+				m_LineLockSprite = lockImg.sprite;
+				m_LineLockColor = lockImg.color;
+				float h = lockImg.rectTransform.rect.height;
+				if (h <= 0.01f) h = lockImg.rectTransform.sizeDelta.y;
+				if (h > 0.01f) m_LineThickness = Mathf.Max(m_LineThickness, h);
+			}
+			if (unlockImg != null)
+			{
+				m_LineUnlockSprite = unlockImg.sprite;
+				m_LineUnlockColor = unlockImg.color;
+				float h = unlockImg.rectTransform.rect.height;
+				if (h <= 0.01f) h = unlockImg.rectTransform.sizeDelta.y;
+				if (h > 0.01f) m_LineThickness = Mathf.Max(m_LineThickness, h);
+			}
+		}
+		catch
+		{
+			// ignore
+		}
+
+		m_LineStyleInited = true;
+		if (m_LineLockSprite == null) m_LineLockSprite = GetWhiteSprite();
+		if (m_LineUnlockSprite == null) m_LineUnlockSprite = GetWhiteSprite();
+	}
+
+	private LineInstance CreateLineInstance(int parentId, int childId)
+	{
+		var go = new GameObject($"Line_{parentId}_{childId}", typeof(RectTransform), typeof(Image));
+		go.transform.SetParent(m_LinesRoot, false);
+		var rt = go.GetComponent<RectTransform>();
+		rt.anchorMin = new Vector2(0.5f, 1f);
+		rt.anchorMax = new Vector2(0.5f, 1f);
+		rt.pivot = new Vector2(0.5f, 0.5f);
+		rt.anchoredPosition = Vector2.zero;
+		rt.sizeDelta = new Vector2(10f, m_LineThickness);
+		rt.localScale = Vector3.one;
+		rt.localRotation = Quaternion.identity;
+
+		var img = go.GetComponent<Image>();
+		img.raycastTarget = false;
+		img.sprite = GetWhiteSprite();
+		img.color = Color.white;
+
+		return new LineInstance
+		{
+			ParentId = parentId,
+			ChildId = childId,
+			Rt = rt,
+			Img = img
+		};
+	}
+
+	private void ApplyLineStyle(LineInstance line, bool isUnlocked)
+	{
+		if (line == null || line.Img == null) return;
+		if (!m_LineStyleInited)
+		{
+			m_LineStyleInited = true;
+			if (m_LineLockSprite == null) m_LineLockSprite = GetWhiteSprite();
+			if (m_LineUnlockSprite == null) m_LineUnlockSprite = GetWhiteSprite();
+		}
+
+		line.Img.sprite = isUnlocked ? m_LineUnlockSprite : m_LineLockSprite;
+		line.Img.color = isUnlocked ? m_LineUnlockColor : m_LineLockColor;
 	}
 	private void OnGrowthBtnClick(int id)
 	{
