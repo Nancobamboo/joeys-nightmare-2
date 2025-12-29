@@ -2625,6 +2625,19 @@ public partial class UIGamePhaseControl : YViewControl
 		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
 		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
 		UICardSimpleControl attackCard = paraArray.Length > 2 ? paraArray[2] as UICardSimpleControl : null;
+
+		// Apply conditional relic bonuses for passive attacks (triggered on equip / on-top effects)
+		// BloodyGloves: HP < 50% 时，赤手空拳/拳套伤害 +5
+		if (attackCard != null && DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+		{
+			if (attackCard.CardEffect != null && attackCard.CardEffect.Id == ECardEffectId.BareHands)
+			{
+				if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+				{
+					damage += 5;
+				}
+			}
+		}
 		
 		// Passive attacks (like shuriken) trigger when weapon is equipped
 		// They should consume temporary buffs (like ApeWine, DualWield) so they only apply once
