@@ -51,14 +51,20 @@ public partial class DataSystem
 
     // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
     // - Card limit +1 nodes: 35 / 48
-    // - HP cap +4 nodes: 37/39/41/43/45/47
-    // - Starting coins +40 nodes: 36/38/40/42/44/46
+    // - Weapon attack +1 nodes: 36 / 44
+    // - Armor defence +1 nodes: 37 / 45
+    // - HP cap +4 nodes: 39/41/43/47
+    // - Starting coins +40 nodes: 38/40/42/46
     private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48 };
-    private static readonly int[] StartMaxHealthPlus4NodeIds = { 37, 39, 41, 43, 45, 47 };
-    private static readonly int[] StartCoinsPlus40NodeIds = { 36, 38, 40, 42, 44, 46 };
+    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 44 };
+    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 45 };
+    private static readonly int[] StartMaxHealthPlus4NodeIds = { 39, 41, 43, 47 };
+    private static readonly int[] StartCoinsPlus40NodeIds = { 38, 40, 42, 46 };
 
     // Growth-applied bonus tracking (to avoid double-applying when ApplyGrowthUnlocks is called multiple times)
     private int m_AppliedEnvCardLimitGrowthBonus = 0;
+    private int m_AppliedWeaponAttackGrowthBonus = 0;
+    private int m_AppliedArmorDefenceGrowthBonus = 0;
 
     // Cache original prices from card_info.csv so we can restore after unlocking
     private Dictionary<string, int> m_BaseCardPriceById = new Dictionary<string, int>();
@@ -129,7 +135,89 @@ public partial class DataSystem
     {
         ApplyGrowthCardUnlocks();
         ApplyGrowthRelicUnlocks();
+        ApplyGrowthWeaponArmorStatBonus();
         ApplyGrowthEnvCardLimitBonus();
+    }
+
+    /// <summary>
+    /// Apply growth nodes:
+    /// - 36/44: Weapon attack +1 (applies to attack cards)
+    /// - 37/45: Armor defence +1 (applies to defence cards)
+    /// This is applied as a delta so it won't stack if called multiple times.
+    /// </summary>
+    private void ApplyGrowthWeaponArmorStatBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+
+        int weaponAtkBonus = 0;
+        int armorDefBonus = 0;
+        if (growth != null)
+        {
+            for (int i = 0; i < StartWeaponAttackPlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartWeaponAttackPlus1NodeIds[i])) weaponAtkBonus += 1;
+            }
+            for (int i = 0; i < StartArmorDefencePlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartArmorDefencePlus1NodeIds[i])) armorDefBonus += 1;
+            }
+        }
+
+        int atkDelta = weaponAtkBonus - m_AppliedWeaponAttackGrowthBonus;
+        int defDelta = armorDefBonus - m_AppliedArmorDefenceGrowthBonus;
+        if (atkDelta == 0 && defDelta == 0) return;
+        m_AppliedWeaponAttackGrowthBonus = weaponAtkBonus;
+        m_AppliedArmorDefenceGrowthBonus = armorDefBonus;
+
+        // 1) Apply to base card configs so all future created cards inherit the buff
+        GData.Instance.LoadCards();
+        foreach (var kv in GData.Instance.CardDict)
+        {
+            Card cfg = kv.Value;
+            if (cfg == null) continue;
+            ECardType type = cfg.GetCardType();
+            if (type == ECardType.attack && atkDelta != 0)
+            {
+                cfg.SetAttack(Mathf.Max(0, cfg.currentAttack + atkDelta));
+            }
+            else if (type == ECardType.defence && defDelta != 0)
+            {
+                cfg.SetDefence(Mathf.Max(0, cfg.currentDefence + defDelta));
+            }
+        }
+
+        // 2) Apply to current player-owned cards (including cached Env cards) so UI/actual values are consistent
+        DataJoeyPlayer player = GetDataJoeyPlayer();
+        if (player == null) return;
+
+        void ApplyDeltaToCard(Card c)
+        {
+            if (c == null) return;
+            ECardType t = c.GetCardType();
+            if (t == ECardType.attack && atkDelta != 0)
+            {
+                c.SetAttack(Mathf.Max(0, c.currentAttack + atkDelta));
+            }
+            else if (t == ECardType.defence && defDelta != 0)
+            {
+                c.SetDefence(Mathf.Max(0, c.currentDefence + defDelta));
+            }
+        }
+
+        if (player.SelfCardDict != null)
+        {
+            foreach (var kv in player.SelfCardDict)
+            {
+                ApplyDeltaToCard(kv.Value);
+            }
+        }
+        if (player.EnvCardDict != null)
+        {
+            foreach (var kv in player.EnvCardDict)
+            {
+                ApplyDeltaToCard(kv.Value);
+            }
+        }
     }
 
     /// <summary>

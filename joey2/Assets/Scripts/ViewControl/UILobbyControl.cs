@@ -51,7 +51,8 @@ public class UILobbyControl : YViewControl
 	{
 		RefreshTips();
 
-		if (Input.GetKeyDown(KeyCode.F9))
+		DebugHotkeyConfig debugCfg = DebugHotkeyConfig.Get();
+		if (debugCfg.enableDebugHotkeys && debugCfg.enableF9UnlockAllDifficulty && Input.GetKeyDown(KeyCode.F9))
 		{
 			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
 			diffData.UnlockUpTo(12);
@@ -59,6 +60,31 @@ public class UILobbyControl : YViewControl
 			DataSystem.Instance.SaveDataDifficulty();
 			RefreshDifficultyUI();
 			Debug.Log("[DEBUG] All difficulty levels unlocked (1-12)");
+		}
+
+		// F10：解锁全部 Joey 成长（growth.csv）
+		if (debugCfg.enableDebugHotkeys && debugCfg.enableF10UnlockAllGrowth && Input.GetKeyDown(KeyCode.F10))
+		{
+			DataGrowth growth = DataSystem.Instance.GetDataGrowth();
+
+			GData.Instance.LoadGrowthInfo();
+			foreach (var kv in GData.Instance.GrowthInfoDict)
+			{
+				GrowthInfo info = kv.Value;
+				if (info == null) continue;
+				growth.Unlock(info.id);
+			}
+
+			DataSystem.Instance.SaveDataGrowth();
+			DataSystem.Instance.ApplyGrowthUnlocks(); // 立刻应用到卡池/遗物池/局外加成等
+
+			// 如果成长界面已打开，刷新一次
+			if (m_GrowthControl != null && m_GrowthControl.gameObject.activeInHierarchy)
+			{
+				m_GrowthControl.SetData();
+			}
+			RefreshTips();
+			Debug.Log("[DEBUG] All growth nodes unlocked");
 		}
 	}
 
