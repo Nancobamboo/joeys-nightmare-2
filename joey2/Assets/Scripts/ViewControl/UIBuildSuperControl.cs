@@ -253,21 +253,6 @@ public class UIBuildSuperControl : YViewControl
 
         Card card = draggedCard.CardData;
         string cardId = card.id;
-        
-        // Cannot sell curse cards (1025: Pain Blade, 2016: Pain Shield)
-        if (cardId == "1025" || cardId == "2016")
-        {
-            Debug.Log("诅咒卡牌无法出售！");
-            RectTransform rectTransform = draggedCard.CacheTrans as RectTransform;
-            if (rectTransform != null)
-            {
-                if (draggedCard.EquipIndex < m_EquipedItemArray.Length)
-                {
-                    rectTransform.localPosition = m_EquipedItemArray[draggedCard.EquipIndex].localPosition;
-                }
-            }
-            return;
-        }
 
         int sellCost = GetSellCardCost();
         if (m_PlayerData.Coin < sellCost)
