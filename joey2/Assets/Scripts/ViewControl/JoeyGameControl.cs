@@ -34,6 +34,7 @@ public class JoeyGameControl : YViewControl
 	private UIShopSuperControl m_ShopSuperControl;
 	private UILobbyControl m_LobbyControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
+	private Dictionary<int, GameObject> VFXPrefabDict = new Dictionary<int, GameObject>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 	private bool m_IsLobbyEnter = false;
@@ -903,11 +904,13 @@ public class JoeyGameControl : YViewControl
 	public void PlayVFX(EVFXName vfxName, Transform parent, float delayTime)
 	{
 		int key = (int)vfxName;
+		GameObject prefab = null;
 
 		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
 		{
 			string prefabPath = "VFX/" + vfxName.ToString();
-			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
 			pool = new MonoBehaviourPool<Transform>(() =>
 			{
 				GameObject instance = Instantiate(prefab, parent);
@@ -917,11 +920,20 @@ public class JoeyGameControl : YViewControl
 			});
 			VFXPoolDict[key] = pool;
 		}
+		else
+		{
+			VFXPrefabDict.TryGetValue(key, out prefab);
+			if (prefab == null)
+			{
+				string prefabPath = "VFX/" + vfxName.ToString();
+				prefab = Resources.Load<GameObject>(prefabPath);
+				VFXPrefabDict[key] = prefab;
+			}
+		}
 
 		Transform vfxTransform = pool.Get();
-		vfxTransform.SetParent(parent);
-		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
+		vfxTransform.SetParent(parent, false);
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
 
 		var cts = new CancellationTokenSource();
 		CancelTokenDict[vfxTransform] = cts;
@@ -929,29 +941,57 @@ public class JoeyGameControl : YViewControl
 		DelayHideVFX(vfxTransform, delayTime, cts, key).Forget();
 	}
 
+	public void ResetVFXTransform(EVFXName vfxName, Transform vfxTransform)
+	{
+		if (vfxTransform == null)
+		{
+			return;
+		}
+
+		int key = (int)vfxName;
+		if (!VFXPrefabDict.TryGetValue(key, out GameObject prefab) || prefab == null)
+		{
+			string prefabPath = "VFX/" + vfxName.ToString();
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
+		}
+
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
+	}
+
 	public Transform GetVFX(EVFXName vfxName, Transform parent)
 	{
 		int key = (int)vfxName;
+		GameObject prefab = null;
 
 		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
 		{
 			string prefabPath = "VFX/" + vfxName.ToString();
-			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
 			pool = new MonoBehaviourPool<Transform>(() =>
 			{
 				GameObject instance = Instantiate(prefab, parent);
 				instance.gameObject.name = vfxName.ToString();
-				instance.transform.localPosition = Vector3.zero;
 
 				return instance.transform;
 			});
 			VFXPoolDict[key] = pool;
 		}
+		else
+		{
+			VFXPrefabDict.TryGetValue(key, out prefab);
+			if (prefab == null)
+			{
+				string prefabPath = "VFX/" + vfxName.ToString();
+				prefab = Resources.Load<GameObject>(prefabPath);
+				VFXPrefabDict[key] = prefab;
+			}
+		}
 
 		Transform vfxTransform = pool.Get();
-		vfxTransform.SetParent(parent);
-		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
+		vfxTransform.SetParent(parent, false);
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
 		vfxTransform.gameObject.SetActive(true);
 
 		return vfxTransform;
@@ -973,9 +1013,50 @@ public class JoeyGameControl : YViewControl
 	{
 		vfxTransform.gameObject.SetActive(false);
 		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
-		vfxTransform.SetParent(effectRoot);
+		vfxTransform.SetParent(effectRoot, false);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.localRotation = Quaternion.identity;
 		vfxTransform.localScale = Vector3.one;
+	}
+
+	private static void ResetVFXTransformFromPrefab(Transform instance, GameObject prefab)
+	{
+		if (instance == null)
+		{
+			return;
+		}
+
+		// Fallback: if prefab is missing (shouldn't happen), at least avoid pool "drift"
+		if (prefab == null)
+		{
+			instance.localPosition = Vector3.zero;
+			instance.localRotation = Quaternion.identity;
+			instance.localScale = Vector3.one;
+
+			if (instance is RectTransform rt)
+			{
+				rt.anchoredPosition3D = Vector3.zero;
+				rt.anchorMin = new Vector2(0.5f, 0.5f);
+				rt.anchorMax = new Vector2(0.5f, 0.5f);
+				rt.pivot = new Vector2(0.5f, 0.5f);
+			}
+			return;
+		}
+
+		Transform prefabTransform = prefab.transform;
+		instance.localPosition = prefabTransform.localPosition;
+		instance.localRotation = prefabTransform.localRotation;
+		instance.localScale = prefabTransform.localScale;
+
+		// For UI VFX, also restore RectTransform layout so anchoredPosition doesn't "drift" across re-parenting
+		if (instance is RectTransform instanceRect && prefabTransform is RectTransform prefabRect)
+		{
+			instanceRect.anchorMin = prefabRect.anchorMin;
+			instanceRect.anchorMax = prefabRect.anchorMax;
+			instanceRect.pivot = prefabRect.pivot;
+			instanceRect.sizeDelta = prefabRect.sizeDelta;
+			instanceRect.anchoredPosition3D = prefabRect.anchoredPosition3D;
+		}
 	}
 
 	private async UniTaskVoid DelayHideVFX(Transform vfxTransform, float delayTime, CancellationTokenSource cts, int key)
