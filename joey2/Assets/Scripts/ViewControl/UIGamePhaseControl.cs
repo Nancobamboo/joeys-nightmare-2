@@ -304,6 +304,9 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 
+		// 螺旋手里剑：回滚上一关的“本关 +2 攻击”临时加成（仅该卡使用）
+		ResetSpiralShurikenLevelBonusesIfNeeded();
+
 		// Restart/重置时：拳头卡缓存不会被 ClearAllCard 回收（为避免频繁重建）
 		// 但像猿酒(ApeWine)/双持等会通过 AddEffectValue 写入临时伤害加成，
 		// 如果此处不清理，会导致“重新开始 buff 不清空”（尤其赤手空拳/拳套永不消耗时更明显）。
@@ -510,6 +513,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearEnvCardList();
 		UsedCardList.Clear();
+
+		// 螺旋手里剑：回滚上一关的“本关 +2 攻击”临时加成（仅该卡使用）
+		ResetSpiralShurikenLevelBonusesIfNeeded();
+
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
 		if (m_KeyPathCardCache != null)
