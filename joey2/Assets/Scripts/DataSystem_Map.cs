@@ -44,21 +44,21 @@ public partial class DataSystem
         { (int)ERelicType.ShieldReflect, 29 },        // 护盾反伤
         { (int)ERelicType.RegenerationAmulet, 30 },   // 再生护符
         { (int)ERelicType.HalfHealthAmulet, 31 },     // 半血护符
-        { (int)ERelicType.BloodyGloves, 32 },         // 染血拳法
-        { (int)ERelicType.ArcaneOrb, 33 },            // 奥术宝珠
+        { (int)ERelicType.BareHandsMaster, 32 },      // 拳套/腕豪（relic_info.csv: 9010）
+        { (int)ERelicType.ShurikenMastery, 33 },      // 手里剑精通（relic_info.csv: 9009）
         { (int)ERelicType.MagicSwordsmanRing, 34 },   // 魔剑士指环
     };
 
     // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
-    // - Card limit +1 nodes: 35 / 48
-    // - Weapon attack +1 nodes: 36 / 39 / 44
-    // - Armor defence +1 nodes: 37 / 40 / 45
-    // - HP cap +4 nodes: 41/43/47/52
+    // - Card limit +1 nodes: 35 / 48 / 53
+    // - Weapon attack +1 nodes: 36 / 39 / 44 / 282
+    // - Armor defence +1 nodes: 37 / 40 / 45 / 283
+    // - HP cap +4 nodes: 41 / 43 / 47 / 52
     // - Starting coins +40 nodes: 46/51/54
     // - High-grade card probability +5% nodes: 38/42/49/50
     private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48, 53 };
-    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 39, 44 };
-    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 40, 45 };
+    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 39, 44, 282 };
+    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 40, 45, 283 };
     private static readonly int[] StartMaxHealthPlus4NodeIds = { 41, 43, 47, 52 };
     private static readonly int[] StartCoinsPlus40NodeIds = { 46, 51, 54 };
     private static readonly int[] HighGradeCardProbabilityPlus5NodeIds = { 38, 42, 49, 50 };
@@ -120,8 +120,8 @@ public partial class DataSystem
         // 初始遗物（growth.csv: 0 / 28 / 32 / 33）
         if (Unlocked(0)) extraRelics?.Add((int)ERelicType.BBQDelight);      // 烤肉香香
         if (Unlocked(28)) extraRelics?.Add((int)ERelicType.BareHandParry);  // 空手接白刃
-        if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BloodyGloves);   // 染血拳法
-        if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ArcaneOrb);      // 奥术宝珠
+        if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BareHandsMaster); // 拳套/腕豪（relic_info.csv: 9010）
+        if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ShurikenMastery); // 手里剑精通（relic_info.csv: 9009）
         // 初始装备增加一个小血瓶（growth.csv: 1，card_info.csv: 3001）
         if (Unlocked(1) && equipmentItem != null && !equipmentItem.Contains("3001"))
         {
@@ -140,11 +140,20 @@ public partial class DataSystem
             if (Unlocked(StartCoinsPlus40NodeIds[i])) coins += 40;
         }
 
-        // 初始装备替换（growth.csv: 2 / 4 / 6 / 22）
+        // 初始装备替换（growth.csv: 2 / 4 / 6 / 22 / 281）
         if (Unlocked(4)) ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
         if (Unlocked(2)) ReplaceFirst(equipmentAttack, "1002", "1004");  // 断剑 -> 木棒
-        if (Unlocked(6)) ReplaceFirst(equipmentAttack, "1004", "1010");  // 木棒 -> kejiaren
-        if (Unlocked(22)) ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        if (Unlocked(6))
+        {
+            ReplaceFirst(equipmentAttack, "1004", "1012");  // 木棒 -> 噬魂剑
+        }
+        // 22：马甲 -> 钢盾（如果没找到马甲，兜底把破盾直接换成钢盾，避免“点了但没变化”的体验）
+        if (Unlocked(22))
+        {
+            if (!ReplaceFirst(equipmentDefence, "2009", "2010")) ReplaceFirst(equipmentDefence, "2001", "2010");
+        }
+        // 281：手里剑 -> 噬魂手里剑
+        if (Unlocked(281)) ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
 
     }
 
@@ -665,10 +674,15 @@ public partial class DataSystem
             DataGrowth growth = GetDataGrowth();
             bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
 
-            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 4 / 6 / 22)
+            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 2 / 4 / 6 / 22 / 281)
             if (Unlocked(4)) ReplaceFirst(envDeck, "2001", "2009"); // 破盾 -> 马甲
-            if (Unlocked(6)) ReplaceFirst(envDeck, "1002", "1004"); // 断剑 -> 木棒
-            if (Unlocked(22)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+            if (Unlocked(2)) ReplaceFirst(envDeck, "1002", "1004");  // 断剑 -> 木棒
+            if (Unlocked(6)) ReplaceFirst(envDeck, "1004", "1012");  // 木棒 -> 噬魂剑
+            if (Unlocked(22))
+            {
+                if (!ReplaceFirst(envDeck, "2009", "2010")) ReplaceFirst(envDeck, "2001", "2010"); // 马甲/破盾 -> 钢盾
+            }
+            if (Unlocked(281)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
         }
 
         // Growth may add starting items via equipmentItem (e.g. node 1 adds 3001 小血瓶).
