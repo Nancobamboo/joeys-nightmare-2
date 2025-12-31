@@ -89,6 +89,8 @@ public class UICardSimpleControl : YViewControl
 	private UIDescExtControl m_DescExtControl;
 	private Transform m_FrozenVFX; // 冰冻特效，循环播放 VFX_Bing2
 	private Transform m_VulnerableVFX; // 易伤特效：怪物存活且易伤>0时常驻播放，易伤结束/怪物死亡立刻回收
+	private float m_LastClickTime; // 点击冷却时间记录
+	private const float CLICK_COOLDOWN = 0.2f; // 点击冷却 0.2 秒
 
 	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
 
@@ -139,7 +141,7 @@ public class UICardSimpleControl : YViewControl
 				}
 			}
 		}
-		
+
 		// If hovering over a monster, notify weapon cards to refresh their display based on target
 		if (IsEnv && cachedCardType == ECardType.monster)
 		{
@@ -158,7 +160,7 @@ public class UICardSimpleControl : YViewControl
 			m_DescExtControl.Close();
 			m_DescExtControl = null;
 		}
-		
+
 		// If exiting hover from a monster, notify weapon cards to refresh back to normal display
 		if (IsEnv && cachedCardType == ECardType.monster)
 		{
@@ -207,6 +209,13 @@ public class UICardSimpleControl : YViewControl
 
 	void OnBtnCardClick()
 	{
+		// 点击冷却检查
+		if (Time.time - m_LastClickTime < CLICK_COOLDOWN)
+		{
+			return;
+		}
+		m_LastClickTime = Time.time;
+
 		if (!IsEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
 		{
 			return;
@@ -264,13 +273,13 @@ public class UICardSimpleControl : YViewControl
 		{
 			case ECardType.attack:
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
-				
+
 				// Debug log for attack cards with UpdateByHpChange buff
 				if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
 				{
 					Debug.Log($"[RefreshCard] {cachedCard?.cardName}: damageEffect={damageEffect}, baseAttack={cachedCard?.currentAttack}");
 				}
-				
+
 				// Special handling for CullingBlade: add preview execute damage
 				if (CardEffect != null && CardEffect.Id == ECardEffectId.CullingBlade)
 				{
@@ -280,7 +289,7 @@ public class UICardSimpleControl : YViewControl
 						damageEffect += cullingBlade.GetPreviewExecuteDamage();
 					}
 				}
-				
+
 				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 				int attackValue = cachedCard.currentAttack + damageEffect;
 
@@ -305,7 +314,7 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtAttack.text = attackValue.ToString();
 				if (hasDonkeyQueenDebuff)
 				{
-					m_View.TxtAttack.color = Color.red;
+					m_View.TxtAttack.color = new Color(1f, 0.5f, 0.5f); // 浅红色
 				}
 				else if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
 				{
@@ -315,7 +324,7 @@ public class UICardSimpleControl : YViewControl
 				{
 					m_View.TxtAttack.color = Color.black;
 				}
-				
+
 				// Update card name with extra attack count indicator
 				UpdateCardNameWithAttackCount(extraAttackCnt);
 				break;
@@ -334,7 +343,7 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtDefence.text = defenceValue.ToString();
 				if (hasDefenceQueenDebuff)
 				{
-					m_View.TxtDefence.color = Color.red;
+					m_View.TxtDefence.color = new Color(1f, 0.5f, 0.5f); // 浅红色
 				}
 				else if (defenceEffect != 0)
 				{
@@ -346,32 +355,32 @@ public class UICardSimpleControl : YViewControl
 				}
 				break;
 
-		case ECardType.monster:
-			m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
-			m_View.TxtAttack.color = Color.black;
-			m_View.TextHeart.text = cachedCard.currentHealth.ToString();
-			if (cachedCard.health > 0)
-			{
-				float ratio = (float)cachedCard.currentHealth / cachedCard.health;
-				m_View.MosterHeart.fillAmount = ratio;
-				
-				// Update health text color based on health percentage
-				if (ratio < 0.25f)
+			case ECardType.monster:
+				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
+				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
+				if (cachedCard.health > 0)
 				{
-					m_View.TextHeart.color = Color.red; // < 25% health: red
+					float ratio = (float)cachedCard.currentHealth / cachedCard.health;
+					m_View.MosterHeart.fillAmount = ratio;
+
+					// Update health text color based on health percentage
+					if (ratio < 0.25f)
+					{
+						m_View.TextHeart.color = Color.red; // < 25% health: red
+					}
+					else if (ratio < 0.5f)
+					{
+						m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+					}
+					else
+					{
+						m_View.TextHeart.color = Color.white; // >= 50% health: white
+					}
 				}
-				else if (ratio < 0.5f)
-				{
-					m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
-				}
-				else
-				{
-					m_View.TextHeart.color = Color.white; // >= 50% health: white
-				}
-			}
-			// Update vulnerable visual effect
-			UpdateVulnerableUI();
-			break;
+				// Update vulnerable visual effect
+				UpdateVulnerableUI();
+				break;
 
 			case ECardType.skill:
 				break;
@@ -393,7 +402,7 @@ public class UICardSimpleControl : YViewControl
 	private void UpdateCardNameWithAttackCount(int extraAttackCnt)
 	{
 		if (cachedCard == null) return;
-		
+
 		string baseName = cachedCard.cardName;
 		// Remove any existing attack count suffix
 		int xIndex = baseName.LastIndexOf(" x");
@@ -401,7 +410,7 @@ public class UICardSimpleControl : YViewControl
 		{
 			baseName = baseName.Substring(0, xIndex);
 		}
-		
+
 		if (extraAttackCnt > 0)
 		{
 			// Total attack count = base (1) + extra attacks
@@ -443,7 +452,7 @@ public class UICardSimpleControl : YViewControl
 			{
 				float ratio = (float)card.currentHealth / card.health;
 				m_View.MosterHeart.fillAmount = ratio;
-				
+
 				// Update health text color based on health percentage
 				if (ratio < 0.25f)
 				{
@@ -473,7 +482,7 @@ public class UICardSimpleControl : YViewControl
 			Debug.Log($"[UICardSimpleControl] UpdateDurabilityDescription - Card: {cachedCard.cardName}, durability: {cachedCard.durability}, description: {m_View.Description.text}");
 		}
 	}
-	
+
 	// Update card description (for dynamic content like heal amounts affected by relics)
 	public void UpdateDescription()
 	{
@@ -682,7 +691,7 @@ public class UICardSimpleControl : YViewControl
 		{
 			UpdateVulnerableVFX();
 		}
-		
+
 		// Update HP-dependent effects when card becomes visible (exposed from underneath)
 		if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
 		{
@@ -690,7 +699,7 @@ public class UICardSimpleControl : YViewControl
 			UpdateBuffValue();
 			RefreshCard();
 		}
-		
+
 		// 未来可以在这里添加其他特效的显示逻辑
 	}
 
@@ -1215,34 +1224,34 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtDefence.color = Color.black;
 				break;
 
-		case ECardType.monster:
-			m_View.Attack.SetActive(true);
-			m_View.TxtAttack.text = card.currentAttack.ToString();
-			m_View.TxtAttack.color = Color.black;
-			m_View.Moster.SetActive(true);
-			m_View.TextHeart.text = card.currentHealth.ToString();
-			if (card.health > 0)
-			{
-				float ratio = (float)card.currentHealth / card.health;
-				m_View.MosterHeart.fillAmount = ratio;
-				
-				// Update health text color based on health percentage
-				if (ratio < 0.25f)
+			case ECardType.monster:
+				m_View.Attack.SetActive(true);
+				m_View.TxtAttack.text = card.currentAttack.ToString();
+				m_View.TxtAttack.color = Color.black;
+				m_View.Moster.SetActive(true);
+				m_View.TextHeart.text = card.currentHealth.ToString();
+				if (card.health > 0)
 				{
-					m_View.TextHeart.color = Color.red; // < 25% health: red
+					float ratio = (float)card.currentHealth / card.health;
+					m_View.MosterHeart.fillAmount = ratio;
+
+					// Update health text color based on health percentage
+					if (ratio < 0.25f)
+					{
+						m_View.TextHeart.color = Color.red; // < 25% health: red
+					}
+					else if (ratio < 0.5f)
+					{
+						m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+					}
+					else
+					{
+						m_View.TextHeart.color = Color.white; // >= 50% health: white
+					}
 				}
-				else if (ratio < 0.5f)
-				{
-					m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
-				}
-				else
-				{
-					m_View.TextHeart.color = Color.white; // >= 50% health: white
-				}
-			}
-			// Update vulnerable visual effect for newly created monster cards
-			UpdateVulnerableUI();
-			break;
+				// Update vulnerable visual effect for newly created monster cards
+				UpdateVulnerableUI();
+				break;
 
 			case ECardType.skill:
 				break;
@@ -1392,7 +1401,7 @@ public class UICardSimpleControl : YViewControl
 				JoeyGameControl.Instance.ReturnVFXPool(go, EnvIndex);
 			}
 		}
-		
+
 		// 清理冰冻特效
 		if (m_FrozenVFX != null)
 		{
@@ -1406,7 +1415,7 @@ public class UICardSimpleControl : YViewControl
 			JoeyGameControl.Instance.ReturnVFXPool(m_VulnerableVFX, EnvIndex);
 			m_VulnerableVFX = null;
 		}
-		
+
 		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)

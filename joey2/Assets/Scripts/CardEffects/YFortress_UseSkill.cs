@@ -58,7 +58,6 @@ public partial class UIGamePhaseControl
             
             // Remove current defence card
             await RemoveBagCard(ECardType.defence, defenceCard);
-            RemoveCardCts(defenceCard);
             
             // Trigger defence card removal effects
             float removeDelayTime = defenceCard.CardEffect?.OnRemoveCard() ?? 0f;

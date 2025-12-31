@@ -78,15 +78,7 @@ public partial class UIGamePhaseControl
         // 对目标造成伤害
         if (damage > 0)
         {
-            CancellationToken token = GetOrCreateCardToken(targetCard);
-            // DealDamageToEnvCard 返回 true 表示敌人死亡，内部已调用 RemoveCardCts
-            enemyKilled = await DealDamageToEnvCard(targetCard, damage, targetEnvIndex, EEffectType.IceMagic, token);
-            
-            // 只有敌人存活时才需要清理 CTS
-            if (!enemyKilled)
-            {
-                RemoveCardCts(targetCard);
-            }
+            enemyKilled = await DealDamageToEnvCard(targetCard, damage, targetEnvIndex, EEffectType.IceMagic, default);
         }
 
         // 如果怪物还活着，给它添加冰冻效果

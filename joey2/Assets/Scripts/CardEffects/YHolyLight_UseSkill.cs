@@ -72,9 +72,7 @@ public partial class UIGamePhaseControl
 			
 			// 参考AttackRandomEnemy的实现，使用目标monster的token
 			int currentHealth = target.card.CardData.currentHealth;
-			CancellationToken token = GetOrCreateCardToken(target.card);
-			await DealDamageToEnvCard(target.card, currentHealth, target.envIndex, EEffectType.Damage, token);
-			RemoveCardCts(target.card);
+			await DealDamageToEnvCard(target.card, currentHealth, target.envIndex, EEffectType.Damage, default);
 		}
 	}
 }

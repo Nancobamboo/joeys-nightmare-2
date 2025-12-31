@@ -49,7 +49,6 @@ public partial class UIGamePhaseControl
         await UniTask.WaitForSeconds(vfxDelay > 0f ? vfxDelay : 0.8f);
 
         await RemoveBagCard(ECardType.defence, defenceCard);
-        RemoveCardCts(defenceCard);
         
         await UniTask.WaitForSeconds(0.5f);
     }

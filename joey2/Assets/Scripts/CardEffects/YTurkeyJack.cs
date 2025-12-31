@@ -84,9 +84,7 @@ public partial class UIGamePhaseControl
             return;
         }
 
-        CancellationToken token = GetOrCreateCardToken(turkeyCard);
-        await TakePlayerDamageAsync(attack, turkeyCard, envIndex, token, null);
-        RemoveCardCts(turkeyCard);
+        await TakePlayerDamageAsync(attack, turkeyCard, envIndex, default, null);
     }
 }
 
