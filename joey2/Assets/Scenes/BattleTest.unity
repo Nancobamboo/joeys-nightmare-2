@@ -738,35 +738,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.size
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
-      propertyPath: DebugEnvCardIds.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
+      propertyPath: DebugEnvCardIds.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[0]
-      value: 3004
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[1]
-      value: 4012
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[2]
-      value: 4011
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[3]
-      value: 4010
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[4]
-      value: 3012
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[5]
-      value: 3013
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugBagCardIds.Array.data[6]
@@ -786,7 +786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7692406811015378531, guid: 3a9f3246bb99a914ea0a5a637b1594a7, type: 3}
       propertyPath: DebugEnvCardIds.Array.data[0]
-      value: 5012
+      value: 1023
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

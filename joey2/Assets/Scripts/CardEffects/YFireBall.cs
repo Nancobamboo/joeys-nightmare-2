@@ -137,15 +137,7 @@ public partial class UIGamePhaseControl
 		// 逐个对目标造成伤害（避免 WhenAll 并行导致的异常传播问题）
 		foreach (var target in targets)
 		{
-			CancellationToken token = GetOrCreateCardToken(target.card);
-			// DealDamageToEnvCard 返回 true 表示敌人死亡，内部已调用 RemoveCardCts
-			bool enemyKilled = await DealDamageToEnvCard(target.card, damage, target.envIndex, EEffectType.FireBall, token);
-			
-			// 只有敌人存活时才需要清理 CTS
-			if (!enemyKilled)
-			{
-				RemoveCardCts(target.card);
-			}
+			await DealDamageToEnvCard(target.card, damage, target.envIndex, EEffectType.FireBall, default);
 		}
 	}
 }

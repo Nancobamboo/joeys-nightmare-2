@@ -81,9 +81,8 @@ public partial class UIGamePhaseControl
                 continue;
             }
 
-            // 怪物打怪物：不应触发“反伤到玩家”
-            // 注意：这里不要调用 GetOrCreateCardToken(sourceCardControl)，否则会把 CTS 留在 m_CardCtsDict 里导致回合推进卡死
-            await DealDamageToEnvCard(lastCard, damage, i, EEffectType.Damage, cancellationToken: null, triggerThorns: false);
+            // 怪物打怪物：不应触发"反伤到玩家"
+            await DealDamageToEnvCard(lastCard, damage, i, EEffectType.Damage, cancellationToken: default, triggerThorns: false);
         }
     }
 }

@@ -96,13 +96,13 @@ public enum ECardEffectId
     KnightSword_OnTop,
     KnightShield_OnTop,
     SpiralShuriken,
-	BlockFirstAttack,
-	TurkeyJack,
-	DonkeyQueen,
-	MonkeyKing,
-	JokerNightmare,
-	WhipDonkey,
-	ShadowTurkey,
+    BlockFirstAttack,
+    TurkeyJack,
+    DonkeyQueen,
+    MonkeyKing,
+    JokerNightmare,
+    WhipDonkey,
+    ShadowTurkey,
 
 }
 
@@ -135,7 +135,7 @@ public enum EVFXName
     VFX_LeiDan,
     VFX_Shouji,
     VFX_Shouji_2, // Changed from VFX_Shouji2 to match prefab filename
-	VFX_Yishun,
+    VFX_Yishun,
     VFX_Fanjia, //仞甲
     VFX_joey_souji,
     VFX_HuiXue,
@@ -182,7 +182,7 @@ public class YCardEffect
 
     public virtual float OnBecomeTopOfPile()
     {
-        return 0f;
+        return 0.3f;
     }
 
     public virtual float OnEnterBag()

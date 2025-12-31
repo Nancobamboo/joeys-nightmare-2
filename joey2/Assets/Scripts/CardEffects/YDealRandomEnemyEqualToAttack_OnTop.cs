@@ -75,10 +75,7 @@ public partial class UIGamePhaseControl
 		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
 		for (int i = 0; i < attackTime; i++)
 		{
-			CancellationToken token = GetOrCreateCardToken(enemyCardControl);
-			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, token);
-
-			RemoveCardCts(enemyCardControl);
+			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, default);
 
 			if (isKilled)
 			{
@@ -87,8 +84,7 @@ public partial class UIGamePhaseControl
 			else if (enemyCardControl.CardEffect?.GetEffectValue(EEffectType.QuickAttack) > 0)
 			{
 				int enemyAttack = enemyCardControl.CardData.currentAttack;
-				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, null);
+				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, default, null);
 			}
 		}
 	}
