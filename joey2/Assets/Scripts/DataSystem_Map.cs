@@ -44,10 +44,50 @@ public partial class DataSystem
         { (int)ERelicType.ShieldReflect, 29 },        // 护盾反伤
         { (int)ERelicType.RegenerationAmulet, 30 },   // 再生护符
         { (int)ERelicType.HalfHealthAmulet, 31 },     // 半血护符
-        { (int)ERelicType.BloodyGloves, 32 },         // 染血拳法
-        { (int)ERelicType.ArcaneOrb, 33 },            // 奥术宝珠
+        { (int)ERelicType.BareHandsMaster, 32 },      // 拳套/腕豪（relic_info.csv: 9010）
+        { (int)ERelicType.ShurikenMastery, 33 },      // 手里剑精通（relic_info.csv: 9009）
         { (int)ERelicType.MagicSwordsmanRing, 34 },   // 魔剑士指环
     };
+
+    // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
+    // - Card limit +1 nodes: 35 / 48 / 53
+    // - Weapon attack +1 nodes: 36 / 39 / 44 / 282
+    // - Armor defence +1 nodes: 37 / 40 / 45 / 283
+    // - HP cap +4 nodes: 41 / 43 / 47 / 52
+    // - Starting coins +40 nodes: 46/51/54
+    // - High-grade card probability +5% nodes: 38/42/49/50
+    private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48, 53 };
+    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 39, 44, 282 };
+    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 40, 45, 283 };
+    private static readonly int[] StartMaxHealthPlus4NodeIds = { 41, 43, 47, 52 };
+    private static readonly int[] StartCoinsPlus40NodeIds = { 46, 51, 54 };
+    private static readonly int[] HighGradeCardProbabilityPlus5NodeIds = { 38, 42, 49, 50 };
+
+    /// <summary>
+    /// Growth bonus: +5% per unlocked node (growth.csv: 38/42/49/50).
+    /// This is applied as a probability modifier to high-grade card selection (stars 2/3),
+    /// and is designed to stack with difficulty penalties.
+    /// </summary>
+    public float GetGrowthHighGradeCardProbabilityBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+        if (growth == null) return 0f;
+
+        float bonus = 0f;
+        for (int i = 0; i < HighGradeCardProbabilityPlus5NodeIds.Length; i++)
+        {
+            if (growth.IsUnlocked(HighGradeCardProbabilityPlus5NodeIds[i]))
+            {
+                bonus += 0.05f;
+            }
+        }
+        return bonus;
+    }
+
+    // Growth-applied bonus tracking (to avoid double-applying when ApplyGrowthUnlocks is called multiple times)
+    private int m_AppliedEnvCardLimitGrowthBonus = 0;
+    private int m_AppliedWeaponAttackGrowthBonus = 0;
+    private int m_AppliedArmorDefenceGrowthBonus = 0;
 
     // Cache original prices from card_info.csv so we can restore after unlocking
     private Dictionary<string, int> m_BaseCardPriceById = new Dictionary<string, int>();
@@ -69,6 +109,7 @@ public partial class DataSystem
     private void ApplyGrowthToStartLoadout(
         List<string> equipmentAttack,
         List<string> equipmentDefence,
+        List<string> equipmentItem,
         ref int coins,
         ref int maxHealth,
         List<int> extraRelics)
@@ -79,28 +120,41 @@ public partial class DataSystem
         // 初始遗物（growth.csv: 0 / 28 / 32 / 33）
         if (Unlocked(0)) extraRelics?.Add((int)ERelicType.BBQDelight);      // 烤肉香香
         if (Unlocked(28)) extraRelics?.Add((int)ERelicType.BareHandParry);  // 空手接白刃
-        if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BloodyGloves);   // 染血拳法
-        if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ArcaneOrb);      // 奥术宝珠
-
-        // hp +4（growth.csv: 1）
-        if (Unlocked(1)) maxHealth += 4;
-
-        // gold +50（growth.csv: 2）
-        if (Unlocked(2)) coins += 50;
-
-        // 初始装备替换（growth.csv: 4 / 6 / 22）
-        if (Unlocked(4))
+        if (Unlocked(32)) extraRelics?.Add((int)ERelicType.BareHandsMaster); // 拳套/腕豪（relic_info.csv: 9010）
+        if (Unlocked(33)) extraRelics?.Add((int)ERelicType.ShurikenMastery); // 手里剑精通（relic_info.csv: 9009）
+        // 初始装备增加一个小血瓶（growth.csv: 1，card_info.csv: 3001）
+        if (Unlocked(1) && equipmentItem != null && !equipmentItem.Contains("3001"))
         {
-            ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
+            equipmentItem.Add("3001");
         }
+
+        // 局外成长：开局属性加成（growth.csv: 35-54）
+        // hp 上限 +4（可叠加）
+        for (int i = 0; i < StartMaxHealthPlus4NodeIds.Length; i++)
+        {
+            if (Unlocked(StartMaxHealthPlus4NodeIds[i])) maxHealth += 4;
+        }
+        // 初始金币 +40（可叠加）
+        for (int i = 0; i < StartCoinsPlus40NodeIds.Length; i++)
+        {
+            if (Unlocked(StartCoinsPlus40NodeIds[i])) coins += 40;
+        }
+
+        // 初始装备替换（growth.csv: 2 / 4 / 6 / 22 / 281）
+        if (Unlocked(4)) ReplaceFirst(equipmentDefence, "2001", "2009"); // 破盾 -> 马甲
+        if (Unlocked(2)) ReplaceFirst(equipmentAttack, "1002", "1004");  // 断剑 -> 木棒
         if (Unlocked(6))
         {
-            ReplaceFirst(equipmentAttack, "1002", "1004"); // 断剑 -> 木棒
+            ReplaceFirst(equipmentAttack, "1004", "1012");  // 木棒 -> 噬魂剑
         }
+        // 22：马甲 -> 钢盾（如果没找到马甲，兜底把破盾直接换成钢盾，避免“点了但没变化”的体验）
         if (Unlocked(22))
         {
-            ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+            if (!ReplaceFirst(equipmentDefence, "2009", "2010")) ReplaceFirst(equipmentDefence, "2001", "2010");
         }
+        // 281：手里剑 -> 噬魂手里剑
+        if (Unlocked(281)) ReplaceFirst(equipmentAttack, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+
     }
 
     /// <summary>
@@ -113,6 +167,122 @@ public partial class DataSystem
     {
         ApplyGrowthCardUnlocks();
         ApplyGrowthRelicUnlocks();
+        ApplyGrowthWeaponArmorStatBonus();
+        ApplyGrowthEnvCardLimitBonus();
+    }
+
+    /// <summary>
+    /// Apply growth nodes:
+    /// - 36/39/44: Weapon attack +1 (applies to attack cards)
+    /// - 37/40/45: Armor defence +1 (applies to defence cards)
+    /// This is applied as a delta so it won't stack if called multiple times.
+    /// </summary>
+    private void ApplyGrowthWeaponArmorStatBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+
+        int weaponAtkBonus = 0;
+        int armorDefBonus = 0;
+        if (growth != null)
+        {
+            for (int i = 0; i < StartWeaponAttackPlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartWeaponAttackPlus1NodeIds[i])) weaponAtkBonus += 1;
+            }
+            for (int i = 0; i < StartArmorDefencePlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartArmorDefencePlus1NodeIds[i])) armorDefBonus += 1;
+            }
+        }
+
+        int atkDelta = weaponAtkBonus - m_AppliedWeaponAttackGrowthBonus;
+        int defDelta = armorDefBonus - m_AppliedArmorDefenceGrowthBonus;
+        if (atkDelta == 0 && defDelta == 0) return;
+        m_AppliedWeaponAttackGrowthBonus = weaponAtkBonus;
+        m_AppliedArmorDefenceGrowthBonus = armorDefBonus;
+
+        // 1) Apply to base card configs so all future created cards inherit the buff
+        GData.Instance.LoadCards();
+        foreach (var kv in GData.Instance.CardDict)
+        {
+            Card cfg = kv.Value;
+            if (cfg == null) continue;
+            ECardType type = cfg.GetCardType();
+            if (type == ECardType.attack && atkDelta != 0)
+            {
+                cfg.SetAttack(Mathf.Max(0, cfg.currentAttack + atkDelta));
+            }
+            else if (type == ECardType.defence && defDelta != 0)
+            {
+                cfg.SetDefence(Mathf.Max(0, cfg.currentDefence + defDelta));
+            }
+        }
+
+        // 2) Apply to current player-owned cards (including cached Env cards) so UI/actual values are consistent
+        DataJoeyPlayer player = GetDataJoeyPlayer();
+        if (player == null) return;
+
+        void ApplyDeltaToCard(Card c)
+        {
+            if (c == null) return;
+            ECardType t = c.GetCardType();
+            if (t == ECardType.attack && atkDelta != 0)
+            {
+                c.SetAttack(Mathf.Max(0, c.currentAttack + atkDelta));
+            }
+            else if (t == ECardType.defence && defDelta != 0)
+            {
+                c.SetDefence(Mathf.Max(0, c.currentDefence + defDelta));
+            }
+        }
+
+        if (player.SelfCardDict != null)
+        {
+            foreach (var kv in player.SelfCardDict)
+            {
+                ApplyDeltaToCard(kv.Value);
+            }
+        }
+        if (player.EnvCardDict != null)
+        {
+            foreach (var kv in player.EnvCardDict)
+            {
+                ApplyDeltaToCard(kv.Value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Apply growth "卡牌上限 +1" nodes to Env mode card limit (RoguelikeCharacter.envCardLimit).
+    /// This is applied as a delta so it remains compatible with other runtime modifiers (e.g. relics).
+    /// </summary>
+    private void ApplyGrowthEnvCardLimitBonus()
+    {
+        DataGrowth growth = GetDataGrowth();
+
+        int bonus = 0;
+        if (growth != null)
+        {
+            for (int i = 0; i < StartEnvCardLimitPlus1NodeIds.Length; i++)
+            {
+                if (growth.IsUnlocked(StartEnvCardLimitPlus1NodeIds[i])) bonus += 1;
+            }
+        }
+
+        int delta = bonus - m_AppliedEnvCardLimitGrowthBonus;
+        if (delta == 0) return;
+        m_AppliedEnvCardLimitGrowthBonus = bonus;
+
+        // Apply to all roguelike characters (index defaults to 0 in most call sites)
+        GData.Instance.LoadRoguelikeCharacter();
+        var list = GData.Instance.RoguelikeCharacterList;
+        if (list == null) return;
+        for (int i = 0; i < list.Count; i++)
+        {
+            RoguelikeCharacter ch = list[i];
+            if (ch == null) continue;
+            ch.envCardLimit += delta;
+        }
     }
 
     private void EnsureBaseCardPricesCached()
@@ -221,6 +391,7 @@ public partial class DataSystem
         VFXDelayTimeDict[(int)EVFXName.VFX_disappear] = 0f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Dunsui] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_glow] = 0f;
+        VFXDelayTimeDict[(int)EVFXName.VFX_Yishun] = 10f;
         VFXDelayTimeDict[(int)EVFXName.VFX_Fanjia] = 1f;
         VFXDelayTimeDict[(int)EVFXName.VFX_joey_souji] = 0.65f;
         VFXDelayTimeDict[(int)EVFXName.VFX_HuiXue] = 0.65f;
@@ -263,13 +434,27 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
 
-        Card card = dataJoeyPlayer.GetEnvCardDictData(cardId);
-        if (card != null)
+        // Get base card config to check card type
+        Card configCard = GData.Instance.GetCardConfigById(cardId);
+        if (configCard == null)
         {
-            return card;
+            Debug.LogError($"Card config not found for ID: {cardId}");
+            return null;
         }
 
-        card = GData.Instance.GetCardConfigById(cardId).Clone();
+        // Monster cards should NOT use cached data because they need difficulty bonuses applied fresh each time
+        // Only non-monster cards (attack/defence/skill/item) use EnvCardDict for permanent upgrades
+        if (configCard.GetCardType() != ECardType.monster)
+        {
+            Card cachedCard = dataJoeyPlayer.GetEnvCardDictData(cardId);
+            if (cachedCard != null)
+            {
+                return cachedCard;
+            }
+        }
+
+        // Create fresh card (either monster, or non-monster that's not cached)
+        Card card = configCard.Clone();
         dataJoeyPlayer.UniqueIdGen++;
         card.UniqueId = dataJoeyPlayer.UniqueIdGen;
 
@@ -277,7 +462,48 @@ public partial class DataSystem
         cardProgress.AddCardIdDictData(cardId, 1);
         SaveDataCardProgress();
 
+        // Apply difficulty effects to player cards in Env mode ONLY when first created (not cached)
+        // This ensures difficulty penalties are applied exactly once, not every time the card is loaded
+        if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+        {
+            ECardType cardType = card.GetCardType();
+            if (cardType == ECardType.attack || cardType == ECardType.defence)
+            {
+                ApplyEnvDifficultyToPlayerCard(card);
+            }
+        }
+
         return card;
+    }
+
+    /// <summary>
+    /// Apply difficulty penalties to player cards in env (cumulative from all unlocked difficulties)
+    /// This should only be called when a card is first created, NOT when loaded from cache
+    /// </summary>
+    private void ApplyEnvDifficultyToPlayerCard(Card playerCard)
+    {
+        int difficultyLevel = GetCurrentDifficulty();
+
+        // Apply cumulative penalties from difficulty levels 2 and up
+        for (int level = 2; level <= difficultyLevel; level++)
+        {
+            DifficultyConfig config = GData.Instance.GetDifficultyConfig(level);
+            if (config == null) continue;
+
+            // Apply attack penalty to attack cards
+            if (playerCard.GetCardType() == ECardType.attack && config.playerAttackPenalty != 0)
+            {
+                playerCard.currentAttack += config.playerAttackPenalty;
+                if (playerCard.currentAttack < 0) playerCard.currentAttack = 0;
+            }
+
+            // Apply defence penalty to defence cards
+            if (playerCard.GetCardType() == ECardType.defence && config.playerDefencePenalty != 0)
+            {
+                playerCard.currentDefence += config.playerDefencePenalty;
+                if (playerCard.currentDefence < 0) playerCard.currentDefence = 0;
+            }
+        }
     }
 
     public bool HasRelic(ERelicType relicType)
@@ -297,8 +523,9 @@ public partial class DataSystem
         int maxHealth = characterData.maxHealth;
         var equipAttack = new List<string>(characterData.equipmentAttack);
         var equipDefence = new List<string>(characterData.equipmentDefence);
+        var equipItem = new List<string>(characterData.equipmentItem);
         var extraRelics = new List<int>();
-        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, equipItem, ref coins, ref maxHealth, extraRelics);
 
         for (int i = 0; i < characterData.cardDeck.Count; i++)
         {
@@ -326,9 +553,9 @@ public partial class DataSystem
             dataJoeyPlayer.AddEquipedDefenceListData(card.UniqueId);
         }
 
-        for (int i = 0; i < characterData.equipmentItem.Count; i++)
+        for (int i = 0; i < equipItem.Count; i++)
         {
-            string cardId = characterData.equipmentItem[i];
+            string cardId = equipItem[i];
             if (string.IsNullOrEmpty(cardId)) continue;
             Card card = CreateCard(cardId);
             dataJoeyPlayer.AddSelfCardDictData(card);
@@ -382,6 +609,7 @@ public partial class DataSystem
         {
             dataJoeyPlayer.playerMaxHealth = maxHealth;
             dataJoeyPlayer.playerHealth = maxHealth;
+            dataJoeyPlayer.stageStartHealth = maxHealth; // Initialize stage start health
         }
 
         RoguelikeStage firstStage = GData.Instance.GetRoguelikeStage(0);
@@ -394,6 +622,9 @@ public partial class DataSystem
                 dataJoeyPlayer.currentLevel = levelId;
             }
         }
+
+        // Save the difficulty level when this save was created
+        dataJoeyPlayer.savedDifficulty = GetCurrentDifficulty();
 
         SaveDataJoeyPlayer();
     }
@@ -427,8 +658,9 @@ public partial class DataSystem
         int maxHealth = characterData.maxHealth;
         var equipAttack = new List<string>(characterData.equipmentAttack);
         var equipDefence = new List<string>(characterData.equipmentDefence);
+        var equipItem = new List<string>(characterData.equipmentItem);
         var extraRelics = new List<int>();
-        ApplyGrowthToStartLoadout(equipAttack, equipDefence, ref coins, ref maxHealth, extraRelics);
+        ApplyGrowthToStartLoadout(equipAttack, equipDefence, equipItem, ref coins, ref maxHealth, extraRelics);
 
         // Safety: ensure a clean env run init (normally EnvCardPool is empty when this is called)
         if (dataJoeyPlayer.EnvCardPool != null) dataJoeyPlayer.EnvCardPool.Clear();
@@ -442,10 +674,27 @@ public partial class DataSystem
             DataGrowth growth = GetDataGrowth();
             bool Unlocked(int id) => growth != null && growth.IsUnlocked(id);
 
-            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 4 / 6 / 22)
+            // Keep in sync with ApplyGrowthToStartLoadout (growth.csv: 2 / 4 / 6 / 22 / 281)
             if (Unlocked(4)) ReplaceFirst(envDeck, "2001", "2009"); // 破盾 -> 马甲
-            if (Unlocked(6)) ReplaceFirst(envDeck, "1002", "1004"); // 断剑 -> 木棒
-            if (Unlocked(22)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+            if (Unlocked(2)) ReplaceFirst(envDeck, "1002", "1004");  // 断剑 -> 木棒
+            if (Unlocked(6)) ReplaceFirst(envDeck, "1004", "1012");  // 木棒 -> 噬魂剑
+            if (Unlocked(22))
+            {
+                if (!ReplaceFirst(envDeck, "2009", "2010")) ReplaceFirst(envDeck, "2001", "2010"); // 马甲/破盾 -> 钢盾
+            }
+            if (Unlocked(281)) ReplaceFirst(envDeck, "1003", "1013"); // 手里剑 -> 噬魂手里剑
+        }
+
+        // Growth may add starting items via equipmentItem (e.g. node 1 adds 3001 小血瓶).
+        // Env mode doesn't use equipment lists, so we merge item cards into the Env start deck/pool here.
+        if (equipItem != null && equipItem.Count > 0)
+        {
+            for (int i = 0; i < equipItem.Count; i++)
+            {
+                string id = equipItem[i];
+                if (string.IsNullOrEmpty(id)) continue;
+                if (!envDeck.Contains(id)) envDeck.Add(id);
+            }
         }
 
         for (int i = 0; i < envDeck.Count; i++)
@@ -480,12 +729,20 @@ public partial class DataSystem
         {
             dataJoeyPlayer.playerMaxHealth = maxHealth;
             dataJoeyPlayer.playerHealth = maxHealth;
+            dataJoeyPlayer.stageStartHealth = maxHealth; // Initialize stage start health
         }
+
+        // Initialize base attack and defence for Env mode
+        dataJoeyPlayer.playerAttack = 0;
+        dataJoeyPlayer.playerDefence = 0;
 
         dataJoeyPlayer.currentLevel = 1;
 
         // Apply difficulty effects based on current difficulty level
         ApplyEnvDifficultyEffects(dataJoeyPlayer);
+
+        // Save the difficulty level when this save was created
+        dataJoeyPlayer.savedDifficulty = GetCurrentDifficulty();
 
         Debug.Log($"Env mode initialized: {dataJoeyPlayer.EnvCardPool.Count} cards in pool, difficulty level: {GetCurrentDifficulty()}");
         SaveDataJoeyPlayer();
@@ -573,72 +830,72 @@ public partial class DataSystem
         SaveDataGrowth();
     }
 
-	/// <summary>
-	/// 判断当前是否存在“买得起”的成长点：
-	/// - 尚未解锁
-	/// - 价格 <= 当前 Points
-	/// - 与已解锁节点联通（dependency 指向已解锁节点）
-	/// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
-	///
-	/// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
-	/// </summary>
-	public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
-	{
-		DataGrowth dataGrowth = GetDataGrowth();
-		if (dataGrowth == null) return false;
+    /// <summary>
+    /// 判断当前是否存在“买得起”的成长点：
+    /// - 尚未解锁
+    /// - 价格 <= 当前 Points
+    /// - 与已解锁节点联通（dependency 指向已解锁节点）
+    /// - 并且其所有 dependency（>=0 的部分）都已解锁（即当前可购买）
+    ///
+    /// 注意：dependency 为空或仅为 -1 的节点视作“根节点”。默认 includeRootNodes=true 时也会纳入判断。
+    /// </summary>
+    public bool HasAffordableConnectedGrowthNode(bool includeRootNodes = true)
+    {
+        DataGrowth dataGrowth = GetDataGrowth();
+        if (dataGrowth == null) return false;
 
-		int points = dataGrowth.Points;
-		var unlockedList = dataGrowth.UnlockedNodes;
-		HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
+        int points = dataGrowth.Points;
+        var unlockedList = dataGrowth.UnlockedNodes;
+        HashSet<int> unlocked = unlockedList != null ? new HashSet<int>(unlockedList) : new HashSet<int>();
 
-		GData.Instance.LoadGrowthInfo();
-		foreach (var kv in GData.Instance.GrowthInfoDict)
-		{
-			GrowthInfo info = kv.Value;
-			if (info == null) continue;
+        GData.Instance.LoadGrowthInfo();
+        foreach (var kv in GData.Instance.GrowthInfoDict)
+        {
+            GrowthInfo info = kv.Value;
+            if (info == null) continue;
 
-			int id = info.id;
-			if (unlocked.Contains(id)) continue;               // 已解锁不算
-			if (info.price > points) continue;                // 买不起
+            int id = info.id;
+            if (unlocked.Contains(id)) continue;               // 已解锁不算
+            if (info.price > points) continue;                // 买不起
 
-			bool hasPrereq = false;
-			bool allPrereqUnlocked = true;
-			bool connectedToUnlocked = false;
+            bool hasPrereq = false;
+            bool allPrereqUnlocked = true;
+            bool connectedToUnlocked = false;
 
-			var deps = info.depends;
-			if (deps != null)
-			{
-				for (int i = 0; i < deps.Count; i++)
-				{
-					int depId = deps[i];
-					if (depId < 0) continue; // -1 表示无前置
+            var deps = info.depends;
+            if (deps != null)
+            {
+                for (int i = 0; i < deps.Count; i++)
+                {
+                    int depId = deps[i];
+                    if (depId < 0) continue; // -1 表示无前置
 
-					hasPrereq = true;
-					if (!unlocked.Contains(depId))
-					{
-						allPrereqUnlocked = false;
-						break;
-					}
-					connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
-				}
-			}
+                    hasPrereq = true;
+                    if (!unlocked.Contains(depId))
+                    {
+                        allPrereqUnlocked = false;
+                        break;
+                    }
+                    connectedToUnlocked = true; // 前置已解锁 => 与已解锁联通
+                }
+            }
 
-			// 根节点：无前置（或前置都是 -1）
-			if (!hasPrereq)
-			{
-				if (!includeRootNodes) continue;
-				allPrereqUnlocked = true;
-				connectedToUnlocked = true;
-			}
+            // 根节点：无前置（或前置都是 -1）
+            if (!hasPrereq)
+            {
+                if (!includeRootNodes) continue;
+                allPrereqUnlocked = true;
+                connectedToUnlocked = true;
+            }
 
-			if (allPrereqUnlocked && connectedToUnlocked)
-			{
-				return true;
-			}
-		}
+            if (allPrereqUnlocked && connectedToUnlocked)
+            {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     public bool AddCardToDataJoeyPlayer(Card card)
     {
@@ -707,6 +964,34 @@ public partial class DataSystem
         SaveDataJoeyPlayer();
 
         Debug.Log($"Player data reset. Difficulty level preserved in DataDifficulty system.");
+    }
+
+    /// <summary>
+    /// Check if the saved game's difficulty matches the current difficulty
+    /// Returns true if save can be continued, false if difficulty mismatch
+    /// </summary>
+    public bool CanContinueSavedGame()
+    {
+        DataJoeyPlayer playerData = GetDataJoeyPlayer();
+
+        // Check if there's save data
+        bool hasSaveData = playerData.EnvCardPool != null && playerData.EnvCardPool.Count > 0;
+        if (!hasSaveData)
+        {
+            return false;
+        }
+
+        // Check if difficulty matches (savedDifficulty defaults to 1 for old saves)
+        int savedDiff = playerData.savedDifficulty > 0 ? playerData.savedDifficulty : 1;
+        int currentDiff = GetCurrentDifficulty();
+
+        if (savedDiff != currentDiff)
+        {
+            Debug.Log($"Cannot continue: Save is from difficulty {savedDiff}, but current difficulty is {currentDiff}");
+            return false;
+        }
+
+        return true;
     }
 }
 

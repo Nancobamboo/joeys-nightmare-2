@@ -34,6 +34,7 @@ public class JoeyGameControl : YViewControl
 	private UIShopSuperControl m_ShopSuperControl;
 	private UILobbyControl m_LobbyControl;
 	private Dictionary<int, MonoBehaviourPool<Transform>> VFXPoolDict = new Dictionary<int, MonoBehaviourPool<Transform>>();
+	private Dictionary<int, GameObject> VFXPrefabDict = new Dictionary<int, GameObject>();
 	private Dictionary<Transform, CancellationTokenSource> CancelTokenDict = new Dictionary<Transform, CancellationTokenSource>();
 	private SingleDelayAction m_GlobalDelayAction = new SingleDelayAction();
 	private bool m_IsLobbyEnter = false;
@@ -52,6 +53,7 @@ public class JoeyGameControl : YViewControl
 		public int PlayerHealth;
 		public int PlayerMaxHealth;
 		public int Coin;
+		public int EnvRandomSeed; // Random seed for env card arrangement
 	}
 
 	private GameStateCache m_GameStateCache;
@@ -300,21 +302,21 @@ public class JoeyGameControl : YViewControl
 				// Player hasn't unlocked this stage yet, treat as final stage
 				Debug.Log($"Stage {currentEnvStage.level} not unlocked yet (max: {maxUnlockedStage}). Completing run.");
 				
-				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-				achievement.PassGameNum++;
-				DataSystem.Instance.SaveDataAchievement();
-				
-				// Unlock next difficulty level (up to max 8) and automatically switch to it
-				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-				int currentDiff = diffData.Current;
-				if (currentDiff < 8)
-				{
-					int newDiff = currentDiff + 1;
-					diffData.UnlockUpTo(newDiff);
-					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-					DataSystem.Instance.SaveDataDifficulty();
-					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-				}
+		DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+		achievement.PassGameNum++;
+		DataSystem.Instance.SaveDataAchievement();
+		
+		// Unlock next difficulty level (up to max 12) and automatically switch to it
+		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+		int currentDiff = diffData.Current;
+		if (currentDiff < 12)
+		{
+			int newDiff = currentDiff + 1;
+			diffData.UnlockUpTo(newDiff);
+			diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+			DataSystem.Instance.SaveDataDifficulty();
+			Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+		}
 				
 				// Reset stage to 0 for next run
 				m_DataJoeyPlayer.StageId = 0;
@@ -336,13 +338,32 @@ public class JoeyGameControl : YViewControl
 			RoguelikeCharacter characterData = GData.Instance.GetRoguelikeCharacter();
 			int cardLimit = characterData != null ? characterData.envCardLimit : 0;
 
-			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit);
+			// Check if we should use existing seed (continue game) or generate new one
+			bool isContinueGame = m_DataJoeyPlayer.envRandomSeed != 0;
+			if (!isContinueGame)
+			{
+				// Generate new env random seed for deterministic card arrangement
+				m_DataJoeyPlayer.envRandomSeed = UnityEngine.Random.Range(1, int.MaxValue);
+				DataSystem.Instance.SaveDataJoeyPlayer();
+				Debug.Log($"Generated new env random seed: {m_DataJoeyPlayer.envRandomSeed}");
+			}
+			else
+			{
+				Debug.Log($"Using saved env random seed: {m_DataJoeyPlayer.envRandomSeed}");
+			}
+
+			List<List<string>> envModeCardList = CardDraw.Instance.DrawCardEnvMode(envLevelId, playerCardPool, cardLimit, m_DataJoeyPlayer.envRandomSeed);
 			for (int i = 0; i < envModeCardList.Count; i++)
 			{
 				List<string> cardIdList = envModeCardList[i];
 				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
 			SaveGameStateCache();
+			
+			// Auto-save when entering new level
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[Auto-Save] Game saved when entering Env level (Stage {envLevelId})");
+			
 			return;
 		}
 
@@ -447,6 +468,10 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
 		{
 			SaveGameStateCache();
+			
+			// Auto-save when entering new level
+			DataSystem.Instance.SaveDataJoeyPlayer();
+			Debug.Log($"[Auto-Save] Game saved when entering level {levelId}");
 		}
 	}
 
@@ -461,6 +486,10 @@ public class JoeyGameControl : YViewControl
 		m_GameStateCache.PlayerHealth = m_DataJoeyPlayer.playerHealth;
 		m_GameStateCache.PlayerMaxHealth = m_DataJoeyPlayer.playerMaxHealth;
 		m_GameStateCache.Coin = m_DataJoeyPlayer.Coin;
+		m_GameStateCache.EnvRandomSeed = m_DataJoeyPlayer.envRandomSeed; // Save env random seed
+
+		// Save current health as stage start health for save/load persistence
+		m_DataJoeyPlayer.stageStartHealth = m_DataJoeyPlayer.playerHealth;
 
 		m_GameStateCache.EnvCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
@@ -512,6 +541,7 @@ public class JoeyGameControl : YViewControl
 		m_DataJoeyPlayer.playerHealth = m_GameStateCache.PlayerHealth;
 		m_DataJoeyPlayer.playerMaxHealth = m_GameStateCache.PlayerMaxHealth;
 		m_DataJoeyPlayer.Coin = m_GameStateCache.Coin;
+		m_DataJoeyPlayer.envRandomSeed = m_GameStateCache.EnvRandomSeed; // Restore env random seed
 
 		m_DataJoeyPlayer.EnvCardPool.Clear();
 		m_DataJoeyPlayer.EnvCardPool.AddRange(m_GameStateCache.EnvCardPool);
@@ -548,7 +578,8 @@ public class JoeyGameControl : YViewControl
 		}
 		else if (GameMode == EGameMode.Env)
 		{
-			DataSystem.Instance.SaveDataJoeyPlayer();
+			// Env random seed is cleared in EndGamePhase() when stage is completed
+			// This prevents losing the seed if player quits during level transition
 		}
 		else if (GameMode == EGameMode.Guide)
 		{
@@ -571,6 +602,13 @@ public class JoeyGameControl : YViewControl
 		}
 		else
 		{
+			// When starting a new stage (no cache), restore health from stageStartHealth if available
+			// This handles the case where player quit mid-stage and continues
+			if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_DataJoeyPlayer.stageStartHealth > 0)
+			{
+				m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.stageStartHealth;
+				Debug.Log($"Restored health from stageStartHealth: {m_DataJoeyPlayer.stageStartHealth}");
+			}
 			SetGamePhase(EGamePhase.BattleStart);
 		}
 	}
@@ -586,6 +624,13 @@ public class JoeyGameControl : YViewControl
 		if (DataSystem.Instance.HasRelic(ERelicType.BBQDelight))
 		{
 			YActionSystem.Instance.DispatchAction(EActionId.AddHp, 6);
+		}
+
+		// Save current health state to cache before processing rewards
+		// This ensures that if player quits during reward selection, they resume at stage end health
+		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
+		{
+			SaveGameStateCache();
 		}
 
 		if (GameMode == EGameMode.Battle)
@@ -617,45 +662,54 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
-		else if (GameMode == EGameMode.Env)
+	else if (GameMode == EGameMode.Env)
+	{
+		int envLevelId = m_DataJoeyPlayer.StageId;
+		EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
+		EStageType stageType = GetEnvStageType(envLevelId);
+		StageReward stageReward = GData.Instance.GetStageReward(stageType);
+
+		// Check if this is the last stage for current difficulty
+		int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+		bool isFinalStageForDifficulty = currentEnvStage != null && currentEnvStage.level >= maxUnlockedStage;
+
+		if (stageType == EStageType.final || isFinalStageForDifficulty)
 		{
-			int envLevelId = m_DataJoeyPlayer.StageId;
-			EStageType stageType = GetEnvStageType(envLevelId);
-			StageReward stageReward = GData.Instance.GetStageReward(stageType);
-
-			if (stageType == EStageType.final)
+			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+			achievement.PassGameNum++;
+			DataSystem.Instance.SaveDataAchievement();
+			
+			// Unlock next difficulty level (up to max 12) and automatically switch to it
+			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+			int currentDiff = diffData.Current;
+			if (currentDiff < 12)
 			{
-				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-				achievement.PassGameNum++;
-				DataSystem.Instance.SaveDataAchievement();
-				
-				// Unlock next difficulty level (up to max 8) and automatically switch to it
-				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-				int currentDiff = diffData.Current;
-				if (currentDiff < 8)
-				{
-					int newDiff = currentDiff + 1;
-					diffData.UnlockUpTo(newDiff);
-					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-					DataSystem.Instance.SaveDataDifficulty();
-					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-				}
-				
-				DataSystem.Instance.isFinishGame = true;
-				ClearAllUniTasks();
-				if (m_LobbyControl == null)
-				{
-					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
-				}
-				m_LobbyControl.OnBtnBuildClick();
-				return;
+				int newDiff = currentDiff + 1;
+				diffData.UnlockUpTo(newDiff);
+				diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+				DataSystem.Instance.SaveDataDifficulty();
+				Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
 			}
-
-			// Handle rewards based on stage_reward.csv configuration
-			HandleStageRewardEnv(stageReward, stageType);
-
-			m_DataJoeyPlayer.StageId++;
+			
+			DataSystem.Instance.isFinishGame = true;
+			ClearAllUniTasks();
+			if (m_LobbyControl == null)
+			{
+				m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+			}
+			m_LobbyControl.OnBtnBuildClick();
+			return;
 		}
+
+		// Handle rewards based on stage_reward.csv configuration
+		HandleStageRewardEnv(stageReward, stageType);
+
+		// Increment stage and clear env random seed for next level
+		// This ensures new level layout when player continues
+		m_DataJoeyPlayer.StageId++;
+		m_DataJoeyPlayer.envRandomSeed = 0;
+		DataSystem.Instance.SaveDataJoeyPlayer();
+	}
 		else if (GameMode == EGameMode.Guide)
 		{
 			if (m_DataJoeyPlayer.currentLevel >= 3)
@@ -827,6 +881,21 @@ public class JoeyGameControl : YViewControl
 
 	public void ReturnToMainMenu()
 	{
+		// Restore health to stage start health before saving
+		// This ensures that when player continues, they start from the beginning of the current stage
+		if ((GameMode == EGameMode.Battle || GameMode == EGameMode.Env) && m_DataJoeyPlayer.stageStartHealth > 0)
+		{
+			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.stageStartHealth;
+			Debug.Log($"Restored health to stage start before saving: {m_DataJoeyPlayer.stageStartHealth}");
+		}
+		
+		// Save current game state before returning to main menu
+		// This ensures seed and progress are not lost if player quits
+		DataSystem.Instance.SaveDataJoeyPlayer();
+		
+		// Clear game state cache to ensure fresh load on continue
+		m_GameStateCache = null;
+		
 		ClearAllUniTasks();
 		Close();
 		SceneLoader.Instance.LoadScene("Start");
@@ -845,11 +914,13 @@ public class JoeyGameControl : YViewControl
 	public void PlayVFX(EVFXName vfxName, Transform parent, float delayTime)
 	{
 		int key = (int)vfxName;
+		GameObject prefab = null;
 
 		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
 		{
 			string prefabPath = "VFX/" + vfxName.ToString();
-			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
 			pool = new MonoBehaviourPool<Transform>(() =>
 			{
 				GameObject instance = Instantiate(prefab, parent);
@@ -859,11 +930,20 @@ public class JoeyGameControl : YViewControl
 			});
 			VFXPoolDict[key] = pool;
 		}
+		else
+		{
+			VFXPrefabDict.TryGetValue(key, out prefab);
+			if (prefab == null)
+			{
+				string prefabPath = "VFX/" + vfxName.ToString();
+				prefab = Resources.Load<GameObject>(prefabPath);
+				VFXPrefabDict[key] = prefab;
+			}
+		}
 
 		Transform vfxTransform = pool.Get();
-		vfxTransform.SetParent(parent);
-		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
+		vfxTransform.SetParent(parent, false);
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
 
 		var cts = new CancellationTokenSource();
 		CancelTokenDict[vfxTransform] = cts;
@@ -871,29 +951,57 @@ public class JoeyGameControl : YViewControl
 		DelayHideVFX(vfxTransform, delayTime, cts, key).Forget();
 	}
 
+	public void ResetVFXTransform(EVFXName vfxName, Transform vfxTransform)
+	{
+		if (vfxTransform == null)
+		{
+			return;
+		}
+
+		int key = (int)vfxName;
+		if (!VFXPrefabDict.TryGetValue(key, out GameObject prefab) || prefab == null)
+		{
+			string prefabPath = "VFX/" + vfxName.ToString();
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
+		}
+
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
+	}
+
 	public Transform GetVFX(EVFXName vfxName, Transform parent)
 	{
 		int key = (int)vfxName;
+		GameObject prefab = null;
 
 		if (!VFXPoolDict.TryGetValue(key, out MonoBehaviourPool<Transform> pool))
 		{
 			string prefabPath = "VFX/" + vfxName.ToString();
-			GameObject prefab = Resources.Load<GameObject>(prefabPath);
+			prefab = Resources.Load<GameObject>(prefabPath);
+			VFXPrefabDict[key] = prefab;
 			pool = new MonoBehaviourPool<Transform>(() =>
 			{
 				GameObject instance = Instantiate(prefab, parent);
 				instance.gameObject.name = vfxName.ToString();
-				instance.transform.localPosition = Vector3.zero;
 
 				return instance.transform;
 			});
 			VFXPoolDict[key] = pool;
 		}
+		else
+		{
+			VFXPrefabDict.TryGetValue(key, out prefab);
+			if (prefab == null)
+			{
+				string prefabPath = "VFX/" + vfxName.ToString();
+				prefab = Resources.Load<GameObject>(prefabPath);
+				VFXPrefabDict[key] = prefab;
+			}
+		}
 
 		Transform vfxTransform = pool.Get();
-		vfxTransform.SetParent(parent);
-		vfxTransform.localPosition = Vector3.zero;
-		vfxTransform.localScale = Vector3.one;
+		vfxTransform.SetParent(parent, false);
+		ResetVFXTransformFromPrefab(vfxTransform, prefab);
 		vfxTransform.gameObject.SetActive(true);
 
 		return vfxTransform;
@@ -915,9 +1023,50 @@ public class JoeyGameControl : YViewControl
 	{
 		vfxTransform.gameObject.SetActive(false);
 		Transform effectRoot = m_GamePhaseControl.GetEffectRoot(envIndex);
-		vfxTransform.SetParent(effectRoot);
+		vfxTransform.SetParent(effectRoot, false);
 		vfxTransform.localPosition = Vector3.zero;
+		vfxTransform.localRotation = Quaternion.identity;
 		vfxTransform.localScale = Vector3.one;
+	}
+
+	private static void ResetVFXTransformFromPrefab(Transform instance, GameObject prefab)
+	{
+		if (instance == null)
+		{
+			return;
+		}
+
+		// Fallback: if prefab is missing (shouldn't happen), at least avoid pool "drift"
+		if (prefab == null)
+		{
+			instance.localPosition = Vector3.zero;
+			instance.localRotation = Quaternion.identity;
+			instance.localScale = Vector3.one;
+
+			if (instance is RectTransform rt)
+			{
+				rt.anchoredPosition3D = Vector3.zero;
+				rt.anchorMin = new Vector2(0.5f, 0.5f);
+				rt.anchorMax = new Vector2(0.5f, 0.5f);
+				rt.pivot = new Vector2(0.5f, 0.5f);
+			}
+			return;
+		}
+
+		Transform prefabTransform = prefab.transform;
+		instance.localPosition = prefabTransform.localPosition;
+		instance.localRotation = prefabTransform.localRotation;
+		instance.localScale = prefabTransform.localScale;
+
+		// For UI VFX, also restore RectTransform layout so anchoredPosition doesn't "drift" across re-parenting
+		if (instance is RectTransform instanceRect && prefabTransform is RectTransform prefabRect)
+		{
+			instanceRect.anchorMin = prefabRect.anchorMin;
+			instanceRect.anchorMax = prefabRect.anchorMax;
+			instanceRect.pivot = prefabRect.pivot;
+			instanceRect.sizeDelta = prefabRect.sizeDelta;
+			instanceRect.anchoredPosition3D = prefabRect.anchoredPosition3D;
+		}
 	}
 
 	private async UniTaskVoid DelayHideVFX(Transform vfxTransform, float delayTime, CancellationTokenSource cts, int key)
@@ -957,6 +1106,24 @@ public class JoeyGameControl : YViewControl
 		return false;
 	}
 
+	public int ApplyDonkeyQueenDebuff(int value)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.ApplyDonkeyQueenDebuff(value);
+		}
+		return value;
+	}
+
+	public bool IsDonkeyQueenAlive()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.IsDonkeyQueenAlive();
+		}
+		return false;
+	}
+
 	public bool IsCardOnTop(UICardSimpleControl cardControl, int envIndex)
 	{
 		UICardSimpleControl lastCard = m_GamePhaseControl.GetLastEnvCard(envIndex);
@@ -972,6 +1139,15 @@ public class JoeyGameControl : YViewControl
 		return 0;
 	}
 
+	public int GetEnvPanelCount()
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.GetEnvPanelCount();
+		}
+		return 0;
+	}
+
 	public void UpdateBadMonkeyAttack(UICardSimpleControl cardControl)
 	{
 
@@ -979,10 +1155,20 @@ public class JoeyGameControl : YViewControl
 
 	}
 
+	public void RemoveEnvCardAndUpdate(int envIndex, UICardSimpleControl cardControl)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.RemoveEnvCardAndUpdate(envIndex, cardControl);
+		}
+	}
+
 	public bool IsPlayerHalfHealth()
 	{
 		Debug.Log("IsPlayerHalfHealth: " + m_DataJoeyPlayer.playerHealth + " " + m_DataJoeyPlayer.playerMaxHealth);
-		return m_DataJoeyPlayer.playerHealth <= m_DataJoeyPlayer.playerMaxHealth / 2;
+		// Use < instead of <= for "below 50%" semantic (strictly less than half)
+		// Use float division to avoid integer division rounding issues
+		return m_DataJoeyPlayer.playerHealth < (m_DataJoeyPlayer.playerMaxHealth / 2.0f);
 	}
 
 	/// <summary>

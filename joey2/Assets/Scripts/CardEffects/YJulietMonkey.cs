@@ -30,7 +30,9 @@ public partial class UIGamePhaseControl
             {
                 Card cardData = lastCard.CardData;
                 cardData.SetAttack(cardData.currentAttack + 5);
+                // Update both currentHealth and maxHealth for proper culling blade calculation
                 cardData.currentHealth += 10;
+                cardData.health += 10;
                 lastCard.RefreshCard();
             }
         }

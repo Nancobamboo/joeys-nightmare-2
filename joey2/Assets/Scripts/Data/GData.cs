@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -1312,7 +1313,8 @@ public sealed class GData : PureSingleton<GData>
 				{
 					if (int.TryParse(parts[p].Trim(), out int depId))
 					{
-						depends.Add(depId);
+						// -1 表示无前置；与 UIGrowthControl 保持一致，这里不放进 depends
+						if (depId >= 0) depends.Add(depId);
 					}
 				}
 			}
@@ -1420,43 +1422,176 @@ public sealed class GData : PureSingleton<GData>
 
 	/// <summary>
 	/// Get the maximum unlocked stage level based on player's difficulty level
-	/// Returns the highest stage number the player can access
+	/// Returns the highest stage number the player can access from difficulty config
 	/// </summary>
 	public int GetMaxUnlockedStage()
 	{
 		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		DifficultyConfig config = GetDifficultyConfig(difficultyLevel);
+		
+		if (config != null && config.maxUnlockedStage > 0)
+		{
+			return config.maxUnlockedStage;
+		}
+		
+		// Fallback to 16 if config not found
+		Debug.LogWarning($"Max unlocked stage not configured for difficulty {difficultyLevel}, using default 16");
+		return 16;
+	}
 
-		// Default max stages by difficulty level
-		// Difficulty 1: stages 1-16
-		// Difficulty 2: stages 1-17
-		// Difficulty 3: stages 1-17
-		// Difficulty 4: stages 1-18
-		// Difficulty 5: stages 1-18
-		// Difficulty 6: stages 1-19
-		// Difficulty 7: stages 1-19
-		// Difficulty 8: stages 1-20
-		int defaultMaxStage = 16; // Base max stage for difficulty 1
+	/// <summary>
+	/// Get cumulative shop price multiplier from all difficulty levels up to current
+	/// Multipliers are stacked multiplicatively (e.g. 1.2 * 1.35 = 1.62)
+	/// </summary>
+	public float GetShopPriceMultiplier()
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		float totalMultiplier = 1.0f;
+		
+		// Apply cumulative multipliers from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
+		{
+			DifficultyConfig config = GetDifficultyConfig(level);
+			if (config == null) continue;
+			
+			// Multiply price multipliers (e.g. 1.0 * 1.2 * 1.35)
+			if (config.shopPriceMultiplier != 1.0f)
+			{
+				totalMultiplier *= config.shopPriceMultiplier;
+			}
+		}
+		
+		return totalMultiplier;
+	}
 
-		if (difficultyLevel >= 8)
+	/// <summary>
+	/// Get cumulative high-grade card probability penalty from difficulty
+	/// Returns negative value (e.g., -0.3 = -30% for high-grade cards)
+	/// </summary>
+	public float GetHighGradeCardProbabilityPenalty()
+	{
+		int difficultyLevel = DataSystem.Instance.GetCurrentDifficulty();
+		float totalPenalty = 0f;
+		
+		// Apply cumulative penalties from difficulty levels 2 and up
+		for (int level = 2; level <= difficultyLevel; level++)
 		{
-			return 20; // All stages unlocked
+			DifficultyConfig config = GetDifficultyConfig(level);
+			if (config != null)
+			{
+				totalPenalty += config.highGradeCardProbability;
+			}
 		}
-		else if (difficultyLevel >= 6)
+
+		// Apply growth bonus (+5% per unlocked node) on top of difficulty penalty
+		// This allows difficulty to reduce high-grade odds while growth can offset/increase it.
+		totalPenalty += DataSystem.Instance.GetGrowthHighGradeCardProbabilityBonus();
+
+		return totalPenalty;
+	}
+
+	/// <summary>
+	/// Select cards with weighted star level probabilities adjusted by difficulty
+	/// </summary>
+	/// <param name="availableCards">Pool of cards to select from</param>
+	/// <param name="count">Number of cards to select</param>
+	/// <param name="baseStarRates">Base star level probabilities (e.g., 1:60;2:30;3:10)</param>
+	/// <returns>List of selected cards</returns>
+	public List<Card> SelectCardsWithStarProbability(List<Card> availableCards, int count, Dictionary<int, int> baseStarRates)
+	{
+		List<Card> selectedCards = new List<Card>();
+		if (availableCards == null || availableCards.Count == 0 || baseStarRates == null || baseStarRates.Count == 0)
 		{
-			return 19;
+			// Fallback: random selection
+			List<Card> shuffled = availableCards.OrderBy(x => UnityEngine.Random.value).ToList();
+			return shuffled.Take(count).ToList();
 		}
-		else if (difficultyLevel >= 4)
+
+		float highGradeReduction = GetHighGradeCardProbabilityPenalty();
+
+		// Build adjusted probability distribution
+		Dictionary<int, int> adjustedRates = new Dictionary<int, int>();
+		int totalAdjusted = 0;
+
+		foreach (var kvp in baseStarRates)
 		{
-			return 18;
+			int star = kvp.Key;
+			int baseRate = kvp.Value;
+			int adjustedRate = baseRate;
+
+			// Apply penalty to high-grade cards (2-star and 3-star)
+			if (star >= 2)
+			{
+				// Direct percentage point reduction
+				// highGradeReduction is negative (e.g., -0.1 = -10 percentage points)
+				// Convert to absolute value: -0.1 * 100 = -10 points
+				int reductionPoints = UnityEngine.Mathf.RoundToInt(highGradeReduction * 100);
+				adjustedRate = UnityEngine.Mathf.Max(0, baseRate + reductionPoints);
+			}
+
+			adjustedRates[star] = adjustedRate;
+			totalAdjusted += adjustedRate;
 		}
-		else if (difficultyLevel >= 2)
+
+		// Normalize to ensure probabilities sum to 100
+		if (totalAdjusted != 100)
 		{
-			return 17;
+			Dictionary<int, int> normalizedRates = new Dictionary<int, int>();
+			int accumulated = 0;
+			int lastStar = 1;
+
+			foreach (var kvp in adjustedRates)
+			{
+				lastStar = kvp.Key;
+				int normalizedRate = UnityEngine.Mathf.RoundToInt((float)kvp.Value * 100f / totalAdjusted);
+				normalizedRates[kvp.Key] = normalizedRate;
+				accumulated += normalizedRate;
+			}
+
+			// Adjust last rate to ensure sum equals 100
+			if (normalizedRates.ContainsKey(lastStar))
+			{
+				normalizedRates[lastStar] += (100 - accumulated);
+			}
+
+			adjustedRates = normalizedRates;
 		}
-		else
+
+		// Select cards based on adjusted star probabilities
+		for (int i = 0; i < count; i++)
 		{
-			return 16;
+			// Determine target star level
+			int random = UnityEngine.Random.Range(0, 100);
+			int cumulative = 0;
+			int targetStar = 1;
+
+			foreach (var kvp in adjustedRates)
+			{
+				cumulative += kvp.Value;
+				if (random < cumulative)
+				{
+					targetStar = kvp.Key;
+					break;
+				}
+			}
+
+			// Filter cards by star level
+			List<Card> starFilteredCards = availableCards.Where(c => c.stars == targetStar && !selectedCards.Contains(c)).ToList();
+
+			// If no cards available for this star level, fallback to any available card
+			if (starFilteredCards.Count == 0)
+			{
+				starFilteredCards = availableCards.Where(c => !selectedCards.Contains(c)).ToList();
+			}
+
+			if (starFilteredCards.Count > 0)
+			{
+				Card selectedCard = starFilteredCards[UnityEngine.Random.Range(0, starFilteredCards.Count)];
+				selectedCards.Add(selectedCard);
+			}
 		}
+
+		return selectedCards;
 	}
 
 }

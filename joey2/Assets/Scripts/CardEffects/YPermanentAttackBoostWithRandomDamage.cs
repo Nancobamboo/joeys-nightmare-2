@@ -44,7 +44,7 @@ public class YPermanentAttackBoostWithRandomDamage : YDefaultEffect
 				int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
 				JoeyGameControl.Instance.AddGlobalDelayCall(() =>
 				{
-					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemyAndClearEffect, damage, attackTime, CardControl);
 				}, 0.3f);
 			}
 		}

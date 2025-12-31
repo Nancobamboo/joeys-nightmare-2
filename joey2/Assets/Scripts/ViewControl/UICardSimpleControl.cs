@@ -87,10 +87,10 @@ public class UICardSimpleControl : YViewControl
 
 	private int[] m_BuffValueArray = new int[(int)EBuffType.Upper];
 	private UIDescExtControl m_DescExtControl;
-	private GameObject m_FrozenOverlay;
+	private Transform m_FrozenVFX; // 冰冻特效，循环播放 VFX_Bing2
+	private Transform m_VulnerableVFX; // 易伤特效：怪物存活且易伤>0时常驻播放，易伤结束/怪物死亡立刻回收
 
 	private static readonly Color RELIC_ENHANCED_COLOR = new Color(0f, 0.5f, 0f, 1f);
-	private static readonly Color FROZEN_OVERLAY_COLOR = new Color(0.4f, 0.7f, 1f, 0.4f);
 
 	public static EResType GetResType()
 	{
@@ -139,6 +139,12 @@ public class UICardSimpleControl : YViewControl
 				}
 			}
 		}
+		
+		// If hovering over a monster, notify weapon cards to refresh their display based on target
+		if (IsEnv && cachedCardType == ECardType.monster)
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.OnHoverMonster, this);
+		}
 	}
 
 	private void OnPointerExit(GameObject go, UnityEngine.EventSystems.PointerEventData eventData)
@@ -151,6 +157,12 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_DescExtControl.Close();
 			m_DescExtControl = null;
+		}
+		
+		// If exiting hover from a monster, notify weapon cards to refresh back to normal display
+		if (IsEnv && cachedCardType == ECardType.monster)
+		{
+			YActionSystem.Instance.DispatchAction(EActionId.OnUnhoverMonster, this);
 		}
 	}
 
@@ -252,6 +264,23 @@ public class UICardSimpleControl : YViewControl
 		{
 			case ECardType.attack:
 				int damageEffect = CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0;
+				
+				// Debug log for attack cards with UpdateByHpChange buff
+				if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+				{
+					Debug.Log($"[RefreshCard] {cachedCard?.cardName}: damageEffect={damageEffect}, baseAttack={cachedCard?.currentAttack}");
+				}
+				
+				// Special handling for CullingBlade: add preview execute damage
+				if (CardEffect != null && CardEffect.Id == ECardEffectId.CullingBlade)
+				{
+					YCullingBlade cullingBlade = CardEffect as YCullingBlade;
+					if (cullingBlade != null)
+					{
+						damageEffect += cullingBlade.GetPreviewExecuteDamage();
+					}
+				}
+				
 				int extraAttackCnt = CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0;
 				int attackValue = cachedCard.currentAttack + damageEffect;
 
@@ -266,8 +295,19 @@ public class UICardSimpleControl : YViewControl
 					}
 				}
 
+				bool hasDonkeyQueenDebuff = false;
+				if (!IsEnv && JoeyGameControl.Instance != null && JoeyGameControl.Instance.IsDonkeyQueenAlive())
+				{
+					attackValue = JoeyGameControl.Instance.ApplyDonkeyQueenDebuff(attackValue);
+					hasDonkeyQueenDebuff = true;
+				}
+
 				m_View.TxtAttack.text = attackValue.ToString();
-				if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
+				if (hasDonkeyQueenDebuff)
+				{
+					m_View.TxtAttack.color = Color.red;
+				}
+				else if (damageEffect != 0 || extraAttackCnt != 0 || hasDualWieldBonus)
 				{
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
@@ -275,13 +315,28 @@ public class UICardSimpleControl : YViewControl
 				{
 					m_View.TxtAttack.color = Color.black;
 				}
+				
+				// Update card name with extra attack count indicator
+				UpdateCardNameWithAttackCount(extraAttackCnt);
 				break;
 
 			case ECardType.defence:
 				int defenceEffect = CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0;
 				int defenceValue = cachedCard.currentDefence + defenceEffect;
+
+				bool hasDefenceQueenDebuff = false;
+				if (!IsEnv && JoeyGameControl.Instance != null && JoeyGameControl.Instance.IsDonkeyQueenAlive())
+				{
+					defenceValue = JoeyGameControl.Instance.ApplyDonkeyQueenDebuff(defenceValue);
+					hasDefenceQueenDebuff = true;
+				}
+
 				m_View.TxtDefence.text = defenceValue.ToString();
-				if (defenceEffect != 0)
+				if (hasDefenceQueenDebuff)
+				{
+					m_View.TxtDefence.color = Color.red;
+				}
+				else if (defenceEffect != 0)
 				{
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
@@ -291,18 +346,32 @@ public class UICardSimpleControl : YViewControl
 				}
 				break;
 
-			case ECardType.monster:
-				m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
-				m_View.TxtAttack.color = Color.black;
-				m_View.TextHeart.text = cachedCard.currentHealth.ToString();
-				if (cachedCard.health > 0)
+		case ECardType.monster:
+			m_View.TxtAttack.text = cachedCard.currentAttack.ToString();
+			m_View.TxtAttack.color = Color.black;
+			m_View.TextHeart.text = cachedCard.currentHealth.ToString();
+			if (cachedCard.health > 0)
+			{
+				float ratio = (float)cachedCard.currentHealth / cachedCard.health;
+				m_View.MosterHeart.fillAmount = ratio;
+				
+				// Update health text color based on health percentage
+				if (ratio < 0.25f)
 				{
-					float ratio = (float)cachedCard.currentHealth / cachedCard.health;
-					m_View.MosterHeart.fillAmount = ratio;
+					m_View.TextHeart.color = Color.red; // < 25% health: red
 				}
-				// Update vulnerable visual effect
-				UpdateVulnerableUI();
-				break;
+				else if (ratio < 0.5f)
+				{
+					m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+				}
+				else
+				{
+					m_View.TextHeart.color = Color.white; // >= 50% health: white
+				}
+			}
+			// Update vulnerable visual effect
+			UpdateVulnerableUI();
+			break;
 
 			case ECardType.skill:
 				break;
@@ -319,6 +388,32 @@ public class UICardSimpleControl : YViewControl
 
 		SetStars(cachedCard.stars);
 	}
+
+	// Update card name with extra attack count indicator (x2, x3, etc.)
+	private void UpdateCardNameWithAttackCount(int extraAttackCnt)
+	{
+		if (cachedCard == null) return;
+		
+		string baseName = cachedCard.cardName;
+		// Remove any existing attack count suffix
+		int xIndex = baseName.LastIndexOf(" x");
+		if (xIndex > 0)
+		{
+			baseName = baseName.Substring(0, xIndex);
+		}
+		
+		if (extraAttackCnt > 0)
+		{
+			// Total attack count = base (1) + extra attacks
+			int totalAttackCount = 1 + extraAttackCnt;
+			m_View.CardName.text = $"{baseName} x{totalAttackCount}";
+		}
+		else
+		{
+			m_View.CardName.text = baseName;
+		}
+	}
+
 
 	public void UpdateCardDisplay(Card card)
 	{
@@ -348,6 +443,20 @@ public class UICardSimpleControl : YViewControl
 			{
 				float ratio = (float)card.currentHealth / card.health;
 				m_View.MosterHeart.fillAmount = ratio;
+				
+				// Update health text color based on health percentage
+				if (ratio < 0.25f)
+				{
+					m_View.TextHeart.color = Color.red; // < 25% health: red
+				}
+				else if (ratio < 0.5f)
+				{
+					m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+				}
+				else
+				{
+					m_View.TextHeart.color = Color.white; // >= 50% health: white
+				}
 			}
 
 			// Update vulnerable visual effect
@@ -362,6 +471,15 @@ public class UICardSimpleControl : YViewControl
 		{
 			m_View.Description.text = cachedCard.GetFormattedDescription();
 			Debug.Log($"[UICardSimpleControl] UpdateDurabilityDescription - Card: {cachedCard.cardName}, durability: {cachedCard.durability}, description: {m_View.Description.text}");
+		}
+	}
+	
+	// Update card description (for dynamic content like heal amounts affected by relics)
+	public void UpdateDescription()
+	{
+		if (cachedCard != null && m_View != null && m_View.Description != null)
+		{
+			m_View.Description.text = cachedCard.GetFormattedDescription();
 		}
 	}
 
@@ -383,6 +501,7 @@ public class UICardSimpleControl : YViewControl
 	public void AddBuff(EBuffType buffType, int value)
 	{
 		Debug.Log(this.name + " AddBuff " + buffType + " " + value);
+		int oldValue = m_BuffValueArray[(int)buffType];
 		m_BuffValueArray[(int)buffType] = value;
 
 		switch (buffType)
@@ -394,6 +513,8 @@ public class UICardSimpleControl : YViewControl
 				UpdateFrozenUI();
 				break;
 			case EBuffType.Vulnerable:
+				// 易伤特效：不使用固定时长，怪物活着且易伤>0就一直播放；易伤结束或怪物死亡(卡牌回收)就回收。
+				UpdateVulnerableVFX();
 				UpdateVulnerableUI();
 				break;
 		}
@@ -408,8 +529,68 @@ public class UICardSimpleControl : YViewControl
 				UpdateFrozenUI();
 				break;
 			case EBuffType.Vulnerable:
+				UpdateVulnerableVFX();
 				UpdateVulnerableUI();
 				break;
+		}
+	}
+
+	private void UpdateVulnerableVFX()
+	{
+		// 只给怪物显示易伤特效
+		if (cachedCardType != ECardType.monster)
+		{
+			StopVulnerableVFX();
+			return;
+		}
+
+		bool isVulnerable = GetBuffValue(EBuffType.Vulnerable) > 0;
+		if (!isVulnerable)
+		{
+			StopVulnerableVFX();
+			return;
+		}
+
+		if (JoeyGameControl.Instance == null || m_View == null || m_View.Anim == null)
+		{
+			return;
+		}
+
+		Transform parent = m_View.Anim.transform;
+
+		if (m_VulnerableVFX == null)
+		{
+			m_VulnerableVFX = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Yishun, parent);
+		}
+		else
+		{
+			m_VulnerableVFX.SetParent(parent, false);
+		}
+
+		// 如果被覆盖（不是顶层怪物卡），先隐藏，等 OnBecomeTopCard 再显示
+		if (IsEnv && EnvIndex >= 0 && !JoeyGameControl.Instance.IsCardOnTop(this, EnvIndex))
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+			return;
+		}
+
+		JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Yishun, m_VulnerableVFX);
+		m_VulnerableVFX.gameObject.SetActive(true);
+	}
+
+	private void StopVulnerableVFX()
+	{
+		if (m_VulnerableVFX != null)
+		{
+			if (JoeyGameControl.Instance != null)
+			{
+				JoeyGameControl.Instance.ReturnVFXPool(m_VulnerableVFX, EnvIndex);
+			}
+			else
+			{
+				m_VulnerableVFX.gameObject.SetActive(false);
+			}
+			m_VulnerableVFX = null;
 		}
 	}
 
@@ -418,26 +599,35 @@ public class UICardSimpleControl : YViewControl
 		bool isFrozen = GetBuffValue(EBuffType.Frozen) > 0;
 		if (isFrozen)
 		{
-			if (m_FrozenOverlay == null)
+			// 开始循环播放 VFX_Bing2 特效
+			if (m_FrozenVFX == null)
 			{
-				m_FrozenOverlay = new GameObject("FrozenOverlay");
-				m_FrozenOverlay.transform.SetParent(m_View.CardImg.transform, false);
-				RectTransform rect = m_FrozenOverlay.AddComponent<RectTransform>();
-				rect.anchorMin = Vector2.zero;
-				rect.anchorMax = Vector2.one;
-				rect.offsetMin = Vector2.zero;
-				rect.offsetMax = Vector2.zero;
-				Image img = m_FrozenOverlay.AddComponent<Image>();
-				img.color = FROZEN_OVERLAY_COLOR;
-				img.raycastTarget = false;
+				m_FrozenVFX = JoeyGameControl.Instance.GetVFX(EVFXName.VFX_Bing2, m_View.Anim.transform);
 			}
-			m_FrozenOverlay.SetActive(true);
+			else
+			{
+				// 确保 VFX 的 parent 是正确的（可能被 ReturnVFXPool 移动过）
+				m_FrozenVFX.SetParent(m_View.Anim.transform, false);
+				if (JoeyGameControl.Instance != null)
+				{
+					JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Bing2, m_FrozenVFX);
+				}
+				else
+				{
+					m_FrozenVFX.localPosition = Vector3.zero;
+					m_FrozenVFX.localRotation = Quaternion.identity;
+					m_FrozenVFX.localScale = Vector3.one;
+				}
+				m_FrozenVFX.gameObject.SetActive(true);
+			}
 		}
 		else
 		{
-			if (m_FrozenOverlay != null)
+			// 停止并回收冰冻特效
+			if (m_FrozenVFX != null)
 			{
-				m_FrozenOverlay.SetActive(false);
+				JoeyGameControl.Instance.ReturnVFXPool(m_FrozenVFX, EnvIndex);
+				m_FrozenVFX = null;
 			}
 		}
 	}
@@ -447,16 +637,81 @@ public class UICardSimpleControl : YViewControl
 		return GetBuffValue(EBuffType.Frozen) > 0;
 	}
 
+	/// <summary>
+	/// 当卡牌被其他卡牌覆盖时调用，隐藏所有持续特效
+	/// </summary>
+	public void OnCoveredByCard()
+	{
+		// 隐藏冰冻特效
+		if (m_FrozenVFX != null)
+		{
+			m_FrozenVFX.gameObject.SetActive(false);
+		}
+		// 隐藏易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+		}
+		// 未来可以在这里添加其他特效的隐藏逻辑
+	}
+
+	/// <summary>
+	/// 当卡牌成为顶层时调用，显示所有持续特效
+	/// </summary>
+	public void OnBecomeTopCard()
+	{
+		// 显示冰冻特效
+		if (IsFrozen() && m_FrozenVFX != null)
+		{
+			m_FrozenVFX.SetParent(m_View.Anim.transform, false);
+			if (JoeyGameControl.Instance != null)
+			{
+				JoeyGameControl.Instance.ResetVFXTransform(EVFXName.VFX_Bing2, m_FrozenVFX);
+			}
+			else
+			{
+				m_FrozenVFX.localPosition = Vector3.zero;
+				m_FrozenVFX.localRotation = Quaternion.identity;
+				m_FrozenVFX.localScale = Vector3.one;
+			}
+			m_FrozenVFX.gameObject.SetActive(true);
+		}
+
+		// 显示易伤特效（常驻）
+		if (GetBuffValue(EBuffType.Vulnerable) > 0)
+		{
+			UpdateVulnerableVFX();
+		}
+		
+		// Update HP-dependent effects when card becomes visible (exposed from underneath)
+		if (GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+		{
+			Debug.Log($"[OnBecomeTopCard] Card {cachedCard?.cardName} has UpdateByHpChange buff, triggering update");
+			UpdateBuffValue();
+			RefreshCard();
+		}
+		
+		// 未来可以在这里添加其他特效的显示逻辑
+	}
+
 	private void ClearAllBuffs()
 	{
 		for (int i = 0; i < m_BuffValueArray.Length; i++)
 		{
 			m_BuffValueArray[i] = 0;
 		}
-		// 清理冰冻覆盖层
-		if (m_FrozenOverlay != null)
+		// 清理冰冻特效
+		if (m_FrozenVFX != null)
 		{
-			m_FrozenOverlay.SetActive(false);
+			// 直接隐藏 VFX，避免 EnvIndex 无效时的问题
+			m_FrozenVFX.gameObject.SetActive(false);
+			m_FrozenVFX = null;
+		}
+		// 清理易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			m_VulnerableVFX.gameObject.SetActive(false);
+			m_VulnerableVFX = null;
 		}
 	}
 
@@ -476,7 +731,7 @@ public class UICardSimpleControl : YViewControl
 		else if (counter > 0)
 		{
 			m_View.Counter.SetActive(true);
-			m_View.TxtCnt.text = (counter - 1).ToString();
+			m_View.TxtCnt.text = counter.ToString();
 		}
 		else
 		{
@@ -526,14 +781,16 @@ public class UICardSimpleControl : YViewControl
 			case ERelicType.EnvAttack:
 				if (IsEnv && cachedCardType == ECardType.attack)
 				{
-					AddEffectValue(EEffectType.Damage, 1);
+					CardEffect?.AddRelicEffectValue(EEffectType.Damage, 1);
+					RefreshCard();
 					m_View.TxtAttack.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
 			case ERelicType.EnvDefence:
 				if (IsEnv && cachedCardType == ECardType.defence)
 				{
-					AddEffectValue(EEffectType.Defence, 1);
+					CardEffect?.AddRelicEffectValue(EEffectType.Defence, 1);
+					RefreshCard();
 					m_View.TxtDefence.color = RELIC_ENHANCED_COLOR;
 				}
 				break;
@@ -644,6 +901,12 @@ public class UICardSimpleControl : YViewControl
 				break;
 			case ECardEffectId.BadMonkey:
 				effect = new YBadMonkey(effectValue);
+				break;
+			case ECardEffectId.BadMonkeyBro:
+				effect = new YBadMonkeyBro(effectValue);
+				break;
+			case ECardEffectId.BadMonkeySis:
+				effect = new YBadMonkeySis(effectValue);
 				break;
 			case ECardEffectId.PermanentAttackBoost:
 				effect = new YPermanentAttackBoost(effectValue);
@@ -849,6 +1112,24 @@ public class UICardSimpleControl : YViewControl
 			case ECardEffectId.BlockFirstAttack:
 				effect = new YBlockFirstAttack();
 				break;
+			case ECardEffectId.TurkeyJack:
+				effect = new YTurkeyJack(effectValue > 0 ? effectValue : 2);
+				break;
+			case ECardEffectId.DonkeyQueen:
+				effect = new YDonkeyQueen(effectValue > 0 ? effectValue : 5);
+				break;
+			case ECardEffectId.MonkeyKing:
+				effect = new YMonkeyKing();
+				break;
+			case ECardEffectId.JokerNightmare:
+				effect = new YJokerNightmare();
+				break;
+			case ECardEffectId.WhipDonkey:
+				effect = new YWhipDonkey(effectValue);
+				break;
+			case ECardEffectId.ShadowTurkey:
+				effect = new YShadowTurkey();
+				break;
 			default:
 				return GetDefaultEffect();
 		}
@@ -893,7 +1174,9 @@ public class UICardSimpleControl : YViewControl
 
 		SetTypeUI(card);
 		SetStars(card.stars);
+		Debug.Log($"[SetData] Before GetCardEffect: Card={card.cardName}, isEnv={isEnv}");
 		CardEffect = GetCardEffect();
+		Debug.Log($"[SetData] After GetCardEffect: Card={card.cardName}, CardEffect={CardEffect?.GetType().Name}, effectId={card.effectId}");
 		IsEffecting = false;
 
 		if (cachedCardType != ECardType.monster && cachedCardType != ECardType.other)
@@ -903,9 +1186,10 @@ public class UICardSimpleControl : YViewControl
 			{
 				AddRelicList(dataJoeyPlayer.RelicList);
 			}
-			// Refresh card display after applying relics (for bag cards)
-			if (!isEnv && (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence))
+			// Refresh card display after applying relics and effects
+			if (cachedCardType == ECardType.attack || cachedCardType == ECardType.defence)
 			{
+				Debug.Log($"[SetData] Calling RefreshCard for {card.cardName}");
 				RefreshCard();
 			}
 		}
@@ -931,20 +1215,34 @@ public class UICardSimpleControl : YViewControl
 				m_View.TxtDefence.color = Color.black;
 				break;
 
-			case ECardType.monster:
-				m_View.Attack.SetActive(true);
-				m_View.TxtAttack.text = card.currentAttack.ToString();
-				m_View.TxtAttack.color = Color.black;
-				m_View.Moster.SetActive(true);
-				m_View.TextHeart.text = card.currentHealth.ToString();
-				if (card.health > 0)
+		case ECardType.monster:
+			m_View.Attack.SetActive(true);
+			m_View.TxtAttack.text = card.currentAttack.ToString();
+			m_View.TxtAttack.color = Color.black;
+			m_View.Moster.SetActive(true);
+			m_View.TextHeart.text = card.currentHealth.ToString();
+			if (card.health > 0)
+			{
+				float ratio = (float)card.currentHealth / card.health;
+				m_View.MosterHeart.fillAmount = ratio;
+				
+				// Update health text color based on health percentage
+				if (ratio < 0.25f)
 				{
-					float ratio = (float)card.currentHealth / card.health;
-					m_View.MosterHeart.fillAmount = ratio;
+					m_View.TextHeart.color = Color.red; // < 25% health: red
 				}
-				// Update vulnerable visual effect for newly created monster cards
-				UpdateVulnerableUI();
-				break;
+				else if (ratio < 0.5f)
+				{
+					m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+				}
+				else
+				{
+					m_View.TextHeart.color = Color.white; // >= 50% health: white
+				}
+			}
+			// Update vulnerable visual effect for newly created monster cards
+			UpdateVulnerableUI();
+			break;
 
 			case ECardType.skill:
 				break;
@@ -1094,6 +1392,21 @@ public class UICardSimpleControl : YViewControl
 				JoeyGameControl.Instance.ReturnVFXPool(go, EnvIndex);
 			}
 		}
+		
+		// 清理冰冻特效
+		if (m_FrozenVFX != null)
+		{
+			JoeyGameControl.Instance.ReturnVFXPool(m_FrozenVFX, EnvIndex);
+			m_FrozenVFX = null;
+		}
+
+		// 清理易伤特效（常驻）
+		if (m_VulnerableVFX != null)
+		{
+			JoeyGameControl.Instance.ReturnVFXPool(m_VulnerableVFX, EnvIndex);
+			m_VulnerableVFX = null;
+		}
+		
 		m_View.Anim.Play(ECardAnimName.Idle.ToString(), 0, 0);
 		RectTransform animRect = m_View.Anim.transform as RectTransform;
 		if (animRect != null)
@@ -1119,7 +1432,14 @@ public class UICardSimpleControl : YViewControl
 
 	public void ClearEffectVlaue()
 	{
-		CardEffect?.ClearAllEffectValues();
+		CardEffect?.ClearTemporaryEffectValues();
+		RefreshCard();
+	}
+
+	public void ClearTemporaryAndRestoreConditional()
+	{
+		CardEffect?.ClearTemporaryEffectValues();
+		UpdateBuffValue(); // Restore conditional bonuses
 		RefreshCard();
 	}
 

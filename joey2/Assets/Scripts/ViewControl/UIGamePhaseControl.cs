@@ -48,7 +48,8 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private UIRelicControl m_CardLimitDebuffControl;
 
-	// ArcaneOrb relic: 每施放三次技能获得一张技能牌
+	// ArcaneOrb relic: 每施放6次技能获得一张技能牌4013（魔力召唤）
+	private const int ARCANE_ORB_TRIGGER_SKILL_CASTS = 6;
 	private int m_ArcaneOrbSkillCounter = 0;
 
 	public static EResType GetResType()
@@ -73,6 +74,7 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.UseBagCard, UseBagCard);
 		RegistAction(EActionId.AddCardFromDiscard, AddCardFromDiscard);
 		RegistAction(EActionId.AttackRandomEnemy, AttackRandomEnemy);
+		RegistAction(EActionId.AttackRandomEnemyAndClearEffect, AttackRandomEnemyAndClearEffect);
 		RegistAction(EActionId.TakeAllEnemyDamage, TakeAllEnemyDamage);
 		RegistAction(EActionId.AddCardToQueue, AddCardToQueue);
 		RegistAction(EActionId.AddEffectValueToBagCard, AddEffectValueToBagCard);
@@ -122,6 +124,14 @@ public partial class UIGamePhaseControl : YViewControl
 		RegistAction(EActionId.ShieldBashActivate, ShieldBashActivate);
 		RegistAction(EActionId.FortressActivate, FortressActivate);
 		RegistAction(EActionId.StrikeActivate, StrikeActivate);
+		RegistAction(EActionId.TurkeyJackExtraCounter, TurkeyJackExtraCounter);
+		RegistAction(EActionId.MonkeyKingRemoveDefence, MonkeyKingRemoveDefence);
+		RegistAction(EActionId.DonkeyQueenHealKing, DonkeyQueenHealKing);
+		RegistAction(EActionId.DonkeyQueenRefreshPlayerCards, DonkeyQueenRefreshPlayerCards);
+		RegistAction(EActionId.JokerNightmareCurse, JokerNightmareCurse);
+		RegistAction(EActionId.WhipDonkeyDamage, WhipDonkeyDamage);
+		RegistAction(EActionId.OnHoverMonster, OnHoverMonster);
+		RegistAction(EActionId.OnUnhoverMonster, OnUnhoverMonster);
 
 		for (int i = 0; i < m_View.EnvPanels.childCount; i++)
 		{
@@ -165,16 +175,44 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float ratio = (float)hp / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
+			
+			// Update player health text color based on health percentage
+			if (ratio < 0.25f)
+			{
+				m_View.TextHeart.color = Color.red; // < 25% health: red
+			}
+			else if (ratio < 0.5f)
+			{
+				m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+			}
+			else
+			{
+				m_View.TextHeart.color = Color.white; // >= 50% health: white
+			}
 		}
 
+		// Update cards in hand (bag) with HP-dependent effects
 		RunActionForEachLastBagCard((x) =>
 		{
 			if (x.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
 			{
 				x.UpdateBuffValue();
+				// Refresh card display to show updated attack/defence values in real-time
+				x.RefreshCard();
 			}
 
 		});
+		
+		// Update cards in environment with HP-dependent effects
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+			{
+				lastCard.UpdateBuffValue();
+				lastCard.RefreshCard();
+			}
+		}
 
 	}
 
@@ -262,8 +300,21 @@ public partial class UIGamePhaseControl : YViewControl
 
 	public void SetData()
 	{
+		PhaseCounter = 0;
 		RefreshView();
 		ClearAllCard();
+
+		// 螺旋手里剑：回滚上一关的“本关 +2 攻击”临时加成（仅该卡使用）
+		ResetSpiralShurikenLevelBonusesIfNeeded();
+
+		// Restart/重置时：拳头卡缓存不会被 ClearAllCard 回收（为避免频繁重建）
+		// 但像猿酒(ApeWine)/双持等会通过 AddEffectValue 写入临时伤害加成，
+		// 如果此处不清理，会导致“重新开始 buff 不清空”（尤其赤手空拳/拳套永不消耗时更明显）。
+		if (m_FistCardCache != null)
+		{
+			m_FistCardCache.ClearEffectVlaue();
+		}
+
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
 		if (m_KeyPathCardCache != null)
@@ -279,6 +330,9 @@ public partial class UIGamePhaseControl : YViewControl
 		ResetShieldBashState();
 		ResetFortressState();
 		ResetStrikeState();
+		
+		// Initialize turn counter display
+		m_View.TxtPhaseCnt.text = (PhaseCounter + 1).ToString();
 	}
 
 	public void SetBackgroundByStageId(int stageId)
@@ -459,6 +513,10 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearEnvCardList();
 		UsedCardList.Clear();
+
+		// 螺旋手里剑：回滚上一关的“本关 +2 攻击”临时加成（仅该卡使用）
+		ResetSpiralShurikenLevelBonusesIfNeeded();
+
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
 		if (m_KeyPathCardCache != null)
@@ -478,6 +536,20 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			float ratio = (float)m_DataJoeyPlayer.playerHealth / m_DataJoeyPlayer.playerMaxHealth;
 			m_View.Heart.fillAmount = ratio;
+			
+			// Update player health text color based on health percentage
+			if (ratio < 0.25f)
+			{
+				m_View.TextHeart.color = Color.red; // < 25% health: red
+			}
+			else if (ratio < 0.5f)
+			{
+				m_View.TextHeart.color = new Color(1f, 0.5f, 0f); // < 50% health: orange
+			}
+			else
+			{
+				m_View.TextHeart.color = Color.white; // >= 50% health: white
+			}
 		}
 		m_View.TxtCoin.text = m_DataJoeyPlayer.Coin.ToString();
 		if (JoeyGameControl.Instance.GameMode == EGameMode.Env)
@@ -700,28 +772,61 @@ public partial class UIGamePhaseControl : YViewControl
 			string cardId = cardIds[i];
 			Card card = CreateCard(cardId);
 
-			if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
-			{
-				card.currentHealth *= 2;
-				card.health *= 2;
-			}
-			
-			// Apply difficulty effects to monsters in Env mode
-			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+		if (DataSystem.Instance.IsHardGame && card.GetCardType() == ECardType.monster)
+		{
+			card.currentHealth *= 2;
+			card.health *= 2;
+		}
+		
+		// Apply difficulty effects to monsters in Env mode
+		if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env)
+		{
+			ECardType cardType = card.GetCardType();
+			if (cardType == ECardType.monster)
 			{
 				ApplyEnvDifficultyToMonster(card);
 			}
+			// Player card difficulty penalties are now applied in DataSystem.CreateCard()
+			// when the card is first created, to prevent duplicate applications when loading from cache
+		}
 
-			if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
+		if (DataSystem.Instance.HasRelic(ERelicType.DecayAura) && card.GetCardType() == ECardType.monster)
 			{
 				if (card.currentAttack > 0) card.currentAttack = Mathf.Max(1, card.currentAttack - 1);
 				if (card.currentHealth > 0) card.currentHealth = Mathf.Max(1, card.currentHealth - 1);
 			}
 
-			UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
-			cardControl.SetData(card, isEnv: true, envIndex: index);
-			AddEnvCard(index, cardControl);
-			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+		UICardSimpleControl cardControl = GetCardSimple(parent.transform, true);
+		cardControl.SetData(card, isEnv: true, envIndex: index);
+		AddEnvCard(index, cardControl);
+		
+		// If card has HP-dependent effects, trigger initial update after SetData
+		if (cardControl.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+		{
+			Debug.Log($"[AddEnvCardList] Card {card.cardName} has UpdateByHpChange buff, triggering update. CardEffect={cardControl.CardEffect?.GetType().Name}");
+			cardControl.UpdateBuffValue();
+			cardControl.RefreshCard();
+		}
+		else if (card.GetCardType() == ECardType.attack || card.GetCardType() == ECardType.defence)
+		{
+			Debug.Log($"[AddEnvCardList] Card {card.cardName} (player card) has NO UpdateByHpChange buff. CardEffect={cardControl.CardEffect?.GetType().Name}");
+		}
+		
+		cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+	}
+
+		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
 		}
 	}
 	
@@ -854,9 +959,6 @@ public partial class UIGamePhaseControl : YViewControl
 			m_BagCardDict[cardTypeInt] = new List<UICardSimpleControl>();
 		}
 
-		// Check if card will become top of pile (last in list)
-		bool willBecomeTop = (m_BagCardDict[cardTypeInt].Count == 0);
-
 		m_BagCardDict[cardTypeInt].Add(cardControl);
 		cardControl.IsEnv = false;
 		cardControl.EnvIndex = -1;
@@ -901,8 +1003,10 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		// Trigger OnBecomeTopOfPile if card becomes top of pile
+		// 注意：AddBagCard 是“直接加入手牌”的路径（例如从弃牌堆抓回/生成卡牌等）。
+		// 由于本函数会把 cardControl 追加到列表末尾，它将成为该牌堆的“顶牌”（GetLastBagCard）。
 		// Skip if isMoveCard=true, as MoveCard callback will handle it
-		if (!isMoveCard && willBecomeTop && cardControl.CardEffect != null)
+		if (!isMoveCard && cardControl.CardEffect != null && GetLastBagCard(cardType) == cardControl)
 		{
 			Debug.Log($"[AddBagCard] Card becomes top of pile, calling OnBecomeTopOfPile for {cardControl.CardData.cardName} (UniqueId: {cardControl.CardData.UniqueId}, Type: {cardType})");
 			cardControl.CardEffect.OnBecomeTopOfPile();
@@ -925,6 +1029,13 @@ public partial class UIGamePhaseControl : YViewControl
 			{
 				Debug.Log($"[RemoveBagCard] New top card: {newLastBagCard.CardData.cardName} (UniqueId: {newLastBagCard.CardData.UniqueId}), calling OnBecomeTopOfPile");
 				float delayTime = newLastBagCard.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
+				await UniTask.WaitForSeconds(delayTime);
+			}
+			// If no weapon card left and we removed an attack card, trigger bare hands OnBecomeTopOfPile
+			else if (cardType == ECardType.attack && m_FistCardCache != null)
+			{
+				Debug.Log($"[RemoveBagCard] No attack cards left, triggering bare hands OnBecomeTopOfPile");
+				float delayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0.5f;
 				await UniTask.WaitForSeconds(delayTime);
 			}
 			else
@@ -1014,6 +1125,11 @@ public partial class UIGamePhaseControl : YViewControl
 		return 0;
 	}
 
+	public int GetEnvPanelCount()
+	{
+		return m_EnvPanels != null ? m_EnvPanels.Count : 0;
+	}
+
 	public bool HasBagCard(ECardType cardType)
 	{
 		List<UICardSimpleControl> cardList = GetBagCardList(cardType);
@@ -1037,6 +1153,14 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			m_EnvCardDict[index] = new List<UICardSimpleControl>();
 		}
+		
+		// 通知被覆盖的卡牌
+		UICardSimpleControl lastCard = GetLastEnvCard(index);
+		if (lastCard != null)
+		{
+			lastCard.OnCoveredByCard();
+		}
+		
 		m_EnvCardDict[index].Add(cardControl);
 	}
 
@@ -1047,6 +1171,47 @@ public partial class UIGamePhaseControl : YViewControl
 			cardList.Remove(cardControl);
 			RemoveCardData(cardControl.CardData.UniqueId);
 			cardControl.Return();
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
+		}
+	}
+
+	public void RemoveEnvCardAndUpdate(int index, UICardSimpleControl cardControl)
+	{
+		// Remove from env card dictionary first
+		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
+		{
+			cardList.Remove(cardControl);
+			RemoveCardData(cardControl.CardData.UniqueId);
+			
+			// Update remaining monster buffs (for BadMonkey/MonkeyKing attack updates)
+			for (int i = 0; i < m_EnvPanels.Count; i++)
+			{
+				UICardSimpleControl lastCard = GetLastEnvCard(i);
+				if (lastCard != null && lastCard.CardType == ECardType.monster)
+				{
+					// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+					if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+					{
+						lastCard.UpdateBuffValue();
+					}
+				}
+			}
+			
+			// Then return the card and notify
+			cardControl.Return();
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
 		}
 	}
 
@@ -1055,10 +1220,17 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_EnvCardDict.TryGetValue(index, out List<UICardSimpleControl> cardList))
 		{
 			cardList.Remove(cardControl);
+			
+			// 通知新的顶层卡牌
+			UICardSimpleControl newLastCard = GetLastEnvCard(index);
+			if (newLastCard != null)
+			{
+				newLastCard.OnBecomeTopCard();
+			}
 		}
 	}
 
-	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage, CancellationToken? cancellationToken = null)
+	private async UniTask<bool> DealDamageToEnvCard(UICardSimpleControl cardControl, int damage, int envIndex, EEffectType effectType = EEffectType.Damage, CancellationToken? cancellationToken = null, bool triggerThorns = true)
 	{
 		CancellationToken token = cancellationToken ?? CancellationToken.None;
 
@@ -1069,11 +1241,20 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			// Apply vulnerable damage bonus (50% extra damage)
 			int vulnerableTurns = cardControl.GetBuffValue(EBuffType.Vulnerable);
-			if (vulnerableTurns > 0 && effectType == EEffectType.Damage)
+			// 易伤应对“所有造成伤害的来源”生效（武器伤害/炸弹/技能/反伤等），而不只限于普通攻击
+			bool isDamageEffect =
+				effectType == EEffectType.Damage ||
+				effectType == EEffectType.Boom ||
+				effectType == EEffectType.Electric ||
+				effectType == EEffectType.FireBall ||
+				effectType == EEffectType.IceMagic ||
+				effectType == EEffectType.ReflectDamage;
+
+			if (vulnerableTurns > 0 && isDamageEffect)
 			{
 				int bonusDamage = Mathf.RoundToInt(damage * 0.5f);
 				damage += bonusDamage;
-				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage ({vulnerableTurns} turns remaining)");
+				Debug.Log($"Vulnerable: {cardControl.CardData.cardName} takes +{bonusDamage} damage from {effectType} ({vulnerableTurns} turns remaining)");
 			}
 
 			float delayTime = cardControl.CallCardTakeDamage(damage, effectType);
@@ -1090,6 +1271,28 @@ public partial class UIGamePhaseControl : YViewControl
 			if (delayTime > 0f)
 			{
 				await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+			}
+
+			// 怪物“反伤”处理：受击后对玩家造成固定反伤（例如：榴莲Donkey 反伤 5）
+			// 这里不要走 TakePlayerDamageAsync（它会播放怪物攻击动画，像“主动反击”），
+			// 反伤只需要直接结算玩家掉血即可。
+			if (triggerThorns && damage > 0 && effectType != EEffectType.ReflectDamage)
+			{
+				int thornsDamage = cardControl.CardEffect?.GetEffectValue(EEffectType.ReflectDamage) ?? 0;
+				if (thornsDamage > 0)
+				{
+					// 反伤属于直接伤害：不走防御/格挡流程，但仍应遵循“抵挡致命伤害”(Unyielding)逻辑
+					if (TryBlockFatalDamage(thornsDamage))
+					{
+						thornsDamage = m_DataJoeyPlayer.playerHealth - 1;
+					}
+
+					if (thornsDamage > 0)
+					{
+						SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
+						ApplyPlayerHealthChange(-thornsDamage);
+					}
+				}
 			}
 
 			// 火球攻击解除冰冻状态
@@ -1132,19 +1335,33 @@ public partial class UIGamePhaseControl : YViewControl
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterFly", 1.0f, 0.5f);
 
 
-			RemoveEnvCard(envIndex, cardControl);
-			delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
-			await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
-			RemoveCardCts(cardControl);
+		RemoveEnvCard(envIndex, cardControl);
+		delayTime = cardControl.CardEffect?.OnDead() ?? 0.5f;
+		await UniTask.WaitForSeconds(delayTime, cancellationToken: token);
+		RemoveCardCts(cardControl);
 
-			if (dropCards != null && dropCards.Count > 0)
+		if (dropCards != null && dropCards.Count > 0)
+		{
+			AddEnvDropCard(dropCards, envIndex);
+		}
+
+		// Update remaining monster buffs immediately after monster death (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
 			{
-				AddEnvDropCard(dropCards, envIndex);
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
 			}
+		}
 
-			CheckAndSpawnKeyPath();
+		CheckAndSpawnKeyPath();
 
-			return true;
+		return true;
 		}
 
 		return false;
@@ -1170,6 +1387,13 @@ public partial class UIGamePhaseControl : YViewControl
 		for (int i = 0; i < cardIds.Count; i++)
 		{
 			Card card = CreateCard(cardIds[i]);
+			
+			// Apply difficulty effects to monsters in Env mode
+			if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+			{
+				ApplyEnvDifficultyToMonster(card);
+			}
+			
 			dropCards.Add(card);
 		}
 
@@ -1209,6 +1433,20 @@ public partial class UIGamePhaseControl : YViewControl
 			cardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
 
 			usedIndices.Add(panelIndex);
+		}
+
+		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
 		}
 	}
 
@@ -1602,6 +1840,20 @@ public partial class UIGamePhaseControl : YViewControl
 			RemoveEnvCardFromDict(cardControl.EnvIndex, cardControl);
 			AddBagCard(cardType, cardControl, true);
 
+			// Update monster buffs after card is removed from env (for BadMonkey/MonkeyKing attack updates)
+			for (int i = 0; i < m_EnvPanels.Count; i++)
+			{
+				UICardSimpleControl lastCard = GetLastEnvCard(i);
+				if (lastCard != null && lastCard.CardType == ECardType.monster)
+				{
+					// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+					if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+					{
+						lastCard.UpdateBuffValue();
+					}
+				}
+			}
+
 			VerticalLayoutGroup layout = null;
 			switch (cardType)
 			{
@@ -1634,6 +1886,18 @@ public partial class UIGamePhaseControl : YViewControl
 					cardControl.CacheTrans.localEulerAngles = Vector3.zero;
 					layout.enabled = true;
 					cardControl.SetMoving(false);
+					
+					// Refresh card display to apply DonkeyQueen debuff if needed
+					if (cardType == ECardType.attack || cardType == ECardType.defence)
+					{
+						// Check if card has HP-dependent effects and trigger update
+						if (cardControl.GetBuffValue(EBuffType.UpdateByHpChange) > 0)
+						{
+							Debug.Log($"[MoveCard] Card {cardControl.CardData?.cardName} has UpdateByHpChange buff, triggering update");
+							cardControl.UpdateBuffValue();
+						}
+						cardControl.RefreshCard();
+					}
 					
 					// Trigger OnEnterBag for the moved card
 					if (cardControl.CardEffect != null)
@@ -1800,7 +2064,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 		if (DataSystem.Instance.HasRelic(ERelicType.GetSpecialCardByAttack))
 		{
-			if (ControlUtil.IsRandomSucceed(5))
+			if (ControlUtil.IsRandomSucceed(10))
 			{
 				AddCardToBag("3009");
 			}
@@ -1854,6 +2118,8 @@ public partial class UIGamePhaseControl : YViewControl
 					damage += 5;
 				}
 			}
+			// 女王debuff在所有增益计算完成后最后应用
+			damage = ApplyDonkeyQueenDebuff(damage);
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, GetOrCreateCardToken(attackCardControl));
@@ -1898,12 +2164,49 @@ public partial class UIGamePhaseControl : YViewControl
 			Debug.Log($"Monster at envIndex {envIndex} unfrozen after weapon attack");
 		}
 
-		if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	if (!enemyKilled && !hasNoCounterAttack && !enemyCounteredFirst && !isEnemyFrozen && enemyCardControl != null && enemyCardControl.gameObject.activeSelf && enemyCardControl.CardData.currentHealth > 0)
+	{
+		int enemyAttack = enemyCardControl.CardData.currentAttack;
+		if (enemyAttack > 0)
 		{
-			int enemyAttack = enemyCardControl.CardData.currentAttack;
-			CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
-			await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
+			int counterCount = GetMonsterCounterAttackCount(enemyCardControl);
+			for (int c = 0; c < counterCount; c++)
+			{
+				if (enemyCardControl == null || !enemyCardControl.gameObject.activeSelf || enemyCardControl.CardData.currentHealth <= 0)
+				{
+					break;
+				}
+				CancellationToken enemyToken = GetOrCreateCardToken(enemyCardControl);
+				await TakePlayerDamageAsync(enemyAttack, enemyCardControl, envIndex, enemyToken, attackCardControl);
+			}
 		}
+	}
+
+	if (!enemyKilled && enemyCardControl != null && enemyCardControl.CardEffect != null)
+	{
+		ECardEffectId effectId = enemyCardControl.CardEffect.Id;
+		if (effectId == ECardEffectId.DonkeyQueen)
+		{
+			await TriggerQueenAttackedEffects();
+		}
+		else if (effectId == ECardEffectId.MonkeyKing)
+		{
+			await TriggerKingAttackedEffects(enemyCardControl);
+		}
+		else if (effectId == ECardEffectId.JokerNightmare)
+		{
+			await TriggerJokerNightmareAttackedEffects(enemyCardControl);
+		}
+	}
+
+	// Handle DodgeChicken swap after counter attack animation completes
+	if (!enemyKilled && enemyCardControl != null && enemyCardControl.CardEffect != null && 
+		enemyCardControl.CardEffect.Id == ECardEffectId.DodgeChicken)
+	{
+		// Add a small delay to ensure counter attack animation fully completes before swapping
+		await UniTask.WaitForSeconds(0.3f, cancellationToken: GetOrCreateCardToken(enemyCardControl));
+		YActionSystem.Instance.DispatchAction(EActionId.SwapEnvCardWithRandom, enemyCardControl);
+	}
 
 		// Play card consumption animation after enemy counter-attack (if any)
 		// This ensures counter-insight parry/counter animations complete before the card disappears
@@ -1920,30 +2223,25 @@ public partial class UIGamePhaseControl : YViewControl
 			// Check if card should be kept in bag (durability mechanic)
 			bool shouldKeep = attackCardControl.CardEffect?.ShouldKeepInBag() ?? false;
 
-			if (!shouldKeep)
+		if (!shouldKeep)
+		{
+			await RemoveBagCard(ECardType.attack, attackCardControl);
+			float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
+			if (removeDelayTime > 0f)
 			{
-				await RemoveBagCard(ECardType.attack, attackCardControl);
-				float removeDelayTime = attackCardControl.CardEffect?.OnRemoveCard() ?? 0f;
-				if (removeDelayTime > 0f)
-				{
-					await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
-				}
-
-				// Check if attack bag is empty, if so trigger fist card's OnBecomeTopOfPile
-				UICardSimpleControl nextAttackCard = GetLastBagCard(ECardType.attack);
-				if (nextAttackCard == null && m_FistCardCache != null)
-				{
-					float fistDelayTime = m_FistCardCache.CardEffect?.OnBecomeTopOfPile() ?? 0f;
-					if (fistDelayTime > 0f)
-					{
-						await UniTask.WaitForSeconds(fistDelayTime);
-					}
-				}
+				await UniTask.WaitForSeconds(removeDelayTime, cancellationToken: GetOrCreateCardToken(attackCardControl));
 			}
 		}
 		else
 		{
-			m_FistCardCache.ClearEffectVlaue();
+			// For permanent weapons (like Shuriken), clear temporary bonuses but keep relic bonuses
+			attackCardControl.ClearTemporaryAndRestoreConditional();
+			Debug.Log($"[PermanentWeapon] Cleared temporary effects after attack for {attackCardControl.CardData.cardName}");
+		}
+		}
+		else
+		{
+			m_FistCardCache.ClearTemporaryAndRestoreConditional();
 
 		}
 
@@ -2003,6 +2301,13 @@ public partial class UIGamePhaseControl : YViewControl
 		int defenceValue = 0;
 		UICardSimpleControl defenceCardControl = GetLastBagCard(ECardType.defence);
 		bool usedWeaponParry = false;
+		bool isMonkeyKingAttack = IsMonkeyKingAttack(enemyCardControl);
+
+		if (isMonkeyKingAttack && defenceCardControl != null)
+		{
+			Debug.Log("MonkeyKing attack: Ignoring defence cards!");
+			defenceCardControl = null;
+		}
 
 		// Check if DualWield is active - if so, cannot use defence cards
 		if (m_DualWieldActive && defenceCardControl != null)
@@ -2059,6 +2364,7 @@ public partial class UIGamePhaseControl : YViewControl
 		else if (defenceCardControl != null)
 		{
 			defenceValue = defenceCardControl.CardData.currentDefence + (defenceCardControl.CardEffect?.GetEffectValue(EEffectType.Defence) ?? 0);
+			defenceValue = ApplyDonkeyQueenDebuff(defenceValue);
 			bool isOverflow = defenceValue < enemyAttack;
 			delayTime = defenceCardControl.CardEffect?.UseDefence(isOverflow) ?? 0.5f;
 			await UniTask.WaitForSeconds(delayTime, cancellationToken: GetOrCreateCardToken(defenceCardControl));
@@ -2246,7 +2552,7 @@ public partial class UIGamePhaseControl : YViewControl
 					AddCardToBag("3008");
 				}
 			}
-			// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+			// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
 			TryArcaneOrbTrigger();
 		}
 		else if (cardType == ECardType.item)
@@ -2321,6 +2627,38 @@ public partial class UIGamePhaseControl : YViewControl
 		await AttackRandomEnemy(damage, attackTime).SuppressCancellationThrow();
 	}
 
+	async void AttackRandomEnemyAndClearEffect(object[] paraArray)
+	{
+		int damage = paraArray[0] is int ? (int)paraArray[0] : 0;
+		int attackTime = paraArray.Length > 1 && paraArray[1] is int ? (int)paraArray[1] : 1;
+		UICardSimpleControl attackCard = paraArray.Length > 2 ? paraArray[2] as UICardSimpleControl : null;
+
+		// Apply conditional relic bonuses for passive attacks (triggered on equip / on-top effects)
+		// BloodyGloves: HP < 50% 时，赤手空拳/拳套伤害 +5
+		if (attackCard != null && DataSystem.Instance.HasRelic(ERelicType.BloodyGloves))
+		{
+			if (attackCard.CardEffect != null && attackCard.CardEffect.Id == ECardEffectId.BareHands)
+			{
+				if (JoeyGameControl.Instance.IsPlayerHalfHealth())
+				{
+					damage += 5;
+				}
+			}
+		}
+		
+		// Passive attacks (like shuriken) trigger when weapon is equipped
+		// They should consume temporary buffs (like ApeWine, DualWield) so they only apply once
+		await AttackRandomEnemy(damage, attackTime).SuppressCancellationThrow();
+		
+		// Clear temporary effects after passive attack completes
+		if (attackCard != null)
+		{
+			attackCard.ClearTemporaryAndRestoreConditional();
+			Debug.Log($"[PassiveAttack] Cleared temporary effects after passive attack for {attackCard.CardData?.cardName}");
+		}
+	}
+
+
 	async UniTask AttackSpecialEnemy(UICardSimpleControl enemyCardControl, int damage, int envIndex, CancellationToken? cancellationToken = null)
 	{
 		if (enemyCardControl == null)
@@ -2342,23 +2680,25 @@ public partial class UIGamePhaseControl : YViewControl
 		UICardSimpleControl cardControl = (UICardSimpleControl)paraArray[0];
 		if (cardControl != null && !cardControl.IsEffecting && !m_CardActionQueue.Contains(cardControl) && CurrentEffectCard != cardControl)
 		{
+			// Only update UpdateAttack buffs at turn start (for BadMonkey/MonkeyKing attack updates)
+			// Counter buffs are updated after each action completes in FixedUpdate
 			for (int i = 0; i < m_EnvPanels.Count; i++)
 			{
 				UICardSimpleControl lastCard = GetLastEnvCard(i);
-				if (lastCard != null)
+				if (lastCard != null && lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
 				{
 					lastCard.UpdateBuffValue();
 				}
 			}
-			if (cardControl.gameObject.activeSelf)
-			{
-				cardControl.IsEffecting = true;
-				m_CardActionQueue.Enqueue(cardControl);
-				CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
-				CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
-			}
-			m_View.TxtPhaseCnt.text = PhaseCounter.ToString();
-			CheckAndSpawnKeyPath();
+		if (cardControl.gameObject.activeSelf)
+		{
+			cardControl.IsEffecting = true;
+			m_CardActionQueue.Enqueue(cardControl);
+			CardActionQueueDebug = new List<UICardSimpleControl>(m_CardActionQueue);
+			CardCtsDictDebug = new List<UICardSimpleControl>(m_CardCtsDict.Keys);
+		}
+		m_View.TxtPhaseCnt.text = (PhaseCounter + 1).ToString();
+		CheckAndSpawnKeyPath();
 		}
 	}
 
@@ -2385,19 +2725,30 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 		}
 
-		if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
+	if (CurrentEffectCard != null && !CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
+	{
+
+		TryBloodStorageHeal();
+		TryUnyieldingTurnUpdate();
+		TryRegenerationHeal();
+		TryHalfHealthAmulet();
+		UpdateVulnerableDebuffs();
+		
+		// Update Counter buffs after each action completes (for AutoBoomMoney, StealMoney, Ghost, etc.)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
 		{
-
-			TryBloodStorageHeal();
-			TryUnyieldingTurnUpdate();
-			TryRegenerationHeal();
-			TryHalfHealthAmulet();
-			UpdateVulnerableDebuffs();
-			CurrentEffectCard = null;
-			PhaseCounter++;
-			UpdateBlockFatalDisplay();
-
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.GetBuffValue(EBuffType.Counter) > 0)
+			{
+				lastCard.UpdateBuffValue();
+			}
 		}
+		
+		CurrentEffectCard = null;
+		PhaseCounter++;
+		UpdateBlockFatalDisplay();
+
+	}
 		else if (CurrentEffectCard != null)
 		{
 			if (CurrentEffectCard.IsEffecting && m_CardCtsDict.Count == 0)
@@ -2542,6 +2893,12 @@ public partial class UIGamePhaseControl : YViewControl
 		{
 			RefreshAllAttackCards();
 		}
+		
+		// HealEnhance relic: Refresh item cards to update health potion descriptions
+		if (relicId == (int)ERelicType.HealEnhance)
+		{
+			RefreshAllItemCards();
+		}
 	}
 
 	private void UpdateAllCardsRelic(int relicId)
@@ -2581,6 +2938,12 @@ public partial class UIGamePhaseControl : YViewControl
 				{
 					cardControl.AddRelic(relicId);
 				}
+				
+				// HealEnhance relic: Update item card descriptions in environment
+				if (relicId == (int)ERelicType.HealEnhance && cardControl.CardType == ECardType.item)
+				{
+					cardControl.UpdateDescription();
+				}
 			}
 		}
 	}
@@ -2601,6 +2964,23 @@ public partial class UIGamePhaseControl : YViewControl
 		if (m_FistCardCache != null)
 		{
 			m_FistCardCache.RefreshCard();
+		}
+	}
+	
+	private void RefreshAllItemCards()
+	{
+		// Refresh all item cards in bag to update descriptions (for health potions with HealEnhance relic)
+		List<UICardSimpleControl> itemCardList = GetBagCardList(ECardType.item);
+		if (itemCardList != null)
+		{
+			for (int i = 0; i < itemCardList.Count; i++)
+			{
+				UICardSimpleControl cardControl = itemCardList[i];
+				if (cardControl != null && cardControl.CardData != null)
+				{
+					cardControl.UpdateDescription();
+				}
+			}
 		}
 	}
 
@@ -2629,6 +3009,54 @@ public partial class UIGamePhaseControl : YViewControl
 		if (shouldShow)
 		{
 			cardControl.ShowCardHoverEffect();
+		}
+	}
+	
+	void OnHoverMonster(object[] paraArray)
+	{
+		UICardSimpleControl monsterCard = (UICardSimpleControl)paraArray[0];
+		if (monsterCard == null || monsterCard.CardType != ECardType.monster)
+		{
+			return;
+		}
+		
+		// Store the hovered monster for CullingBlade to reference
+		m_CurrentAttackTargetEnvIndex = monsterCard.EnvIndex;
+		
+		// Refresh attack card display to show updated damage based on monster's health
+		UICardSimpleControl attackCard = GetLastBagCard(ECardType.attack);
+		if (attackCard == null)
+		{
+			attackCard = GetFistCard();
+		}
+		
+		if (attackCard != null)
+		{
+			attackCard.RefreshCard();
+		}
+	}
+	
+	void OnUnhoverMonster(object[] paraArray)
+	{
+		UICardSimpleControl monsterCard = (UICardSimpleControl)paraArray[0];
+		if (monsterCard == null || monsterCard.CardType != ECardType.monster)
+		{
+			return;
+		}
+		
+		// Clear the hovered monster reference
+		m_CurrentAttackTargetEnvIndex = -1;
+		
+		// Refresh attack card display back to normal
+		UICardSimpleControl attackCard = GetLastBagCard(ECardType.attack);
+		if (attackCard == null)
+		{
+			attackCard = GetFistCard();
+		}
+		
+		if (attackCard != null)
+		{
+			attackCard.RefreshCard();
 		}
 	}
 
@@ -2961,14 +3389,14 @@ public partial class UIGamePhaseControl : YViewControl
 	}
 
 	/// <summary>
-	/// 奥术宝珠效果：每施放三次技能获得一张技能牌4013
+	/// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
 	/// </summary>
 	private void TryArcaneOrbTrigger()
 	{
 		if (DataSystem.Instance.HasRelic(ERelicType.ArcaneOrb))
 		{
 			m_ArcaneOrbSkillCounter++;
-			if (m_ArcaneOrbSkillCounter >= 5)
+			if (m_ArcaneOrbSkillCounter >= ARCANE_ORB_TRIGGER_SKILL_CASTS)
 			{
 				m_ArcaneOrbSkillCounter = 0;
 				AddCardToBag("4013");

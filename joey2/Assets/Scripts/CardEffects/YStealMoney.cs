@@ -36,9 +36,9 @@ public class YStealMoney : YDefaultEffect
                 {
                     if (CardControl.CardData != null)
                     {
-                        // 对玩家造成伤害，参考 YGhost
+                        // Queue actions to trigger
                         int damage = CardControl.CardData.currentAttack;
-                        YActionSystem.Instance.DispatchAction(EActionId.TakePlayerNoDefenceDamage, damage, EVFXName.VFX_Shouji);
+                        JoeyGameControl.Instance.QueueAction(EActionId.TakePlayerNoDefenceDamage, damage, EVFXName.VFX_Shouji);
 
                         // 玩家扣 baseExtra 的钱
                         DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
@@ -46,7 +46,8 @@ public class YStealMoney : YDefaultEffect
                         int newCoin = Mathf.Max(0, currentCoin - baseExtra);
                         DataSystem.Instance.AddCoin(-baseExtra);
 
-                        CardControl.Return();
+                        // Remove from env and update other monsters
+                        JoeyGameControl.Instance.RemoveEnvCardAndUpdate(envIndex, CardControl);
                     }
                 }
             }

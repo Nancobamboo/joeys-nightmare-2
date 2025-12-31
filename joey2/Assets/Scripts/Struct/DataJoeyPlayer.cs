@@ -8,6 +8,7 @@ public class DataJoeyPlayer : IData
 	public int lastPlayerHealth;
 	public int playerHealth;
 	public int playerMaxHealth;
+	public int stageStartHealth; // Health at the start of current stage (for save/load)
 	public int playerAttack;
 	public int playerDefence;
 	public int currentLevel;
@@ -30,6 +31,8 @@ public class DataJoeyPlayer : IData
 	public int StageId;
 	public int levelRandomSeed;
 	public int giftBoxUseCounter;
+	public int envRandomSeed;
+	public int savedDifficulty; // Difficulty level when this save was created
 	public List<string> EnvCardPool = new List<string>();
 	public Dictionary<string, Card> EnvCardDict = new Dictionary<string, Card>();
 	public void LoadFromJson(JObject jobject)
@@ -37,6 +40,7 @@ public class DataJoeyPlayer : IData
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
 		playerHealth = (int)jobject["playerHealth"];
 		playerMaxHealth = (int)jobject["playerMaxHealth"];
+		stageStartHealth = jobject.ContainsKey("stageStartHealth") ? (int)jobject["stageStartHealth"] : playerHealth;
 		playerAttack = (int)jobject["playerAttack"];
 		playerDefence = (int)jobject["playerDefence"];
 		currentLevel = (int)jobject["currentLevel"];
@@ -64,6 +68,8 @@ public class DataJoeyPlayer : IData
 		StageId = (int)jobject["StageId"];
 		levelRandomSeed = jobject.ContainsKey("levelRandomSeed") ? (int)jobject["levelRandomSeed"] : 0;
 		giftBoxUseCounter = jobject.ContainsKey("giftBoxUseCounter") ? (int)jobject["giftBoxUseCounter"] : 0;
+		envRandomSeed = jobject.ContainsKey("envRandomSeed") ? (int)jobject["envRandomSeed"] : 0;
+		savedDifficulty = jobject.ContainsKey("savedDifficulty") ? (int)jobject["savedDifficulty"] : 1;
 		JsonUtil.ToList(jobject, "EnvCardPool", ref EnvCardPool);
 		var EnvCardList = new List<Card>();
 		JsonUtil.ToList(jobject, "EnvCardList", ref EnvCardList);
@@ -77,6 +83,7 @@ public class DataJoeyPlayer : IData
 		jobject.Add("lastPlayerHealth", lastPlayerHealth);
 		jobject.Add("playerHealth", playerHealth);
 		jobject.Add("playerMaxHealth", playerMaxHealth);
+		jobject.Add("stageStartHealth", stageStartHealth);
 		jobject.Add("playerAttack", playerAttack);
 		jobject.Add("playerDefence", playerDefence);
 		jobject.Add("currentLevel", currentLevel);
@@ -100,6 +107,8 @@ public class DataJoeyPlayer : IData
 		jobject.Add("StageId", StageId);
 		jobject.Add("levelRandomSeed", levelRandomSeed);
 		jobject.Add("giftBoxUseCounter", giftBoxUseCounter);
+		jobject.Add("envRandomSeed", envRandomSeed);
+		jobject.Add("savedDifficulty", savedDifficulty);
 		jobject.Add("EnvCardPool", JsonUtil.ToJArray(EnvCardPool));
 		var EnvCardList = EnvCardDict.Values.ToList();
 		jobject.Add("EnvCardList", JsonUtil.ToJArray(EnvCardList));

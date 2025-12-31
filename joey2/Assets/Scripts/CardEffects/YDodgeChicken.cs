@@ -9,12 +9,15 @@ public class YDodgeChicken : YDefaultEffect
         Id = ECardEffectId.DodgeChicken;
     }
 
+    public override float OnDealDamage()
+    {
+        // Counter attack animation
+        return base.OnDealDamage();
+    }
+
     public override float OnTakeDamage(EEffectType effectType = EEffectType.Damage, int damage = 0)
     {
-        if (CardControl != null && effectType == EEffectType.Damage)
-        {
-            YActionSystem.Instance.DispatchAction(EActionId.SwapEnvCardWithRandom, CardControl);
-        }
+        // Don't swap immediately on taking damage - wait until after counter attack
         return base.OnTakeDamage(effectType, damage);
     }
 }

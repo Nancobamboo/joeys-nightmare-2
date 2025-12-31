@@ -29,7 +29,12 @@ public partial class UIGamePhaseControl
             return;
         }
         Debug.Log("VampireMonkeyDealDamage handle logic");
+        // Heal 3 HP, but don't exceed max health (no need to increase max health for healing)
         cardControl.CardData.currentHealth += 3;
+        if (cardControl.CardData.currentHealth > cardControl.CardData.health)
+        {
+            cardControl.CardData.currentHealth = cardControl.CardData.health;
+        }
         cardControl.RefreshCard();
         //cardControl.CallCardTakeDamage(3, EEffectType.Heal);
         // cardControl.CardEffect.AddEffectValue(EEffectType.Heal, 3);

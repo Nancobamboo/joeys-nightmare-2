@@ -42,6 +42,12 @@ public partial class UIGamePhaseControl
                 card.SetDefence(enhancedCard.currentDefence);
             }
             
+            // Apply difficulty effects to monsters in Env mode
+            if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && card.GetCardType() == ECardType.monster)
+            {
+                ApplyEnvDifficultyToMonster(card);
+            }
+            
             int envIndex = selectedIndices[i];
 
             VerticalLayoutGroup parent = m_EnvPanels[envIndex];
@@ -50,6 +56,20 @@ public partial class UIGamePhaseControl
             AddEnvCard(envIndex, newCardControl);
             newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
         }
+
+		// Update monster buffs after new cards are added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
+		}
     }
 
     private List<int> SelectUniqueEnvIndices(int count)

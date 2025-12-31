@@ -63,10 +63,18 @@ public partial class UIGamePhaseControl
 			// 动画完成后归还原卡的CardControl
 			weaponCard.Return();
 			
-			// 注意：这里不触发新栈顶卡的OnBecomeTopOfPile
-			// 因为ThrowWeaponToEnv是从SingleDelayAction的回调中执行的，
-			// 如果在此触发OnBecomeTopOfPile，会导致AddGlobalDelayCall立即执行缓存的action，
-			// 造成连锁反应把多张卡都扔到Env
+			// Check if bare hands should be triggered after weapon is thrown
+			// This needs to happen AFTER the async operation completes to avoid race conditions
+			UICardSimpleControl newLastBagCard = GetLastBagCard(ECardType.attack);
+			if (newLastBagCard != null)
+			{
+				newLastBagCard.CardEffect?.OnBecomeTopOfPile();
+			}
+			// If no weapon card left, trigger bare hands OnBecomeTopOfPile
+			else if (m_FistCardCache != null)
+			{
+				m_FistCardCache.CardEffect?.OnBecomeTopOfPile();
+			}
 		}
 	}
 
@@ -109,5 +117,19 @@ public partial class UIGamePhaseControl
 		newCardControl.CacheTrans.localEulerAngles = Vector3.zero;
 		parent.enabled = true;
 		newCardControl.SetMoving(false);
+
+		// Update monster buffs after new card is added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
+		}
 	}
 }

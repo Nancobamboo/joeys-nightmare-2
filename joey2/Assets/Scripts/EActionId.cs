@@ -14,6 +14,7 @@ public enum EActionId
 	UseBagCard,
 	AddCardFromDiscard,
 	AttackRandomEnemy,
+	AttackRandomEnemyAndClearEffect,
 	TakeAllEnemyDamage,
 	AddCardToQueue,
 	TryLoadScene,
@@ -76,6 +77,14 @@ public enum EActionId
 	ShieldBashActivate,
 	FortressActivate,
 	StrikeActivate,
+	TurkeyJackExtraCounter,
+	MonkeyKingRemoveDefence,
+	DonkeyQueenHealKing,
+	DonkeyQueenRefreshPlayerCards,
+	JokerNightmareCurse,
+	WhipDonkeyDamage,
+	OnHoverMonster,
+	OnUnhoverMonster,
 	Upper,
 
 }

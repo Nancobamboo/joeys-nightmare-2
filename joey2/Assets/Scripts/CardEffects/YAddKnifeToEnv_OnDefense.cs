@@ -47,6 +47,13 @@ public partial class UIGamePhaseControl
         }
         // TODO fix card id to knife card id
         Card knifeCard = CreateCard(cardId);
+        
+        // Apply difficulty effects to monsters in Env mode
+        if (JoeyGameControl.Instance != null && JoeyGameControl.Instance.GameMode == EGameMode.Env && knifeCard.GetCardType() == ECardType.monster)
+        {
+            ApplyEnvDifficultyToMonster(knifeCard);
+        }
+        
         int randomIndex = envIndex == -1 ? Random.Range(0, m_EnvPanels.Count) : envIndex;
         VerticalLayoutGroup parent = m_EnvPanels[randomIndex];
         m_CardDict[knifeCard.UniqueId] = knifeCard;
@@ -54,5 +61,19 @@ public partial class UIGamePhaseControl
         newCardControl.SetData(knifeCard, isEnv: true, envIndex: randomIndex);
         AddEnvCard(randomIndex, newCardControl);
         newCardControl.PlayVFX(new List<EVFXName>(), ECardAnimName.UI_Carditem_pailai, EVFXLife.CardLife);
+
+		// Update monster buffs after new card is added (for BadMonkey/MonkeyKing attack updates)
+		for (int i = 0; i < m_EnvPanels.Count; i++)
+		{
+			UICardSimpleControl lastCard = GetLastEnvCard(i);
+			if (lastCard != null && lastCard.CardType == ECardType.monster)
+			{
+				// Only update cards with UpdateAttack buff to avoid affecting Counter-based effects
+				if (lastCard.GetBuffValue(EBuffType.UpdateAttack) > 0)
+				{
+					lastCard.UpdateBuffValue();
+				}
+			}
+		}
 	}
 }

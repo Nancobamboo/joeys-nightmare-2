@@ -43,17 +43,18 @@ public partial class UIGamePhaseControl
 
     async UniTask DealSplashDamageAsync(UICardSimpleControl attackCardControl, int splashDamage)
     {
+        // Capture target index immediately to avoid race conditions
+        int targetEnvIndex = m_CurrentAttackTargetEnvIndex;
+        
         Debug.Log("DealSplashDamageAsync: " + splashDamage);
-        Debug.Log("m_CurrentAttackTargetEnvIndex: " + m_CurrentAttackTargetEnvIndex);
-        if (m_CurrentAttackTargetEnvIndex < 0)
+        Debug.Log("targetEnvIndex: " + targetEnvIndex);
+        if (targetEnvIndex < 0)
         {
             return;
         }
 
         // 等待主目标伤害完成后再触发溅射伤害
         await UniTask.WaitForSeconds(0.5f);
-
-        int targetEnvIndex = m_CurrentAttackTargetEnvIndex;
         
         // 检查左右相邻位置的怪物
         int[] adjacentIndices = new int[] { targetEnvIndex - 1, targetEnvIndex + 1 };
@@ -92,17 +93,12 @@ public partial class UIGamePhaseControl
             List<UniTask> damageTasks = new List<UniTask>();
             foreach (var target in targets)
             {
-                CancellationToken token = GetOrCreateCardToken(target.card);
-                damageTasks.Add(DealDamageToEnvCard(target.card, splashDamage, target.envIndex, EEffectType.Damage, token));
+                // Use CancellationToken.None to avoid OperationCanceledException when target dies
+                // DealDamageToEnvCard will handle card cleanup internally
+                damageTasks.Add(DealDamageToEnvCard(target.card, splashDamage, target.envIndex, EEffectType.Damage, CancellationToken.None));
             }
             
             await UniTask.WhenAll(damageTasks);
-            
-            // 清理所有目标的 CancellationTokenSource
-            foreach (var target in targets)
-            {
-                RemoveCardCts(target.card);
-            }
         }
     }
 }

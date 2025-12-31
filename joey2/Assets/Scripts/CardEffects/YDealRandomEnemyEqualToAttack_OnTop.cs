@@ -24,7 +24,7 @@ public class YDealRandomEnemyEqualToAttack_OnTop : YDefaultEffect
 				{
 					int damage = CardControl.CardData.currentAttack + (CardControl.CardEffect?.GetEffectValue(EEffectType.Damage) ?? 0);
 					int attackTime = 1 + (CardControl.CardEffect?.GetEffectValue(EEffectType.ExtraAttackCnt) ?? 0);
-					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemy, damage, attackTime);
+					YActionSystem.Instance.DispatchAction(EActionId.AttackRandomEnemyAndClearEffect, damage, attackTime, CardControl);
 				}, 0.3f);
 			}
 		}

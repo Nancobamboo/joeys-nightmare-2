@@ -21,9 +21,11 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
             CardControl.AddBuff(EBuffType.UpdateByHpChange, 1);
             bool currentHalfHealth = JoeyGameControl.Instance.IsPlayerHalfHealth();
             m_CachedHalfHealth = currentHalfHealth;
+            Debug.Log($"[ExtraDamage_HalfHealth] SetData: Card={cardControl.CardData?.cardName}, IsHalfHealth={currentHalfHealth}, baseExtra={baseExtra}");
             if (currentHalfHealth)
             {
                 CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
+                Debug.Log($"[ExtraDamage_HalfHealth] Added {baseExtra} damage at initialization");
             }
         }
     }
@@ -36,10 +38,18 @@ public class YExtraDamage_HalfHealth : YDefaultEffect
             if (currentHalfHealth != m_CachedHalfHealth)
             {
                 m_CachedHalfHealth = currentHalfHealth;
-                CardControl.ClearEffectVlaue();
+                // Don't clear all effect values! Just add or subtract our bonus
                 if (currentHalfHealth)
                 {
+                    // Player health dropped below 50%, add our bonus
+                    Debug.Log($"[ExtraDamage_HalfHealth] Player below 50% HP, adding {baseExtra} damage");
                     CardControl.AddEffectValue(EEffectType.Damage, baseExtra);
+                }
+                else
+                {
+                    // Player health went above 50%, remove our bonus
+                    Debug.Log($"[ExtraDamage_HalfHealth] Player above 50% HP, removing {baseExtra} damage");
+                    CardControl.AddEffectValue(EEffectType.Damage, -baseExtra);
                 }
             }
         }

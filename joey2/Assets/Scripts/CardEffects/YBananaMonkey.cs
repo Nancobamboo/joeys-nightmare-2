@@ -30,7 +30,9 @@ public partial class UIGamePhaseControl
             {
                 Card cardData = lastCard.CardData;
                 Debug.Log($"BananaMonkeyDead Before: {cardData.cardName} currentHealth: {cardData.currentHealth}");
+                // Update both currentHealth and maxHealth for proper culling blade calculation
                 cardData.currentHealth += 3;
+                cardData.health += 3;
                 if (cardData.currentHealth > cardData.health)
                 {
                     cardData.currentHealth = cardData.health;
