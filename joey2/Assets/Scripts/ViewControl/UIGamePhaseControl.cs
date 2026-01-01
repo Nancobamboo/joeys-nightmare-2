@@ -790,6 +790,7 @@ public partial class UIGamePhaseControl : YViewControl
 				}
 			}
 		}
+
 	}
 
 	private void ApplyEnvDifficultyToMonster(Card monsterCard)

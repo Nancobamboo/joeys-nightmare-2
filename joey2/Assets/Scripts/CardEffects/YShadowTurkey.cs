@@ -9,9 +9,14 @@ using System.Threading;
 /// </summary>
 public class YShadowTurkey : YDefaultEffect
 {
-    private bool m_AttackScheduled;
+    // 纯“卡牌游戏事件”实现：不使用 Time/轮询。
+    // 通过监听会影响环境堆叠的 Action，在 Action 发生后自检自己是否变成堆顶。
+
+    private bool m_IsSubscribed;
     private bool m_WasTop;
-    private CancellationTokenSource m_MonitorCts;
+    private bool m_TriggeredWhileTop;
+    private System.Action<object[]> m_OnEnvMaybeChanged;
+    private CancellationTokenSource m_InitialTopCheckCts;
 
     public YShadowTurkey()
     {
@@ -21,137 +26,203 @@ public class YShadowTurkey : YDefaultEffect
     public override void SetData(UICardSimpleControl cardControl)
     {
         base.SetData(cardControl);
-
-        // 只在自己内部做“是否成为堆顶”的自检，不依赖外部通知，避免影响其它卡
-        StartMonitor();
-    }
-
-    public override float OnBecomeTopOfPile()
-    {
-        // 保留该入口：如果未来某处确实调用了 OnBecomeTopOfPile，也走同一套触发逻辑
-        TryTriggerAttackIfNowTop();
-        return base.OnBecomeTopOfPile();
+        ResetState();
+        EnsureSubscribed();
+        ScheduleInitialTopCheck();
     }
 
     public override float OnDead()
     {
-        StopMonitor();
+        Unsubscribe();
         return base.OnDead();
     }
 
     public override float OnRemoveCard()
     {
-        StopMonitor();
+        Unsubscribe();
         return base.OnRemoveCard();
     }
 
-    private void StartMonitor()
+    private void ResetState()
     {
-        StopMonitor();
         m_WasTop = false;
-        m_MonitorCts = new CancellationTokenSource();
-        MonitorTopStateAsync(m_MonitorCts.Token).Forget();
+        m_TriggeredWhileTop = false;
+        CancelInitialTopCheck();
     }
 
-    private void StopMonitor()
+    private void ScheduleInitialTopCheck()
     {
-        if (m_MonitorCts != null && !m_MonitorCts.IsCancellationRequested)
+        // 开局发牌/摆放环境牌不是 Action 驱动的。
+        // 为了让“开局就已经在最上层”的暗影turkey也能自动触发一次，
+        // 在下一帧（发牌流程结束后）做一次性自检。
+        CancelInitialTopCheck();
+        m_InitialTopCheckCts = new CancellationTokenSource();
+        InitialTopCheckNextFrameAsync(m_InitialTopCheckCts.Token).Forget();
+    }
+
+    private void CancelInitialTopCheck()
+    {
+        if (m_InitialTopCheckCts != null)
         {
-            m_MonitorCts.Cancel();
-            m_MonitorCts.Dispose();
+            if (!m_InitialTopCheckCts.IsCancellationRequested)
+            {
+                m_InitialTopCheckCts.Cancel();
+            }
+            m_InitialTopCheckCts.Dispose();
+            m_InitialTopCheckCts = null;
         }
-        m_MonitorCts = null;
-        m_WasTop = false;
-        m_AttackScheduled = false;
     }
 
-    private async UniTaskVoid MonitorTopStateAsync(CancellationToken token)
+    private async UniTaskVoid InitialTopCheckNextFrameAsync(CancellationToken token)
     {
-        // 轻量轮询：只对 ShadowTurkey 生效，用来捕捉“上面的怪移动走后，我露出成为顶牌”这种瞬间
-        // 间隔不用太小，避免无意义开销；0.05s 足够“看起来即时”
-        const float CHECK_INTERVAL = 0.05f;
+        await UniTask.NextFrame(token);
+        // 可能已被对象池复用/替换 effect：统一走保护逻辑
+        TryTriggerOnBecomeTop();
+    }
 
-        while (!token.IsCancellationRequested)
+    private void EnsureSubscribed()
+    {
+        if (m_IsSubscribed) return;
+        if (YActionSystem.Instance == null) return;
+
+        m_OnEnvMaybeChanged ??= OnEnvMaybeChanged;
+
+        // 只监听“可能改变环境堆叠/堆顶”的动作（无需任何时间轮询）
+        EActionId[] ids =
         {
-            if (CardControl == null || CardControl.CardData == null || CardControl.gameObject == null || !CardControl.gameObject.activeSelf)
-            {
-                // 被回收到对象池/销毁：结束监控
-                break;
-            }
+            EActionId.MoveEnvCardLeft,
+            EActionId.MoveCard,
+            EActionId.TakeEnemyDamage,
+            EActionId.TakeAllEnemyDamage,
+            EActionId.BoomEnvCard,
+            EActionId.SwapEnvCard,
+            EActionId.SwapTopTwoEnvCards,
+            EActionId.SwapEnvCardWithRandom,
+            EActionId.AddEnvCardFromBag,
+            EActionId.AddCardToEnv,
+            EActionId.AddCardToSpecifiedEnv,
+            EActionId.AddCardsToEnv,
+            EActionId.AddCardsToEnvByCardId,
+            EActionId.KillSkeletonMonster,
+            EActionId.DealSplashDamage,
+        };
 
-            bool isTopNow = IsEnvMonsterTopNow();
-            if (isTopNow && !m_WasTop)
-            {
-                // 从“非顶牌”变为“顶牌”：触发一次
-                TryTriggerAttackIfNowTop();
-            }
-
-            m_WasTop = isTopNow;
-            await UniTask.WaitForSeconds(CHECK_INTERVAL, cancellationToken: token);
+        for (int i = 0; i < ids.Length; i++)
+        {
+            YActionSystem.Instance.RegistAction(ids[i], m_OnEnvMaybeChanged);
         }
 
-        // 退出前清理
-        StopMonitor();
+        m_IsSubscribed = true;
+
+        // 不在这里“立即触发”：初始化发牌阶段不是 Action 驱动，避免在发牌过程中误触发。
+        // 正式进入战斗后的任意一次 Action 会触发自检。
     }
 
-    private bool IsEnvMonsterTopNow()
+    private void Unsubscribe()
     {
-        if (CardControl == null || CardControl.CardData == null) return false;
-        if (!CardControl.IsEnv || CardControl.CardType != ECardType.monster) return false;
+        if (!m_IsSubscribed) return;
+        if (YActionSystem.Instance == null) { m_IsSubscribed = false; return; }
+        if (m_OnEnvMaybeChanged == null) { m_IsSubscribed = false; return; }
+
+        CancelInitialTopCheck();
+
+        EActionId[] ids =
+        {
+            EActionId.MoveEnvCardLeft,
+            EActionId.MoveCard,
+            EActionId.TakeEnemyDamage,
+            EActionId.TakeAllEnemyDamage,
+            EActionId.BoomEnvCard,
+            EActionId.SwapEnvCard,
+            EActionId.SwapTopTwoEnvCards,
+            EActionId.SwapEnvCardWithRandom,
+            EActionId.AddEnvCardFromBag,
+            EActionId.AddCardToEnv,
+            EActionId.AddCardToSpecifiedEnv,
+            EActionId.AddCardsToEnv,
+            EActionId.AddCardsToEnvByCardId,
+            EActionId.KillSkeletonMonster,
+            EActionId.DealSplashDamage,
+        };
+
+        for (int i = 0; i < ids.Length; i++)
+        {
+            YActionSystem.Instance.UnRegistAction(ids[i], m_OnEnvMaybeChanged);
+        }
+
+        m_IsSubscribed = false;
+    }
+
+    private void OnEnvMaybeChanged(object[] _)
+    {
+        // 处理对象池复用/旧实例残留：如果我已经不是当前 CardEffect，就自我卸载
+        if (CardControl == null || CardControl.gameObject == null)
+        {
+            Unsubscribe();
+            return;
+        }
+        if (!CardControl.gameObject.activeSelf)
+        {
+            Unsubscribe();
+            return;
+        }
+        if (CardControl.CardEffect != this)
+        {
+            Unsubscribe();
+            return;
+        }
+
+        TryTriggerOnBecomeTop();
+    }
+
+    private void TryTriggerOnBecomeTop()
+    {
+        // 处理对象池复用/旧实例残留：如果我已经不是当前 CardEffect，就自我卸载
+        if (CardControl == null || CardControl.gameObject == null)
+        {
+            Unsubscribe();
+            return;
+        }
+        if (!CardControl.gameObject.activeSelf)
+        {
+            Unsubscribe();
+            return;
+        }
+        if (CardControl.CardEffect != this)
+        {
+            Unsubscribe();
+            return;
+        }
+
+        if (JoeyGameControl.Instance == null) return;
+        if (CardControl == null || CardControl.CardData == null) return;
+        if (!CardControl.IsEnv || CardControl.CardType != ECardType.monster) return;
 
         int envIndex = CardControl.EnvIndex;
-        if (envIndex < 0) return false;
-        if (JoeyGameControl.Instance == null) return false;
+        bool isTop = envIndex >= 0 && JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex);
 
-        // 以“环境该列最外层卡牌 == 我”为准
-        return JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex);
-    }
+        if (!isTop)
+        {
+            // 被盖住/离开堆顶：允许下次再次露头触发
+            m_WasTop = false;
+            m_TriggeredWhileTop = false;
+            return;
+        }
 
-    private void TryTriggerAttackIfNowTop()
-    {
-        // 防止同一段时间重复触发
-        if (m_AttackScheduled) return;
-        if (!IsEnvMonsterTopNow()) return;
+        if (!m_WasTop)
+        {
+            // 刚刚露头
+            m_WasTop = true;
+            m_TriggeredWhileTop = false;
+        }
 
-        int attack = CardControl?.CardData?.currentAttack ?? 0;
+        if (m_TriggeredWhileTop) return;
+
+        int attack = CardControl.CardData.currentAttack;
         if (attack <= 0) return;
 
-        int envIndex = CardControl.EnvIndex;
-        m_AttackScheduled = true;
-        TriggerAttackOnceAsync(attack, envIndex).Forget();
-    }
-
-    private async UniTaskVoid TriggerAttackOnceAsync(int attack, int envIndex)
-    {
-        // 用独立延迟，避免被 JoeyGameControl 的 SingleDelayAction（只能缓存一个 action）覆盖/取消
-        await UniTask.WaitForSeconds(0.15f);
-
-        try
-        {
-            if (CardControl == null || CardControl.CardData == null || !CardControl.gameObject.activeSelf)
-            {
-                return;
-            }
-            if (JoeyGameControl.Instance == null)
-            {
-                return;
-            }
-            if (!CardControl.IsEnv || CardControl.CardType != ECardType.monster || envIndex < 0)
-            {
-                return;
-            }
-            if (!JoeyGameControl.Instance.IsCardOnTop(CardControl, envIndex))
-            {
-                return;
-            }
-
-            // 走完整的“怪物主动攻击玩家”流程（包含防御/反击等逻辑）
-            JoeyGameControl.Instance.QueueAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
-        }
-        finally
-        {
-            m_AttackScheduled = false;
-        }
+        m_TriggeredWhileTop = true;
+        JoeyGameControl.Instance.QueueAction(EActionId.TakePlayerDamage, attack, CardControl, envIndex);
     }
 }
 
