@@ -96,6 +96,8 @@ public class UIPreviewCardControl : YViewControl
                 texts[i].raycastTarget = false;
             }
         }
+
+        m_View.BtnCard.image.raycastTarget = true;
     }
 
     void OnBtnCardClick()

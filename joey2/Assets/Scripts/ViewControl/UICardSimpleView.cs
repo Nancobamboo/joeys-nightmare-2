@@ -17,14 +17,14 @@ public class UICardSimpleView : YBaseView
 	public GameObject Moster;
 	public GameObject Defence;
 	public GameObject StarLayout;
-	public Button BtnCard;
-	public EventTriggerListener Trigger;
 	public Text Text;
 	public GameObject Price;
 	public Image CardBackground;
 	public Text TxtCnt;
 	public GameObject Counter;
 	public Image MosterHeart;
+	public Button BtnCard;
+	public EventTriggerListener Trigger;
 	public override void OnInit(Transform holder)
 	{
 		var itemRef = holder.GetComponent<YViewReference>();
@@ -44,13 +44,13 @@ public class UICardSimpleView : YBaseView
 		Moster = viewItemList[10].Target.gameObject;
 		Defence = viewItemList[11].Target.gameObject;
 		StarLayout = viewItemList[12].Target.gameObject;
-		BtnCard = viewItemList[13].Target.GetComponent<Button>();
-		Trigger = viewItemList[13].Target.GetComponent<EventTriggerListener>();
-		Text = viewItemList[14].Target.GetComponent<Text>();
-		Price = viewItemList[15].Target.gameObject;
-		CardBackground = viewItemList[16].Target.GetComponent<Image>();
-		TxtCnt = viewItemList[17].Target.GetComponent<Text>();
-		Counter = viewItemList[18].Target.gameObject;
-		MosterHeart = viewItemList[19].Target.GetComponent<Image>();
+		Text = viewItemList[13].Target.GetComponent<Text>();
+		Price = viewItemList[14].Target.gameObject;
+		CardBackground = viewItemList[15].Target.GetComponent<Image>();
+		TxtCnt = viewItemList[16].Target.GetComponent<Text>();
+		Counter = viewItemList[17].Target.gameObject;
+		MosterHeart = viewItemList[18].Target.GetComponent<Image>();
+		BtnCard = viewItemList[19].Target.GetComponent<Button>();
+		Trigger = viewItemList[19].Target.GetComponent<EventTriggerListener>();
 	}
 }
