@@ -225,10 +225,10 @@ public class UICardSimpleControl : YViewControl
 			return;
 		}
 
-		if (IsEnv && EnvIndex >= 0 && !JoeyGameControl.Instance.IsCardOnTop(this, EnvIndex))
-		{
-			return;
-		}
+		// if (IsEnv && EnvIndex >= 0 && !JoeyGameControl.Instance.IsCardOnTop(this, EnvIndex))
+		// {
+		// 	return;
+		// }
 		if (IsEnv && cachedCardType == ECardType.other)
 		{
 			JoeyGameControl.Instance.EndGamePhase();

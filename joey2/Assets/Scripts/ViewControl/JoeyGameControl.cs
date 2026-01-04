@@ -168,7 +168,7 @@ public class JoeyGameControl : YViewControl
 				m_PauseControl.gameObject.SetActive(!isActive);
 			}
 		}
-		
+
 		// Debug: Jump to final stage (F11)
 		if (Input.GetKeyDown(KeyCode.F11) && GameMode == EGameMode.Env)
 		{
@@ -180,7 +180,7 @@ public class JoeyGameControl : YViewControl
 			// Reload the level
 			SetGamePhase(EGamePhase.BattleStart);
 		}
-		
+
 		// Debug: Quick win current stage (F12)
 		if (Input.GetKeyDown(KeyCode.F12))
 		{
@@ -188,17 +188,17 @@ public class JoeyGameControl : YViewControl
 			QuickWinCurrentStage();
 		}
 	}
-	
+
 	/// <summary>
 	/// Debug function: Instantly win current stage by clearing all monsters
 	/// </summary>
 	private void QuickWinCurrentStage()
 	{
 		if (m_GamePhaseControl == null) return;
-		
+
 		// Get all env cards (monsters)
 		Dictionary<int, List<UICardSimpleControl>> envCardDict = m_GamePhaseControl.GetEnvCardDict();
-		
+
 		List<UICardSimpleControl> allMonsters = new List<UICardSimpleControl>();
 		foreach (var kvp in envCardDict)
 		{
@@ -210,9 +210,9 @@ public class JoeyGameControl : YViewControl
 				}
 			}
 		}
-		
+
 		Debug.Log($"[DEBUG] Found {allMonsters.Count} monsters to clear");
-		
+
 		// Kill all monsters by setting health to 0 and hiding them
 		foreach (var monsterControl in allMonsters)
 		{
@@ -226,7 +226,7 @@ public class JoeyGameControl : YViewControl
 				monsterControl.gameObject.SetActive(false);
 			}
 		}
-		
+
 		// Clear the env card dictionary to remove references
 		envCardDict.Clear();
 	}
@@ -292,36 +292,36 @@ public class JoeyGameControl : YViewControl
 			m_GamePhaseControl.SetData();
 
 			int envLevelId = m_DataJoeyPlayer.StageId;
-			
+
 			// Check if player has unlocked this stage based on difficulty level
 			int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
 			EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
-			
+
 			if (currentEnvStage != null && currentEnvStage.level > maxUnlockedStage)
 			{
 				// Player hasn't unlocked this stage yet, treat as final stage
 				Debug.Log($"Stage {currentEnvStage.level} not unlocked yet (max: {maxUnlockedStage}). Completing run.");
-				
-		DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-		achievement.PassGameNum++;
-		DataSystem.Instance.SaveDataAchievement();
-		
-		// Unlock next difficulty level (up to max 12) and automatically switch to it
-		DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-		int currentDiff = diffData.Current;
-		if (currentDiff < 12)
-		{
-			int newDiff = currentDiff + 1;
-			diffData.UnlockUpTo(newDiff);
-			diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-			DataSystem.Instance.SaveDataDifficulty();
-			Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
-		}
-				
+
+				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+				achievement.PassGameNum++;
+				DataSystem.Instance.SaveDataAchievement();
+
+				// Unlock next difficulty level (up to max 12) and automatically switch to it
+				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+				int currentDiff = diffData.Current;
+				if (currentDiff < 12)
+				{
+					int newDiff = currentDiff + 1;
+					diffData.UnlockUpTo(newDiff);
+					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+					DataSystem.Instance.SaveDataDifficulty();
+					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+				}
+
 				// Reset stage to 0 for next run
 				m_DataJoeyPlayer.StageId = 0;
 				DataSystem.Instance.SaveDataJoeyPlayer();
-				
+
 				DataSystem.Instance.isFinishGame = true;
 				ClearAllUniTasks();
 				if (m_LobbyControl == null)
@@ -331,7 +331,7 @@ public class JoeyGameControl : YViewControl
 				m_LobbyControl.OnBtnBuildClick();
 				return;
 			}
-			
+
 			List<string> playerCardPool = new List<string>(m_DataJoeyPlayer.EnvCardPool);
 
 			// Get card limit from character config
@@ -359,11 +359,11 @@ public class JoeyGameControl : YViewControl
 				m_GamePhaseControl.AddEnvCardList(cardIds: cardIdList, index: i);
 			}
 			SaveGameStateCache();
-			
+
 			// Auto-save when entering new level
 			DataSystem.Instance.SaveDataJoeyPlayer();
 			Debug.Log($"[Auto-Save] Game saved when entering Env level (Stage {envLevelId})");
-			
+
 			return;
 		}
 
@@ -468,7 +468,7 @@ public class JoeyGameControl : YViewControl
 		if (GameMode == EGameMode.Battle || GameMode == EGameMode.Env)
 		{
 			SaveGameStateCache();
-			
+
 			// Auto-save when entering new level
 			DataSystem.Instance.SaveDataJoeyPlayer();
 			Debug.Log($"[Auto-Save] Game saved when entering level {levelId}");
@@ -662,54 +662,54 @@ public class JoeyGameControl : YViewControl
 
 			m_DataJoeyPlayer.StageId++;
 		}
-	else if (GameMode == EGameMode.Env)
-	{
-		int envLevelId = m_DataJoeyPlayer.StageId;
-		EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
-		EStageType stageType = GetEnvStageType(envLevelId);
-		StageReward stageReward = GData.Instance.GetStageReward(stageType);
-
-		// Check if this is the last stage for current difficulty
-		int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
-		bool isFinalStageForDifficulty = currentEnvStage != null && currentEnvStage.level >= maxUnlockedStage;
-
-		if (stageType == EStageType.final || isFinalStageForDifficulty)
+		else if (GameMode == EGameMode.Env)
 		{
-			DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
-			achievement.PassGameNum++;
-			DataSystem.Instance.SaveDataAchievement();
-			
-			// Unlock next difficulty level (up to max 12) and automatically switch to it
-			DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
-			int currentDiff = diffData.Current;
-			if (currentDiff < 12)
+			int envLevelId = m_DataJoeyPlayer.StageId;
+			EnvStage currentEnvStage = GData.Instance.GetEnvStage(envLevelId);
+			EStageType stageType = GetEnvStageType(envLevelId);
+			StageReward stageReward = GData.Instance.GetStageReward(stageType);
+
+			// Check if this is the last stage for current difficulty
+			int maxUnlockedStage = GData.Instance.GetMaxUnlockedStage();
+			bool isFinalStageForDifficulty = currentEnvStage != null && currentEnvStage.level >= maxUnlockedStage;
+
+			if (stageType == EStageType.final || isFinalStageForDifficulty)
 			{
-				int newDiff = currentDiff + 1;
-				diffData.UnlockUpTo(newDiff);
-				diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
-				DataSystem.Instance.SaveDataDifficulty();
-				Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+				DataAchievement achievement = DataSystem.Instance.GetDataAchievement();
+				achievement.PassGameNum++;
+				DataSystem.Instance.SaveDataAchievement();
+
+				// Unlock next difficulty level (up to max 12) and automatically switch to it
+				DataDifficulty diffData = DataSystem.Instance.GetDataDifficulty();
+				int currentDiff = diffData.Current;
+				if (currentDiff < 12)
+				{
+					int newDiff = currentDiff + 1;
+					diffData.UnlockUpTo(newDiff);
+					diffData.Current = newDiff; // Automatically switch to the newly unlocked difficulty
+					DataSystem.Instance.SaveDataDifficulty();
+					Debug.Log($"Unlocked and switched to difficulty level: {newDiff}");
+				}
+
+				DataSystem.Instance.isFinishGame = true;
+				ClearAllUniTasks();
+				if (m_LobbyControl == null)
+				{
+					m_LobbyControl = Asset.OpenUI<UILobbyControl>();
+				}
+				m_LobbyControl.OnBtnBuildClick();
+				return;
 			}
-			
-			DataSystem.Instance.isFinishGame = true;
-			ClearAllUniTasks();
-			if (m_LobbyControl == null)
-			{
-				m_LobbyControl = Asset.OpenUI<UILobbyControl>();
-			}
-			m_LobbyControl.OnBtnBuildClick();
-			return;
+
+			// Handle rewards based on stage_reward.csv configuration
+			HandleStageRewardEnv(stageReward, stageType);
+
+			// Increment stage and clear env random seed for next level
+			// This ensures new level layout when player continues
+			m_DataJoeyPlayer.StageId++;
+			m_DataJoeyPlayer.envRandomSeed = 0;
+			DataSystem.Instance.SaveDataJoeyPlayer();
 		}
-
-		// Handle rewards based on stage_reward.csv configuration
-		HandleStageRewardEnv(stageReward, stageType);
-
-		// Increment stage and clear env random seed for next level
-		// This ensures new level layout when player continues
-		m_DataJoeyPlayer.StageId++;
-		m_DataJoeyPlayer.envRandomSeed = 0;
-		DataSystem.Instance.SaveDataJoeyPlayer();
-	}
 		else if (GameMode == EGameMode.Guide)
 		{
 			if (m_DataJoeyPlayer.currentLevel >= 3)
@@ -888,14 +888,14 @@ public class JoeyGameControl : YViewControl
 			m_DataJoeyPlayer.playerHealth = m_DataJoeyPlayer.stageStartHealth;
 			Debug.Log($"Restored health to stage start before saving: {m_DataJoeyPlayer.stageStartHealth}");
 		}
-		
+
 		// Save current game state before returning to main menu
 		// This ensures seed and progress are not lost if player quits
 		DataSystem.Instance.SaveDataJoeyPlayer();
-		
+
 		// Clear game state cache to ensure fresh load on continue
 		m_GameStateCache = null;
-		
+
 		ClearAllUniTasks();
 		Close();
 		SceneLoader.Instance.LoadScene("Start");
