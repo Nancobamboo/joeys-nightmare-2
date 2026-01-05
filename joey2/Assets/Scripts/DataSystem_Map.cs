@@ -9,59 +9,72 @@ public partial class DataSystem
 {
     // -------- Growth unlock mappings (keep in sync with Resources/Data/growth.csv) --------
     // Card unlock: when NOT unlocked => price=0 (excluded from shop/reward pools). When unlocked => price restored (>0).
-    private static readonly Dictionary<string, int> CardUnlockNodeByCardId = new Dictionary<string, int>
+    // Note: value is an array to support one node unlocking multiple cards.
+    private static readonly Dictionary<string, int[]> CardUnlockNodeByCardId = new Dictionary<string, int[]>
     {
         // id, nodeId
-        { "4013", 3 },   // 魔力召唤
-        { "1023", 5 },   // 骑士剑
-        { "1020", 7 },   // 噩梦长枪
-        { "4015", 8 },   // 冰霜魔法
-        { "1021", 9 },   // 魔法剑
-        { "2015", 10 },  // 骑士盾
-        { "1024", 11 },  // 螺旋手里剑
-        { "2012", 14 },  // 复仇之盾
-        { "2013", 15 },  // 破盾的救赎
-        { "3012", 16 },  // 沸腾兽血
-        { "3013", 17 },  // 鲜血护符
-        { "1022", 18 },  // 魔杖
-        { "2014", 19 },  // 魔法盾
-        { "3014", 20 },  // 魔法药水
-        { "4014", 21 },  // 烈焰火球
-        { "4011", 24 },  // 宁死不屈
-        { "4012", 25 },  // 浴血奋战
-        { "4016", 26 },  // 技能强化
+        // growth.csv 变更后的主解锁节点
+        { "4013", new[] { 3 } },        // 魔力召唤
+        { "3014", new[] { 3 } },        // 魔法药水
+
+        { "1023", new[] { 5 } },        // 骑士剑
+        { "2015", new[] { 5 } },        // 骑士盾
+
+        { "1020", new[] { 7 } },        // 噩梦长枪
+        { "2012", new[] { 7 } },        // 噩梦之盾/复仇之盾
+
+        { "4015", new[] { 8 } },        // 冰霜魔法
+        { "4014", new[] { 8 } },        // 烈焰火球
+
+        { "1021", new[] { 9 } },        // 魔法剑
+        { "1022", new[] { 9 } },        // 魔杖
+        { "2014", new[] { 9 } },        // 魔法盾
+
+        { "1024", new[] { 11 } },       // 螺旋手里剑
+        { "2013", new[] { 15 } },       // 破盾的救赎
+
+        { "3012", new[] { 16 } },       // 沸腾兽血
+        { "3013", new[] { 16 } },       // 鲜血护符
+
+        { "4011", new[] { 25 } },       // 宁死不屈
+        { "4012", new[] { 25 } },       // 浴血奋战
+        { "4016", new[] { 26 } },       // 技能强化
     };
 
     // Relic unlock: when NOT unlocked => canDraw=false (excluded from relic selection pool).
-    private static readonly Dictionary<int, int> RelicUnlockNodeByRelicId = new Dictionary<int, int>
+    // Note: value is an array to support fusion nodes.
+    private static readonly Dictionary<int, int[]> RelicUnlockNodeByRelicId = new Dictionary<int, int[]>
     {
-        { (int)ERelicType.BBQDelight, 0 },            // 烤肉香香
-        { (int)ERelicType.WeaponParry, 12 },          // 弹刀
-        { (int)ERelicType.CounterInsight, 13 },       // 看破
-        { (int)ERelicType.DualWieldMastery, 23 },     // 双持精通
-        { (int)ERelicType.HighArt, 27 },              // 高等艺术
-        { (int)ERelicType.BareHandParry, 28 },        // 空手接白刃
-        { (int)ERelicType.ShieldReflect, 29 },        // 护盾反伤
-        { (int)ERelicType.RegenerationAmulet, 30 },   // 再生护符
-        { (int)ERelicType.HalfHealthAmulet, 31 },     // 半血护符
-        { (int)ERelicType.BareHandsMaster, 32 },      // 拳套/腕豪（relic_info.csv: 9010）
-        { (int)ERelicType.ShurikenMastery, 33 },      // 手里剑精通（relic_info.csv: 9009）
-        { (int)ERelicType.MagicSwordsmanRing, 34 },   // 魔剑士指环
+        { (int)ERelicType.BBQDelight, new[] { 0 } },              // 烤肉香香
+        // 融合节点：23（弹刀/看破/双持）
+        { (int)ERelicType.WeaponParry, new[] { 23 } },            // 弹刀
+        { (int)ERelicType.CounterInsight, new[] { 23 } },         // 看破
+        { (int)ERelicType.DualWieldMastery, new[] { 23 } },       // 双持精通
+        { (int)ERelicType.HighArt, new[] { 27 } },                // 高等艺术
+        { (int)ERelicType.ArcaneOrb, new[] { 27 } },              // 奥术宝珠
+        { (int)ERelicType.BareHandParry, new[] { 28 } },          // 空手接白刃
+        { (int)ERelicType.ShieldReflect, new[] { 29 } },          // 护盾反伤
+        { (int)ERelicType.RegenerationAmulet, new[] { 30 } },     // 再生护符
+        { (int)ERelicType.HalfHealthAmulet, new[] { 30 } },       // 半血护符
+        { (int)ERelicType.BareHandsMaster, new[] { 32 } },        // 拳套/腕豪（relic_info.csv: 9010）
+        { (int)ERelicType.ShurikenMastery, new[] { 33 } },        // 手里剑精通（relic_info.csv: 9009）
+        { (int)ERelicType.MagicSwordsmanRing, new[] { 27 } },     // 魔剑士指环
     };
 
     // Start-run stat bonuses (keep in sync with Resources/Data/growth.csv)
-    // - Card limit +1 nodes: 35 / 48 / 53
-    // - Weapon attack +1 nodes: 36 / 39 / 44 / 282
-    // - Armor defence +1 nodes: 37 / 40 / 45 / 283
-    // - HP cap +4 nodes: 41 / 43 / 47 / 52
-    // - Starting coins +40 nodes: 46/51/54
-    // - High-grade card probability +5% nodes: 38/42/49/50
-    private static readonly int[] StartEnvCardLimitPlus1NodeIds = { 35, 48, 53 };
-    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 36, 39, 44, 282 };
-    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 40, 45, 283 };
-    private static readonly int[] StartMaxHealthPlus4NodeIds = { 41, 43, 47, 52 };
-    private static readonly int[] StartCoinsPlus40NodeIds = { 46, 51, 54 };
-    private static readonly int[] HighGradeCardProbabilityPlus5NodeIds = { 38, 42, 49, 50 };
+    // - Card limit +2 nodes: 35
+    // - Base "atk+def +1" nodes: 37 / 39 / 48 (apply to both weapon+1 and armor+1 in runtime card stats)
+    // - Weapon attack +1 nodes: 37 / 39 / 48 / 282
+    // - Armor defence +1 nodes: 37 / 39 / 48 / 282
+    // - HP cap +8 nodes: 41 / 43
+    // - Starting coins +80 nodes: 46 / 51
+    // - High-grade card probability +10% nodes: 49 / 54
+    private static readonly int[] StartEnvCardLimitPlus2NodeIds = { 35 };
+    private static readonly int[] StartWeaponAttackPlus1NodeIds = { 37, 39, 48, 282 };
+    private static readonly int[] StartArmorDefencePlus1NodeIds = { 37, 39, 48, 282 };
+    private static readonly int[] StartMaxHealthPlus8NodeIds = { 41, 43 };
+    private static readonly int[] StartCoinsPlus80NodeIds = { 46, 51 };
+    private static readonly int[] HighGradeCardProbabilityPlus10NodeIds = { 49, 54 };
 
     /// <summary>
     /// Growth bonus: +5% per unlocked node (growth.csv: 38/42/49/50).
@@ -74,11 +87,11 @@ public partial class DataSystem
         if (growth == null) return 0f;
 
         float bonus = 0f;
-        for (int i = 0; i < HighGradeCardProbabilityPlus5NodeIds.Length; i++)
+        for (int i = 0; i < HighGradeCardProbabilityPlus10NodeIds.Length; i++)
         {
-            if (growth.IsUnlocked(HighGradeCardProbabilityPlus5NodeIds[i]))
+            if (growth.IsUnlocked(HighGradeCardProbabilityPlus10NodeIds[i]))
             {
-                bonus += 0.05f;
+                bonus += 0.10f;
             }
         }
         return bonus;
@@ -130,14 +143,14 @@ public partial class DataSystem
 
         // 局外成长：开局属性加成（growth.csv: 35-54）
         // hp 上限 +4（可叠加）
-        for (int i = 0; i < StartMaxHealthPlus4NodeIds.Length; i++)
+        for (int i = 0; i < StartMaxHealthPlus8NodeIds.Length; i++)
         {
-            if (Unlocked(StartMaxHealthPlus4NodeIds[i])) maxHealth += 4;
+            if (Unlocked(StartMaxHealthPlus8NodeIds[i])) maxHealth += 8;
         }
-        // 初始金币 +40（可叠加）
-        for (int i = 0; i < StartCoinsPlus40NodeIds.Length; i++)
+        // 初始金币 +80（可叠加）
+        for (int i = 0; i < StartCoinsPlus80NodeIds.Length; i++)
         {
-            if (Unlocked(StartCoinsPlus40NodeIds[i])) coins += 40;
+            if (Unlocked(StartCoinsPlus80NodeIds[i])) coins += 80;
         }
 
         // 初始装备替换（growth.csv: 2 / 4 / 6 / 22 / 281）
@@ -263,9 +276,9 @@ public partial class DataSystem
         int bonus = 0;
         if (growth != null)
         {
-            for (int i = 0; i < StartEnvCardLimitPlus1NodeIds.Length; i++)
+            for (int i = 0; i < StartEnvCardLimitPlus2NodeIds.Length; i++)
             {
-                if (growth.IsUnlocked(StartEnvCardLimitPlus1NodeIds[i])) bonus += 1;
+                if (growth.IsUnlocked(StartEnvCardLimitPlus2NodeIds[i])) bonus += 2;
             }
         }
 
@@ -309,11 +322,22 @@ public partial class DataSystem
         foreach (var kv in CardUnlockNodeByCardId)
         {
             string cardId = kv.Key;
-            int nodeId = kv.Value;
+            int[] nodeIds = kv.Value;
 
             if (!GData.Instance.CardDict.TryGetValue(cardId, out Card cfg) || cfg == null) continue;
 
-            bool unlocked = growth.IsUnlocked(nodeId);
+            bool unlocked = false;
+            if (nodeIds != null)
+            {
+                for (int i = 0; i < nodeIds.Length; i++)
+                {
+                    if (growth.IsUnlocked(nodeIds[i]))
+                    {
+                        unlocked = true;
+                        break;
+                    }
+                }
+            }
             if (!unlocked)
             {
                 cfg.price = 0;
@@ -348,9 +372,21 @@ public partial class DataSystem
             if (info == null) continue;
 
             // Default: drawable unless gated by growth
-            if (RelicUnlockNodeByRelicId.TryGetValue(info.id, out int nodeId))
+            if (RelicUnlockNodeByRelicId.TryGetValue(info.id, out int[] nodeIds))
             {
-                info.canDraw = growth.IsUnlocked(nodeId);
+                bool unlocked = false;
+                if (nodeIds != null)
+                {
+                    for (int i = 0; i < nodeIds.Length; i++)
+                    {
+                        if (growth.IsUnlocked(nodeIds[i]))
+                        {
+                            unlocked = true;
+                            break;
+                        }
+                    }
+                }
+                info.canDraw = unlocked;
             }
             else
             {
