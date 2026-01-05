@@ -1170,6 +1170,8 @@ public class UIGrowthControl : YViewControl
 			btnCtrl.Setup(id, OnGrowthBtnClick);
 			// 给 uibtn 补上文字：默认显示节点名（为空时回退到 id）
 			btnCtrl.SetTitle(!string.IsNullOrEmpty(node.Name) ? node.Name : id.ToString());
+			// 图标：unknow 统一用 skilltree_icon_unknow；其余按类型使用 Resources/Art/Img/growth 下的素材
+			btnCtrl.SetGrowthIcon(GetGrowthIconType(node));
 			if (!m_LineStyleInited)
 			{
 				TryInitLineStyleFromBtn(btnCtrl);
@@ -1197,6 +1199,47 @@ public class UIGrowthControl : YViewControl
 
 		// 重要：让“靠近根节点/层级更浅”的节点绘制在更上层，避免子节点的线段盖到父节点上（看起来像线露出来）
 		ReorderSlotsByLevel();
+	}
+
+	private static UIBtnControl.EGrowthIconType GetGrowthIconType(GrowthNode node)
+	{
+		if (node == null) return UIBtnControl.EGrowthIconType.Hp;
+		string name = node.Name ?? string.Empty;
+
+		// 初始遗物 / 初始卡牌(装备)节点
+		if (name.StartsWith("初始遗物", StringComparison.Ordinal) ||
+		    name.StartsWith("初始装备", StringComparison.Ordinal) ||
+		    name.StartsWith("初始卡牌", StringComparison.Ordinal))
+		{
+			return UIBtnControl.EGrowthIconType.StartRelicOrStartCard;
+		}
+
+		// 新遗物节点（注意：要放在“初始遗物”判断后面）
+		if (name.StartsWith("遗物", StringComparison.Ordinal))
+		{
+			return UIBtnControl.EGrowthIconType.NewRelic;
+		}
+
+		// 新卡/卡牌相关节点（含：新卡、高级卡牌、卡牌上限等）
+		if (name.StartsWith("新卡", StringComparison.Ordinal) || name.Contains("卡牌"))
+		{
+			return UIBtnControl.EGrowthIconType.NewCard;
+		}
+
+		// 富裕节点
+		if (name.Contains("富裕"))
+		{
+			return UIBtnControl.EGrowthIconType.Gold;
+		}
+
+		// 体魄节点（以及未列出的默认强化节点）
+		if (name.Contains("体魄") || name.Contains("基础强化"))
+		{
+			return UIBtnControl.EGrowthIconType.Hp;
+		}
+
+		// 默认：用体魄图标兜底（避免空图）
+		return UIBtnControl.EGrowthIconType.Hp;
 	}
 
 	private void ReorderSlotsByLevel()

@@ -8,6 +8,9 @@ public class UIBtnControl : YViewControl
 	private Action<int> m_OnClick;
 	private int m_Index;
 	private const string RuntimeTitleName = "RuntimeTitle";
+	private const string GrowthSpriteRoot = "Art/Img/growth/";
+	private static readonly System.Collections.Generic.Dictionary<string, Sprite> s_GrowthSpriteCache =
+		new System.Collections.Generic.Dictionary<string, Sprite>();
 
 	public enum EBtnState
 	{
@@ -15,6 +18,19 @@ public class UIBtnControl : YViewControl
 		Unlock,
 		Lock,
 		Unknow
+	}
+
+	/// <summary>
+	/// 成长(技能树)节点的图标类型（用于 IconStart/IconLock/IconUnlock）。
+	/// IconUnknow 始终使用 skilltree_icon_unknow。
+	/// </summary>
+	public enum EGrowthIconType
+	{
+		Hp,
+		Gold,
+		NewCard,
+		StartRelicOrStartCard,
+		NewRelic,
 	}
 
 	public static EResType GetResType()
@@ -99,6 +115,57 @@ public class UIBtnControl : YViewControl
 				SetActiveSafe(m_View.IconUnknow, true);
 				break;
 		}
+	}
+
+	/// <summary>
+	/// 给成长树节点按钮设置 icon（只改 IconStart/IconLock/IconUnlock/IconUnknow 四张图）。
+	/// </summary>
+	public void SetGrowthIcon(EGrowthIconType type)
+	{
+		if (m_View == null) return;
+
+		Sprite typeSprite = LoadGrowthSprite(GetGrowthSpriteName(type));
+		Sprite unknownSprite = LoadGrowthSprite("skilltree_icon_unknow");
+
+		SetSpriteSafe(m_View.IconStart, typeSprite);
+		SetSpriteSafe(m_View.IconUnlock, typeSprite);
+		SetSpriteSafe(m_View.IconLock, typeSprite);
+		SetSpriteSafe(m_View.IconUnknow, unknownSprite);
+	}
+
+	private static string GetGrowthSpriteName(EGrowthIconType type)
+	{
+		switch (type)
+		{
+			case EGrowthIconType.Hp:
+				return "skilltree_icon_hp2";
+			case EGrowthIconType.Gold:
+				return "skilltree_icon_gold1";
+			case EGrowthIconType.NewCard:
+				return "skilltree_icon_newcard";
+			case EGrowthIconType.StartRelicOrStartCard:
+				return "skilltree_icon_relic1";
+			case EGrowthIconType.NewRelic:
+				return "skilltree_icon_relic2";
+			default:
+				return "skilltree_icon_hp2";
+		}
+	}
+
+	private static Sprite LoadGrowthSprite(string spriteNameNoExt)
+	{
+		if (string.IsNullOrWhiteSpace(spriteNameNoExt)) return null;
+		if (s_GrowthSpriteCache.TryGetValue(spriteNameNoExt, out var cached) && cached != null) return cached;
+
+		var sp = Resources.Load<Sprite>(GrowthSpriteRoot + spriteNameNoExt);
+		s_GrowthSpriteCache[spriteNameNoExt] = sp;
+		return sp;
+	}
+
+	private void SetSpriteSafe(Image img, Sprite sprite)
+	{
+		if (img == null || sprite == null) return;
+		img.sprite = sprite;
 	}
 
 	public void SetLine(bool show, bool isUnlock, float angle, float length)
