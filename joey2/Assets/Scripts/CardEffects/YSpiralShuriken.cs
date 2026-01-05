@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class YSpiralShuriken : YDealRandomEnemyEqualToAttack_OnTop
 {
-	public const int TriggerAttackBonus = 2;
+	public const int TriggerAttackBonus = 1;
 
 	public YSpiralShuriken()
 	{
