@@ -1220,6 +1220,12 @@ public class UIGrowthControl : YViewControl
 			return UIBtnControl.EGrowthIconType.NewRelic;
 		}
 
+		// 高级卡牌节点
+		if (name.Contains("高级卡牌"))
+		{
+			return UIBtnControl.EGrowthIconType.Gold2;
+		}
+
 		// 新卡/卡牌相关节点（含：新卡、高级卡牌、卡牌上限等）
 		if (name.StartsWith("新卡", StringComparison.Ordinal) || name.Contains("卡牌"))
 		{
@@ -1232,8 +1238,14 @@ public class UIGrowthControl : YViewControl
 			return UIBtnControl.EGrowthIconType.Gold;
 		}
 
-		// 体魄节点（以及未列出的默认强化节点）
-		if (name.Contains("体魄") || name.Contains("基础强化"))
+		// 基础强化节点
+		if (name.Contains("基础强化"))
+		{
+			return UIBtnControl.EGrowthIconType.BaseHp;
+		}
+
+		// 体魄节点
+		if (name.Contains("体魄"))
 		{
 			return UIBtnControl.EGrowthIconType.Hp;
 		}
