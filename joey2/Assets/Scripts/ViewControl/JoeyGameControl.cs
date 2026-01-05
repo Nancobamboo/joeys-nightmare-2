@@ -615,6 +615,13 @@ public class JoeyGameControl : YViewControl
 
 	public void EndGamePhase()
 	{
+		// Clear per-level temporary bonuses (e.g. SpiralShuriken +ATK when moved to env),
+		// so they never carry over to the next stage even if levelRandomSeed logic changes.
+		if (m_GamePhaseControl != null)
+		{
+			m_GamePhaseControl.ForceResetSpiralShurikenLevelBonuses();
+		}
+
 		if (m_GamePhaseControl != null)
 		{
 			m_GamePhaseControl.ClearEnvCardList();

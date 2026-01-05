@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class YSpiralShuriken : YDealRandomEnemyEqualToAttack_OnTop
 {
-	public const int TriggerAttackBonus = 1;
+	public const int TriggerAttackBonus = 2;
 
 	public YSpiralShuriken()
 	{
@@ -15,27 +15,16 @@ public class YSpiralShuriken : YDealRandomEnemyEqualToAttack_OnTop
 public partial class UIGamePhaseControl
 {
 	private static readonly Dictionary<int, int> s_SpiralShurikenLevelBonusByUniqueId = new Dictionary<int, int>();
-	private static int s_SpiralShurikenLastLevelSeed = 0;
 
-	private void ResetSpiralShurikenLevelBonusesIfNeeded()
+	/// <summary>
+	/// 清除“螺旋手里剑”在本关内由该效果累计增加的攻击（只回滚本脚本自己加的那部分）。
+	/// </summary>
+	private void ResetSpiralShurikenLevelBonuses()
 	{
 		if (m_DataJoeyPlayer == null)
 		{
 			return;
 		}
-
-		int currentSeed = m_DataJoeyPlayer.levelRandomSeed;
-		if (currentSeed == 0)
-		{
-			return;
-		}
-
-		if (s_SpiralShurikenLastLevelSeed == currentSeed)
-		{
-			return;
-		}
-
-		s_SpiralShurikenLastLevelSeed = currentSeed;
 
 		if (s_SpiralShurikenLevelBonusByUniqueId.Count == 0)
 		{
@@ -68,6 +57,14 @@ public partial class UIGamePhaseControl
 		s_SpiralShurikenLevelBonusByUniqueId.Clear();
 	}
 
+	/// <summary>
+	/// 强制清理“螺旋手里剑”本关累计的临时加攻，避免跨关继承。
+	/// </summary>
+	public void ForceResetSpiralShurikenLevelBonuses()
+	{
+		ResetSpiralShurikenLevelBonuses();
+	}
+
 	private void AddSpiralShurikenLevelBonus(Card spiralCardData, int bonus)
 	{
 		if (spiralCardData == null)
@@ -98,8 +95,6 @@ public partial class UIGamePhaseControl
 
 	private void CheckAndMoveSpiralShurikenToEnv(UICardSimpleControl newlyAddedCard)
 	{
-		ResetSpiralShurikenLevelBonusesIfNeeded();
-
 		if (newlyAddedCard != null && newlyAddedCard.CardData != null && newlyAddedCard.CardData.id == "1024")
 		{
 			return;
@@ -159,8 +154,6 @@ public partial class UIGamePhaseControl
 		{
 			return;
 		}
-
-		ResetSpiralShurikenLevelBonusesIfNeeded();
 
 		int cardTypeInt = (int)ECardType.attack;
 		if (m_BagCardDict.TryGetValue(cardTypeInt, out List<UICardSimpleControl> cardList))
