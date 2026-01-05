@@ -27,7 +27,9 @@ public class UIBtnControl : YViewControl
 	public enum EGrowthIconType
 	{
 		Hp,
+		BaseHp,
 		Gold,
+		Gold2,
 		NewCard,
 		StartRelicOrStartCard,
 		NewRelic,
@@ -139,8 +141,12 @@ public class UIBtnControl : YViewControl
 		{
 			case EGrowthIconType.Hp:
 				return "skilltree_icon_hp2";
+			case EGrowthIconType.BaseHp:
+				return "skilltree_icon_hp1";
 			case EGrowthIconType.Gold:
 				return "skilltree_icon_gold1";
+			case EGrowthIconType.Gold2:
+				return "skilltree_icon_gold2";
 			case EGrowthIconType.NewCard:
 				return "skilltree_icon_newcard";
 			case EGrowthIconType.StartRelicOrStartCard:
