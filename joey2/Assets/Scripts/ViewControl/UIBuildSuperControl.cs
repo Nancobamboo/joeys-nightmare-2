@@ -172,7 +172,7 @@ public class UIBuildSuperControl : YViewControl
     void UpdateTxtCoin()
     {
         int sellCost = GetSellCardCost();
-        m_View.TxtCoin.text = "-" + sellCost.ToString();
+        m_View.TxtCoin.text = sellCost.ToString();
     }
 
     public void SaveBuild(ECardType cardType)

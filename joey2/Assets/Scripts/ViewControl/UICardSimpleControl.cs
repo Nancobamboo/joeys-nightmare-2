@@ -227,10 +227,16 @@ public class UICardSimpleControl : YViewControl
 			return;
 		}
 
-		// if (IsEnv && EnvIndex >= 0 && !JoeyGameControl.Instance.IsCardOnTop(this, EnvIndex))
-		// {
-		// 	return;
-		// }
+		// Check if card is on top of its pile (for bag cards: skill/item)
+		if (!IsEnv && (cachedCardType == ECardType.skill || cachedCardType == ECardType.item))
+		{
+			// For bag cards, check if this card is the last (top) card in its bag list
+			if (!JoeyGameControl.Instance.IsBagCardOnTop(this))
+			{
+				return;
+			}
+		}
+
 		if (IsEnv && cachedCardType == ECardType.other)
 		{
 			JoeyGameControl.Instance.EndGamePhase();
