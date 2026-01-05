@@ -296,8 +296,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearAllCard();
 
-		ResetSpiralShurikenLevelBonusesIfNeeded();
-
 		if (m_FistCardCache != null)
 		{
 			m_FistCardCache.ClearEffectVlaue();
@@ -488,8 +486,6 @@ public partial class UIGamePhaseControl : YViewControl
 		RefreshView();
 		ClearEnvCardList();
 		UsedCardList.Clear();
-
-		ResetSpiralShurikenLevelBonusesIfNeeded();
 
 		CreateFistCardCache();
 		CreateKeyPathCardCache();
