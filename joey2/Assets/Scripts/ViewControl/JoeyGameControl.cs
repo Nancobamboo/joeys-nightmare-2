@@ -1134,6 +1134,15 @@ public class JoeyGameControl : YViewControl
 		return lastCard != null && lastCard == cardControl;
 	}
 
+	public bool IsBagCardOnTop(UICardSimpleControl cardControl)
+	{
+		if (m_GamePhaseControl != null)
+		{
+			return m_GamePhaseControl.IsBagCardOnTop(cardControl);
+		}
+		return false;
+	}
+
 	public int GetEnvCardCount(int envIndex)
 	{
 		if (m_GamePhaseControl != null)

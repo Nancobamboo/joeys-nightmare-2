@@ -1002,6 +1002,15 @@ public partial class UIGamePhaseControl : YViewControl
 		return null;
 	}
 
+	public bool IsBagCardOnTop(UICardSimpleControl cardControl)
+	{
+		if (cardControl == null) return false;
+		
+		ECardType cardType = cardControl.CardType;
+		UICardSimpleControl lastCard = GetLastBagCard(cardType);
+		return lastCard != null && lastCard == cardControl;
+	}
+
 	public UICardSimpleControl GetLastEnvCard(int envIndex)
 	{
 		if (m_EnvCardDict.TryGetValue(envIndex, out List<UICardSimpleControl> cardList))
