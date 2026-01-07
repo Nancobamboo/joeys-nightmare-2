@@ -29,6 +29,7 @@ public class YAddKnifeToEnv_OnDefense : YCardEffect
     public override float OnRemoveCard()
 	{
 		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1018");
+		YActionSystem.Instance.DispatchAction(EActionId.AddCardToEnv, CardControl, "1018");
 		return 0f;
 	}
 }
