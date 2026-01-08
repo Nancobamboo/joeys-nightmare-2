@@ -45,7 +45,7 @@ public partial class UIGamePhaseControl : YViewControl
 
 	private UIRelicControl m_CardLimitDebuffControl;
 
-	private const int ARCANE_ORB_TRIGGER_SKILL_CASTS = 6;
+	private const int ARCANE_ORB_TRIGGER_SKILL_CASTS = 8;
 	private int m_ArcaneOrbSkillCounter = 0;
 
 	public static EResType GetResType()
@@ -2429,7 +2429,7 @@ public partial class UIGamePhaseControl : YViewControl
 					AddCardToBag("3008");
 				}
 			}
-			// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
+			// 奥术宝珠效果：每施放8次技能获得一张技能牌4013（魔力召唤）
 			TryArcaneOrbTrigger();
 
 			// 魔法进化（永久）：每次使用技能卡，10% 概率技能伤害永久 +1
@@ -3221,7 +3221,7 @@ public partial class UIGamePhaseControl : YViewControl
 	{
 		if (DataSystem.Instance.HasRelic(ERelicType.RegenerationAmulet))
 		{
-			if (PhaseCounter > 0 && PhaseCounter % 3 == 0)
+			if (PhaseCounter > 0 && PhaseCounter % 2 == 0)
 			{
 				ApplyPlayerHealthChange(1, true);
 			}
@@ -3237,8 +3237,8 @@ public partial class UIGamePhaseControl : YViewControl
 				bool isHalfHealthOrBelow = JoeyGameControl.Instance.IsPlayerHalfHealth();
 				if (isHalfHealthOrBelow)
 				{
-					// 血量小于等于50%，回复1HP
-					ApplyPlayerHealthChange(1, true);
+					// 血量小于等于50%，回复2HP
+					ApplyPlayerHealthChange(2, true);
 				}
 				else
 				{
@@ -3258,7 +3258,7 @@ public partial class UIGamePhaseControl : YViewControl
 	}
 
 	/// <summary>
-	/// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
+	/// 奥术宝珠效果：每施放8次技能获得一张技能牌4013（魔力召唤）
 	/// </summary>
 	private void TryArcaneOrbTrigger()
 	{
