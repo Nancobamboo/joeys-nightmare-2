@@ -8,6 +8,15 @@ public class DataJoeyPlayer : IData
 	public int lastPlayerHealth;
 	public int playerHealth;
 	public int playerMaxHealth;
+
+	// 手里剑相关：自动攻击额外伤害永久成长值（遗物“手里剑成长”会累加）
+	public int shurikenAutoAttackBonus;
+
+	// 拳头相关：赤手空拳/拳套攻击额外伤害永久成长值（遗物“拳王成长中”会累加）
+	public int bareHandsAttackBonus;
+
+	// 技能相关：技能伤害永久成长值（遗物“魔法进化”会累加）
+	public int skillDamagePermanentBonus;
 	public int stageStartHealth; // Health at the start of current stage (for save/load)
 	public int playerAttack;
 	public int playerDefence;
@@ -40,6 +49,9 @@ public class DataJoeyPlayer : IData
 		lastPlayerHealth = (int)jobject["lastPlayerHealth"];
 		playerHealth = (int)jobject["playerHealth"];
 		playerMaxHealth = (int)jobject["playerMaxHealth"];
+		shurikenAutoAttackBonus = jobject.ContainsKey("shurikenAutoAttackBonus") ? (int)jobject["shurikenAutoAttackBonus"] : 0;
+		bareHandsAttackBonus = jobject.ContainsKey("bareHandsAttackBonus") ? (int)jobject["bareHandsAttackBonus"] : 0;
+		skillDamagePermanentBonus = jobject.ContainsKey("skillDamagePermanentBonus") ? (int)jobject["skillDamagePermanentBonus"] : 0;
 		stageStartHealth = jobject.ContainsKey("stageStartHealth") ? (int)jobject["stageStartHealth"] : playerHealth;
 		playerAttack = (int)jobject["playerAttack"];
 		playerDefence = (int)jobject["playerDefence"];
@@ -83,6 +95,9 @@ public class DataJoeyPlayer : IData
 		jobject.Add("lastPlayerHealth", lastPlayerHealth);
 		jobject.Add("playerHealth", playerHealth);
 		jobject.Add("playerMaxHealth", playerMaxHealth);
+		jobject.Add("shurikenAutoAttackBonus", shurikenAutoAttackBonus);
+		jobject.Add("bareHandsAttackBonus", bareHandsAttackBonus);
+		jobject.Add("skillDamagePermanentBonus", skillDamagePermanentBonus);
 		jobject.Add("stageStartHealth", stageStartHealth);
 		jobject.Add("playerAttack", playerAttack);
 		jobject.Add("playerDefence", playerDefence);

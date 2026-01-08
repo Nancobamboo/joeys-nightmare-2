@@ -22,7 +22,7 @@ id   ,cardImage ,cardBackground,cardName            ,comment,type,description,at
 1021,Art/Img/Attack/魔法剑,Art/Img/Attack/img_bg_Attack,魔法剑,,attack,玩家每使用一张技能牌，当前武器牌攻击力增加3点,5,0,0,300,3,MagicSword:3
 1022,Art/Img/Attack/魔杖,Art/Img/Attack/img_bg_Attack,魔杖,,attack,攻击视作技能施放,3,0,0,0,1,MagicWand
 1023,Art/Img/Attack/骑士剑,Art/Img/Attack/img_bg_Attack,骑士剑,,attack,装备：使用次数+1  剩余次数:{durability},10,0,0,300,3,KnightSword_OnTop
-1024,Art/Img/Attack/img_card_Dart,Art/Img/Attack/img_bg_Attack,螺旋手里剑,,attack,手里剑 获得其他武器时:此牌进入环境并有概率永久+1攻击,6,0,0,200,2,SpiralShuriken
+1024,Art/Img/Attack/螺旋手里剑,Art/Img/Attack/img_bg_Attack,螺旋手里剑,,attack,手里剑 获得其他武器时:此牌进入环境并有概率永久+1攻击,6,0,0,200,2,SpiralShuriken
 1025,Art/Img/Attack/苦痛之刃,Art/Img/Attack/img_bg_Attack,苦痛之刃,诅咒,attack,攻击力为0的诅咒武器,0,0,0,0,1,
 ,,,,,,,,,,,,
 ,,,,,,,,,,,,

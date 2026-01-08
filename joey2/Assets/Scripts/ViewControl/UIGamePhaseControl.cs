@@ -259,6 +259,23 @@ public partial class UIGamePhaseControl : YViewControl
 		CheckGameOver();
 	}
 
+
+	/// <summary>
+	/// 遗物：皮糙肉厚 - 在没有护盾的情况下每次承受伤害，有50%概率永久+1生命上限
+	/// </summary>
+	private void TryTriggerThickSkinOnNoShieldDamage(bool noShieldThisHit, int damage)
+	{
+		if (!noShieldThisHit) return;
+		if (damage <= 0) return;
+		if (!DataSystem.Instance.HasRelic(ERelicType.ThickSkin)) return;
+		if (!ControlUtil.IsRandomSucceed(70)) return;
+
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		playerData.playerMaxHealth += 1;
+		// 与“桃/驴肉火烧”保持一致：提升生命上限后，同时用 AddHp 让当前生命值同步+1（且刷新UI）
+		YActionSystem.Instance.DispatchAction(EActionId.AddHp, 1);
+	}
+
 	private void CheckGameOver()
 	{
 		if (m_DataJoeyPlayer.playerHealth <= 0)
@@ -2284,6 +2301,11 @@ public partial class UIGamePhaseControl : YViewControl
 			SFX.PlayAudio("Audio/SFX/Battle/MonsterOnAttack", 1.0f, 0f);
 		}
 		ApplyPlayerHealthChange(-damage);
+
+		// 皮糙肉厚：本次若没有使用任何护盾（防御牌/武器格挡），且确实受到了伤害，则有概率永久+1生命上限
+		bool noShieldThisHit = defenceCardControl == null && !usedWeaponParry && defenceValue <= 0;
+		TryTriggerThickSkinOnNoShieldDamage(noShieldThisHit, damage);
+
 		OnAttackChanged(m_DataJoeyPlayer.playerAttack);
 		OnDefenceChanged(m_DataJoeyPlayer.playerDefence);
 
@@ -2364,6 +2386,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		ApplyPlayerHealthChange(-damage);
+		TryTriggerThickSkinOnNoShieldDamage(true, damage);
 	}
 
 	void TakePlayerNoDefenceDamage(object[] paraArray)
@@ -2382,6 +2405,7 @@ public partial class UIGamePhaseControl : YViewControl
 		}
 
 		ApplyPlayerHealthChange(-damage);
+		TryTriggerThickSkinOnNoShieldDamage(true, damage);
 	}
 
 
@@ -2407,6 +2431,15 @@ public partial class UIGamePhaseControl : YViewControl
 			}
 			// 奥术宝珠效果：每施放6次技能获得一张技能牌4013（魔力召唤）
 			TryArcaneOrbTrigger();
+
+			// 魔法进化（永久）：每次使用技能卡，10% 概率技能伤害永久 +1
+			if (DataSystem.Instance.HasRelic(ERelicType.MagicEvolution))
+			{
+				if (ControlUtil.IsRandomSucceed(10))
+				{
+					m_DataJoeyPlayer.skillDamagePermanentBonus += 1;
+				}
+			}
 		}
 		else if (cardType == ECardType.item)
 		{

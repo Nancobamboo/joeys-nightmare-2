@@ -552,6 +552,13 @@ public partial class DataSystem
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
 
+        // New run: reset shuriken auto-attack growth
+        dataJoeyPlayer.shurikenAutoAttackBonus = 0;
+        // New run: reset fist/bare-hands growth
+        dataJoeyPlayer.bareHandsAttackBonus = 0;
+        // New run: reset permanent skill damage growth
+        dataJoeyPlayer.skillDamagePermanentBonus = 0;
+
         // Apply latest growth unlocks before initializing run data
         ApplyGrowthUnlocks();
 
@@ -686,6 +693,13 @@ public partial class DataSystem
     public void InitEnvModeCharacterData(RoguelikeCharacter characterData)
     {
         DataJoeyPlayer dataJoeyPlayer = GetDataJoeyPlayer();
+
+        // New env run: reset shuriken auto-attack growth
+        dataJoeyPlayer.shurikenAutoAttackBonus = 0;
+        // New env run: reset fist/bare-hands growth
+        dataJoeyPlayer.bareHandsAttackBonus = 0;
+        // New env run: reset permanent skill damage growth
+        dataJoeyPlayer.skillDamagePermanentBonus = 0;
 
         // Apply latest growth unlocks before initializing env run data
         ApplyGrowthUnlocks();

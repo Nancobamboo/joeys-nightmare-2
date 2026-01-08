@@ -61,6 +61,10 @@ public enum ERelicType
 	CounterInsight = 9029,           // 看破
 	BareHandParry = 9030,            // 空手接白刃
 	BBQDelight = 9031,               // 烤肉香香
+	ThickSkin = 9032,                // 皮糙肉厚
+	ShurikenGrowth = 9033,           // 手里剑成长
+	FistGrowth = 9034,              // 拳王成长中
+	MagicEvolution = 9035,          // 魔法进化
 
 	CardLimitDebuff = 9999,
 }
