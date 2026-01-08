@@ -268,7 +268,7 @@ public partial class UIGamePhaseControl : YViewControl
 		if (!noShieldThisHit) return;
 		if (damage <= 0) return;
 		if (!DataSystem.Instance.HasRelic(ERelicType.ThickSkin)) return;
-		if (!ControlUtil.IsRandomSucceed(70)) return;
+		if (!ControlUtil.IsRandomSucceed(80)) return;
 
 		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
 		playerData.playerMaxHealth += 1;
@@ -2435,7 +2435,7 @@ public partial class UIGamePhaseControl : YViewControl
 			// 魔法进化（永久）：每次使用技能卡，10% 概率技能伤害永久 +1
 			if (DataSystem.Instance.HasRelic(ERelicType.MagicEvolution))
 			{
-				if (ControlUtil.IsRandomSucceed(10))
+				if (ControlUtil.IsRandomSucceed(5))
 				{
 					m_DataJoeyPlayer.skillDamagePermanentBonus += 1;
 				}

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class YBareHands : YCardEffect
 {
-    private const int FIST_GROWTH_RATIO = 25; // percent
+    private const int FIST_GROWTH_RATIO = 20; // percent
     private int m_AppliedGrowthBonus = 0;
 
     public YBareHands()
@@ -49,7 +49,7 @@ public class YBareHands : YCardEffect
 
     public override float OnKill()
     {
-        // 拳王成长中：用赤手空拳(包含拳套等)每次击杀，有25%概率拳头攻击永久+1
+        // 拳王成长中：用赤手空拳(包含拳套等)每次击杀，有20%概率拳头攻击永久+1
         if (DataSystem.Instance != null && DataSystem.Instance.HasRelic(ERelicType.FistGrowth))
         {
             if (ControlUtil.IsRandomSucceed(FIST_GROWTH_RATIO))
