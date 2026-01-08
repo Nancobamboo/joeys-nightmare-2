@@ -66,13 +66,15 @@ public partial class UIGamePhaseControl
   /// </summary>
   private int ApplySkillDamageBonus(int baseDamage, EEffectType effectType)
   {
-    if (IsSkillDamageType(effectType) && m_SkillDamageBonus > 0)
+    int permanentBonus = m_DataJoeyPlayer != null ? m_DataJoeyPlayer.skillDamagePermanentBonus : 0;
+
+    if (IsSkillDamageType(effectType) && (m_SkillDamageBonus > 0 || permanentBonus > 0))
     {
-      int finalDamage = baseDamage + m_SkillDamageBonus;
-      Debug.Log($"SkillPowerUp: Applied bonus {m_SkillDamageBonus} to {effectType}, final damage: {finalDamage}");
+      int finalDamage = baseDamage + m_SkillDamageBonus + permanentBonus;
+      Debug.Log($"SkillDamageBonus: Applied temp={m_SkillDamageBonus}, perm={permanentBonus} to {effectType}, final damage: {finalDamage}");
       
       // 标记需要延迟清除，并启动延迟清除任务
-      if (!m_SkillDamageBonusPendingClear)
+      if (m_SkillDamageBonus > 0 && !m_SkillDamageBonusPendingClear)
       {
         m_SkillDamageBonusPendingClear = true;
         ClearSkillDamageBonusDelayed().Forget();

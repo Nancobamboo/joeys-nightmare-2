@@ -50,12 +50,14 @@ public partial class UIGamePhaseControl
 {
 	public async UniTask AttackRandomEnemy(int damage, int attackTime)
 	{
-		if (DataSystem.Instance.HasRelic(ERelicType.ShurikenMastery))
-		{
-			damage += 2;
-		}
+		DataJoeyPlayer playerData = DataSystem.Instance.GetDataJoeyPlayer();
+		bool hasMastery = DataSystem.Instance.HasRelic(ERelicType.ShurikenMastery);
+		bool hasGrowth = DataSystem.Instance.HasRelic(ERelicType.ShurikenGrowth);
+		int hitDamage = damage;
+		if (hasMastery) hitDamage += 2;
+		if (playerData != null) hitDamage += playerData.shurikenAutoAttackBonus;
 
-		if (damage <= 0)
+		if (hitDamage <= 0)
 		{
 			return;
 		}
@@ -75,7 +77,13 @@ public partial class UIGamePhaseControl
 		Debug.Log("AttackRandomEnemy: attackTime = " + attackTime);
 		for (int i = 0; i < attackTime; i++)
 		{
-			bool isKilled = await DealDamageToEnvCard(enemyCardControl, damage, envIndex, EEffectType.Damage, default);
+			bool isKilled = await DealDamageToEnvCard(enemyCardControl, hitDamage, envIndex, EEffectType.Damage, default);
+
+			// 手里剑成长：每次触发一次手里剑自动攻击，有10%概率永久+1自动攻击伤害
+			if (hasGrowth && playerData != null && ControlUtil.IsRandomSucceed(10))
+			{
+				playerData.shurikenAutoAttackBonus += 1;
+			}
 
 			if (isKilled)
 			{
