@@ -79,8 +79,8 @@ public partial class UIGamePhaseControl
 		{
 			bool isKilled = await DealDamageToEnvCard(enemyCardControl, hitDamage, envIndex, EEffectType.Damage, default);
 
-			// 手里剑成长：每次触发一次手里剑自动攻击，有10%概率永久+1自动攻击伤害
-			if (hasGrowth && playerData != null && ControlUtil.IsRandomSucceed(10))
+			// 手里剑成长：每次触发一次手里剑自动攻击，有7%概率永久+1自动攻击伤害
+			if (hasGrowth && playerData != null && ControlUtil.IsRandomSucceed(7))
 			{
 				playerData.shurikenAutoAttackBonus += 1;
 			}
