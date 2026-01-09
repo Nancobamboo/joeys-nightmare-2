@@ -30,8 +30,8 @@ id   ,cardImage ,iconImage,name,description,stars
 9029,Art\Img\Relic\img_relic_看破,Art\Img\Relic\icon_relic_看破,看破,当被怪物攻击5次后，下次将躲闪并反击，没有装备防具时计数翻倍,3
 9030,Art\Img\Relic\img_relic_空手接白刃,Art\Img\Relic\icon_relic_空手接白刃,空手接白刃,当没有装备武器牌和防御牌时，格挡一半伤害,3
 9031,Art\Img\Relic\img_relic_烤肉香香,Art\Img\Relic\icon_relic_烤肉香香,烤肉香香,关卡结束时，回复6点生命值,1
-9032,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,皮糙肉厚,在没有护盾的情况下每次承受伤害，有小概率永久增加1生命上限,2
-9033,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,忍者进化,每触发一次手里剑自动攻击，有小概率使手里剑自动攻击伤害永久+1,2
-9034,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,拳王进化,用赤手空拳(包含拳套)每次击杀，有小概率拳头攻击永久+1,2
-9035,Art\Img\Relic\img_relic_attack,Art\Img\Relic\icon_relic_attack,魔法进化,每次使用技能卡，有小概率使技能伤害永久+1,2
+9032,Art\Img\Relic\img_relic_皮糙肉厚,Art\Img\Relic\icon_relic_皮糙肉厚,皮糙肉厚,在没有护盾的情况下每次承受伤害，有小概率永久增加1生命上限,2
+9033,Art\Img\Relic\img_relic_忍者进化,Art\Img\Relic\icon_relic_忍者进化,忍者进化,每触发一次手里剑自动攻击，有小概率使手里剑自动攻击伤害永久+1,2
+9034,Art\Img\Relic\img_relic_拳王进化,Art\Img\Relic\icon_relic_拳王进化,拳王进化,用赤手空拳(包含拳套)每次击杀，有小概率拳头攻击永久+1,2
+9035,Art\Img\Relic\img_relic_魔法进化,Art\Img\Relic\icon_relic_魔法进化,魔法进化,每次使用技能卡，有小概率使技能伤害永久+1,2
 9999,Art/Img/Relic/卡牌超载,Art/Img/Relic/卡牌超载,卡牌超载,卡牌超过{cardLimit}张上限（当前{currentCount}张），多出的卡牌无法加入关卡,1
